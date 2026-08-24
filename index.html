@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Classroom App - Trợ Lý AI Bộ Môn Công Nghệ & Hướng Nghiệp</title>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Tailwind Configuration for Scientific Theme -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              dark: '#0f172a',
+              card: '#1e293b',
+              emerald: '#059669',
+              cyan: '#0891b2',
+              slate: '#f8fafc'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- React & Babel CDN -->
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Chart.js CDN for Analytics -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    body { font-family: 'Inter', sans-serif; background-color: #f8fafc; color: #0f172a; }
+    .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    .markdown-preview pre { background-color: #0f172a; color: #e2e8f0; padding: 1rem; border-radius: 0.5rem; overflow-x: auto; }
+    .markdown-preview h1 { font-size: 1.5rem; font-weight: 700; color: #059669; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.5rem; margin-top: 1rem; margin-bottom: 0.75rem; }
+    .markdown-preview h2 { font-size: 1.25rem; font-weight: 600; color: #0891b2; margin-top: 1rem; margin-bottom: 0.5rem; }
+    .markdown-preview h3 { font-size: 1.1rem; font-weight: 600; color: #334155; margin-top: 0.75rem; margin-bottom: 0.25rem; }
+  </style>
+</head>
+<body class="bg-slate-50 min-h-screen text-slate-900">
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect, useRef } = React;
+
+    // Mock Data Models
+    const INITIAL_LESSONS = [
+      {
+        id: '1',
+        title: 'Kế hoạch bài dạy: Quy trình thiết kế kỹ thuật',
+        gradeLevel: 8,
+        subjectModule: 'Công nghệ',
+        topicName: 'Thiết kế kỹ thuật',
+        durationPeriods: 2,
+        contentMarkdown: `# BÀI DẠY: QUY TRÌNH THIẾT KẾ KỸ THUẬT (LỚP 8)\n- Môn học: Công nghệ\n- Thời lượng: 2 tiết\n\n## I. MỤC TIÊU BÀI HỌC\n1. Kiến thức: Trình bày được các bước chính trong quy trình thiết kế kỹ thuật.\n2. Năng lực: Vận dụng quy trình thiết kế để đề xuất sản phẩm học tập đơn giản.\n3. Phẩm chất: Cẩn thận, làm việc nhóm khoa học.\n\n## II. THIẾT BỊ DẠY HỌC VÀ HỌC LIỆU\n1. Giáo viên: Kế hoạch bài dạy, máy chiếu, sơ đồ quy trình 5 bước.\n2. Học sinh: SGK Công nghệ 8, phiếu học tập số 1.\n\n## III. TIẾN TRÌNH DẠY HỌC (CÔNG VĂN 5512)\n### HOẠT ĐỘNG 1: MỞ ĐẦU (KHỞI ĐỘNG - 5-7 phút)\na) Mục tiêu: Tạo nhu cầu tìm hiểu về cách thiết kế chiếc hộp đựng dụng cụ học tập.\nb) Nội dung: GV giao nhiệm vụ quan sát 2 mẫu hộp khác nhau.\nc) Sản phẩm: Đề xuất cải tiến của HS.\nd) Tổ chức thực hiện: GV nêu vấn đề -> HS thảo luận cặp đôi -> GV kết luận dẫn dắt vào bài.\n\n### HOẠT ĐỘNG 2: HÌNH THÀNH KIẾN THỨC MỚI (20 phút)\na) Mục tiêu: Học sinh tìm hiểu 5 bước thiết kế kỹ thuật.\nb) Nội dung: Đọc SGK, phân tích ví dụ thiết kế quạt mini.\nc) Sản phẩm: Sơ đồ tư duy 5 bước thiết kế.\nd) Tổ chức thực hiện: Nhóm 4 HS thảo luận và trình bày bảng phụ.\n\n### HOẠT ĐỘNG 3: LUYỆN TẬP (10 phút)\na) Mục tiêu: Củng cố thứ tự các bước.\nb) Nội dung: Trả lời câu hỏi trắc nghiệm tương tác.\nc) Sản phẩm: Đáp án trên phiếu bài tập.\n\n### HOẠT ĐỘNG 4: VẬN DỤNG (5 phút)\na) Mục tiêu: Vận dụng thiết kế đồ dùng tái chế tại nhà.\nb) Nội dung: Giao nhiệm vụ phác thảo ý tưởng chậu cây từ chai nhựa.\nc) Sản phẩm: Bản vẽ phác nộp vào tiết sau.`,
+        createdAt: '2026-08-24 14:20'
+      },
+      {
+        id: '2',
+        title: 'KHBD: Khám phá bản thân & Chọn nghề tương lai',
+        gradeLevel: 9,
+        subjectModule: 'Hoạt động trải nghiệm, hướng nghiệp',
+        topicName: 'Định hướng nghề nghiệp',
+        durationPeriods: 3,
+        contentMarkdown: `# BÀI DẠY: KHÁM PHÁ BẢN THÂN VÀ ĐỊNH HƯỚNG NGHỀ NGHIỆP (LỚP 9)\n- Môn học: Hoạt động trải nghiệm, hướng nghiệp\n- Thời lượng: 3 tiết\n\n## I. MỤC TIÊU BÀI HỌC\n- Nhận diện sở thích, năng lực cá nhân và yêu cầu của thị trường lao động hiện đại.\n- Xây dựng kế hoạch rèn luyện bản thân thích ứng với các ngành nghề kỹ thuật - công nghệ.\n\n## II. TIẾN TRÌNH DẠY HỌC\n### HOẠT ĐỘNG 1: MỞ ĐẦU - Trò chơi "Tôi là ai trong tương lai?"\n### HOẠT ĐỘNG 2: Khám phá các nhóm ngành nghề kỹ thuật phổ biến.\n### HOẠT ĐỘNG 3: Thực hành làm trắc nghiệm định hướng Holland.\n### HOẠT ĐỘNG 4: Lập sơ đồ cây nghề nghiệp cá nhân.`,
+        createdAt: '2026-08-23 09:15'
+      }
+    ];
+
+    const INITIAL_MATERIALS = [
+      { id: 'm1', title: 'Slide Bài giảng: Quy trình thiết kế 3D', category: 'SLIDE', grade: 8, size: '14.2 MB', type: 'PPTX', downloads: 84 },
+      { id: 'm2', title: 'Đề thi Giữa kỳ 1 Môn Công nghệ 8 (Có ma trận)', category: 'EXAM', grade: 8, size: '245 KB', type: 'DOCX', downloads: 156 },
+      { id: 'm3', title: 'Bản vẽ kỹ thuật CAD mô hình quạt gió', category: 'CAD_DRAWING', grade: 9, size: '4.8 MB', type: 'DWG', downloads: 62 },
+      { id: 'm4', title: 'Video thực hành: Ghép nối mạch điện điều khiển', category: 'VIDEO', grade: 9, size: '128 MB', type: 'MP4', downloads: 93 }
+    ];
+
+    const INITIAL_QUESTIONS = [
+      {
+        id: 1,
+        question: 'Trong quy trình thiết kế kỹ thuật (Môn Công nghệ lớp 8), bước đầu tiên cần thực hiện là gì?',
+        options: [
+          'A. Xây dựng bản vẽ chi tiết sản phẩm',
+          'B. Xác định vấn đề và đặt ra yêu cầu thiết kế',
+          'C. Thử nghiệm và đánh giá chất lượng',
+          'D. Chế tạo mẫu thử nghiệm'
+        ],
+        answer: 1,
+        level: 'Nhận biết',
+        explain: 'Bước 1 luôn là xác định rõ vấn đề và nhu cầu cần giải quyết bằng giải pháp kỹ thuật.'
+      },
+      {
+        id: 2,
+        question: 'Năng lực đặc thù nào sau đây là trọng tâm phát triển của môn Công nghệ GDPT 2018?',
+        options: [
+          'A. Năng lực thiết kế kỹ thuật và giao tiếp công nghệ',
+          'B. Năng lực vận động thể thao',
+          'C. Năng lực sáng tác nhạc lý',
+          'D. Năng lực dịch thuật văn học'
+        ],
+        answer: 0,
+        level: 'Thông hiểu',
+        explain: 'Môn Công nghệ hình thành 4 thành phần năng lực công nghệ: Nhận thức, Giao tiếp, Sử dụng và Thiết kế.'
+      }
+    ];
+
+    function App() {
+      const [activeTab, setActiveTab] = useState('AI_GENERATOR'); // 'DASHBOARD', 'AI_GENERATOR', 'EXAM_GENERATOR', 'MATERIALS', 'STATS', 'DATABASE_VIEW'
+      const [lessons, setLessons] = useState(INITIAL_LESSONS);
+      const [materials, setMaterials] = useState(INITIAL_MATERIALS);
+      const [selectedLesson, setSelectedLesson] = useState(INITIAL_LESSONS[0]);
+
+      // Form Generator State
+      const [topicInput, setTopicInput] = useState('Trồng trọt công nghệ cao & Mô hình nhà kính');
+      const [gradeSelect, setGradeSelect] = useState(8);
+      const [subjectSelect, setSubjectSelect] = useState('Công nghệ');
+      const [periodsSelect, setPeriodsSelect] = useState(2);
+      const [isGenerating, setIsGenerating] = useState(false);
+      const [generatedStreamText, setGeneratedStreamText] = useState('');
+      const [filterCategory, setFilterCategory] = useState('ALL');
+      const [showUploadModal, setShowUploadModal] = useState(false);
+
+      // Effect to initialize Lucide icons
+      useEffect(() => {
+        if (window.lucide) {
+          window.lucide.createIcons();
+        }
+      }, [activeTab, lessons, isGenerating, generatedStreamText, showUploadModal]);
+
+      // AI Lesson Plan Streaming Generator Handler
+      const handleGenerateLesson = () => {
+        setIsGenerating(true);
+        setGeneratedStreamText('');
+
+        const promptTemplate = `# BÀI DẠY: ${topicInput.toUpperCase()} (LỚP ${gradeSelect})\n- Môn học: ${subjectSelect}\n- Thời lượng: ${periodsSelect} tiết\n\n## I. MỤC TIÊU BÀI HỌC\n1. Kiến thức: Nêu được khái niệm ${topicInput}, ưu điểm của mô hình ứng dụng công nghệ cao trong thực tiễn.\n2. Năng lực:\n   - Năng lực Công nghệ: Nhận thức các thiết bị cảm biến, hệ thống tưới tự động trong nhà kính.\n   - Năng lực chung: Giao tiếp & Hợp tác nhóm khi thiết kế mô hình.\n3. Phẩm chất: Yêu thiên nhiên, có ý thức ứng dụng công nghệ bảo vệ môi trường.\n\n## II. THIẾT BỊ DẠY HỌC VÀ HỌC LIỆU\n- Máy chiếu, video mô phỏng nhà kính thông minh, phiếu học tập nhóm.\n\n## III. TIẾN TRÌNH DẠY HỌC (CÔNG VĂN 5512)\n\n### HOẠT ĐỘNG 1: MỞ ĐẦU (KHỞI ĐỘNG - 7 phút)\na) Mục tiêu: Kích thích tò mò về sự khác biệt giữa nông nghiệp truyền thống và công nghệ cao.\nb) Nội dung: Xem clip 2 phút về nông trại thẳng đứng tại Singapore.\nc) Sản phẩm: Câu trả lời thảo luận của đại diện các nhóm.\nd) Tổ chức thực hiện:\n   - Bước 1 (Giao nhiệm vụ): GV chiếu clip và đặt câu hỏi: "Tại sao không cần đất vẫn trồng được rau sạch?"\n   - Bước 2 (Thực hiện): HS quan sát, trao đổi cặp đôi.\n   - Bước 3 (Báo cáo): 2-3 cặp HS xung phong phát biểu.\n   - Bước 4 (Kết luận): GV nhận xét, chốt kiến thức dẫn dắt vào bài mới.\n\n### HOẠT ĐỘNG 2: HÌNH THÀNH KIẾN THỨC MỚI (20 phút)\na) Mục tiêu: Khám phá cấu tạo hệ thống tưới nhỏ giọt & điều hòa nhiệt độ trong nhà kính.\nb) Nội dung: Đọc SGK mục 2, thảo luận hoàn thành phiếu học tập số 1.\nc) Sản phẩm: Phiếu học tập đã điền đầy đủ các bộ phận chính.\nd) Tổ chức thực hiện: Chia lớp thành 4 nhóm tương ứng 4 góc trải nghiệm.\n\n### HOẠT ĐỘNG 3: LUYỆN TẬP (10 phút)\na) Mục tiêu: Củng cố nguyên lý vận hành của cảm biến độ ẩm.\nb) Nội dung: Giải quyết tình huống giả định khi thời tiết nắng nóng kéo dài.\nc) Sản phẩm: Đề xuất phương án tự động bật máy phun sương.\n\n### HOẠT ĐỘNG 4: VẬN DỤNG (5 phút)\na) Mục tiêu: Đề xuất ý tưởng mô hình trồng cây thủy canh tại góc học tập.\nb) Nội dung: Giao bài tập dự án nhóm làm tại nhà.\nc) Sản phẩm: Bản vẽ thiết kế mô hình nộp vào tuần sau.`;
+
+        const lines = promptTemplate.split('\n');
+        let currentText = '';
+        let index = 0;
+
+        const interval = setInterval(() => {
+          if (index < lines.length) {
+            currentText += lines[index] + '\n';
+            setGeneratedStreamText(currentText);
+            index++;
+          } else {
+            clearInterval(interval);
+            setIsGenerating(false);
+            // Auto save to lesson list
+            const newLesson = {
+              id: Date.now().toString(),
+              title: `KHBD: ${topicInput}`,
+              gradeLevel: Number(gradeSelect),
+              subjectModule: subjectSelect,
+              topicName: topicInput,
+              durationPeriods: Number(periodsSelect),
+              contentMarkdown: currentText,
+              createdAt: new Date().toISOString().slice(0, 16).replace('T', ' ')
+            };
+            setLessons(prev => [newLesson, ...prev]);
+            setSelectedLesson(newLesson);
+          }
+        }, 60);
+      };
+
+      // Export Word Function
+      const exportToWord = (plan) => {
+        const textContent = `TRƯỜNG THCS / THPT CHUYÊN\nTỔ MÔN: CÔNG NGHỆ - HƯỚNG NGHIỆP\n\n${plan.contentMarkdown}`;
+        const blob = new Blob([textContent], { type: 'application/msword;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${plan.title.replace(/\s+/g, '_')}.doc`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      };
+
+      // Export PDF Function
+      const exportToPdf = (plan) => {
+        const win = window.open('', '_blank');
+        win.document.write(`
+          <html>
+            <head>
+              <title>${plan.title}</title>
+              <style>
+                body { font-family: 'Times New Roman', serif; padding: 40px; line-height: 1.6; }
+                h1 { text-align: center; font-size: 18pt; text-transform: uppercase; color: #059669; }
+                h2 { font-size: 14pt; color: #0891b2; border-bottom: 2px solid #059669; padding-bottom: 4px; }
+                pre { font-family: 'Times New Roman', serif; white-space: pre-wrap; font-size: 13pt; }
+              </style>
+            </head>
+            <body>
+              <h1>KẾ HOẠCH BÀI DẠY (CÔNG VĂN 5512)</h1>
+              <pre>${plan.contentMarkdown}</pre>
+              <script>window.onload = function() { window.print(); }<\/script>
+            </body>
+          </html>
+        `);
+        win.document.close();
+      };
+
+      return (
+        <div className="flex flex-col min-h-screen">
+          {/* TOP NAVBAR - SCIENTIFIC SLATE STYLE */}
+          <header className="bg-slate-900 text-white border-b border-slate-800 sticky top-0 z-50 shadow-md">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                <div className="bg-emerald-600 p-2 rounded-lg text-white font-bold flex items-center justify-center">
+                  <i data-lucide="cpu" className="w-6 h-6"></i>
+                </div>
+                <div>
+                  <h1 className="font-bold text-lg leading-tight tracking-wide flex items-center gap-2">
+                    Classroom App <span className="bg-emerald-500/20 text-emerald-400 text-xs px-2 py-0.5 rounded-full border border-emerald-500/30">AI Assistant</span>
+                  </h1>
+                  <p className="text-xs text-slate-400">Trợ lý AI Bộ Môn Công Nghệ & Hoạt Động Trải Nghiệm - Hướng Nghiệp</p>
+                </div>
+              </div>
+
+              {/* Status Indicators representing Architecture Diagram */}
+              <div className="hidden md:flex items-center space-x-6 text-xs text-slate-300">
+                <div className="flex items-center gap-1.5 bg-slate-800 px-3 py-1.5 rounded-md border border-slate-700">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                  <span>Vercel Edge CDN & API</span>
+                </div>
+                <div className="flex items-center gap-1.5 bg-slate-800 px-3 py-1.5 rounded-md border border-slate-700">
+                  <i data-lucide="shield-check" className="w-4 h-4 text-cyan-400"></i>
+                  <span>Supabase Auth Guard (Active)</span>
+                </div>
+                <div className="flex items-center gap-2 border-l border-slate-700 pl-4">
+                  <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150" className="w-8 h-8 rounded-full border border-emerald-500" />
+                  <div className="text-left">
+                    <p className="font-semibold text-white">Thầy Nguyễn Văn An</p>
+                    <p className="text-[10px] text-slate-400">Giáo viên Công nghệ</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </header>
+
+          <div className="flex-1 flex max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 gap-6">
+            {/* SIDEBAR NAVIGATION */}
+            <aside className="w-64 bg-white rounded-xl border border-slate-200 shadow-sm p-4 flex flex-col justify-between hidden md:flex">
+              <div className="space-y-1">
+                <div className="px-3 py-2 text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                  Chức năng chính
+                </div>
+                <button
+                  onClick={() => setActiveTab('AI_GENERATOR')}
+                  className={`w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                    activeTab === 'AI_GENERATOR' ? 'bg-emerald-50 text-emerald-700 font-semibold border-l-4 border-emerald-600' : 'text-slate-600 hover:bg-slate-50'
+                  }`}
+                >
+                  <i data-lucide="sparkles" className="w-4 h-4 text-emerald-600"></i>
+                  <span>Trợ Lý AI Soạn KHBD 5512</span>
+                </button>
+                <button
+                  onClick={() => setActiveTab('EXAM_GENERATOR')}
+                  className={`w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                    activeTab === 'EXAM_GENERATOR' ? 'bg-emerald-50 text-emerald-700 font-semibold border-l-4 border-emerald-600' : 'text-slate-600 hover:bg-slate-50'
+                  }`}
+                >
+                  <i data-lucide="file-check-2" className="w-4 h-4 text-cyan-600"></i>
+                  <span>Tạo Đề Thi & Câu Hỏi</span>
+                </button>
+                <button
+                  onClick={() => setActiveTab('MATERIALS')}
+                  className={`w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                    activeTab === 'MATERIALS' ? 'bg-emerald-50 text-emerald-700 font-semibold border-l-4 border-emerald-600' : 'text-slate-600 hover:bg-slate-50'
+                  }`}
+                >
+                  <i data-lucide="folder-open" className="w-4 h-4 text-amber-600"></i>
+                  <span>Thư Viện Học Liệu</span>
+                </button>
+                <button
+                  onClick={() => setActiveTab('STATS')}
+                  className={`w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                    activeTab === 'STATS' ? 'bg-emerald-50 text-emerald-700 font-semibold border-l-4 border-emerald-600' : 'text-slate-600 hover:bg-slate-50'
+                  }`}
+                >
+                  <i data-lucide="bar-chart-3" className="w-4 h-4 text-indigo-600"></i>
+                  <span>Báo Cáo & Thống Kê</span>
+                </button>
+
+                <div className="pt-4 px-3 py-2 text-xs font-semibold text-slate-400 uppercase tracking-wider border-t border-slate-100">
+                  Cơ Sở Dữ Liệu Cloud
+                </div>
+                <button
+                  onClick={() => setActiveTab('DATABASE_VIEW')}
+                  className={`w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                    activeTab === 'DATABASE_VIEW' ? 'bg-slate-100 text-slate-900 font-semibold' : 'text-slate-600 hover:bg-slate-50'
+                  }`}
+                >
+                  <i data-lucide="database" className="w-4 h-4 text-slate-700"></i>
+                  <span>Supabase PostgreSQL Schema</span>
+                </button>
+              </div>
+
+              {/* Architecture Info Box */}
+              <div className="bg-slate-900 text-slate-300 p-3 rounded-lg text-xs space-y-2 border border-slate-800">
+                <div className="flex items-center gap-1.5 font-bold text-emerald-400">
+                  <i data-lucide="layers" className="w-3.5 h-3.5"></i>
+                  <span>Kiến trúc Sơ đồ 4 Tầng</span>
+                </div>
+                <p className="text-[11px] text-slate-400 leading-snug">
+                  Đã kết nối React Frontend + Vercel Edge + AI Controller + Supabase PostgreSQL & Storage.
+                </p>
+              </div>
+            </aside>
+
+            {/* MAIN CONTENT AREA */}
+            <main className="flex-1 space-y-6">
+
+              {/* TAB 1: AI LESSON PLAN GENERATOR (CÔNG VĂN 5512) */}
+              {activeTab === 'AI_GENERATOR' && (
+                <div className="space-y-6">
+                  {/* Form input card */}
+                  <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
+                    <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                      <div className="flex items-center space-x-2">
+                        <div className="bg-emerald-100 text-emerald-700 p-2 rounded-lg">
+                          <i data-lucide="bot" className="w-5 h-5"></i>
+                        </div>
+                        <div>
+                          <h2 className="font-bold text-slate-800 text-base">Trợ Lý AI Soạn Kế Hoạch Bài Dạy (Công văn 5512)</h2>
+                          <p className="text-xs text-slate-500">Tự động hóa 100% cấu trúc 4 hoạt động dạy học chuẩn GDPT 2018</p>
+                        </div>
+                      </div>
+                      <span className="text-xs bg-cyan-50 text-cyan-700 font-medium px-2.5 py-1 rounded-full border border-cyan-200">
+                        Model: Gemini 1.5 Flash API
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                      <div className="md:col-span-2">
+                        <label className="block text-xs font-semibold text-slate-700 mb-1">Tên Bài dạy / Chủ đề bài học</label>
+                        <input
+                          type="text"
+                          value={topicInput}
+                          onChange={(e) => setTopicInput(e.target.value)}
+                          className="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white"
+                          placeholder="Nhập tên bài học (vd: Quy trình thiết kế kỹ thuật...)"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-semibold text-slate-700 mb-1">Phân môn học</label>
+                        <select
+                          value={subjectSelect}
+                          onChange={(e) => setSubjectSelect(e.target.value)}
+                          className="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white"
+                        >
+                          <option value="Công nghệ">Công nghệ</option>
+                          <option value="Hoạt động trải nghiệm, hướng nghiệp">HDTN, Hướng nghiệp</option>
+                        </select>
+                      </div>
+                      <div className="grid grid-cols-2 gap-2">
+                        <div>
+                          <label className="block text-xs font-semibold text-slate-700 mb-1">Khối lớp</label>
+                          <select
+                            value={gradeSelect}
+                            onChange={(e) => setGradeSelect(Number(e.target.value))}
+                            className="w-full px-2 py-2 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                          >
+                            {[6,7,8,9,10,11,12].map(g => <option key={g} value={g}>Lớp {g}</option>)}
+                          </select>
+                        </div>
+                        <div>
+                          <label className="block text-xs font-semibold text-slate-700 mb-1">Số tiết</label>
+                          <select
+                            value={periodsSelect}
+                            onChange={(e) => setPeriodsSelect(Number(e.target.value))}
+                            className="w-full px-2 py-2 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                          >
+                            {[1,2,3,4].map(p => <option key={p} value={p}>{p} tiết</option>)}
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex justify-end pt-2">
+                      <button
+                        onClick={handleGenerateLesson}
+                        disabled={isGenerating || !topicInput.trim()}
+                        className="bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-sm px-5 py-2.5 rounded-lg flex items-center space-x-2 shadow-sm transition-all disabled:opacity-50"
+                      >
+                        {isGenerating ? (
+                          <>
+                            <i data-lucide="loader-2" className="w-4 h-4 animate-spin"></i>
+                            <span>AI Đang Soạn Giáo Án 5512...</span>
+                          </>
+                        ) : (
+                          <>
+                            <i data-lucide="sparkles" className="w-4 h-4"></i>
+                            <span>Tạo Giáo Án Chuẩn CV 5512</span>
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Main view split: History List & Active Markdown Preview */}
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    {/* Left List of saved plans */}
+                    <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-4 space-y-3">
+                      <h3 className="font-bold text-xs uppercase tracking-wider text-slate-500 flex items-center justify-between">
+                        <span>Danh Sách Giáo Án ({lessons.length})</span>
+                        <i data-lucide="file-text" className="w-4 h-4 text-emerald-600"></i>
+                      </h3>
+                      <div className="space-y-2 max-h-[500px] overflow-y-auto custom-scrollbar">
+                        {lessons.map(lesson => (
+                          <div
+                            key={lesson.id}
+                            onClick={() => setSelectedLesson(lesson)}
+                            className={`p-3 rounded-lg border text-left cursor-pointer transition-all ${
+                              selectedLesson?.id === lesson.id
+                                ? 'border-emerald-500 bg-emerald-50/50 shadow-sm'
+                                : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50'
+                            }`}
+                          >
+                            <h4 className="font-semibold text-xs text-slate-800 line-clamp-2">{lesson.title}</h4>
+                            <div className="flex items-center justify-between text-[11px] text-slate-500 mt-2">
+                              <span className="bg-slate-100 text-slate-700 px-2 py-0.5 rounded">Lớp {lesson.gradeLevel} • {lesson.durationPeriods} tiết</span>
+                              <span>{lesson.createdAt}</span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Right Lesson Plan Content Viewer */}
+                    <div className="lg:col-span-2 bg-white rounded-xl border border-slate-200 shadow-sm p-6 space-y-4">
+                      {isGenerating ? (
+                        <div className="space-y-4">
+                          <div className="flex items-center gap-2 text-emerald-600 font-semibold text-sm">
+                            <i data-lucide="sparkles" className="w-4 h-4 animate-spin"></i>
+                            <span>AI Assistants Controller đang khởi tạo luồng câu lệnh...</span>
+                          </div>
+                          <div className="bg-slate-900 text-slate-200 p-4 rounded-lg font-mono text-xs max-h-[500px] overflow-y-auto custom-scrollbar whitespace-pre-wrap border border-slate-800">
+                            {generatedStreamText}
+                          </div>
+                        </div>
+                      ) : selectedLesson ? (
+                        <div className="space-y-4">
+                          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-4">
+                            <div>
+                              <span className="text-xs font-semibold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">
+                                {selectedLesson.subjectModule} - Lớp {selectedLesson.gradeLevel}
+                              </span>
+                              <h3 className="font-bold text-lg text-slate-900 mt-1">{selectedLesson.title}</h3>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              <button
+                                onClick={() => exportToWord(selectedLesson)}
+                                className="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold px-3 py-2 rounded-lg flex items-center space-x-1.5 transition-colors"
+                              >
+                                <i data-lucide="download" className="w-3.5 h-3.5 text-blue-600"></i>
+                                <span>Xuất File Word (.doc)</span>
+                              </button>
+                              <button
+                                onClick={() => exportToPdf(selectedLesson)}
+                                className="bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold px-3 py-2 rounded-lg flex items-center space-x-1.5 transition-colors"
+                              >
+                                <i data-lucide="printer" className="w-3.5 h-3.5 text-emerald-400"></i>
+                                <span>In / Xuất PDF</span>
+                              </button>
+                            </div>
+                          </div>
+
+                          <div className="bg-slate-50 p-6 rounded-lg border border-slate-200 max-h-[550px] overflow-y-auto custom-scrollbar markdown-preview text-sm leading-relaxed">
+                            <pre className="font-sans text-slate-800 bg-transparent p-0 text-sm whitespace-pre-wrap">{selectedLesson.contentMarkdown}</pre>
+                          </div>
+                        </div>
+                      ) : null}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* TAB 2: EXAM GENERATOR & QUESTION BANK */}
+              {activeTab === 'EXAM_GENERATOR' && (
+                <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6 space-y-6">
+                  <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+                    <div>
+                      <h2 className="font-bold text-slate-800 text-base flex items-center gap-2">
+                        <i data-lucide="file-check-2" className="w-5 h-5 text-cyan-600"></i>
+                        <span>Ngân Hàng Câu Hỏi & Tạo Ma Trận Đề Kiểm Tra GDPT 2018</span>
+                      </h2>
+                      <p className="text-xs text-slate-500">Tự động phân loại 4 cấp độ tư duy: Nhận biết, Thông hiểu, Vận dụng, Vận dụng cao</p>
+                    </div>
+                    <button className="bg-cyan-600 hover:bg-cyan-700 text-white text-xs font-semibold px-4 py-2 rounded-lg flex items-center gap-2">
+                      <i data-lucide="plus" className="w-4 h-4"></i>
+                      <span>Tạo Đề Kiểm Tra Mới</span>
+                    </button>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div className="bg-cyan-50 border border-cyan-200 p-4 rounded-xl">
+                      <p className="text-xs font-medium text-cyan-700">Tổng Số Câu Hỏi</p>
+                      <p className="text-2xl font-bold text-cyan-900 mt-1">128 Câu</p>
+                    </div>
+                    <div className="bg-emerald-50 border border-emerald-200 p-4 rounded-xl">
+                      <p className="text-xs font-medium text-emerald-700">Môn Công Nghệ</p>
+                      <p className="text-2xl font-bold text-emerald-900 mt-1">84 Câu</p>
+                    </div>
+                    <div className="bg-amber-50 border border-amber-200 p-4 rounded-xl">
+                      <p className="text-xs font-medium text-amber-700">Môn Hướng Nghiệp</p>
+                      <p className="text-2xl font-bold text-amber-900 mt-1">44 Câu</p>
+                    </div>
+                    <div className="bg-slate-100 border border-slate-200 p-4 rounded-xl">
+                      <p className="text-xs font-medium text-slate-700">Đã Tạo Ma Trận</p>
+                      <p className="text-2xl font-bold text-slate-900 mt-1">14 Đề</p>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4">
+                    <h3 className="font-bold text-sm text-slate-800">Xem Trước Câu Hỏi Mẫu Trong Ngân Hàng:</h3>
+                    {INITIAL_QUESTIONS.map(q => (
+                      <div key={q.id} className="p-4 rounded-lg border border-slate-200 bg-slate-50 space-y-3">
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-bold text-cyan-700 bg-cyan-100 px-2.5 py-1 rounded">
+                            Câu {q.id} ({q.level})
+                          </span>
+                          <span className="text-xs text-slate-500">Môn Công nghệ 8</span>
+                        </div>
+                        <p className="font-semibold text-sm text-slate-900">{q.question}</p>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs">
+                          {q.options.map((opt, i) => (
+                            <div
+                              key={i}
+                              className={`p-2.5 rounded border ${
+                                i === q.answer ? 'border-emerald-500 bg-emerald-50 text-emerald-900 font-semibold' : 'border-slate-200 bg-white text-slate-700'
+                              }`}
+                            >
+                              {opt} {i === q.answer && '✓ (Đáp án đúng)'}
+                            </div>
+                          ))}
+                        </div>
+                        <p className="text-xs text-slate-500 italic bg-white p-2.5 rounded border border-slate-200">
+                          💡 <strong>Lời giải chi tiết:</strong> {q.explain}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* TAB 3: MATERIALS & SLIDES MANAGER */}
+              {activeTab === 'MATERIALS' && (
+                <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6 space-y-6">
+                  <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-100 pb-4">
+                    <div>
+                      <h2 className="font-bold text-slate-800 text-base flex items-center gap-2">
+                        <i data-lucide="folder-open" className="w-5 h-5 text-amber-600"></i>
+                        <span>Material Controller - Quản Lý Thư Viện Học Liệu</span>
+                      </h2>
+                      <p className="text-xs text-slate-500">Lưu trữ Slide trình chiếu, Bản vẽ CAD kỹ thuật, Đề thi trên Supabase Storage</p>
+                    </div>
+                    <button
+                      onClick={() => setShowUploadModal(true)}
+                      className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold px-4 py-2 rounded-lg flex items-center gap-2"
+                    >
+                      <i data-lucide="upload" className="w-4 h-4"></i>
+                      <span>Upload Học Liệu Mới</span>
+                    </button>
+                  </div>
+
+                  {/* Category Filters */}
+                  <div className="flex space-x-2">
+                    {['ALL', 'SLIDE', 'EXAM', 'CAD_DRAWING', 'VIDEO'].map(cat => (
+                      <button
+                        key={cat}
+                        onClick={() => setFilterCategory(cat)}
+                        className={`text-xs font-semibold px-3 py-1.5 rounded-lg border transition-colors ${
+                          filterCategory === cat ? 'bg-slate-900 text-white border-slate-900' : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'
+                        }`}
+                      >
+                        {cat === 'ALL' ? 'Tất cả' : cat}
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* Materials Grid */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {materials
+                      .filter(m => filterCategory === 'ALL' || m.category === filterCategory)
+                      .map(mat => (
+                        <div key={mat.id} className="p-4 rounded-xl border border-slate-200 bg-slate-50/50 hover:bg-slate-50 transition-all flex items-start space-x-3">
+                          <div className="bg-amber-100 text-amber-700 p-2.5 rounded-lg">
+                            <i data-lucide="file-text" className="w-6 h-6"></i>
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[10px] font-bold bg-slate-200 text-slate-700 px-2 py-0.5 rounded">Lớp {mat.grade}</span>
+                              <span className="text-[11px] text-slate-400">{mat.size}</span>
+                            </div>
+                            <h4 className="font-semibold text-xs text-slate-900 mt-1 truncate">{mat.title}</h4>
+                            <div className="flex items-center justify-between text-xs text-slate-500 mt-3">
+                              <span>Lượt tải: <strong>{mat.downloads}</strong></span>
+                              <button className="text-emerald-600 hover:text-emerald-700 font-semibold text-xs flex items-center gap-1">
+                                <i data-lucide="download-cloud" className="w-3.5 h-3.5"></i>
+                                <span>Tải Xuống</span>
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                  </div>
+                </div>
+              )}
+
+              {/* TAB 4: STATS & ANALYTICS WORKER */}
+              {activeTab === 'STATS' && (
+                <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6 space-y-6">
+                  <div className="border-b border-slate-100 pb-4">
+                    <h2 className="font-bold text-slate-800 text-base flex items-center gap-2">
+                      <i data-lucide="bar-chart-3" className="w-5 h-5 text-indigo-600"></i>
+                      <span>Stats & Export Worker - Thống Kê Lượt Sử Dụng AI & Học Liệu</span>
+                    </h2>
+                    <p className="text-xs text-slate-500">Tổng hợp dữ liệu lượt soạn bài, token tiêu thụ và dung lượng lưu trữ trên Cloud</p>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="p-5 rounded-xl bg-slate-900 text-white space-y-2">
+                      <p className="text-xs text-slate-400 font-medium">Tổng Lượt Soạn Giáo Án AI</p>
+                      <p className="text-3xl font-extrabold text-emerald-400">148 Bài</p>
+                      <p className="text-[11px] text-slate-400">+24% so với tháng trước</p>
+                    </div>
+                    <div className="p-5 rounded-xl bg-slate-900 text-white space-y-2">
+                      <p className="text-xs text-slate-400 font-medium">Dung Lượng Supabase Storage</p>
+                      <p className="text-3xl font-extrabold text-cyan-400">1.42 GB / 5 GB</p>
+                      <p className="text-[11px] text-slate-400">Đã lưu trữ 42 file học liệu</p>
+                    </div>
+                    <div className="p-5 rounded-xl bg-slate-900 text-white space-y-2">
+                      <p className="text-xs text-slate-400 font-medium"> Tokens Gemini AI Tiêu Thụ</p>
+                      <p className="text-3xl font-extrabold text-amber-400">425,800</p>
+                      <p className="text-[11px] text-slate-400">Tối ưu chi phí Vercel API</p>
+                    </div>
+                  </div>
+
+                  <div className="p-4 rounded-xl border border-slate-200 bg-slate-50">
+                    <h3 className="font-bold text-xs uppercase tracking-wider text-slate-700 mb-3">Lịch Sử Hoạt Động Gần Đây:</h3>
+                    <div className="space-y-2 text-xs text-slate-600">
+                      <div className="flex justify-between p-2 bg-white rounded border border-slate-200">
+                        <span>Soạn giáo án: "Quy trình thiết kế kỹ thuật"</span>
+                        <span className="text-emerald-600 font-semibold">Thành công • 1,240 tokens</span>
+                      </div>
+                      <div className="flex justify-between p-2 bg-white rounded border border-slate-200">
+                        <span>Xuất file Word (.doc) Công văn 5512</span>
+                        <span className="text-blue-600 font-semibold">Tải về hoàn tất</span>
+                      </div>
+                      <div className="flex justify-between p-2 bg-white rounded border border-slate-200">
+                        <span>Upload Slide bài giảng 3D môn Công nghệ 8</span>
+                        <span className="text-amber-600 font-semibold">14.2 MB • Supabase Storage</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* TAB 5: DATABASE SCHEMA VIEWER */}
+              {activeTab === 'DATABASE_VIEW' && (
+                <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6 space-y-4">
+                  <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+                    <div>
+                      <h2 className="font-bold text-slate-800 text-base flex items-center gap-2">
+                        <i data-lucide="database" className="w-5 h-5 text-slate-800"></i>
+                        <span>Supabase PostgreSQL Database Schema (`database/schema.sql`)</span>
+                      </h2>
+                      <p className="text-xs text-slate-500">Cấu trúc 4 bảng dữ liệu, chính sách bảo mật RLS và câu lệnh SQL khởi tạo</p>
+                    </div>
+                    <span className="text-xs bg-emerald-100 text-emerald-800 font-mono px-2.5 py-1 rounded font-semibold">
+                      PostgreSQL 15
+                    </span>
+                  </div>
+
+                  <div className="bg-slate-900 text-emerald-400 p-4 rounded-xl font-mono text-xs overflow-x-auto max-h-[500px] border border-slate-800 custom-scrollbar whitespace-pre">
+{`-- 1. BẢNG HỒ SƠ GIÁO VIÊN (PROFILES)
+CREATE TABLE IF NOT EXISTS public.profiles (
+    id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+    email TEXT NOT NULL UNIQUE,
+    full_name TEXT NOT NULL,
+    school_name TEXT DEFAULT 'Trường THCS / THPT Chuyên',
+    subject TEXT DEFAULT 'Công nghệ & Hướng nghiệp',
+    avatar_url TEXT,
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- 2. BẢNG KẾ HOẠCH BÀI DẠY (LESSON_PLANS)
+CREATE TABLE IF NOT EXISTS public.lesson_plans (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+    title TEXT NOT NULL,
+    grade_level INT NOT NULL CHECK (grade_level BETWEEN 6 AND 12),
+    subject_module TEXT NOT NULL,
+    topic_name TEXT NOT NULL,
+    duration_periods INT DEFAULT 2,
+    content_markdown TEXT NOT NULL,
+    format_type TEXT DEFAULT 'CV_5512',
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- 3. BẢNG THƯ VIỆN HỌC LIỆU (MATERIALS)
+CREATE TABLE IF NOT EXISTS public.materials (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+    title TEXT NOT NULL,
+    category TEXT NOT NULL CHECK (category IN ('SLIDE', 'EXAM', 'CAD_DRAWING', 'VIDEO')),
+    file_path TEXT NOT NULL,
+    file_size BIGINT NOT NULL,
+    downloads_count INT DEFAULT 0
+);`}
+                  </div>
+                </div>
+              )}
+
+            </main>
+          </div>
+
+          {/* FOOTER - STUDENT & SYSTEM CREDITS FROM DIAGRAM */}
+          <footer className="bg-slate-900 text-slate-400 border-t border-slate-800 py-4 text-xs mt-auto">
+            <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-2">
+              <div className="flex items-center space-x-2">
+                <i data-lucide="graduation-cap" className="w-4 h-4 text-emerald-400"></i>
+                <span>Học viên: <strong className="text-white">dangvansach86</strong></span>
+              </div>
+              <p className="text-slate-500">Dự án Classroom App • Tự động hóa Giảng dạy Môn Công nghệ & Hướng nghiệp GDPT 2018</p>
+              <div>Xuất bản: 24/08/2026 19:39</div>
+            </div>
+          </footer>
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>
