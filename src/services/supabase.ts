@@ -5,8 +5,9 @@ import { TeacherProfile, LessonPlan, TeachingMaterial } from '../types';
  * Tầng Bảo mật & Middleware (Supabase Auth Guard) & Database Access
  */
 export class SupabaseClientService {
-  private static SUPABASE_URL = process.env.VITE_SUPABASE_URL || 'https://demo.supabase.co';
-  private static SUPABASE_ANON_KEY = process.env.VITE_SUPABASE_ANON_KEY || 'demo-key';
+  public static SUPABASE_URL = process.env.VITE_SUPABASE_URL || 'https://aqvftcfoovckjcldqfbr.supabase.co';
+  public static SUPABASE_ANON_KEY = process.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFxdmZ0Y2Zvb3Zja2pjbGRxZmJyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc1NzQxODAsImV4cCI6MjEwMzE1MDE4MH0.DDvIvivdC9La9pfoJzNmrZEIAdS7W9cjMpmQzIwuYfg';
+  public static SUPABASE_SERVICE_ROLE_KEY = process.env.VITE_SUPABASE_SERVICE_ROLE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFxdmZ0Y2Zvb3Zja2pjbGRxZmJyIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4NzU3NDE4MCwiZXhwIjoyMTAzMTUwMTgwfQ.a_SsHCkjInn77_Fx4LzJ3M5kBl10YURmQP6CbBjHK2s';
 
   // State người dùng hiện tại
   private static currentUser: TeacherProfile = {
@@ -27,15 +28,15 @@ export class SupabaseClientService {
   }
 
   /**
-   * Giả lập Đăng nhập Auth Guard
+   * Giả lập Đăng nhập Auth Guard với dự án Supabase chính thức
    */
   public static async loginWithGoogle(): Promise<TeacherProfile> {
-    console.log('Authenticating via Supabase Auth Guard Google Provider...');
+    console.log(`Authenticating via Supabase Auth Guard (${this.SUPABASE_URL})...`);
     return this.currentUser;
   }
 
   /**
-   * Lấy danh sách Giáo án từ Database Supabase PostgreSQL
+   * Lấy danh sách Giáo án từ Database Supabase PostgreSQL Project
    */
   public static async fetchLessonPlans(): Promise<LessonPlan[]> {
     return [
@@ -73,7 +74,7 @@ export class SupabaseClientService {
   }
 
   /**
-   * Lấy danh sách Học liệu từ Supabase Storage & Database
+   * Lấy danh sách Học liệu từ Supabase Storage (`aqvftcfoovckjcldqfbr`)
    */
   public static async fetchMaterials(): Promise<TeachingMaterial[]> {
     return [
