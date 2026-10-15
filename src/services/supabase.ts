@@ -77,33 +77,6 @@ export class SupabaseClientService {
    * Lấy danh sách Học liệu từ Supabase Storage (`aqvftcfoovckjcldqfbr`)
    */
   public static async fetchMaterials(): Promise<TeachingMaterial[]> {
-    return [
-      {
-        id: 'm1',
-        userId: this.currentUser.id,
-        title: 'Slide Bài giảng: Vẽ kỹ thuật cơ bản & Bản vẽ chi tiết',
-        category: 'SLIDE',
-        gradeLevel: 8,
-        filePath: 'materials/slide_ve_ky_thuat_lop8.pptx',
-        fileSize: 14250000,
-        fileType: 'pptx',
-        description: 'Bộ slide trình chiếu sinh động kèm video minh họa mô hình 3D.',
-        downloadsCount: 56,
-        createdAt: '2026-08-21T11:20:00Z'
-      },
-      {
-        id: 'm2',
-        userId: this.currentUser.id,
-        title: 'Đề thi Giữa kỳ 1 Môn Công nghệ 8 (Có ma trận & đáp án)',
-        category: 'EXAM',
-        gradeLevel: 8,
-        filePath: 'materials/de_thi_gk1_cong_nghe_8.docx',
-        fileSize: 245000,
-        fileType: 'docx',
-        description: 'Đề kiểm tra 45 phút gồm 28 câu trắc nghiệm và 2 câu tự luận vận dụng.',
-        downloadsCount: 112,
-        createdAt: '2026-08-23T15:40:00Z'
-      }
-    ];
+    return [];
   }
 }

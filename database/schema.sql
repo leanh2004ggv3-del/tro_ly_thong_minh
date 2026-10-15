@@ -62,6 +62,48 @@ CREATE TABLE IF NOT EXISTS public.usage_stats (
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- 5. BẢNG PHÂN PHỐI CHƯƠNG TRÌNH (PPCT_PLANS)
+CREATE TABLE IF NOT EXISTS public.ppct_plans (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+    subject TEXT NOT NULL,
+    grade_level INT NOT NULL,
+    total_periods INT NOT NULL,
+    ppct_table_json JSONB NOT NULL,
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- 6. BẢNG MẪU KẾ HOẠCH BÀI DẠY (LESSON_TEMPLATES)
+CREATE TABLE IF NOT EXISTS public.lesson_templates (
+    id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
+    user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE,
+    name TEXT NOT NULL,
+    subject TEXT NOT NULL,
+    grade_level TEXT NOT NULL,
+    identified_sections JSONB NOT NULL DEFAULT '[]'::jsonb,
+    has_two_column_table BOOLEAN DEFAULT TRUE,
+    is_default BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- 7. BẢNG KHO GIÁO ÁN SOẠN THEO MẪU HĐTN & MÔN HỌC (HDTN_SAVED_PLANS)
+CREATE TABLE IF NOT EXISTS public.hdtn_saved_plans (
+    id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
+    user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE,
+    title TEXT NOT NULL,
+    topic TEXT NOT NULL,
+    subject TEXT NOT NULL,
+    grade TEXT NOT NULL,
+    week TEXT NOT NULL,
+    school_year TEXT DEFAULT '2026 - 2027',
+    teacher_name TEXT DEFAULT 'Đặng Văn Sạch',
+    school_name TEXT DEFAULT 'TRƯỜNG THCS TỊNH BIÊN',
+    plan_data JSONB NOT NULL,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
 -- ==============================================================================
 -- INDEXES CHO TỐI ƯU TỐC ĐỘ TRUY VẤN
 -- ==============================================================================
@@ -70,6 +112,7 @@ CREATE INDEX IF NOT EXISTS idx_lesson_plans_grade ON public.lesson_plans(grade_l
 CREATE INDEX IF NOT EXISTS idx_materials_user_id ON public.materials(user_id);
 CREATE INDEX IF NOT EXISTS idx_materials_category ON public.materials(category);
 CREATE INDEX IF NOT EXISTS idx_usage_stats_user_id ON public.usage_stats(user_id);
+CREATE INDEX IF NOT EXISTS idx_hdtn_saved_plans_user_id ON public.hdtn_saved_plans(user_id);
 
 -- ==============================================================================
 -- ROW LEVEL SECURITY (RLS) POLICIES - BẢO MẬT DỮ LIỆU NGUYÊN TẮC SUPABASE
@@ -112,11 +155,36 @@ CREATE POLICY "System insert stats" ON public.usage_stats
 -- ==============================================================================
 INSERT INTO public.profiles (id, email, full_name, school_name, subject, role)
 VALUES 
+('00000000-0000-0000-0000-000000000099', 'dangvansach86@gmail.com', 'Đặng Văn Sạch', 'Ban Quản Trị Hệ Thống (Super Admin)', 'Quản trị viên Hệ thống AI', 'ADMIN'),
 ('00000000-0000-0000-0000-000000000001', 'teacher.demo@edu.vn', 'Thầy Nguyễn Văn An', 'Trường THCS Chu Văn An', 'Công nghệ & Hướng nghiệp', 'TEACHER')
-ON CONFLICT (id) DO NOTHING;
+ON CONFLICT (id) DO UPDATE SET role = EXCLUDED.role, full_name = EXCLUDED.full_name;
 
 INSERT INTO public.lesson_plans (id, user_id, title, grade_level, subject_module, topic_name, duration_periods, content_markdown, is_public)
 VALUES
 ('11111111-1111-1111-1111-111111111111', '00000000-0000-0000-0000-000000000001', 'Kế hoạch bài dạy: Quy trình thiết kế kỹ thuật', 8, 'Công nghệ', 'Thiết kế kỹ thuật', 2, 
 '# I. MỤC TIÊU BÀI HỌC\n1. Kiến thức: Trình bày được các bước chính trong quy trình thiết kế kỹ thuật.\n2. Năng lực: Vận dụng quy trình thiết kế để đề xuất sản phẩm học tập đơn giản.\n3. Phẩm chất: Cẩn thận, hợp tác nhóm.\n\n# II. THIẾT BỊ DẠY HỌC\n- Máy chiếu, slide bài giảng, phiếu học tập số 1.\n\n# III. TIẾN TRÌNH DẠY HỌC (CÔNG VĂN 5512)\n## Hoạt động 1: Mở đầu (Khởi động)\n## Hoạt động 2: Hình thành kiến thức mới\n## Hoạt động 3: Luyện tập\n## Hoạt động 4: Vận dụng', true)
 ON CONFLICT (id) DO NOTHING;
+
+-- ==============================================================================
+-- AUTOMATIC TRIGGER FOR SUPABASE AUTH SIGNUP
+-- ==============================================================================
+CREATE OR REPLACE FUNCTION public.handle_new_user()
+RETURNS TRIGGER AS $$
+BEGIN
+  INSERT INTO public.profiles (id, email, full_name, school_name, subject, role)
+  VALUES (
+    NEW.id,
+    NEW.email,
+    COALESCE(NEW.raw_user_meta_data->>'full_name', 'Giáo viên'),
+    COALESCE(NEW.raw_user_meta_data->>'school_name', 'Trường THCS / THPT'),
+    COALESCE(NEW.raw_user_meta_data->>'subject', 'Công nghệ & Hướng nghiệp'),
+    'TEACHER'
+  );
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
+CREATE TRIGGER on_auth_user_created
+  AFTER INSERT ON auth.users
+  FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();

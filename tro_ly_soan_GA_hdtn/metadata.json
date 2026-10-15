@@ -1,0 +1,6 @@
+{
+  "name": "Trợ lý Soạn Giáo Án Theo Mẫu Giáo Viên",
+  "description": "Ứng dụng chuyên nghiệp hỗ trợ giáo viên tất cả các môn học, cấp học tải lên giáo án mẫu (PDF, Word) để nhận diện cấu trúc, bố cục, hệ thống tiêu đề, bảng 2 cột và tự động tạo giáo án mới chuẩn GDPT 2018 bám sát 100% mẫu đã cung cấp.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

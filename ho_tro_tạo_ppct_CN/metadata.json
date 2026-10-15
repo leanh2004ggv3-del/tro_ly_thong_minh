@@ -1,0 +1,8 @@
+{
+  "name": "Hỗ trợ tạo PPCT môn CN",
+  "description": "Tự động tạo phân phối chương trình môn Công nghệ dựa trên sách giáo khoa và số tiết.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

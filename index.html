@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Classroom App - Trợ Lý AI Bộ Môn Công Nghệ & Hướng Nghiệp</title>
+  <title>Trợ Lý Thông Minh - Bộ Môn Công Nghệ & Hướng Nghiệp</title>
 
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -39,7 +39,16 @@
 
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-    body { font-family: 'Inter', sans-serif; background-color: #f8fafc; color: #0f172a; }
+    body {
+      font-family: 'Inter', sans-serif;
+      color: #0f172a;
+      background-image: linear-gradient(rgba(248, 250, 252, 0.88), rgba(248, 250, 252, 0.92)), url('Anhtruong.png'), url('Anhtruong.jpg');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+      min-height: 100vh;
+    }
     .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
     .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; }
     .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
@@ -50,7 +59,7 @@
     .markdown-preview h3 { font-size: 1.1rem; font-weight: 600; color: #334155; margin-top: 0.75rem; margin-bottom: 0.25rem; }
   </style>
 </head>
-<body class="bg-slate-50 min-h-screen text-slate-900">
+<body class="min-h-screen text-slate-900">
   <div id="root"></div>
 
   <script type="text/babel">
@@ -80,12 +89,7 @@
       }
     ];
 
-    const INITIAL_MATERIALS = [
-      { id: 'm1', title: 'Slide Bài giảng: Quy trình thiết kế 3D', category: 'SLIDE', grade: 8, size: '14.2 MB', type: 'PPTX', downloads: 84 },
-      { id: 'm2', title: 'Đề thi Giữa kỳ 1 Môn Công nghệ 8 (Có ma trận)', category: 'EXAM', grade: 8, size: '245 KB', type: 'DOCX', downloads: 156 },
-      { id: 'm3', title: 'Bản vẽ kỹ thuật CAD mô hình quạt gió', category: 'CAD_DRAWING', grade: 9, size: '4.8 MB', type: 'DWG', downloads: 62 },
-      { id: 'm4', title: 'Video thực hành: Ghép nối mạch điện điều khiển', category: 'VIDEO', grade: 9, size: '128 MB', type: 'MP4', downloads: 93 }
-    ];
+    const INITIAL_MATERIALS = [];
 
     const INITIAL_QUESTIONS = [
       {
@@ -116,8 +120,566 @@
       }
     ];
 
+    
+    // Dữ liệu mẫu chuẩn Kế hoạch bài dạy HĐTN & Môn học (Module tro_ly_soan_GA_hdtn)
+    const HDTN_CURRICULUM_PRESETS = [
+      {
+        grade: '9',
+        topic: 'CHỦ ĐỀ 1: EM VỚI NHÀ TRƯỜNG',
+        week: 'Tuần 1',
+        lessonTitle: 'Tôn trọng sự khác biệt và sống hài hòa với bạn bè, thầy cô',
+        duration: '3 tiết (1 tiết SHDC, 1 tiết HĐGD, 1 tiết SHL)',
+        nlsCode: 'NLS 2.5.TC2b',
+        nlsDesc: 'Nguyên tắc Stop & Think trước khi bình luận, tôn trọng sự khác biệt trên không gian mạng.',
+        nlaiCode: 'NLAI 9.A3.1',
+        nlaiDesc: 'Sự đồng cảm, cảm xúc chân thật là năng lực đặc quyền của con người mà AI không thể thay thế.',
+        flagSaluteTitle: 'Tham gia cuộc phát động phong trào thi đua "Xây dựng truyền thống nhà trường"',
+        topicActivityTitle: 'Tôn trọng sự khác biệt và sống hài hòa với bạn bè, thầy cô',
+        classMeetingTitle: 'Xây dựng nội quy tự quản & Bản cam kết văn hóa lớp học 9'
+      },
+      {
+        grade: '6',
+        topic: 'CHỦ ĐỀ 1: EM VỚI NHÀ TRƯỜNG VÀ BẠN BÈ MỚI',
+        week: 'Tuần 1 - 2',
+        lessonTitle: 'Khám phá môi trường học tập mới và thiết lập mối quan hệ bạn bè',
+        duration: '3 tiết',
+        nlsCode: 'NLS 2.1TC1b',
+        nlsDesc: 'Giao tiếp số an toàn, bảo vệ danh tính cá nhân khi tương tác trong nhóm lớp trực tuyến.',
+        nlaiCode: 'NLAI 6.A1.3',
+        nlaiDesc: 'Con người đưa ra quyết định cuối cùng và chịu trách nhiệm khi sử dụng công cụ AI hỗ trợ học tập.',
+        flagSaluteTitle: 'Tìm hiểu truyền thống nhà trường THCS và nội quy học sinh',
+        topicActivityTitle: 'Làm quen bạn mới và thích ứng với môi trường học tập THCS',
+        classMeetingTitle: 'Bầu ban cán sự lớp và xây dựng quy tắc ứng xử văn minh trong lớp'
+      },
+      {
+        grade: '7',
+        topic: 'CHỦ ĐỀ 2: RÈN LUYỆN TÍNH KIÊN TRÌ VÀ SỰ CHĂM CHỈ',
+        week: 'Tuần 5 - 6',
+        lessonTitle: 'Rèn luyện tính kiên trì, chăm chỉ trong học tập và cuộc sống',
+        duration: '3 tiết',
+        nlsCode: 'NLS 2.5TC1a',
+        nlsDesc: 'Chuẩn mực hành vi số, không để mạng xã hội làm xao nhãng việc rèn luyện sự kiên trì.',
+        nlaiCode: 'NLAI 7.A1.1',
+        nlaiDesc: 'Con người giữ quyền ra quyết định để đảm bảo tính công bằng và trung thực trong học tập.',
+        flagSaluteTitle: 'Tọa đàm tấm gương sáng vượt khó và phong trào Mỗi ngày một việc tốt',
+        topicActivityTitle: 'Phân tích biểu hiện của sự kiên trì và phương pháp vượt qua tính trì hoãn',
+        classMeetingTitle: 'Báo cáo tuần đầu Nhật ký 21 ngày kiên trì và lập các cặp Đôi bạn cùng tiến'
+      },
+      {
+        grade: '8',
+        topic: 'CHỦ ĐỀ 4: TỰ HÀO TRUYỀN THỐNG QUÊ HƯƠNG VÀ VĂN HÓA ỨNG XỬ',
+        week: 'Tuần 13 - 14',
+        lessonTitle: 'Tôn vinh nét đẹp truyền thống và xây dựng văn hóa ứng xử văn minh',
+        duration: '3 tiết',
+        nlsCode: 'NLS 4.2TC2a',
+        nlsDesc: 'Bảo vệ dữ liệu cá nhân, chia sẻ hình ảnh văn hóa quê hương an toàn trên không gian số.',
+        nlaiCode: 'NLAI 8.A1.1',
+        nlaiDesc: 'AI không thể thay thế cảm xúc và trải nghiệm nhân văn của con người đối với văn hóa dân tộc.',
+        flagSaluteTitle: 'Giới thiệu danh lam thắng cảnh và di tích lịch sử quê hương An Giang',
+        topicActivityTitle: 'Ứng xử văn hóa nơi công cộng và không gian mạng',
+        classMeetingTitle: 'Trưng bày sản phẩm truyền thông số giới thiệu quê hương và ký cam kết văn minh'
+      }
+    ];
+
+    const DEFAULT_HDTN_PLAN = {
+      id: 'plan-thcs-tinhbien-lop9-chude1',
+      grade: '9',
+      schoolName: 'TRƯỜNG THCS TỊNH BIÊN',
+      teacherName: 'Đặng Văn Sạch',
+      departmentName: 'Tổ: Công nghệ - Hướng nghiệp',
+      schoolYear: '2026 - 2027',
+      semester: 'Học kỳ: I - Tuần 1',
+      topic: 'CHỦ ĐỀ 1: EM VỚI NHÀ TRƯỜNG',
+      week: 'Tuần 1',
+      lessonTitle: 'Tôn trọng sự khác biệt và sống hài hòa với bạn bè, thầy cô',
+      duration: '3 tiết (Tiết 1: SHDC, Tiết 2: HĐGD, Tiết 3: SHL)',
+      generalObjectives: {
+        knowledge: [
+          'Tôn trọng sự khác biệt và sống hài hòa với bạn bè, thầy cô;',
+          'Xây dựng kế hoạch tổ chức hoạt động phòng chống bạo lực và bắt nạt học đường;',
+          'Xác định mục tiêu và xây dựng kế hoạch cho các buổi lao động công ích;',
+          'Làm các sản phẩm đóng góp xây dựng truyền thống nhà trường.'
+        ],
+        qualities: [
+          'Nhân ái, khoan dung, tôn trọng mọi người;',
+          'Trách nhiệm thông qua các hoạt động phòng chống bắt nạt học đường và lao động công ích.'
+        ],
+        competencies: [
+          'Thích ứng với cuộc sống; Thiết kế và tổ chức hoạt động;',
+          'Tự chủ trong các mối quan hệ với bạn bè, thầy cô; Giao tiếp và hợp tác nhóm.'
+        ]
+      },
+      flagSalute: {
+        title: 'TIẾT 1: SINH HOẠT DƯỚI CỜ (TỔ CHỨC TẠI PHÒNG HỌC)',
+        subTitle: 'CHỦ ĐỀ: THAM GIA CUỘC PHÁT ĐỘNG PHONG TRÀO THI ĐUA "XÂY DỰNG TRUYỀN THỐNG NHÀ TRƯỜNG"',
+        note: '(Do Giáo viên được phân công phụ trách điều hành tại phòng học, cả lớp chia thành 6 nhóm)',
+        objectives: 'Học sinh hiểu và thực hiện được các hoạt động làm sản phẩm đóng góp xây dựng truyền thống nhà trường, bồi đắp lòng tự hào về trường lớp. Giao tiếp, hợp tác hiệu quả theo 6 nhóm.',
+        equipment: 'Máy tính, máy chiếu phòng học, loa lớp, video clip truyền thống nhà trường; SGK, sổ ghi chép, kịch bản điều hành.',
+        steps: [
+          {
+            name: '1. Khởi động (Chào cờ tại lớp & Khai mạc - 5 phút)',
+            objective: 'Tạo không khí trang nghiêm, phấn khởi đầu năm học.',
+            method: 'Phương pháp hoạt động tập thể, nghi thức Đội.',
+            action: 'GV phổ biến nghi thức chào cờ tại phòng học. Lớp trưởng điều hành cả lớp đứng nghiêm trang hướng về Quốc kỳ hát Quốc ca. Đội văn nghệ biểu diễn 1 tiết mục chào mừng. GV chiếu clip 2 phút truyền thống trường.',
+            product: 'Nghi lễ chào cờ trang nghiêm; học sinh hào hứng, trật tự, tập trung theo dõi.'
+          },
+          {
+            name: '2. Tuyên bố lý do & Phân chia 6 nhóm học tập (5 phút)',
+            objective: 'Xác định rõ mục đích sinh hoạt và chia nhóm hoạt động.',
+            method: 'Phương pháp thuyết trình gợi mở, giao nhiệm vụ theo nhóm.',
+            action: 'MC học sinh tuyên bố lý do phát động thi đua. GV chia lớp thành 6 nhóm (mỗi nhóm 6-7 HS), phân công Nhóm trưởng và Thư ký, phát phiếu nhiệm vụ cho từng nhóm.',
+            product: '6 nhóm học sinh ổn định vị trí, sẵn sàng thực hiện nhiệm vụ thi đua.'
+          },
+          {
+            name: '3. Thực hiện chủ đề (Phát động thi đua & Giao lưu - 23 phút)',
+            objective: 'Quán triệt phong trào thi đua và tìm hiểu truyền thống trường qua 6 nhóm.',
+            method: 'Phương pháp thảo luận nhóm, trò chơi tương tác, đàm thoại gợi mở.',
+            action: 'GV phát động thi đua cấp lớp và tổ chức trò chơi "Theo dòng lịch sử trường em". 6 nhóm thảo luận ghi chỉ tiêu thi đua lên bảng nhóm và trả lời các câu hỏi giao lưu. GV quan sát, khích lệ. Đại diện các nhóm trình bày, nhận xét chéo.',
+            product: 'Bảng chỉ tiêu thi đua hoàn thiện của 6 nhóm; học sinh trả lời đúng các câu hỏi lịch sử nhà trường.'
+          },
+          {
+            name: '4. Đánh giá, tổng kết thi đua (7 phút)',
+            objective: 'Đánh giá tinh thần, thái độ tham gia của học sinh toàn lớp.',
+            method: 'Phương pháp đánh giá đồng đẳng, nhận xét sư phạm tích cực.',
+            action: 'Các nhóm tự chấm điểm và đánh giá chéo theo thang điểm Tốt - Khá - Đạt. Ban cán sự tổng hợp và công bố kết quả. GV tuyên dương các nhóm tích cực, chốt thông điệp trách nhiệm của học sinh khối 9.',
+            product: 'Bảng tổng hợp thi đua dân chủ, công bằng; học sinh nhận thức sâu sắc trách nhiệm bản thân.'
+          },
+          {
+            name: '5. Dặn dò – Nhiệm vụ tiếp nối (5 phút)',
+            objective: 'Định hướng chuẩn bị cho Tiết 2 Hoạt động giáo dục theo chủ đề.',
+            method: 'Phương pháp giao nhiệm vụ, hướng dẫn tự học.',
+            action: 'GV giao nhiệm vụ đọc trước bài "Tôn trọng sự khác biệt và sống hài hòa với bạn bè, thầy cô" (SGK). HS ghi chép nhiệm vụ vào vở.',
+            product: '100% học sinh nắm vững yêu cầu chuẩn bị tài liệu cho Tiết 2.'
+          }
+        ]
+      },
+      topicActivity: {
+        title: 'TIẾT 2: HOẠT ĐỘNG GIÁO DỤC THEO CHỦ ĐỀ (BẢNG 2 CỘT 5512)',
+        subTitle: 'NỘI DUNG: TÔN TRỌNG SỰ KHÁC BIỆT VÀ SỐNG HÀI HÒA VỚI BẠN BÈ, THẦY CÔ',
+        nls: {
+          code: 'NLS 2.5.TC2b',
+          title: 'Năng lực số (Màu đỏ)',
+          desc: 'Thực hành nguyên tắc "Stop & Think" (Dừng lại & suy nghĩ) trước khi bình luận, chia sẻ trên không gian mạng.'
+        },
+        nlai: {
+          code: 'NLAI 9.A3.1',
+          title: 'Năng lực AI (Màu xanh dương)',
+          desc: 'Sự đồng cảm, cảm xúc chân thật và khả năng chấp nhận sự khác biệt là năng lực đặc quyền của con người mà AI không thể thay thế.'
+        },
+        activities: [
+          {
+            name: '1. Hoạt động 1: Khởi động (5-7 phút)',
+            objective: 'Tạo không khí cởi mở, gợi mở vấn đề về sự khác biệt cá nhân từ đời thực đến không gian số.',
+            method: 'Phương pháp trực quan, vấn đáp gợi mở và nêu vấn đề.',
+            steps: [
+              { stepTitle: 'Bước 1: Chuyển giao nhiệm vụ', text: 'Giáo viên trình chiếu 2 hình ảnh trên mạng xã hội: Hình 1 (bạn hát dân ca/chầu văn), Hình 2 (bạn tạo tranh bằng AI độc lạ). Đặt câu hỏi: "Nếu gặp bài đăng có sở thích khác biệt như vậy trên mạng, em thường làm gì?"' },
+              { stepTitle: 'Bước 2: Thực hiện nhiệm vụ', text: 'Học sinh quan sát, suy nghĩ câu hỏi gợi mở. Giáo viên theo dõi, khuyến khích học sinh thoải mái bộc lộ suy nghĩ.' },
+              { stepTitle: 'Bước 3: Báo cáo, thảo luận', text: '2 - 3 học sinh phát biểu tự do suy nghĩ về phản ứng của bản thân trước các sở thích độc đáo của bạn bè. Cả lớp lắng nghe, trao đổi ngắn.' },
+              { stepTitle: 'Bước 4: Kết luận, nhận định', text: 'Giáo viên khen ngợi câu trả lời chân thành; kết luận: Sự khác biệt làm nên tính đa dạng; dẫn dắt vào bài học tôn trọng sự khác biệt cả ngoài đời thực lẫn môi trường số.' }
+            ],
+            product: '- Học sinh hào hứng quan sát các hình ảnh bài đăng mạng xã hội.\n- Bộc lộ suy nghĩ cá nhân cởi mở, chân thành.\n- Tạo tâm thế tích cực, sẵn sàng tiếp nhận nội dung bài học mới.'
+          },
+          {
+            name: '2. Hoạt động 2: Khám phá – Thảo luận tình huống tôn trọng sự khác biệt (15-20 phút)',
+            objective: 'Phân tích các hành vi ứng xử với sự khác biệt, thực hành kỹ năng giao tiếp số văn minh và nhận thức vai trò đặc quyền của cảm xúc con người.',
+            method: 'Phương pháp nghiên cứu trường hợp, thảo luận nhóm, giải quyết vấn đề.',
+            steps: [
+              { stepTitle: 'Bước 1: Chuyển giao nhiệm vụ', text: 'Giáo viên chia lớp thành 4 nhóm, phát Phiếu học tập số 1 với 2 tình huống: Tình huống 1 (bạn Vân thích hát chầu văn bị thả biểu cảm giễu cợt trên mạng); Tình huống 2 (dùng AI tạo bài viết châm biếm phong cách cô giáo mới dạy thay). Yêu cầu thảo luận trong 7 phút.' },
+              { stepTitle: 'Bước 2: Thực hiện nhiệm vụ', text: 'Các nhóm thảo luận sôi nổi, ghi phiếu A3. Giáo viên hướng dẫn phân tích:\n[NLS] - Tích hợp NLS 2.5.TC2b: Giáo viên hướng dẫn học sinh thảo luận và chốt nguyên tắc "Stop & Think" (Dừng lại và suy nghĩ) trước khi bình luận hoặc thả reaction trên mạng xã hội. Tự hỏi: "Lời bình luận này có làm tổn thương bạn không?", đảm bảo ứng xử văn minh số.\n[NLAI] - Tích hợp NLAI 9.A3.1: Giáo viên gợi mở: "AI có thể tạo ảnh hay văn bản chế giễu rất nhanh, nhưng AI có biết đau lòng hay biết thấu cảm không?" Học sinh nhận thức rõ: AI chỉ là công cụ vô cảm, sự đồng cảm và trân trọng tình cảm thầy cô, bạn bè là năng lực đặc quyền của con người.' },
+              { stepTitle: 'Bước 3: Báo cáo, thảo luận', text: 'Đại diện Nhóm 1 và Nhóm 3 lên bảng trình bày phân tích. Nhóm 2 và Nhóm 4 lắng nghe, nhận xét chéo và đặt câu hỏi phản biện tích cực.' },
+              { stepTitle: 'Bước 4: Kết luận, nhận định', text: 'Giáo viên nhận xét, chuẩn hóa kiến thức: Giễu cợt sở thích cá nhân là thiếu văn minh; dùng AI châm biếm là thiếu tôn trọng. Chốt lại giá trị của lòng nhân ái và sự đồng cảm.' }
+            ],
+            product: '- Phân tích Tình huống 1: Giễu cợt sở thích là thiếu văn minh; cần tôn trọng nét đẹp đam mê của bạn.\n- Phân tích Tình huống 2: Dùng AI chế giễu là sai trái; cần cởi mở đón nhận phong cách dạy học của thầy cô.\n[NLS] - Nắm vững và cam kết thực hành nguyên tắc Stop & Think trên không gian mạng.\n[NLAI] - Khẳng định cảm xúc chân thật, sự thấu cảm là năng lực đặc quyền của con người.'
+          },
+          {
+            name: '3. Hoạt động 3: Luyện tập – Sắm vai xử lý tình huống (10-15 phút)',
+            objective: 'Thực hành nguyên tắc giao tiếp số văn minh và thể hiện năng lực đồng cảm, tôn trọng cá tính riêng thông qua sắm vai.',
+            method: 'Phương pháp sắm vai, luyện tập thực hành, phản hồi tích cực.',
+            steps: [
+              { stepTitle: 'Bước 1: Chuyển giao nhiệm vụ', text: 'Phân công sắm vai: Nhóm 1 & 2 xử lý Tình huống 1 (vào bình luận động viên bạn, ngăn chặn bình luận tiêu cực); Nhóm 3 & 4 xử lý Tình huống 2 (lớp trưởng nhắc nhở không dùng AI giễu cợt thầy cô, cùng thích ứng phương pháp mới). Thời gian chuẩn bị 4 phút.' },
+              { stepTitle: 'Bước 2: Thực hiện nhiệm vụ', text: 'Các nhóm phân vai, tập luyện lời thoại. Giáo viên theo dõi, hướng dẫn cách thể hiện hành vi văn minh và cảm xúc chân thật.' },
+              { stepTitle: 'Bước 3: Báo cáo, thảo luận', text: 'Đại diện các nhóm trình diễn tiểu phẩm trước lớp (3 phút/nhóm).\n[NLS] - Thể hiện rõ hành động dừng lại 3 giây trước điện thoại, xóa bình luận tiêu cực và thay bằng lời động viên văn minh.\n[NLAI] - Thoại nhân vật khẳng định: "Công nghệ AI có thể giúp tìm tài liệu nhanh, nhưng không thể thay thế tình cảm chân thành dành cho thầy cô!"' },
+              { stepTitle: 'Bước 4: Kết luận, nhận định', text: 'Giáo viên đánh giá phần thể hiện sáng tạo, sâu sắc của các nhóm. Chốt lại kỹ năng ứng xử tôn trọng sự khác biệt trong đời sống.' }
+            ],
+            product: '- Kịch bản sắm vai sinh động, chân thực, giải quyết xung đột thấu đáo.\n[NLS] - Thực hành thành thạo thói quen Stop & Think.\n[NLAI] - Thể hiện sự tôn trọng thầy cô bằng cảm xúc và thái độ nhân văn.'
+          },
+          {
+            name: '4. Hoạt động 4: Vận dụng & Cam kết hành động (5-7 phút)',
+            objective: 'Củng cố bài học và đưa ra thông điệp cam kết hành động cụ thể tại trường lớp và gia đình.',
+            method: 'Phương pháp dạy học dự án vi mô, viết cam kết hành động cá nhân.',
+            steps: [
+              { stepTitle: 'Bước 1: Chuyển giao nhiệm vụ', text: 'Giáo viên phát giấy stick-note cho 100% học sinh; yêu cầu viết 01 thông điệp cam kết: "Tôn trọng sự khác biệt – Kết nối bằng trái tim chân thành" để dán lên Cây văn hóa lớp học.' },
+              { stepTitle: 'Bước 2: Thực hiện nhiệm vụ', text: 'Học sinh suy nghĩ độc lập, viết thông điệp trong 3 phút. Giáo viên quan sát, khích lệ.' },
+              { stepTitle: 'Bước 3: Báo cáo, thảo luận', text: 'Từng dãy bàn lên dán stick-note lên bảng tin. Mời 2-3 bạn đọc to thông điệp cam kết.' },
+              { stepTitle: 'Bước 4: Kết luận, nhận định', text: 'Giáo viên tổng kết: Luôn ghi nhớ quy tắc Stop & Think trên mạng và làm chủ công nghệ bằng sự đồng cảm con người. Dặn dò chuẩn bị tiết Sinh hoạt lớp.' }
+            ],
+            product: '- 100% học sinh hoàn thành thông điệp cam kết dán lên Cây văn hóa lớp học.\n[NLS] & [NLAI] - Khắc sâu 2 quy tắc cốt lõi về Năng lực số và Năng lực AI.'
+          }
+        ]
+      },
+      classMeeting: {
+        title: 'TIẾT 3: SINH HOẠT LỚP (VẬN DỤNG & CAM KẾT VĂN HÓA KHỔ A0)',
+        subTitle: 'CHỦ ĐỀ: XÂY DỰNG NỘI QUY TỰ QUẢN & BẢN CAM KẾT VĂN HÓA LỚP HỌC 9',
+        note: '(Tiến trình 5 bước chuẩn mẫu: Khởi động -> Chia sẻ nhóm -> Báo cáo lớp -> Thống nhất -> Ký cam kết A0)',
+        steps: [
+          {
+            name: '1. Khởi động (5 phút)',
+            objective: 'Tạo không khí vui vẻ, gắn kết, dẫn dắt vào nội dung tiết sinh hoạt lớp.',
+            method: 'Trò chơi tương tác "Tôi cần, tôi cần", trình chiếu trực quan.',
+            action: 'Ban văn nghệ và Lớp trưởng điều hành trò chơi nhanh. GVCN trình chiếu hình ảnh tập thể lớp đoàn kết. Học sinh hào hứng tham gia.',
+            product: 'Tâm thế phấn khởi, cởi mở, gắn kết 100% học sinh trong lớp.'
+          },
+          {
+            name: '2. Học sinh chia sẻ kết quả vận dụng trong nhóm (10 phút)',
+            objective: 'Đánh giá việc thực hiện nề nếp, tôn trọng bạn bè và ứng xử văn minh trong tuần.',
+            method: 'Thảo luận nhóm, tự đánh giá và đánh giá đồng đẳng.',
+            action: 'Các nhóm tổ chức chia sẻ việc đã làm được và chưa làm được về tôn trọng sự khác biệt và văn hóa mạng. Thư ký ghi vào biên bản nhóm.',
+            product: 'Biên bản tổng hợp ý kiến chân thực của 4 tổ/nhóm.'
+          },
+          {
+            name: '3. Đại diện các nhóm chia sẻ trước lớp (12 phút)',
+            objective: 'Rút kinh nghiệm chung toàn lớp và phát huy các điển hình tích cực.',
+            method: 'Thuyết trình, trao đổi phản biện giữa các tổ.',
+            action: 'Tổ trưởng 4 tổ lần lượt báo cáo. Lớp phó và Lớp trưởng tổng kết các ưu điểm, tồn tại về giao tiếp đời thực và nhóm chat trực tuyến.',
+            product: 'Bức tranh toàn cảnh về nề nếp và văn hóa giao tiếp của lớp trong tuần.'
+          },
+          {
+            name: '4. Thảo luận, thống nhất giải pháp & Phân công Đôi bạn cùng tiến (10 phút)',
+            objective: 'Thống nhất các điều khoản nội quy tự quản và lập danh sách giúp đỡ nhau.',
+            method: 'Phương pháp đàm thoại, biểu quyết dân chủ.',
+            action: 'Cả lớp thảo luận 5 điều khoản cam kết văn hóa. Lập danh sách 6 cặp "Đôi bạn cùng tiến" kèm kế hoạch hỗ trợ cụ thể.',
+            product: 'Danh sách 6 cặp Đôi bạn cùng tiến và sự đồng thuận 100% của học sinh.'
+          },
+          {
+            name: '5. Đánh giá chủ đề, Ký Bản cam kết văn hóa khổ A0 & Dặn dò (8 phút)',
+            objective: 'Khắc sâu tính pháp lý và trách nhiệm thực thi văn hóa lớp học.',
+            method: 'Phương pháp cam kết văn bản trang trọng.',
+            action: 'GVCN công bố Bản cam kết văn hóa lớp học khổ A0. Ban cán sự lớp, các tổ trưởng lên bàn GV ký tên trang trọng trước sự chứng kiến của cả lớp. GVCN ký xác nhận và trao cho Lớp trưởng treo ở góc bảng tin.',
+            product: 'Bản cam kết văn hóa lớp học khổ A0 có đầy đủ chữ ký trang trọng.'
+          }
+        ],
+        commitmentA0: {
+          title: 'BẢN CAM KẾT VĂN HÓA LỚP HỌC 9 (KHỔ A0)',
+          school: 'TRƯỜNG THCS TỊNH BIÊN - CHI ĐỘI LỚP 9',
+          rules: [
+            'Điều 1: Tôn trọng sự khác biệt về sở thích, ngoại hình, hoàn cảnh và cá tính của bạn bè và thầy cô.',
+            'Điều 2: Thực hiện nghiêm ngặt nguyên tắc Stop & Think (Dừng lại & suy nghĩ) trước khi bình luận, chia sẻ trên mạng xã hội.',
+            'Điều 3: Tuyệt đối không sử dụng công cụ AI để chế ảnh, tạo văn bản giễu cợt thầy cô và bạn bè.',
+            'Điều 4: Đoàn kết, chủ động tương trợ bạn gặp khó khăn trong học tập thông qua mô hình "Đôi bạn cùng tiến".',
+            'Điều 5: Tích cực đóng góp ý kiến xây dựng tập thể lớp 9 vững mạnh, gương mẫu toàn trường.'
+          ],
+          signatories: ['Lớp trưởng', 'Bí thư Chi đội', 'Tổ trưởng Tổ 1, 2, 3, 4', 'Giáo viên Chủ nhiệm xác nhận']
+        }
+      }
+    };
+
     function App() {
-      const [activeTab, setActiveTab] = useState('AI_GENERATOR'); // 'DASHBOARD', 'AI_GENERATOR', 'EXAM_GENERATOR', 'MATERIALS', 'STATS', 'DATABASE_VIEW'
+      const [activeTab, setActiveTab] = useState('HDTN_TEMPLATE_GENERATOR');
+
+      // ==========================================
+      // MODULE TRỢ LÝ SOẠN GIÁO ÁN THEO MẪU (HĐTN)
+      // ==========================================
+      const [hdtnGrade, setHdtnGrade] = useState('9');
+      const [hdtnSchoolName, setHdtnSchoolName] = useState('TRƯỜNG THCS TỊNH BIÊN');
+      const [hdtnTeacherName, setHdtnTeacherName] = useState('Đặng Văn Sạch');
+      const [hdtnDepartment, setHdtnDepartment] = useState('Tổ: Công nghệ - Hướng nghiệp');
+      const [hdtnSchoolYear, setHdtnSchoolYear] = useState('2026 - 2027');
+      const [hdtnSemester, setHdtnSemester] = useState('Học kỳ: I - Tuần 1');
+      const [hdtnTopic, setHdtnTopic] = useState('CHỦ ĐỀ 1: EM VỚI NHÀ TRƯỜNG');
+      const [hdtnWeek, setHdtnWeek] = useState('Tuần 1');
+      const [hdtnLessonTitle, setHdtnLessonTitle] = useState('Tôn trọng sự khác biệt và sống hài hòa với bạn bè, thầy cô');
+      const [hdtnDuration, setHdtnDuration] = useState('3 tiết (Tiết 1: SHDC, Tiết 2: HĐGD, Tiết 3: SHL)');
+      
+      const [hdtnIncludeActivities, setHdtnIncludeActivities] = useState({
+        flagSalute: true,
+        topicActivity: true,
+        classMeeting: true
+      });
+      const [hdtnNlsActive, setHdtnNlsActive] = useState(true);
+      const [hdtnNlsCode, setHdtnNlsCode] = useState('NLS 2.5.TC2b');
+      const [hdtnNlsDesc, setHdtnNlsDesc] = useState('Nguyên tắc Stop & Think trước khi bình luận, tôn trọng sự khác biệt trên mạng.');
+      
+      const [hdtnNlaiActive, setHdtnNlaiActive] = useState(true);
+      const [hdtnNlaiCode, setHdtnNlaiCode] = useState('NLAI 9.A3.1');
+      const [hdtnNlaiDesc, setHdtnNlaiDesc] = useState('Sự đồng cảm, cảm xúc chân thật là năng lực đặc quyền của con người mà AI không thể thay thế.');
+
+      const [hdtnUploadedFileName, setHdtnUploadedFileName] = useState('');
+      const [isGeneratingHdtn, setIsGeneratingHdtn] = useState(false);
+      const [hdtnActiveSubTab, setHdtnActiveSubTab] = useState('VIEWER'); // 'VIEWER', 'TEMPLATES', 'WAREHOUSE'
+      const [hdtnActivePeriodTab, setHdtnActivePeriodTab] = useState('ALL'); // 'ALL', 'SHDC', 'HDGD', 'SHL'
+      const [currentHdtnPlan, setCurrentHdtnPlan] = useState(DEFAULT_HDTN_PLAN);
+      const [hdtnToast, setHdtnToast] = useState('');
+
+      const showHdtnToast = (msg) => {
+        setHdtnToast(msg);
+        setTimeout(() => setHdtnToast(''), 3500);
+      };
+
+      const [hdtnSavedPlans, setHdtnSavedPlans] = useState(() => {
+        try {
+          const s = localStorage.getItem('classroom_app_hdtn_saved_plans');
+          if (s) return JSON.parse(s);
+          return [
+            {
+              id: 'plan_sample_01',
+              title: DEFAULT_HDTN_PLAN.lessonTitle,
+              topic: DEFAULT_HDTN_PLAN.topic,
+              grade: DEFAULT_HDTN_PLAN.grade,
+              week: DEFAULT_HDTN_PLAN.week,
+              savedAt: '15/10/2026',
+              plan: DEFAULT_HDTN_PLAN
+            }
+          ];
+        } catch(e) {
+          return [];
+        }
+      });
+
+      const handleSelectHdtnPreset = (preset) => {
+        setHdtnGrade(preset.grade);
+        setHdtnTopic(preset.topic);
+        setHdtnWeek(preset.week);
+        setHdtnLessonTitle(preset.lessonTitle);
+        setHdtnDuration(preset.duration);
+        setHdtnNlsCode(preset.nlsCode);
+        setHdtnNlsDesc(preset.nlsDesc);
+        setHdtnNlaiCode(preset.nlaiCode);
+        setHdtnNlaiDesc(preset.nlaiDesc);
+        showHdtnToast(`Đã nạp thiết lập mẫu ${preset.grade}: ${preset.topic}`);
+      };
+
+      const handleGenerateHdtnPlan = () => {
+        setIsGeneratingHdtn(true);
+        setTimeout(() => {
+          setIsGeneratingHdtn(false);
+          const updatedPlan = {
+            ...DEFAULT_HDTN_PLAN,
+            id: 'plan_' + Date.now(),
+            grade: hdtnGrade,
+            schoolName: hdtnSchoolName,
+            teacherName: hdtnTeacherName,
+            departmentName: hdtnDepartment,
+            schoolYear: hdtnSchoolYear,
+            semester: hdtnSemester,
+            topic: hdtnTopic,
+            week: hdtnWeek,
+            lessonTitle: hdtnLessonTitle,
+            duration: hdtnDuration,
+            topicActivity: {
+              ...DEFAULT_HDTN_PLAN.topicActivity,
+              nls: hdtnNlsActive ? { code: hdtnNlsCode, title: 'Năng lực số', desc: hdtnNlsDesc } : null,
+              nlai: hdtnNlaiActive ? { code: hdtnNlaiCode, title: 'Năng lực AI', desc: hdtnNlaiDesc } : null,
+            }
+          };
+          setCurrentHdtnPlan(updatedPlan);
+          setHdtnActiveSubTab('VIEWER');
+          showHdtnToast('Đã tạo thành công Kế hoạch bài dạy theo mẫu chuẩn GDPT 2018!');
+        }, 1200);
+      };
+
+      const handleSaveHdtnPlan = () => {
+        const item = {
+          id: 'plan_' + Date.now(),
+          title: currentHdtnPlan.lessonTitle,
+          topic: currentHdtnPlan.topic,
+          grade: currentHdtnPlan.grade,
+          week: currentHdtnPlan.week,
+          savedAt: new Date().toLocaleDateString('vi-VN'),
+          plan: currentHdtnPlan
+        };
+        const updated = [item, ...hdtnSavedPlans];
+        setHdtnSavedPlans(updated);
+        localStorage.setItem('classroom_app_hdtn_saved_plans', JSON.stringify(updated));
+        showHdtnToast('Đã lưu Kế hoạch bài dạy vào Kho lưu trữ cá nhân!');
+      };
+
+      const handleDeleteHdtnPlan = (id) => {
+        const updated = hdtnSavedPlans.filter(p => p.id !== id);
+        setHdtnSavedPlans(updated);
+        localStorage.setItem('classroom_app_hdtn_saved_plans', JSON.stringify(updated));
+        showHdtnToast('Đã xóa bài dạy khỏi kho lưu trữ!');
+      };
+
+      const handleExportHdtnDoc = () => {
+        if (!currentHdtnPlan) return;
+        const p = currentHdtnPlan;
+        
+        let htmlDoc = `
+<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
+<head>
+<meta charset="utf-8">
+<title>${p.lessonTitle}</title>
+<style>
+  body { font-family: 'Times New Roman', serif; font-size: 13pt; line-height: 1.35; color: #000; }
+  h1 { font-size: 15pt; text-align: center; text-transform: uppercase; font-weight: bold; margin: 12pt 0 4pt 0; }
+  h2 { font-size: 13.5pt; text-transform: uppercase; font-weight: bold; margin: 12pt 0 4pt 0; }
+  h3 { font-size: 13pt; font-weight: bold; margin: 8pt 0 3pt 0; }
+  table.header-table { width: 100%; border-collapse: collapse; margin-bottom: 12pt; border: none; }
+  table.header-table td { vertical-align: top; font-size: 12pt; border: none; padding: 2pt 4pt; }
+  table.content-table { width: 100%; border-collapse: collapse; margin: 8pt 0; }
+  table.content-table th, table.content-table td { border: 1pt solid #000; padding: 6pt; vertical-align: top; font-size: 12pt; }
+  table.content-table th { background-color: #f2f2f2; text-align: center; font-weight: bold; }
+  .nls-tag { color: #dc2626; font-weight: bold; }
+  .nlai-tag { color: #2563eb; font-weight: bold; }
+  .center { text-align: center; }
+  .bold { font-weight: bold; }
+  .italic { font-style: italic; }
+</style>
+</head>
+<body>
+  <!-- KHUNG ĐẦU TRANG 2 CỘT CHUẨN MẪU TỊNH BIÊN -->
+  <table class="header-table">
+    <tr>
+      <td style="width: 50%;">
+        <div class="bold center">${p.schoolName}</div>
+        <div class="center">${p.departmentName}</div>
+      </td>
+      <td style="width: 50%;">
+        <div class="bold center">Họ và tên GV: ${p.teacherName}</div>
+        <div class="center">Năm học: ${p.schoolYear} • ${p.semester}</div>
+      </td>
+    </tr>
+  </table>
+
+  <h1>${p.topic} (${p.week})</h1>
+  <div class="center bold" style="font-size: 13.5pt; margin-bottom: 12pt;">BÀI: ${p.lessonTitle.toUpperCase()}</div>
+  <div class="center italic" style="margin-bottom: 14pt;">Thời lượng: ${p.duration}</div>
+
+  <h2>PHẦN A. MỤC TIÊU CHUNG CỦA CHỦ ĐỀ</h2>
+  <p><span class="bold">• Kiến thức:</span></p>
+  <ul>
+    ${p.generalObjectives.knowledge.map(k => `<li>${k}</li>`).join('')}
+  </ul>
+  <p><span class="bold">• Phẩm chất:</span></p>
+  <ul>
+    ${p.generalObjectives.qualities.map(q => `<li>${q}</li>`).join('')}
+  </ul>
+  <p><span class="bold">• Năng lực:</span></p>
+  <ul>
+    ${p.generalObjectives.competencies.map(c => `<li>${c}</li>`).join('')}
+  </ul>
+
+  <h2>PHẦN B. THIẾT KẾ TIẾN TRÌNH CÁC TIẾT DẠY</h2>
+
+  <!-- TIẾT 1 -->
+  <h3>${p.flagSalute.title}</h3>
+  <div class="italic bold">${p.flagSalute.subTitle}</div>
+  <div class="italic" style="margin-bottom: 6pt;">${p.flagSalute.note}</div>
+  <p><span class="bold">1. Mục tiêu:</span> ${p.flagSalute.objectives}</p>
+  <p><span class="bold">2. Thiết bị dạy học và học liệu:</span> ${p.flagSalute.equipment}</p>
+  <p class="bold">3. Tiến trình tổ chức hoạt động tại phòng học (Cả lớp chia thành 6 nhóm):</p>
+  <table class="content-table">
+    <thead>
+      <tr>
+        <th style="width: 65%;">HOẠT ĐỘNG CỦA GIÁO VIÊN VÀ HỌC SINH</th>
+        <th style="width: 35%;">DỰ KIẾN SẢN PHẨM</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${p.flagSalute.steps.map(s => `
+        <tr>
+          <td>
+            <div class="bold" style="margin-bottom: 4pt;">${s.name}</div>
+            <div class="italic" style="margin-bottom: 2pt;">* Mục tiêu: ${s.objective}</div>
+            <div class="italic" style="margin-bottom: 4pt;">* Phương pháp: ${s.method}</div>
+            <div>${s.action.replace(/\n/g, '<br/>')}</div>
+          </td>
+          <td>${s.product.replace(/\n/g, '<br/>')}</td>
+        </tr>
+      `).join('')}
+    </tbody>
+  </table>
+
+  <!-- TIẾT 2 -->
+  <h3 style="page-break-before: always;">${p.topicActivity.title}</h3>
+  <div class="bold italic" style="margin-bottom: 8pt;">${p.topicActivity.subTitle}</div>
+  ${p.topicActivity.nls ? `<div class="nls-tag" style="margin-bottom: 4pt;">[NLS] - ${p.topicActivity.nls.title} (${p.topicActivity.nls.code}): ${p.topicActivity.nls.desc}</div>` : ''}
+  ${p.topicActivity.nlai ? `<div class="nlai-tag" style="margin-bottom: 8pt;">[NLAI] - ${p.topicActivity.nlai.title} (${p.topicActivity.nlai.code}): ${p.topicActivity.nlai.desc}</div>` : ''}
+  
+  <p class="bold">Tiến trình tổ chức hoạt động dạy học (Chuẩn 4 bước Công văn 5512):</p>
+  <table class="content-table">
+    <thead>
+      <tr>
+        <th style="width: 65%;">HOẠT ĐỘNG CỦA GV VÀ HS</th>
+        <th style="width: 35%;">DỰ KIẾN SẢN PHẨM</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${p.topicActivity.activities.map(act => `
+        <tr>
+          <td>
+            <div class="bold" style="margin-bottom: 4pt; font-size: 12.5pt;">${act.name}</div>
+            <div class="italic" style="margin-bottom: 2pt;">* Mục tiêu: ${act.objective}</div>
+            <div class="italic" style="margin-bottom: 4pt;">* Phương pháp: ${act.method}</div>
+            <div class="bold" style="margin-top: 4pt;">* Tổ chức thực hiện:</div>
+            ${act.steps.map(st => `
+              <div style="margin-top: 4pt;">
+                <span class="bold">${st.stepTitle}:</span> 
+                ${st.text.replace(/\[NLS\]/g, '<span class="nls-tag">[NLS]</span>').replace(/\[NLAI\]/g, '<span class="nlai-tag">[NLAI]</span>').replace(/\n/g, '<br/>')}
+              </div>
+            `).join('')}
+          </td>
+          <td>${act.product.replace(/\[NLS\]/g, '<span class="nls-tag">[NLS]</span>').replace(/\[NLAI\]/g, '<span class="nlai-tag">[NLAI]</span>').replace(/\n/g, '<br/>')}</td>
+        </tr>
+      `).join('')}
+    </tbody>
+  </table>
+
+  <!-- TIẾT 3 -->
+  <h3 style="page-break-before: always;">${p.classMeeting.title}</h3>
+  <div class="bold italic" style="margin-bottom: 4pt;">${p.classMeeting.subTitle}</div>
+  <div class="italic" style="margin-bottom: 8pt;">${p.classMeeting.note}</div>
+  
+  <p class="bold">Tiến trình 5 bước tổ chức Sinh hoạt lớp:</p>
+  <table class="content-table">
+    <thead>
+      <tr>
+        <th style="width: 65%;">HOẠT ĐỘNG CỦA GV VÀ HS</th>
+        <th style="width: 35%;">DỰ KIẾN SẢN PHẨM</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${p.classMeeting.steps.map(s => `
+        <tr>
+          <td>
+            <div class="bold" style="margin-bottom: 4pt;">${s.name}</div>
+            <div class="italic" style="margin-bottom: 2pt;">* Mục tiêu: ${s.objective}</div>
+            <div class="italic" style="margin-bottom: 4pt;">* Phương pháp: ${s.method}</div>
+            <div>${s.action.replace(/\n/g, '<br/>')}</div>
+          </td>
+          <td>${s.product.replace(/\n/g, '<br/>')}</td>
+        </tr>
+      `).join('')}
+    </tbody>
+  </table>
+
+  <div style="margin-top: 14pt; padding: 10pt; border: 1pt dashed #000; background-color: #fafafa;">
+    <div class="bold center" style="font-size: 13pt;">${p.classMeeting.commitmentA0.title}</div>
+    <div class="center italic" style="margin-bottom: 8pt;">Đơn vị: ${p.classMeeting.commitmentA0.school}</div>
+    <ul>
+      ${p.classMeeting.commitmentA0.rules.map(r => `<li>${r}</li>`).join('')}
+    </ul>
+    <table class="header-table" style="margin-top: 14pt;">
+      <tr>
+        <td class="center bold">ĐẠI DIỆN HỌC SINH<br/><span class="italic" style="font-weight: normal;">(Lớp trưởng, Bí thư, Tổ trưởng ký tên)</span></td>
+        <td class="center bold">GIÁO VIÊN CHỦ NHIỆM<br/><span class="italic" style="font-weight: normal;">(Ký và ghi rõ họ tên)</span></td>
+      </tr>
+    </table>
+  </div>
+</body>
+</html>
+`;
+        const blob = new Blob([htmlDoc], { type: 'application/msword;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `GiaoAn_HDTN_Lop${p.grade}_${p.week.replace(/\s+/g, '_')}_${p.teacherName.replace(/\s+/g, '_')}.doc`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        showHdtnToast('Đã xuất Kế hoạch bài dạy chuẩn Word (.doc) thành công!');
+      };
+ // 'MATERIALS', 'STATS', 'DATABASE_VIEW'
       const [lessons, setLessons] = useState(INITIAL_LESSONS);
       const [materials, setMaterials] = useState(INITIAL_MATERIALS);
       const [selectedLesson, setSelectedLesson] = useState(INITIAL_LESSONS[0]);
@@ -132,12 +694,244 @@
       const [filterCategory, setFilterCategory] = useState('ALL');
       const [showUploadModal, setShowUploadModal] = useState(false);
 
+      // User Auth State & LocalStorage Persistence
+      const [currentUser, setCurrentUser] = useState(() => {
+        try {
+          const savedUser = localStorage.getItem('classroom_app_current_user');
+          return savedUser ? JSON.parse(savedUser) : {
+            id: 'admin_dangvansach_01',
+            email: 'dangvansach86@gmail.com',
+            fullName: 'Đặng Văn Sạch',
+            schoolName: 'Ban Quản Trị Hệ Thống (Super Admin)',
+            subject: 'Quản trị viên Hệ thống AI Master',
+            avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150',
+            role: 'ADMIN'
+          };
+        } catch(e) {
+          return null;
+        }
+      });
+
+      const [showAuthModal, setShowAuthModal] = useState(false);
+      const [authTab, setAuthTab] = useState('LOGIN'); // 'LOGIN' or 'REGISTER'
+      const [authForm, setAuthForm] = useState({
+        email: '',
+        password: '',
+        fullName: '',
+        schoolName: 'Trường THCS Chu Văn An',
+        subject: 'Công nghệ',
+        confirmPassword: ''
+      });
+      const [authError, setAuthError] = useState('');
+      const [authSuccess, setAuthSuccess] = useState('');
+      const [showProfileMenu, setShowProfileMenu] = useState(false);
+
+      // PPCT Generator Module State (ho_tro_tạo_ppct_CN)
+      const [ppctSubject, setPpctSubject] = useState('Công nghệ');
+      const [ppctGrade, setPpctGrade] = useState('Lớp 10');
+      const [ppctTotalPeriods, setPpctTotalPeriods] = useState(35);
+      const [ppctFile, setPpctFile] = useState(null);
+      const [isGeneratingPpct, setIsGeneratingPpct] = useState(false);
+      const [ppctData, setPpctData] = useState([
+        { tietPpct: "1", baiHoc: "Mở đầu: Bài 1. Công nghệ và đời sống xã hội", soTiet: 1, thoiDiem: "Tuần 1", thietBi: "SGK, Máy chiếu, Slide 3D", diaDiem: "Lớp học", ghiChu: "Khởi động chương trình" },
+        { tietPpct: "2-3", baiHoc: "Bài 2. Hệ thống kỹ thuật và quy trình công nghệ", soTiet: 2, thoiDiem: "Tuần 1 - Tuần 2", thietBi: "SGK, Mô hình sơ đồ khối", diaDiem: "Lớp học", ghiChu: "Thảo luận nhóm" },
+        { tietPpct: "4-5", baiHoc: "Bài 3. Bản vẽ kỹ thuật và tiêu chuẩn trình bày", soTiet: 2, thoiDiem: "Tuần 2 - Tuần 3", thietBi: "Bộ dụng cụ vẽ, giấy A4, máy chiếu", diaDiem: "Phòng thực hành", ghiChu: "Thực hành vẽ" },
+        { tietPpct: "6-7", baiHoc: "Bài 4. Thiết kế kỹ thuật và các bước thực hiện", soTiet: 2, thoiDiem: "Tuần 3 - Tuần 4", thietBi: "SGK, Phiếu học tập số 1", diaDiem: "Lớp học", ghiChu: "Đánh giá 5512" },
+        { tietPpct: "8", baiHoc: "Kiểm tra đánh giá giữa kỳ I môn Công nghệ", soTiet: 1, thoiDiem: "Tuần 4", thietBi: "Ma trận đề thi, giấy làm bài", diaDiem: "Lớp học", ghiChu: "Kiểm tra 45 phút" }
+      ]);
+
+      const handleGeneratePpct = () => {
+        setIsGeneratingPpct(true);
+        setTimeout(() => {
+          setIsGeneratingPpct(false);
+          const generatedTable = [
+            { tietPpct: "1", baiHoc: `Mở đầu: Khái quát về môn ${ppctSubject} ${ppctGrade}`, soTiet: 1, thoiDiem: "Tuần 1", thietBi: "SGK, Máy chiếu, Slide bài giảng", diaDiem: "Lớp học", ghiChu: "Giới thiệu chương trình" },
+            { tietPpct: "2-3", baiHoc: "Chương I: Tổng quan về Thiết kế & Quy trình Kỹ thuật", soTiet: 2, thoiDiem: "Tuần 1-2", thietBi: "Bộ dụng cụ mô phỏng 3D, phiếu học tập", diaDiem: "Lớp học", ghiChu: "Hoạt động nhóm 4 HS" },
+            { tietPpct: "4-6", baiHoc: "Chương II: Bản vẽ kỹ thuật và Đọc bản vẽ chi tiết", soTiet: 3, thoiDiem: "Tuần 2-3", thietBi: "Thước kẻ, bản vẽ mẫu CAD, giấy A4", diaDiem: "Phòng thực hành", ghiChu: "Thực hành cá nhân" },
+            { tietPpct: "7-9", baiHoc: "Chương III: Vật liệu kỹ thuật và Phương pháp gia công", soTiet: 3, thoiDiem: "Tuần 4-5", thietBi: "Mẫu vật liệu (kim loại, phi kim), kính bảo hộ", diaDiem: "Phòng thực hành Công nghệ", ghiChu: "Thực hành nhận biết" },
+            { tietPpct: "10", baiHoc: "Kiểm tra Đánh giá Giữa Kỳ I", soTiet: 1, thoiDiem: "Tuần 5", thietBi: "Đề kiểm tra, đáp án ma trận 4 cấp độ", diaDiem: "Lớp học", ghiChu: "Đánh giá định kỳ 45p" },
+            { tietPpct: "11-14", baiHoc: "Chương IV: Ứng dụng Công nghệ cao & Tự động hóa", soTiet: 4, thoiDiem: "Tuần 6-7", thietBi: "Mô hình Arduino, cảm biến độ ẩm, rơ-le", diaDiem: "Phòng STEM / Lab", ghiChu: "Dự án học tập" },
+            { tietPpct: "15-18", baiHoc: "Chương V: Định hướng nghề nghiệp ngành Kỹ thuật - Công nghệ", soTiet: 4, thoiDiem: "Tuần 8-9", thietBi: "Video thực tế doanh nghiệp, trắc nghiệm Holland", diaDiem: "Lớp học / Hội trường", ghiChu: "Hướng nghiệp Lớp 10-12" }
+          ];
+          setPpctData(generatedTable);
+        }, 1200);
+      };
+
+      const handleExportPpctWord = () => {
+        if (!ppctData) return;
+        let content = `BẢNG PHÂN PHỐI CHƯƠNG TRÌNH MÔN ${ppctSubject.toUpperCase()} - ${ppctGrade.toUpperCase()}\n`;
+        content += `Tổng số tiết: ${ppctTotalPeriods} tiết / năm học\n\n`;
+        content += `Tiết PPCT\tBài học / Chủ đề\tSố tiết\tThời điểm\tThiết bị dạy học\tĐịa điểm\tGhi chú\n`;
+        ppctData.forEach(item => {
+          content += `${item.tietPpct}\t${item.baiHoc}\t${item.soTiet}\t${item.thoiDiem}\t${item.thietBi}\t${item.diaDiem}\t${item.ghiChu}\n`;
+        });
+        const blob = new Blob([content], { type: 'application/msword;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `PPCT_${ppctSubject}_${ppctGrade}.doc`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      };
+
+      // Auth Handler Actions
+      const openLoginModal = () => {
+        setAuthTab('LOGIN');
+        setAuthError('');
+        setAuthSuccess('');
+        setShowAuthModal(true);
+      };
+
+      const openRegisterModal = () => {
+        setAuthTab('REGISTER');
+        setAuthError('');
+        setAuthSuccess('');
+        setShowAuthModal(true);
+      };
+
+      const handleAuthSubmit = (e) => {
+        e.preventDefault();
+        setAuthError('');
+        setAuthSuccess('');
+
+        let savedUsers = [];
+        try {
+          savedUsers = JSON.parse(localStorage.getItem('classroom_app_registered_users') || '[]');
+        } catch(err) { savedUsers = []; }
+
+        if (authTab === 'LOGIN') {
+          if (!authForm.email || !authForm.password) {
+            setAuthError('Vui lòng nhập đầy đủ Email và Mật khẩu!');
+            return;
+          }
+
+          let identifier = authForm.email.trim().toLowerCase();
+          let foundUser = null;
+
+          // Admin Đặng Văn Sạch check
+          if (
+            (identifier === 'dangvansach86' || 
+             identifier === 'dangvansach86@gmail.com' || 
+             identifier === 'dangvansach86@edu.vn' || 
+             identifier === 'đặng văn sạch' || 
+             identifier === 'dang van sach') && 
+            authForm.password === '20121984@'
+          ) {
+            foundUser = {
+              id: 'admin_dangvansach_01',
+              email: 'dangvansach86@gmail.com',
+              fullName: 'Đặng Văn Sạch',
+              schoolName: 'Ban Quản Trị Hệ Thống (Super Admin)',
+              subject: 'Quản trị viên Hệ thống AI Master',
+              avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150',
+              role: 'ADMIN'
+            };
+          } else if (identifier === 'teacher.demo@edu.vn' && authForm.password === '123456') {
+            foundUser = {
+              id: '00000000-0000-0000-0000-000000000001',
+              email: 'teacher.demo@edu.vn',
+              fullName: 'Thầy Nguyễn Văn An',
+              schoolName: 'Trường THCS Chu Văn An',
+              subject: 'Công nghệ & Hướng nghiệp',
+              avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150',
+              role: 'TEACHER'
+            };
+          } else {
+            foundUser = savedUsers.find(u => 
+              (u.email.toLowerCase() === identifier || u.username === identifier) && u.password === authForm.password
+            );
+          }
+
+          if (foundUser) {
+            const userProfile = {
+              id: foundUser.id,
+              email: foundUser.email,
+              fullName: foundUser.fullName,
+              schoolName: foundUser.schoolName || 'Trường THCS / THPT',
+              subject: foundUser.subject || 'Công nghệ',
+              avatarUrl: foundUser.avatarUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150',
+              role: foundUser.role || 'TEACHER'
+            };
+            setCurrentUser(userProfile);
+            localStorage.setItem('classroom_app_current_user', JSON.stringify(userProfile));
+            setAuthSuccess(`Đăng nhập thành công! Chào mừng Quản trị viên ${userProfile.fullName}`);
+            setTimeout(() => {
+              setShowAuthModal(false);
+              setAuthSuccess('');
+            }, 800);
+          } else {
+            setAuthError('Email hoặc mật khẩu không chính xác! (Admin: dangvansach86@gmail.com / 20121984@)');
+          }
+        } else {
+          // REGISTER FLOW
+          if (!authForm.fullName || !authForm.email || !authForm.password) {
+            setAuthError('Vui lòng điền đầy đủ Họ tên, Email và Mật khẩu!');
+            return;
+          }
+
+          if (authForm.password.length < 6) {
+            setAuthError('Mật khẩu phải chứa từ 6 ký tự trở lên!');
+            return;
+          }
+
+          if (authForm.password !== authForm.confirmPassword) {
+            setAuthError('Mật khẩu xác nhận không trùng khớp!');
+            return;
+          }
+
+          const existing = savedUsers.find(u => u.email.toLowerCase() === authForm.email.trim().toLowerCase());
+          if (existing) {
+            setAuthError('Email này đã được sử dụng! Vui lòng đăng nhập.');
+            return;
+          }
+
+          const newUser = {
+            id: 'usr_' + Date.now(),
+            email: authForm.email.trim(),
+            password: authForm.password,
+            fullName: authForm.fullName.trim(),
+            schoolName: authForm.schoolName.trim() || 'Trường THCS / THPT',
+            subject: authForm.subject || 'Công nghệ',
+            avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150',
+            role: 'TEACHER'
+          };
+
+          savedUsers.push(newUser);
+          localStorage.setItem('classroom_app_registered_users', JSON.stringify(savedUsers));
+
+          const userProfile = {
+            id: newUser.id,
+            email: newUser.email,
+            fullName: newUser.fullName,
+            schoolName: newUser.schoolName,
+            subject: newUser.subject,
+            avatarUrl: newUser.avatarUrl,
+            role: newUser.role
+          };
+          setCurrentUser(userProfile);
+          localStorage.setItem('classroom_app_current_user', JSON.stringify(userProfile));
+
+          setAuthSuccess(`Tạo tài khoản thành công! Xin chào ${userProfile.fullName}`);
+          setTimeout(() => {
+            setShowAuthModal(false);
+            setAuthSuccess('');
+          }, 1000);
+        }
+      };
+
+      const handleLogout = () => {
+        setCurrentUser(null);
+        localStorage.removeItem('classroom_app_current_user');
+        setShowProfileMenu(false);
+      };
+
       // Effect to initialize Lucide icons
       useEffect(() => {
         if (window.lucide) {
           window.lucide.createIcons();
         }
-      }, [activeTab, lessons, isGenerating, generatedStreamText, showUploadModal]);
+      }, [activeTab, lessons, isGenerating, generatedStreamText, showUploadModal, showAuthModal, currentUser, showProfileMenu, authTab, hdtnActiveSubTab, hdtnActivePeriodTab, currentHdtnPlan]);
 
       // AI Lesson Plan Streaming Generator Handler
       const handleGenerateLesson = () => {
@@ -218,93 +1012,186 @@
           <header className="bg-slate-900 text-white border-b border-slate-800 sticky top-0 z-50 shadow-md">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
               <div className="flex items-center space-x-3">
-                <div className="bg-emerald-600 p-2 rounded-lg text-white font-bold flex items-center justify-center">
-                  <i data-lucide="cpu" className="w-6 h-6"></i>
+                <div className="flex items-center justify-center shrink-0">
+                  <img
+                    src="logo.png"
+                    alt="Classroom App Logo"
+                    className="w-10 h-10 object-contain rounded-xl border border-emerald-500/40 bg-slate-800/60 p-1 shadow-md hover:scale-105 transition-transform"
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = 'logo.jpg';
+                    }}
+                  />
                 </div>
                 <div>
                   <h1 className="font-bold text-lg leading-tight tracking-wide flex items-center gap-2">
-                    Classroom App <span className="bg-emerald-500/20 text-emerald-400 text-xs px-2 py-0.5 rounded-full border border-emerald-500/30">AI Assistant</span>
+                    Trợ Lý Thông Minh <span className="bg-emerald-500/20 text-emerald-400 text-xs px-2 py-0.5 rounded-full border border-emerald-500/30">AI Assistant</span>
                   </h1>
                   <p className="text-xs text-slate-400">Trợ lý AI Bộ Môn Công Nghệ & Hoạt Động Trải Nghiệm - Hướng Nghiệp</p>
                 </div>
               </div>
 
-              {/* Status Indicators representing Architecture Diagram */}
-              <div className="hidden md:flex items-center space-x-6 text-xs text-slate-300">
+              {/* Status Indicators representing Architecture Diagram & User Profile */}
+              <div className="hidden md:flex items-center space-x-4 text-xs text-slate-300">
                 <div className="flex items-center gap-1.5 bg-slate-800 px-3 py-1.5 rounded-md border border-slate-700">
                   <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                  <span>Vercel Edge CDN & API</span>
+                  <span>Vercel Edge CDN</span>
                 </div>
                 <div className="flex items-center gap-1.5 bg-slate-800 px-3 py-1.5 rounded-md border border-slate-700">
                   <i data-lucide="shield-check" className="w-4 h-4 text-cyan-400"></i>
-                  <span>Supabase Project: aqvftcfoovckjcldqfbr</span>
+                  <span>Supabase Auth</span>
                 </div>
-                <div className="flex items-center gap-2 border-l border-slate-700 pl-4">
-                  <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150" className="w-8 h-8 rounded-full border border-emerald-500" />
-                  <div className="text-left">
-                    <p className="font-semibold text-white">Thầy Nguyễn Văn An</p>
-                    <p className="text-[10px] text-slate-400">Giáo viên Công nghệ</p>
+
+                {currentUser ? (
+                  <div className="relative border-l border-slate-700 pl-4">
+                    <div
+                      onClick={() => setShowProfileMenu(!showProfileMenu)}
+                      className="flex items-center gap-2.5 cursor-pointer hover:opacity-90 transition-opacity bg-slate-800/80 px-3 py-1.5 rounded-lg border border-slate-700/80"
+                    >
+                      <img src={currentUser.avatarUrl} className="w-7 h-7 rounded-full border border-emerald-500 object-cover" />
+                      <div className="text-left">
+                        <p className="font-semibold text-white text-xs flex items-center gap-1">
+                          {currentUser.fullName}
+                          <i data-lucide="chevron-down" className="w-3.5 h-3.5 text-slate-400"></i>
+                        </p>
+                        <p className="text-[10px] text-slate-400 truncate max-w-[120px]">{currentUser.schoolName}</p>
+                      </div>
+                    </div>
+
+                    {showProfileMenu && (
+                      <div className="absolute right-0 mt-2 w-60 bg-slate-900 border border-slate-700 rounded-xl shadow-2xl p-2 z-50 text-slate-200 animate-in fade-in zoom-in-95 duration-150">
+                        <div className="p-2.5 border-b border-slate-800 bg-slate-950/50 rounded-lg">
+                          <p className="font-bold text-xs text-white">{currentUser.fullName}</p>
+                          <p className="text-[11px] text-slate-400 truncate">{currentUser.email}</p>
+                          <span className="inline-block mt-1 text-[10px] bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded border border-emerald-500/30">
+                            {currentUser.subject}
+                          </span>
+                        </div>
+                        <button
+                          onClick={handleLogout}
+                          className="w-full mt-2 flex items-center space-x-2 px-3 py-2 rounded-lg text-xs font-semibold text-rose-400 hover:bg-rose-500/10 transition-colors"
+                        >
+                          <i data-lucide="log-out" className="w-4 h-4"></i>
+                          <span>Đăng xuất tài khoản</span>
+                        </button>
+                      </div>
+                    )}
                   </div>
-                </div>
+                ) : (
+                  <div className="flex items-center space-x-2 border-l border-slate-700 pl-4">
+                    <button
+                      onClick={openLoginModal}
+                      className="bg-slate-800 hover:bg-slate-700 text-white font-medium text-xs px-3.5 py-1.5 rounded-lg border border-slate-700 flex items-center gap-1.5 transition-all"
+                    >
+                      <i data-lucide="log-in" className="w-3.5 h-3.5 text-emerald-400"></i>
+                      <span>Đăng nhập</span>
+                    </button>
+                    <button
+                      onClick={openRegisterModal}
+                      className="bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-xs px-3.5 py-1.5 rounded-lg shadow-sm flex items-center gap-1.5 transition-all"
+                    >
+                      <i data-lucide="user-plus" className="w-3.5 h-3.5"></i>
+                      <span>Đăng ký</span>
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           </header>
 
           <div className="flex-1 flex max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 gap-6">
             {/* SIDEBAR NAVIGATION */}
-            <aside className="w-64 bg-white rounded-xl border border-slate-200 shadow-sm p-4 flex flex-col justify-between hidden md:flex">
+            <aside className="w-64 bg-white/90 backdrop-blur-md rounded-xl border border-slate-200/80 shadow-sm p-4 flex flex-col justify-between hidden md:flex shrink-0">
               <div className="space-y-1">
-                <div className="px-3 py-2 text-xs font-semibold text-slate-400 uppercase tracking-wider">
-                  Chức năng chính
+                <div className="px-3 py-1.5 text-xs font-bold text-slate-400 uppercase tracking-wider">
+                  Trợ Lý Chuyên Môn AI
                 </div>
+                
+                {/* TAB 1: SOẠN GIÁO ÁN THEO MẪU (HĐTN) - MODULE MỚI */}
                 <button
-                  onClick={() => setActiveTab('AI_GENERATOR')}
-                  className={`w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
-                    activeTab === 'AI_GENERATOR' ? 'bg-emerald-50 text-emerald-700 font-semibold border-l-4 border-emerald-600' : 'text-slate-600 hover:bg-slate-50'
+                  onClick={() => setActiveTab('HDTN_TEMPLATE_GENERATOR')}
+                  className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                    activeTab === 'HDTN_TEMPLATE_GENERATOR' ? 'bg-emerald-50 text-emerald-800 font-bold border-l-4 border-emerald-600 shadow-sm' : 'text-slate-700 hover:bg-slate-50'
                   }`}
                 >
-                  <i data-lucide="sparkles" className="w-4 h-4 text-emerald-600"></i>
-                  <span>Trợ Lý AI Soạn KHBD 5512</span>
-                </button>
-                <button
-                  onClick={() => setActiveTab('EXAM_GENERATOR')}
-                  className={`w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
-                    activeTab === 'EXAM_GENERATOR' ? 'bg-emerald-50 text-emerald-700 font-semibold border-l-4 border-emerald-600' : 'text-slate-600 hover:bg-slate-50'
-                  }`}
-                >
-                  <i data-lucide="file-check-2" className="w-4 h-4 text-cyan-600"></i>
-                  <span>Tạo Đề Thi & Câu Hỏi</span>
-                </button>
-                <button
-                  onClick={() => setActiveTab('MATERIALS')}
-                  className={`w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
-                    activeTab === 'MATERIALS' ? 'bg-emerald-50 text-emerald-700 font-semibold border-l-4 border-emerald-600' : 'text-slate-600 hover:bg-slate-50'
-                  }`}
-                >
-                  <i data-lucide="folder-open" className="w-4 h-4 text-amber-600"></i>
-                  <span>Thư Viện Học Liệu</span>
-                </button>
-                <button
-                  onClick={() => setActiveTab('STATS')}
-                  className={`w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
-                    activeTab === 'STATS' ? 'bg-emerald-50 text-emerald-700 font-semibold border-l-4 border-emerald-600' : 'text-slate-600 hover:bg-slate-50'
-                  }`}
-                >
-                  <i data-lucide="bar-chart-3" className="w-4 h-4 text-indigo-600"></i>
-                  <span>Báo Cáo & Thống Kê</span>
+                  <div className="flex items-center space-x-2.5 truncate">
+                    <i data-lucide="sparkles" className="w-4 h-4 text-emerald-600 shrink-0"></i>
+                    <span className="truncate">Soạn GA Theo Mẫu (HĐTN)</span>
+                  </div>
+                  <span className="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-1.5 py-0.5 rounded uppercase">Mới</span>
                 </button>
 
-                <div className="pt-4 px-3 py-2 text-xs font-semibold text-slate-400 uppercase tracking-wider border-t border-slate-100">
-                  Cơ Sở Dữ Liệu Cloud
-                </div>
+                {/* TAB 2: SOẠN KẾ HOẠCH BÀI DẠY 5512 CÔNG NGHỆ */}
                 <button
-                  onClick={() => setActiveTab('DATABASE_VIEW')}
-                  className={`w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
-                    activeTab === 'DATABASE_VIEW' ? 'bg-slate-100 text-slate-900 font-semibold' : 'text-slate-600 hover:bg-slate-50'
+                  onClick={() => setActiveTab('AI_GENERATOR')}
+                  className={`w-full flex items-center space-x-2.5 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                    activeTab === 'AI_GENERATOR' ? 'bg-emerald-50 text-emerald-800 font-bold border-l-4 border-emerald-600 shadow-sm' : 'text-slate-700 hover:bg-slate-50'
                   }`}
                 >
-                  <i data-lucide="database" className="w-4 h-4 text-slate-700"></i>
-                  <span>Supabase PostgreSQL Schema</span>
+                  <i data-lucide="bot" className="w-4 h-4 text-cyan-600 shrink-0"></i>
+                  <span className="truncate">Soạn KHBD 5512 Công Nghệ</span>
+                </button>
+
+                {/* TAB 3: TẠO PPCT 7 CỘT */}
+                <button
+                  onClick={() => setActiveTab('PPCT_GENERATOR')}
+                  className={`w-full flex items-center space-x-2.5 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                    activeTab === 'PPCT_GENERATOR' ? 'bg-emerald-50 text-emerald-800 font-bold border-l-4 border-emerald-600 shadow-sm' : 'text-slate-700 hover:bg-slate-50'
+                  }`}
+                >
+                  <i data-lucide="calendar-range" className="w-4 h-4 text-blue-600 shrink-0"></i>
+                  <span className="truncate">Tạo Phân Phối CT (PPCT)</span>
+                </button>
+
+                {/* TAB 4: NGÂN HÀNG ĐỀ THI */}
+                <button
+                  onClick={() => setActiveTab('EXAM_GENERATOR')}
+                  className={`w-full flex items-center space-x-2.5 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                    activeTab === 'EXAM_GENERATOR' ? 'bg-emerald-50 text-emerald-800 font-bold border-l-4 border-emerald-600 shadow-sm' : 'text-slate-700 hover:bg-slate-50'
+                  }`}
+                >
+                  <i data-lucide="file-check" className="w-4 h-4 text-slate-700 shrink-0"></i>
+                  <span className="truncate">Ngân Hàng Đề & Ma Trận</span>
+                </button>
+
+                <div className="pt-3 px-3 py-1.5 text-xs font-bold text-slate-400 uppercase tracking-wider border-t border-slate-100">
+                  Quản Lý & Học Liệu
+                </div>
+
+                {/* TAB 5: THƯ VIỆN HỌC LIỆU */}
+                <button
+                  onClick={() => setActiveTab('MATERIALS')}
+                  className={`w-full flex items-center space-x-2.5 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                    activeTab === 'MATERIALS' ? 'bg-emerald-50 text-emerald-800 font-bold border-l-4 border-emerald-600 shadow-sm' : 'text-slate-700 hover:bg-slate-50'
+                  }`}
+                >
+                  <i data-lucide="folder-open" className="w-4 h-4 text-amber-600 shrink-0"></i>
+                  <span className="truncate">Thư Viện Học Liệu</span>
+                </button>
+
+                {/* TAB 6: BÁO CÁO & THỐNG KÊ */}
+                <button
+                  onClick={() => setActiveTab('STATS')}
+                  className={`w-full flex items-center space-x-2.5 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                    activeTab === 'STATS' ? 'bg-emerald-50 text-emerald-800 font-bold border-l-4 border-emerald-600 shadow-sm' : 'text-slate-700 hover:bg-slate-50'
+                  }`}
+                >
+                  <i data-lucide="bar-chart-3" className="w-4 h-4 text-indigo-600 shrink-0"></i>
+                  <span className="truncate">Báo Cáo & Thống Kê</span>
+                </button>
+
+                <div className="pt-3 px-3 py-1.5 text-xs font-bold text-slate-400 uppercase tracking-wider border-t border-slate-100">
+                  Cơ Sở Dữ Liệu Cloud
+                </div>
+                {/* TAB 7: SUPABASE DATABASE */}
+                <button
+                  onClick={() => setActiveTab('DATABASE_VIEW')}
+                  className={`w-full flex items-center space-x-2.5 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                    activeTab === 'DATABASE_VIEW' ? 'bg-slate-100 text-slate-900 font-bold' : 'text-slate-700 hover:bg-slate-50'
+                  }`}
+                >
+                  <i data-lucide="database" className="w-4 h-4 text-slate-700 shrink-0"></i>
+                  <span className="truncate">Supabase PostgreSQL</span>
                 </button>
               </div>
 
@@ -322,12 +1209,862 @@
 
             {/* MAIN CONTENT AREA */}
             <main className="flex-1 space-y-6">
+            {/* MOBILE NAVIGATION STRIP */}
+            <div className="md:hidden flex overflow-x-auto gap-2 pb-2 mb-4 border-b border-slate-200">
+              <button
+                onClick={() => setActiveTab('HDTN_TEMPLATE_GENERATOR')}
+                className={`px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap ${
+                  activeTab === 'HDTN_TEMPLATE_GENERATOR' ? 'bg-emerald-600 text-white font-bold' : 'bg-white text-slate-700 border border-slate-200'
+                }`}
+              >
+                🌟 GA Theo Mẫu HĐTN
+              </button>
+              <button
+                onClick={() => setActiveTab('AI_GENERATOR')}
+                className={`px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap ${
+                  activeTab === 'AI_GENERATOR' ? 'bg-emerald-600 text-white font-bold' : 'bg-white text-slate-700 border border-slate-200'
+                }`}
+              >
+                🤖 Soạn 5512 Công Nghệ
+              </button>
+              <button
+                onClick={() => setActiveTab('PPCT_GENERATOR')}
+                className={`px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap ${
+                  activeTab === 'PPCT_GENERATOR' ? 'bg-blue-600 text-white font-bold' : 'bg-white text-slate-700 border border-slate-200'
+                }`}
+              >
+                📅 Tạo PPCT 7 Cột
+              </button>
+              <button
+                onClick={() => setActiveTab('EXAM_GENERATOR')}
+                className={`px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap ${
+                  activeTab === 'EXAM_GENERATOR' ? 'bg-slate-800 text-white font-bold' : 'bg-white text-slate-700 border border-slate-200'
+                }`}
+              >
+                📝 Đề Thi & Ma Trận
+              </button>
+              <button
+                onClick={() => setActiveTab('MATERIALS')}
+                className={`px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap ${
+                  activeTab === 'MATERIALS' ? 'bg-emerald-600 text-white font-bold' : 'bg-white text-slate-700 border border-slate-200'
+                }`}
+              >
+                📂 Học Liệu
+              </button>
+              <button
+                onClick={() => setActiveTab('STATS')}
+                className={`px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap ${
+                  activeTab === 'STATS' ? 'bg-emerald-600 text-white font-bold' : 'bg-white text-slate-700 border border-slate-200'
+                }`}
+              >
+                📊 Thống Kê
+              </button>
+            </div>
+
+
+              
+              {/* TAB 0: TRỢ LÝ SOẠN GIÁO ÁN THEO MẪU (MODULE TRO_LY_SOAN_GA_HDTN) */}
+              {activeTab === 'HDTN_TEMPLATE_GENERATOR' && (
+                <div className="space-y-6">
+                  {/* Toast Notification */}
+                  {hdtnToast && (
+                    <div className="p-3 bg-emerald-600 text-white text-xs font-semibold rounded-xl shadow-lg flex items-center justify-between animate-in fade-in slide-in-from-top-2">
+                      <div className="flex items-center gap-2">
+                        <i data-lucide="check-circle-2" className="w-4 h-4"></i>
+                        <span>{hdtnToast}</span>
+                      </div>
+                      <button onClick={() => setHdtnToast('')} className="text-white hover:opacity-80">✕</button>
+                    </div>
+                  )}
+
+                  {/* Header Card */}
+                  <div className="bg-white/90 backdrop-blur-md p-6 rounded-xl border border-slate-200/80 shadow-sm space-y-4">
+                    <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-100 pb-4">
+                      <div className="flex items-center space-x-3">
+                        <div className="bg-emerald-100 text-emerald-800 p-2.5 rounded-xl border border-emerald-200 shadow-sm">
+                          <i data-lucide="sparkles" className="w-6 h-6"></i>
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <h2 className="font-bold text-slate-800 text-base md:text-lg">Trợ Lý AI Soạn Kế Hoạch Bài Dạy Theo Mẫu Giáo Viên</h2>
+                            <span className="text-[11px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full border border-emerald-200">
+                              Module tro_ly_soan_GA_hdtn
+                            </span>
+                          </div>
+                          <p className="text-xs text-slate-500 mt-0.5">
+                            Bám sát 100% mẫu chuẩn <strong>THCS Tịnh Biên</strong> • Công văn 5512 • Thông tư 02 • Tích hợp Năng lực số (NLS) & AI
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Subtabs Nav & Word Export Button */}
+                      <div className="flex flex-wrap items-center gap-2">
+                        <div className="bg-slate-100 p-1 rounded-lg flex items-center text-xs font-medium border border-slate-200">
+                          <button
+                            onClick={() => setHdtnActiveSubTab('VIEWER')}
+                            className={`px-3 py-1.5 rounded-md transition-all flex items-center gap-1.5 ${
+                              hdtnActiveSubTab === 'VIEWER' ? 'bg-white text-emerald-800 font-bold shadow-sm' : 'text-slate-600 hover:text-slate-900'
+                            }`}
+                          >
+                            <i data-lucide="file-text" className="w-3.5 h-3.5"></i>
+                            <span>Xem Giáo Án</span>
+                          </button>
+                          <button
+                            onClick={() => setHdtnActiveSubTab('TEMPLATES')}
+                            className={`px-3 py-1.5 rounded-md transition-all flex items-center gap-1.5 ${
+                              hdtnActiveSubTab === 'TEMPLATES' ? 'bg-white text-emerald-800 font-bold shadow-sm' : 'text-slate-600 hover:text-slate-900'
+                            }`}
+                          >
+                            <i data-lucide="layers" className="w-3.5 h-3.5"></i>
+                            <span>Kho Mẫu Chuẩn</span>
+                          </button>
+                          <button
+                            onClick={() => setHdtnActiveSubTab('WAREHOUSE')}
+                            className={`px-3 py-1.5 rounded-md transition-all flex items-center gap-1.5 ${
+                              hdtnActiveSubTab === 'WAREHOUSE' ? 'bg-white text-emerald-800 font-bold shadow-sm' : 'text-slate-600 hover:text-slate-900'
+                            }`}
+                          >
+                            <i data-lucide="folder" className="w-3.5 h-3.5"></i>
+                            <span>Kho Đã Lưu ({hdtnSavedPlans.length})</span>
+                          </button>
+                        </div>
+
+                        <button
+                          onClick={handleExportHdtnDoc}
+                          className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-3.5 py-2 rounded-lg flex items-center space-x-1.5 shadow-sm transition-all"
+                        >
+                          <i data-lucide="download" className="w-4 h-4"></i>
+                          <span>Xuất File Word (.doc)</span>
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Presets Chips */}
+                    <div>
+                      <div className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 flex items-center gap-1">
+                        <i data-lucide="zap" className="w-3.5 h-3.5 text-amber-500"></i>
+                        <span>Nạp nhanh chủ đề mẫu chuẩn THCS Tịnh Biên:</span>
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
+                        {HDTN_CURRICULUM_PRESETS.map((p, idx) => (
+                          <div
+                            key={idx}
+                            onClick={() => handleSelectHdtnPreset(p)}
+                            className={`p-2.5 rounded-lg border text-left cursor-pointer transition-all hover:border-emerald-500 hover:bg-emerald-50/50 ${
+                              hdtnGrade === p.grade && hdtnTopic === p.topic ? 'border-emerald-600 bg-emerald-50 shadow-sm' : 'border-slate-200 bg-slate-50'
+                            }`}
+                          >
+                            <div className="flex items-center justify-between text-xs font-bold text-emerald-800">
+                              <span>Lớp {p.grade} • {p.week}</span>
+                              <span className="text-[10px] bg-white px-1.5 py-0.5 rounded border border-emerald-200">3 tiết</span>
+                            </div>
+                            <p className="text-xs font-semibold text-slate-800 truncate mt-1">{p.topic}</p>
+                            <p className="text-[11px] text-slate-500 truncate">{p.lessonTitle}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Configuration Form Card */}
+                    <div className="pt-2 border-t border-slate-100 space-y-4">
+                      <div className="grid grid-cols-1 md:grid-cols-4 gap-3 text-xs">
+                        <div>
+                          <label className="block font-bold text-slate-700 mb-1">Khối Lớp *</label>
+                          <select
+                            value={hdtnGrade}
+                            onChange={(e) => setHdtnGrade(e.target.value)}
+                            className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 font-semibold"
+                          >
+                            <option value="6">Khối 6 (GDPT 2018)</option>
+                            <option value="7">Khối 7 (GDPT 2018)</option>
+                            <option value="8">Khối 8 (GDPT 2018)</option>
+                            <option value="9">Khối 9 (GDPT 2018 - THCS Tịnh Biên)</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label className="block font-bold text-slate-700 mb-1">Trường Công Tác *</label>
+                          <input
+                            type="text"
+                            value={hdtnSchoolName}
+                            onChange={(e) => setHdtnSchoolName(e.target.value)}
+                            className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                          />
+                        </div>
+                        <div>
+                          <label className="block font-bold text-slate-700 mb-1">Họ và Tên Giáo Viên *</label>
+                          <input
+                            type="text"
+                            value={hdtnTeacherName}
+                            onChange={(e) => setHdtnTeacherName(e.target.value)}
+                            className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 font-semibold text-emerald-800"
+                          />
+                        </div>
+                        <div>
+                          <label className="block font-bold text-slate-700 mb-1">Tổ Chuyên Môn *</label>
+                          <input
+                            type="text"
+                            value={hdtnDepartment}
+                            onChange={(e) => setHdtnDepartment(e.target.value)}
+                            className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-4 gap-3 text-xs">
+                        <div className="md:col-span-2">
+                          <label className="block font-bold text-slate-700 mb-1">Tên Chủ Đề *</label>
+                          <input
+                            type="text"
+                            value={hdtnTopic}
+                            onChange={(e) => setHdtnTopic(e.target.value)}
+                            className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 font-semibold"
+                            placeholder="Ví dụ: CHỦ ĐỀ 1: EM VỚI NHÀ TRƯỜNG"
+                          />
+                        </div>
+                        <div>
+                          <label className="block font-bold text-slate-700 mb-1">Tuần Giảng Dạy *</label>
+                          <input
+                            type="text"
+                            value={hdtnWeek}
+                            onChange={(e) => setHdtnWeek(e.target.value)}
+                            className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                            placeholder="Tuần 1..."
+                          />
+                        </div>
+                        <div>
+                          <label className="block font-bold text-slate-700 mb-1">Thời Lượng *</label>
+                          <input
+                            type="text"
+                            value={hdtnDuration}
+                            onChange={(e) => setHdtnDuration(e.target.value)}
+                            className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="text-xs">
+                        <label className="block font-bold text-slate-700 mb-1">Tên Bài Dạy / Hoạt Động Trọng Tâm *</label>
+                        <input
+                          type="text"
+                          value={hdtnLessonTitle}
+                          onChange={(e) => setHdtnLessonTitle(e.target.value)}
+                          className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                          placeholder="Ví dụ: Tôn trọng sự khác biệt và sống hài hòa với bạn bè, thầy cô"
+                        />
+                      </div>
+
+                      {/* Tiết Học Áp Dụng & Tải Mẫu */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
+                        <div className="bg-slate-50 p-3 rounded-lg border border-slate-200 space-y-2">
+                          <label className="block text-xs font-bold text-slate-700">Tiết Dạy Cần Soạn Trong Tuần:</label>
+                          <div className="space-y-1.5 text-xs text-slate-700">
+                            <label className="flex items-center gap-2 cursor-pointer">
+                              <input
+                                type="checkbox"
+                                checked={hdtnIncludeActivities.flagSalute}
+                                onChange={(e) => setHdtnIncludeActivities({ ...hdtnIncludeActivities, flagSalute: e.target.checked })}
+                                className="w-4 h-4 text-emerald-600 rounded"
+                              />
+                              <span className="font-semibold">Tiết 1: Sinh hoạt dưới cờ</span> (Tổ chức tại phòng học, chia 6 nhóm)
+                            </label>
+                            <label className="flex items-center gap-2 cursor-pointer">
+                              <input
+                                type="checkbox"
+                                checked={hdtnIncludeActivities.topicActivity}
+                                onChange={(e) => setHdtnIncludeActivities({ ...hdtnIncludeActivities, topicActivity: e.target.checked })}
+                                className="w-4 h-4 text-emerald-600 rounded"
+                              />
+                              <span className="font-semibold">Tiết 2: HĐ giáo dục theo chủ đề</span> (Bảng 2 cột chuẩn 5512)
+                            </label>
+                            <label className="flex items-center gap-2 cursor-pointer">
+                              <input
+                                type="checkbox"
+                                checked={hdtnIncludeActivities.classMeeting}
+                                onChange={(e) => setHdtnIncludeActivities({ ...hdtnIncludeActivities, classMeeting: e.target.checked })}
+                                className="w-4 h-4 text-emerald-600 rounded"
+                              />
+                              <span className="font-semibold">Tiết 3: Sinh hoạt lớp</span> (5 bước + Ký cam kết văn hóa khổ A0)
+                            </label>
+                          </div>
+                        </div>
+
+                        <div className="bg-slate-50 p-3 rounded-lg border border-slate-200 space-y-2">
+                          <label className="block text-xs font-bold text-slate-700">Tải Lên Mẫu Giáo Án Tham Chiếu (Word/PDF):</label>
+                          <div className="relative">
+                            <input
+                              type="file"
+                              accept=".docx,.doc,.pdf"
+                              onChange={(e) => {
+                                if (e.target.files && e.target.files[0]) {
+                                  setHdtnUploadedFileName(e.target.files[0].name);
+                                  showHdtnToast(`Đã nhận diện tệp mẫu: ${e.target.files[0].name}`);
+                                }
+                              }}
+                              className="hidden"
+                              id="hdtn-template-upload"
+                            />
+                            <label
+                              htmlFor="hdtn-template-upload"
+                              className="w-full px-3 py-2 bg-white hover:bg-slate-100 border border-dashed border-slate-300 rounded-lg flex items-center justify-between cursor-pointer transition-all text-xs"
+                            >
+                              <span className="truncate font-medium text-slate-700">
+                                {hdtnUploadedFileName ? hdtnUploadedFileName : 'Chọn tệp giáo án mẫu (.docx / .pdf)...'}
+                              </span>
+                              <i data-lucide="upload-cloud" className="w-4 h-4 text-emerald-600 shrink-0 ml-2"></i>
+                            </label>
+                          </div>
+                          <p className="text-[11px] text-slate-500">
+                            💡 AI sẽ tự động bóc tách cấu trúc tiêu đề, bảng 2 cột và quy cách sư phạm từ tệp của thầy/cô.
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Tích Hợp NLS & AI */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
+                        {/* NLS Box */}
+                        <div className="p-3 bg-rose-50/70 rounded-lg border border-rose-200 space-y-2 text-xs">
+                          <div className="flex items-center justify-between">
+                            <label className="flex items-center gap-2 font-bold text-rose-800 cursor-pointer">
+                              <input
+                                type="checkbox"
+                                checked={hdtnNlsActive}
+                                onChange={(e) => setHdtnNlsActive(e.target.checked)}
+                                className="w-4 h-4 text-rose-600 rounded"
+                              />
+                              <span>Tích Hợp Năng Lực Số (NLS) - Quy ước Chữ Đỏ</span>
+                            </label>
+                            <span className="text-[10px] font-bold bg-rose-100 text-rose-800 px-2 py-0.5 rounded border border-rose-300">
+                              Màu Đỏ
+                            </span>
+                          </div>
+                          {hdtnNlsActive && (
+                            <div className="space-y-1.5 pt-1">
+                              <input
+                                type="text"
+                                value={hdtnNlsCode}
+                                onChange={(e) => setHdtnNlsCode(e.target.value)}
+                                className="w-full px-2.5 py-1.5 bg-white border border-rose-300 rounded text-xs font-semibold text-rose-800"
+                                placeholder="Mã hiệu (ví dụ: NLS 2.5.TC2b)"
+                              />
+                              <textarea
+                                rows={2}
+                                value={hdtnNlsDesc}
+                                onChange={(e) => setHdtnNlsDesc(e.target.value)}
+                                className="w-full px-2.5 py-1.5 bg-white border border-rose-300 rounded text-xs text-slate-700"
+                                placeholder="Mô tả yêu cầu cần đạt NLS..."
+                              />
+                            </div>
+                          )}
+                        </div>
+
+                        {/* NLAI Box */}
+                        <div className="p-3 bg-blue-50/70 rounded-lg border border-blue-200 space-y-2 text-xs">
+                          <div className="flex items-center justify-between">
+                            <label className="flex items-center gap-2 font-bold text-blue-800 cursor-pointer">
+                              <input
+                                type="checkbox"
+                                checked={hdtnNlaiActive}
+                                onChange={(e) => setHdtnNlaiActive(e.target.checked)}
+                                className="w-4 h-4 text-blue-600 rounded"
+                              />
+                              <span>Tích Hợp Năng Lực Trí Tuệ Nhân Tạo (NLAI) - Quy ước Chữ Xanh</span>
+                            </label>
+                            <span className="text-[10px] font-bold bg-blue-100 text-blue-800 px-2 py-0.5 rounded border border-blue-300">
+                              Màu Xanh
+                            </span>
+                          </div>
+                          {hdtnNlaiActive && (
+                            <div className="space-y-1.5 pt-1">
+                              <input
+                                type="text"
+                                value={hdtnNlaiCode}
+                                onChange={(e) => setHdtnNlaiCode(e.target.value)}
+                                className="w-full px-2.5 py-1.5 bg-white border border-blue-300 rounded text-xs font-semibold text-blue-800"
+                                placeholder="Mã hiệu (ví dụ: NLAI 9.A3.1)"
+                              />
+                              <textarea
+                                rows={2}
+                                value={hdtnNlaiDesc}
+                                onChange={(e) => setHdtnNlaiDesc(e.target.value)}
+                                className="w-full px-2.5 py-1.5 bg-white border border-blue-300 rounded text-xs text-slate-700"
+                                placeholder="Mô tả yêu cầu cần đạt NLAI..."
+                              />
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Action Button Bar */}
+                      <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-slate-100">
+                        <div className="flex items-center gap-2 text-xs text-slate-500">
+                          <i data-lucide="shield-check" className="w-4 h-4 text-emerald-600"></i>
+                          <span>Đạt chuẩn 100% Thông tư 02/2024 & Công văn 5512/BGDĐT-GDTrH.</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={handleSaveHdtnPlan}
+                            className="bg-slate-800 hover:bg-slate-700 text-white font-semibold text-xs px-4 py-2.5 rounded-lg flex items-center space-x-1.5 transition-all shadow-sm"
+                          >
+                            <i data-lucide="save" className="w-4 h-4"></i>
+                            <span>Lưu Vào Kho Kế Hoạch</span>
+                          </button>
+                          <button
+                            onClick={handleGenerateHdtnPlan}
+                            disabled={isGeneratingHdtn}
+                            className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm px-6 py-2.5 rounded-lg flex items-center space-x-2 shadow-md transition-all disabled:opacity-50"
+                          >
+                            {isGeneratingHdtn ? (
+                              <>
+                                <i data-lucide="loader-2" className="w-4 h-4 animate-spin"></i>
+                                <span>AI Đang Soạn Giáo Án Theo Mẫu...</span>
+                              </>
+                            ) : (
+                              <>
+                                <i data-lucide="sparkles" className="w-4 h-4"></i>
+                                <span>Tạo Kế Hoạch Bài Dạy Chuẩn Mẫu</span>
+                              </>
+                            )}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* ====================================================== */}
+                  {/* SUBTAB 1: PLAN VIEWER (XEM KẾ HOẠCH BÀI DẠY ĐANG SOẠN) */}
+                  {/* ====================================================== */}
+                  {hdtnActiveSubTab === 'VIEWER' && currentHdtnPlan && (
+                    <div className="bg-white/95 backdrop-blur-md rounded-xl border border-slate-200/90 shadow-lg p-6 md:p-8 space-y-6">
+                      
+                      {/* Filter 4 Buttons */}
+                      <div className="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-slate-200">
+                        <div className="flex items-center gap-1.5 text-xs font-semibold">
+                          <span className="text-slate-500 mr-1">Bộ lọc hiển thị:</span>
+                          <button
+                            onClick={() => setHdtnActivePeriodTab('ALL')}
+                            className={`px-3 py-1.5 rounded-lg border transition-all ${
+                              hdtnActivePeriodTab === 'ALL' ? 'bg-emerald-600 text-white font-bold border-emerald-600' : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
+                            }`}
+                          >
+                            Toàn Bộ 3 Tiết
+                          </button>
+                          <button
+                            onClick={() => setHdtnActivePeriodTab('SHDC')}
+                            className={`px-3 py-1.5 rounded-lg border transition-all ${
+                              hdtnActivePeriodTab === 'SHDC' ? 'bg-emerald-600 text-white font-bold border-emerald-600' : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
+                            }`}
+                          >
+                            Tiết 1: SHDC (6 Nhóm)
+                          </button>
+                          <button
+                            onClick={() => setHdtnActivePeriodTab('HDGD')}
+                            className={`px-3 py-1.5 rounded-lg border transition-all ${
+                              hdtnActivePeriodTab === 'HDGD' ? 'bg-emerald-600 text-white font-bold border-emerald-600' : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
+                            }`}
+                          >
+                            Tiết 2: HĐGD (Bảng 2 Cột)
+                          </button>
+                          <button
+                            onClick={() => setHdtnActivePeriodTab('SHL')}
+                            className={`px-3 py-1.5 rounded-lg border transition-all ${
+                              hdtnActivePeriodTab === 'SHL' ? 'bg-emerald-600 text-white font-bold border-emerald-600' : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
+                            }`}
+                          >
+                            Tiết 3: SHL (Cam Kết A0)
+                          </button>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={handleExportHdtnDoc}
+                            className="bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 font-bold text-xs px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all"
+                          >
+                            <i data-lucide="file-down" className="w-3.5 h-3.5"></i>
+                            <span>Tải Bản Word A4</span>
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* KHUNG THÔNG TIN ĐẦU TRANG 2 CỘT CHUẨN MẪU TỊNH BIÊN */}
+                      <div className="grid grid-cols-2 gap-4 pb-4 border-b-2 border-slate-800 text-xs md:text-sm">
+                        <div className="text-center font-bold space-y-1">
+                          <div className="uppercase tracking-wide text-slate-900">{currentHdtnPlan.schoolName}</div>
+                          <div className="font-medium text-slate-700">{currentHdtnPlan.departmentName}</div>
+                        </div>
+                        <div className="text-center space-y-1">
+                          <div>Họ và tên GV: <strong className="text-emerald-900 font-bold">{currentHdtnPlan.teacherName}</strong></div>
+                          <div className="text-slate-600">Năm học: <strong>{currentHdtnPlan.schoolYear}</strong> • <strong>{currentHdtnPlan.semester}</strong></div>
+                        </div>
+                      </div>
+
+                      {/* TIÊU ĐỀ BÀI CĂN GIỮA */}
+                      <div className="text-center space-y-1 py-2">
+                        <h1 className="text-lg md:text-xl font-extrabold text-slate-900 uppercase tracking-wide">
+                          {currentHdtnPlan.topic} ({currentHdtnPlan.week})
+                        </h1>
+                        <p className="text-sm md:text-base font-bold text-emerald-800 uppercase">
+                          BÀI: {currentHdtnPlan.lessonTitle}
+                        </p>
+                        <p className="text-xs italic text-slate-500">
+                          Thời lượng: {currentHdtnPlan.duration}
+                        </p>
+                      </div>
+
+                      {/* PHẦN A. MỤC TIÊU CHUNG CỦA CHỦ ĐỀ */}
+                      <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 text-xs md:text-sm space-y-2.5">
+                        <h2 className="font-bold text-slate-900 uppercase text-xs md:text-sm tracking-wider flex items-center gap-2">
+                          <span className="w-2 h-2 rounded-full bg-emerald-600"></span>
+                          <span>PHẦN A. MỤC TIÊU CHUNG CỦA CHỦ ĐỀ</span>
+                        </h2>
+                        
+                        <div className="space-y-1.5 pl-3">
+                          <div>
+                            <span className="font-bold text-slate-800">• Kiến thức: </span>
+                            <span className="text-slate-700">{currentHdtnPlan.generalObjectives.knowledge.join(' ')}</span>
+                          </div>
+                          <div>
+                            <span className="font-bold text-slate-800">• Phẩm chất: </span>
+                            <span className="text-slate-700">{currentHdtnPlan.generalObjectives.qualities.join(' ')}</span>
+                          </div>
+                          <div>
+                            <span className="font-bold text-slate-800">• Năng lực: </span>
+                            <span className="text-slate-700">{currentHdtnPlan.generalObjectives.competencies.join(' ')}</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* PHẦN B. THIẾT KẾ TIẾN TRÌNH CÁC TIẾT DẠY */}
+                      <div className="space-y-8 text-xs md:text-sm">
+                        
+                        {/* TIẾT 1: SINH HOẠT DƯỚI CỜ (TỔ CHỨC TẠI PHÒNG HỌC) */}
+                        {(hdtnActivePeriodTab === 'ALL' || hdtnActivePeriodTab === 'SHDC') && (
+                          <div className="space-y-4 pt-2 border-t border-slate-200">
+                            <div className="bg-emerald-800 text-white p-3 rounded-lg shadow-sm">
+                              <h3 className="font-bold text-sm md:text-base">{currentHdtnPlan.flagSalute.title}</h3>
+                              <p className="text-xs text-emerald-100 font-medium">{currentHdtnPlan.flagSalute.subTitle}</p>
+                              <p className="text-[11px] text-emerald-200 italic mt-0.5">{currentHdtnPlan.flagSalute.note}</p>
+                            </div>
+
+                            <div className="bg-slate-50 p-3 rounded-lg border border-slate-200 space-y-1.5 text-xs">
+                              <div><strong className="text-slate-800">1. Mục tiêu:</strong> <span className="text-slate-700">{currentHdtnPlan.flagSalute.objectives}</span></div>
+                              <div><strong className="text-slate-800">2. Thiết bị dạy học:</strong> <span className="text-slate-700">{currentHdtnPlan.flagSalute.equipment}</span></div>
+                            </div>
+
+                            {/* Bảng 2 Cột Tiết 1 */}
+                            <div className="overflow-x-auto rounded-lg border border-slate-300">
+                              <table className="min-w-full divide-y divide-slate-300 text-xs">
+                                <thead className="bg-slate-100">
+                                  <tr>
+                                    <th className="px-4 py-2.5 text-left font-bold text-slate-800 uppercase tracking-wider w-2/3 border-r border-slate-300">
+                                      HOẠT ĐỘNG CỦA GIÁO VIÊN VÀ HỌC SINH (6 NHÓM TẠI LỚP)
+                                    </th>
+                                    <th className="px-4 py-2.5 text-left font-bold text-slate-800 uppercase tracking-wider w-1/3">
+                                      DỰ KIẾN SẢN PHẨM
+                                    </th>
+                                  </tr>
+                                </thead>
+                                <tbody className="divide-y divide-slate-200 bg-white">
+                                  {currentHdtnPlan.flagSalute.steps.map((st, i) => (
+                                    <tr key={i} className="hover:bg-slate-50/70">
+                                      <td className="px-4 py-3 align-top border-r border-slate-200 space-y-1.5">
+                                        <p className="font-bold text-emerald-900 text-xs md:text-sm">{st.name}</p>
+                                        <p className="text-[11px] italic text-slate-500">* Mục tiêu: {st.objective}</p>
+                                        <p className="text-[11px] italic text-slate-500">* Phương pháp: {st.method}</p>
+                                        <p className="text-slate-700 whitespace-pre-line leading-relaxed pt-1">{st.action}</p>
+                                      </td>
+                                      <td className="px-4 py-3 align-top text-slate-700 whitespace-pre-line leading-relaxed bg-slate-50/40">
+                                        {st.product}
+                                      </td>
+                                    </tr>
+                                  ))}
+                                </tbody>
+                              </table>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* TIẾT 2: HOẠT ĐỘNG GIÁO DỤC THEO CHỦ ĐỀ (BẢNG 2 CỘT 5512) */}
+                        {(hdtnActivePeriodTab === 'ALL' || hdtnActivePeriodTab === 'HDGD') && (
+                          <div className="space-y-4 pt-4 border-t-2 border-emerald-600">
+                            <div className="bg-emerald-900 text-white p-3 rounded-lg shadow-sm flex flex-wrap items-center justify-between gap-2">
+                              <div>
+                                <h3 className="font-bold text-sm md:text-base">{currentHdtnPlan.topicActivity.title}</h3>
+                                <p className="text-xs text-emerald-200 font-medium">{currentHdtnPlan.topicActivity.subTitle}</p>
+                              </div>
+                              <span className="bg-emerald-700 text-white text-xs font-bold px-2.5 py-1 rounded">
+                                Bảng 2 Cột Chuẩn CV 5512
+                              </span>
+                            </div>
+
+                            {/* Tags NLS & NLAI */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+                              {currentHdtnPlan.topicActivity.nls && (
+                                <div className="p-2.5 bg-rose-50 border-l-4 border-rose-600 rounded text-rose-900 space-y-0.5">
+                                  <div className="font-bold flex items-center gap-1.5 text-rose-700">
+                                    <span className="w-2 h-2 rounded-full bg-rose-600"></span>
+                                    <span>[NLS] {currentHdtnPlan.topicActivity.nls.title} ({currentHdtnPlan.topicActivity.nls.code})</span>
+                                  </div>
+                                  <p className="text-[11px] text-rose-800 leading-snug">{currentHdtnPlan.topicActivity.nls.desc}</p>
+                                </div>
+                              )}
+                              {currentHdtnPlan.topicActivity.nlai && (
+                                <div className="p-2.5 bg-blue-50 border-l-4 border-blue-600 rounded text-blue-900 space-y-0.5">
+                                  <div className="font-bold flex items-center gap-1.5 text-blue-700">
+                                    <span className="w-2 h-2 rounded-full bg-blue-600"></span>
+                                    <span>[NLAI] {currentHdtnPlan.topicActivity.nlai.title} ({currentHdtnPlan.topicActivity.nlai.code})</span>
+                                  </div>
+                                  <p className="text-[11px] text-blue-800 leading-snug">{currentHdtnPlan.topicActivity.nlai.desc}</p>
+                                </div>
+                              )}
+                            </div>
+
+                            {/* Bảng 2 Cột Tiết 2 */}
+                            <div className="overflow-x-auto rounded-lg border border-slate-300">
+                              <table className="min-w-full divide-y divide-slate-300 text-xs">
+                                <thead className="bg-slate-100">
+                                  <tr>
+                                    <th className="px-4 py-2.5 text-left font-bold text-slate-800 uppercase tracking-wider w-2/3 border-r border-slate-300">
+                                      HOẠT ĐỘNG CỦA GV VÀ HS (ĐẦY ĐỦ 4 BƯỚC 5512)
+                                    </th>
+                                    <th className="px-4 py-2.5 text-left font-bold text-slate-800 uppercase tracking-wider w-1/3">
+                                      DỰ KIẾN SẢN PHẨM
+                                    </th>
+                                  </tr>
+                                </thead>
+                                <tbody className="divide-y divide-slate-200 bg-white">
+                                  {currentHdtnPlan.topicActivity.activities.map((act, idx) => (
+                                    <tr key={idx} className="hover:bg-slate-50/70">
+                                      <td className="px-4 py-3 align-top border-r border-slate-200 space-y-2">
+                                        <div className="font-bold text-emerald-900 text-xs md:text-sm">{act.name}</div>
+                                        <div className="text-[11px] italic text-slate-500">* Mục tiêu: {act.objective}</div>
+                                        <div className="text-[11px] italic text-slate-500">* Phương pháp: {act.method}</div>
+                                        <div className="font-semibold text-slate-800 pt-1">* Tổ chức thực hiện:</div>
+                                        <div className="space-y-1.5 pl-2">
+                                          {act.steps.map((st, sidx) => (
+                                            <div key={sidx} className="text-slate-700 leading-relaxed">
+                                              <strong className="text-slate-900">{st.stepTitle}: </strong>
+                                              <span>
+                                                {st.text.split('[NLS]').map((part1, p1) => 
+                                                  p1 === 0 ? part1 : (
+                                                    <React.Fragment key={p1}>
+                                                      <strong className="text-rose-600 bg-rose-50 px-1 py-0.5 rounded font-bold">[NLS]</strong>
+                                                      {part1}
+                                                    </React.Fragment>
+                                                  )
+                                                )}
+                                              </span>
+                                            </div>
+                                          ))}
+                                        </div>
+                                      </td>
+                                      <td className="px-4 py-3 align-top text-slate-700 whitespace-pre-line leading-relaxed bg-slate-50/40">
+                                        {act.product.split('[NLS]').map((p1, idx1) => 
+                                          idx1 === 0 ? p1 : (
+                                            <React.Fragment key={idx1}>
+                                              <strong className="text-rose-600 bg-rose-50 px-1 py-0.5 rounded font-bold">[NLS]</strong>
+                                              {p1}
+                                            </React.Fragment>
+                                          )
+                                        )}
+                                      </td>
+                                    </tr>
+                                  ))}
+                                </tbody>
+                              </table>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* TIẾT 3: SINH HOẠT LỚP (VẬN DỤNG & CAM KẾT VĂN HÓA KHỔ A0) */}
+                        {(hdtnActivePeriodTab === 'ALL' || hdtnActivePeriodTab === 'SHL') && (
+                          <div className="space-y-4 pt-4 border-t-2 border-slate-400">
+                            <div className="bg-slate-800 text-white p-3 rounded-lg shadow-sm">
+                              <h3 className="font-bold text-sm md:text-base">{currentHdtnPlan.classMeeting.title}</h3>
+                              <p className="text-xs text-slate-300 font-medium">{currentHdtnPlan.classMeeting.subTitle}</p>
+                              <p className="text-[11px] text-slate-400 italic mt-0.5">{currentHdtnPlan.classMeeting.note}</p>
+                            </div>
+
+                            {/* Bảng 2 Cột Tiết 3 */}
+                            <div className="overflow-x-auto rounded-lg border border-slate-300">
+                              <table className="min-w-full divide-y divide-slate-300 text-xs">
+                                <thead className="bg-slate-100">
+                                  <tr>
+                                    <th className="px-4 py-2.5 text-left font-bold text-slate-800 uppercase tracking-wider w-2/3 border-r border-slate-300">
+                                      HOẠT ĐỘNG CỦA GV VÀ HS (5 BƯỚC SINH HOẠT LỚP)
+                                    </th>
+                                    <th className="px-4 py-2.5 text-left font-bold text-slate-800 uppercase tracking-wider w-1/3">
+                                      DỰ KIẾN SẢN PHẨM
+                                    </th>
+                                  </tr>
+                                </thead>
+                                <tbody className="divide-y divide-slate-200 bg-white">
+                                  {currentHdtnPlan.classMeeting.steps.map((st, i) => (
+                                    <tr key={i} className="hover:bg-slate-50/70">
+                                      <td className="px-4 py-3 align-top border-r border-slate-200 space-y-1.5">
+                                        <p className="font-bold text-slate-900 text-xs md:text-sm">{st.name}</p>
+                                        <p className="text-[11px] italic text-slate-500">* Mục tiêu: {st.objective}</p>
+                                        <p className="text-[11px] italic text-slate-500">* Phương pháp: {st.method}</p>
+                                        <p className="text-slate-700 whitespace-pre-line leading-relaxed pt-1">{st.action}</p>
+                                      </td>
+                                      <td className="px-4 py-3 align-top text-slate-700 whitespace-pre-line leading-relaxed bg-slate-50/40">
+                                        {st.product}
+                                      </td>
+                                    </tr>
+                                  ))}
+                                </tbody>
+                              </table>
+                            </div>
+
+                            {/* BẢN CAM KẾT VĂN HÓA LỚP HỌC KHỔ A0 CÓ CHỮ KÝ */}
+                            <div className="p-5 bg-amber-50/60 rounded-xl border-2 border-dashed border-amber-300 space-y-3">
+                              <div className="text-center">
+                                <h4 className="font-extrabold text-sm md:text-base text-amber-900 uppercase">
+                                  {currentHdtnPlan.classMeeting.commitmentA0.title}
+                                </h4>
+                                <p className="text-xs text-amber-800 font-semibold">{currentHdtnPlan.classMeeting.commitmentA0.school}</p>
+                              </div>
+                              <ul className="space-y-1 text-xs text-slate-800 pl-4 list-disc">
+                                {currentHdtnPlan.classMeeting.commitmentA0.rules.map((rule, ridx) => (
+                                  <li key={ridx} className="leading-relaxed font-medium">{rule}</li>
+                                ))}
+                              </ul>
+                              <div className="grid grid-cols-2 gap-4 pt-3 border-t border-amber-200 text-center text-xs">
+                                <div>
+                                  <p className="font-bold text-slate-900">ĐẠI DIỆN HỌC SINH LỚP 9</p>
+                                  <p className="text-[11px] text-slate-500 italic">(Lớp trưởng, Bí thư, Tổ trưởng đã ký tên)</p>
+                                  <div className="h-10"></div>
+                                  <p className="font-semibold text-emerald-800">[Đã ký Bản cam kết A0]</p>
+                                </div>
+                                <div>
+                                  <p className="font-bold text-slate-900">GIÁO VIÊN CHỦ NHIỆM</p>
+                                  <p className="text-[11px] text-slate-500 italic">(Ký và xác nhận)</p>
+                                  <div className="h-10"></div>
+                                  <p className="font-bold text-slate-800">{currentHdtnPlan.teacherName}</p>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* ====================================================== */}
+                  {/* SUBTAB 2: TEMPLATE MANAGER (QUẢN LÝ KHO MẪU CHUẨN) */}
+                  {/* ====================================================== */}
+                  {hdtnActiveSubTab === 'TEMPLATES' && (
+                    <div className="bg-white/95 backdrop-blur-md rounded-xl border border-slate-200/90 shadow-sm p-6 space-y-4">
+                      <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                        <div className="flex items-center space-x-2">
+                          <i data-lucide="layers" className="w-5 h-5 text-emerald-600"></i>
+                          <h3 className="font-bold text-sm text-slate-800">Kho Mẫu Kế Hoạch Bài Dạy Chuẩn (Template Manager)</h3>
+                        </div>
+                        <span className="text-xs bg-emerald-50 text-emerald-800 font-semibold px-2.5 py-0.5 rounded border border-emerald-200">
+                          2 Mẫu Có Sẵn
+                        </span>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="p-4 rounded-xl border-2 border-emerald-600 bg-emerald-50/40 space-y-3">
+                          <div className="flex items-center justify-between">
+                            <span className="font-bold text-sm text-emerald-900">Mẫu Chuẩn Hoạt Động Trải Nghiệm 9 (THCS Tịnh Biên)</span>
+                            <span className="text-[10px] bg-emerald-600 text-white font-bold px-2 py-0.5 rounded">Mặc định</span>
+                          </div>
+                          <p className="text-xs text-slate-600 leading-relaxed">
+                            Bao gồm: Khung đầu trang 2 cột, Phần A Mục tiêu chung, Tiết 1 SHDC tại lớp chia 6 nhóm, Tiết 2 HĐGD Bảng 2 cột 5512, Tiết 3 SHL 5 bước và Bản cam kết A0.
+                          </p>
+                          <div className="text-[11px] font-semibold text-emerald-800 flex items-center gap-2">
+                            <span>✓ Bảng 2 cột 5512</span>
+                            <span>✓ Tích hợp NLS & AI</span>
+                            <span>✓ Ký cam kết A0</span>
+                          </div>
+                        </div>
+
+                        <div className="p-4 rounded-xl border border-slate-200 bg-slate-50 space-y-3">
+                          <div className="flex items-center justify-between">
+                            <span className="font-bold text-sm text-slate-800">Mẫu Kế Hoạch Bài Dạy Chuẩn Công Văn 5512 (Các Môn Học)</span>
+                            <span className="text-[10px] bg-slate-200 text-slate-700 font-bold px-2 py-0.5 rounded">Phổ biến</span>
+                          </div>
+                          <p className="text-xs text-slate-600 leading-relaxed">
+                            Cấu trúc tiêu chuẩn cho các môn: Công nghệ, KHTN, Toán, Tin học, Ngữ văn. Bảng 2 cột: Hoạt động của GV và HS - Dự kiến sản phẩm.
+                          </p>
+                          <div className="text-[11px] font-semibold text-slate-600 flex items-center gap-2">
+                            <span>✓ Bảng 2 cột chuẩn</span>
+                            <span>✓ 4 hoạt động 5512</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* ====================================================== */}
+                  {/* SUBTAB 3: WAREHOUSE (KHO GIÁO ÁN ĐÃ LƯU) */}
+                  {/* ====================================================== */}
+                  {hdtnActiveSubTab === 'WAREHOUSE' && (
+                    <div className="bg-white/95 backdrop-blur-md rounded-xl border border-slate-200/90 shadow-sm p-6 space-y-4">
+                      <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                        <div className="flex items-center space-x-2">
+                          <i data-lucide="folder" className="w-5 h-5 text-emerald-600"></i>
+                          <h3 className="font-bold text-sm text-slate-800">Kho Lưu Trữ Kế Hoạch Bài Dạy Cá Nhân</h3>
+                        </div>
+                        <span className="text-xs text-slate-500 font-medium">Tổng: {hdtnSavedPlans.length} bài dạy</span>
+                      </div>
+
+                      {hdtnSavedPlans.length === 0 ? (
+                        <div className="p-8 text-center text-slate-500 text-xs">
+                          Chưa có bài dạy nào được lưu. Hãy nhấn "Lưu Vào Kho Kế Hoạch" sau khi soạn xong!
+                        </div>
+                      ) : (
+                        <div className="divide-y divide-slate-100">
+                          {hdtnSavedPlans.map((item) => (
+                            <div key={item.id} className="py-3 flex flex-wrap items-center justify-between gap-3 hover:bg-slate-50/80 px-2 rounded-lg transition-colors">
+                              <div>
+                                <div className="flex items-center gap-2 text-xs font-bold text-slate-800">
+                                  <span>{item.title}</span>
+                                  <span className="text-[10px] bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded">
+                                    Lớp {item.grade} • {item.week}
+                                  </span>
+                                </div>
+                                <p className="text-[11px] text-slate-500 mt-0.5">{item.topic} • Lưu ngày: {item.savedAt}</p>
+                              </div>
+                              <div className="flex items-center gap-2 text-xs">
+                                <button
+                                  onClick={() => {
+                                    setCurrentHdtnPlan(item.plan);
+                                    setHdtnActiveSubTab('VIEWER');
+                                    showHdtnToast(`Đã mở bài dạy: ${item.title}`);
+                                  }}
+                                  className="px-2.5 py-1.5 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 rounded font-semibold transition-colors"
+                                >
+                                  Xem Lại
+                                </button>
+                                <button
+                                  onClick={handleExportHdtnDoc}
+                                  className="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded font-semibold transition-colors"
+                                >
+                                  Tải Word
+                                </button>
+                                <button
+                                  onClick={() => handleDeleteHdtnPlan(item.id)}
+                                  className="px-2.5 py-1.5 text-rose-600 hover:bg-rose-50 rounded font-semibold transition-colors"
+                                >
+                                  Xóa
+                                </button>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
 
               {/* TAB 1: AI LESSON PLAN GENERATOR (CÔNG VĂN 5512) */}
               {activeTab === 'AI_GENERATOR' && (
                 <div className="space-y-6">
                   {/* Form input card */}
-                  <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
+                  <div className="bg-white/90 backdrop-blur-md p-6 rounded-xl border border-slate-200/80 shadow-sm space-y-4">
                     <div className="flex items-center justify-between border-b border-slate-100 pb-3">
                       <div className="flex items-center space-x-2">
                         <div className="bg-emerald-100 text-emerald-700 p-2 rounded-lg">
@@ -591,32 +2328,44 @@
                     ))}
                   </div>
 
-                  {/* Materials Grid */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {materials
-                      .filter(m => filterCategory === 'ALL' || m.category === filterCategory)
-                      .map(mat => (
-                        <div key={mat.id} className="p-4 rounded-xl border border-slate-200 bg-slate-50/50 hover:bg-slate-50 transition-all flex items-start space-x-3">
-                          <div className="bg-amber-100 text-amber-700 p-2.5 rounded-lg">
-                            <i data-lucide="file-text" className="w-6 h-6"></i>
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center justify-between">
-                              <span className="text-[10px] font-bold bg-slate-200 text-slate-700 px-2 py-0.5 rounded">Lớp {mat.grade}</span>
-                              <span className="text-[11px] text-slate-400">{mat.size}</span>
+                  {/* Materials Grid or Empty State */}
+                  {materials.filter(m => filterCategory === 'ALL' || m.category === filterCategory).length > 0 ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {materials
+                        .filter(m => filterCategory === 'ALL' || m.category === filterCategory)
+                        .map(mat => (
+                          <div key={mat.id} className="p-4 rounded-xl border border-slate-200 bg-slate-50/50 hover:bg-slate-50 transition-all flex items-start space-x-3">
+                            <div className="bg-amber-100 text-amber-700 p-2.5 rounded-lg">
+                              <i data-lucide="file-text" className="w-6 h-6"></i>
                             </div>
-                            <h4 className="font-semibold text-xs text-slate-900 mt-1 truncate">{mat.title}</h4>
-                            <div className="flex items-center justify-between text-xs text-slate-500 mt-3">
-                              <span>Lượt tải: <strong>{mat.downloads}</strong></span>
-                              <button className="text-emerald-600 hover:text-emerald-700 font-semibold text-xs flex items-center gap-1">
-                                <i data-lucide="download-cloud" className="w-3.5 h-3.5"></i>
-                                <span>Tải Xuống</span>
-                              </button>
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center justify-between">
+                                <span className="text-[10px] font-bold bg-slate-200 text-slate-700 px-2 py-0.5 rounded">Lớp {mat.grade}</span>
+                                <span className="text-[11px] text-slate-400">{mat.size}</span>
+                              </div>
+                              <h4 className="font-semibold text-xs text-slate-900 mt-1 truncate">{mat.title}</h4>
+                              <div className="flex items-center justify-between text-xs text-slate-500 mt-3">
+                                <span>Lượt tải: <strong>{mat.downloads}</strong></span>
+                                <button className="text-emerald-600 hover:text-emerald-700 font-semibold text-xs flex items-center gap-1">
+                                  <i data-lucide="download-cloud" className="w-3.5 h-3.5"></i>
+                                  <span>Tải Xuống</span>
+                                </button>
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      ))}
-                  </div>
+                        ))}
+                    </div>
+                  ) : (
+                    <div className="p-12 text-center border-2 border-dashed border-slate-200 rounded-xl bg-slate-50/50 space-y-3">
+                      <div className="bg-amber-100 text-amber-600 p-3 rounded-full w-12 h-12 flex items-center justify-center mx-auto">
+                        <i data-lucide="folder-open" className="w-6 h-6"></i>
+                      </div>
+                      <h3 className="font-bold text-slate-800 text-sm">Thư viện hiện chưa có học liệu</h3>
+                      <p className="text-xs text-slate-500 max-w-sm mx-auto">
+                        Tạm thời chưa tải lên các học liệu. Thầy/Cô có thể nhấp vào nút <strong>"Upload Học Liệu Mới"</strong> bên trên để tải tài liệu bài giảng lên hệ thống.
+                      </p>
+                    </div>
+                  )}
                 </div>
               )}
 
@@ -725,15 +2474,370 @@ CREATE TABLE IF NOT EXISTS public.materials (
                 </div>
               )}
 
+              {/* TAB 6: PPCT GENERATOR (MODULE HO_TRO_TẠO_PPCT_CN) */}
+              {activeTab === 'PPCT_GENERATOR' && (
+                <div className="space-y-6">
+                  {/* Header & Config Card */}
+                  <div className="bg-white/90 backdrop-blur-md p-6 rounded-xl border border-slate-200/80 shadow-sm space-y-4">
+                    <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-100 pb-4">
+                      <div className="flex items-center space-x-3">
+                        <div className="bg-blue-100 text-blue-700 p-2.5 rounded-xl border border-blue-200">
+                          <i data-lucide="calendar-range" className="w-6 h-6"></i>
+                        </div>
+                        <div>
+                          <h2 className="font-bold text-slate-800 text-base flex items-center gap-2">
+                            <span>Trợ Lý AI Tạo Phân Phối Chương Trình (PPCT) Môn Công Nghệ</span>
+                            <span className="text-xs bg-blue-100 text-blue-800 font-semibold px-2.5 py-0.5 rounded-full border border-blue-200">
+                              Module ho_tro_tạo_ppct_CN
+                            </span>
+                          </h2>
+                          <p className="text-xs text-slate-500">Tự động phân bổ số tiết và thời điểm dạy học chuẩn 7 cột cho SGK & Chương trình GDPT 2018</p>
+                        </div>
+                      </div>
+                      {ppctData && ppctData.length > 0 && (
+                        <div className="flex items-center space-x-2">
+                          <button
+                            onClick={handleExportPpctWord}
+                            className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs px-4 py-2 rounded-lg flex items-center space-x-2 shadow-sm transition-all"
+                          >
+                            <i data-lucide="download" className="w-4 h-4"></i>
+                            <span>Xuất Bảng PPCT ra File Word (.doc)</span>
+                          </button>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Inputs & Config Form */}
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4 pt-1">
+                      <div>
+                        <label className="block text-xs font-semibold text-slate-700 mb-1">Môn học / Phân môn *</label>
+                        <select
+                          value={ppctSubject}
+                          onChange={(e) => setPpctSubject(e.target.value)}
+                          className="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        >
+                          <option value="Công nghệ">Công nghệ</option>
+                          <option value="Hoạt động trải nghiệm, hướng nghiệp">HĐTN, Hướng nghiệp</option>
+                          <option value="Tin học">Tin học</option>
+                          <option value="Toán học">Toán học</option>
+                          <option value="Ngữ văn">Ngữ văn</option>
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-semibold text-slate-700 mb-1">Khối lớp *</label>
+                        <select
+                          value={ppctGrade}
+                          onChange={(e) => setPpctGrade(e.target.value)}
+                          className="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        >
+                          {[6,7,8,9,10,11,12].map(g => <option key={g} value={`Lớp ${g}`}>Lớp {g}</option>)}
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-semibold text-slate-700 mb-1">Tổng số tiết năm học *</label>
+                        <input
+                          type="number"
+                          value={ppctTotalPeriods}
+                          onChange={(e) => setPpctTotalPeriods(Number(e.target.value))}
+                          className="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          placeholder="Ví dụ: 35 tiết..."
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-semibold text-slate-700 mb-1">Upload Sách giáo khoa (PDF/Word)</label>
+                        <div className="relative">
+                          <input
+                            type="file"
+                            accept=".pdf,.doc,.docx"
+                            onChange={(e) => setPpctFile(e.target.files ? e.target.files[0] : null)}
+                            className="hidden"
+                            id="ppct-file-upload-input"
+                          />
+                          <label
+                            htmlFor="ppct-file-upload-input"
+                            className="w-full px-3 py-2 text-xs bg-slate-100 hover:bg-slate-200 border border-slate-300 rounded-lg flex items-center justify-between cursor-pointer transition-colors"
+                          >
+                            <span className="truncate text-slate-700 font-medium">{ppctFile ? ppctFile.name : 'Chọn tệp PDF / DOCX...'}</span>
+                            <i data-lucide="upload-cloud" className="w-4 h-4 text-blue-600 shrink-0 ml-2"></i>
+                          </label>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between pt-2 border-t border-slate-100">
+                      <div className="text-xs text-blue-700 bg-blue-50 px-3 py-1.5 rounded-lg border border-blue-200 flex items-center gap-1.5">
+                        <i data-lucide="info" className="w-4 h-4 shrink-0"></i>
+                        <span>AI sẽ tự động đọc file SGK và phân bổ số tiết khớp 100% với tổng {ppctTotalPeriods} tiết đã nhập.</span>
+                      </div>
+                      <button
+                        onClick={handleGeneratePpct}
+                        disabled={isGeneratingPpct}
+                        className="bg-blue-600 hover:bg-blue-700 text-white font-medium text-sm px-6 py-2.5 rounded-lg flex items-center space-x-2 shadow-md transition-all disabled:opacity-50"
+                      >
+                        {isGeneratingPpct ? (
+                          <>
+                            <i data-lucide="loader-2" className="w-4 h-4 animate-spin"></i>
+                            <span>AI Đang Đọc SGK & Xử Lý PPCT...</span>
+                          </>
+                        ) : (
+                          <>
+                            <i data-lucide="sparkles" className="w-4 h-4"></i>
+                            <span>Tạo Bảng Phân Phối Chương Trình 7 Cột</span>
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* PPCT 7-Column Result Table Card */}
+                  <div className="bg-white/90 backdrop-blur-md rounded-xl border border-slate-200/80 shadow-sm p-6 space-y-4">
+                    <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                      <h3 className="font-bold text-sm text-slate-800 flex items-center gap-2">
+                        <i data-lucide="table" className="w-4 h-4 text-blue-600"></i>
+                        <span>Bảng Kết Quả Phân Phối Chương Trình ({ppctSubject} - {ppctGrade} • {ppctTotalPeriods} Tiết)</span>
+                      </h3>
+                      <span className="text-xs font-semibold text-blue-700 bg-blue-50 px-2.5 py-1 rounded border border-blue-200">
+                        Cấu trúc Chuẩn 7 cột Bộ GD&ĐT
+                      </span>
+                    </div>
+
+                    {isGeneratingPpct ? (
+                      <div className="p-12 text-center space-y-3">
+                        <i data-lucide="loader-2" className="w-8 h-8 text-blue-600 animate-spin mx-auto"></i>
+                        <p className="text-sm font-semibold text-slate-700">Mô hình AI đang bóc tách chủ đề từ tài liệu SGK và cân đối tiến trình giảng dạy...</p>
+                      </div>
+                    ) : ppctData && ppctData.length > 0 ? (
+                      <div className="overflow-x-auto rounded-lg border border-slate-200">
+                        <table className="min-w-full divide-y divide-slate-200 text-xs">
+                          <thead className="bg-slate-900 text-slate-200 font-semibold">
+                            <tr>
+                              <th className="px-3 py-3 text-left w-20">Tiết PPCT</th>
+                              <th className="px-4 py-3 text-left">Tên Bài Học / Chủ Đề</th>
+                              <th className="px-3 py-3 text-center w-16">Số Tiết</th>
+                              <th className="px-3 py-3 text-left w-28">Thời Điểm (Tuần)</th>
+                              <th className="px-4 py-3 text-left">Thiết Bị Dạy Học</th>
+                              <th className="px-3 py-3 text-left w-32">Địa Điểm Dạy</th>
+                              <th className="px-3 py-3 text-left w-28">Ghi Chú</th>
+                            </tr>
+                          </thead>
+                          <tbody className="bg-white divide-y divide-slate-200 text-slate-800">
+                            {ppctData.map((item, idx) => (
+                              <tr key={idx} className="hover:bg-blue-50/50 transition-colors">
+                                <td className="px-3 py-3 font-bold text-blue-700">{item.tietPpct}</td>
+                                <td className="px-4 py-3 font-semibold text-slate-900">{item.baiHoc}</td>
+                                <td className="px-3 py-3 text-center font-bold bg-slate-50">{item.soTiet}</td>
+                                <td className="px-3 py-3 text-slate-600">{item.thoiDiem}</td>
+                                <td className="px-4 py-3 text-slate-700">{item.thietBi}</td>
+                                <td className="px-3 py-3 text-slate-700">{item.diaDiem}</td>
+                                <td className="px-3 py-3 text-slate-500 italic">{item.ghiChu || '-'}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    ) : null}
+                  </div>
+                </div>
+              )}
+
             </main>
           </div>
+
+          {/* AUTHENTICATION MODAL (LOGIN / REGISTER) */}
+          {showAuthModal && (
+            <div className="fixed inset-0 bg-slate-950/75 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+              <div className="bg-slate-900 border border-slate-800 text-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
+                {/* Modal Header */}
+                <div className="bg-slate-900 p-5 border-b border-slate-800 flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <div className="bg-emerald-600/20 text-emerald-400 p-2.5 rounded-xl border border-emerald-500/30">
+                      <i data-lucide={authTab === 'LOGIN' ? 'log-in' : 'user-plus'} className="w-5 h-5"></i>
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-base text-white">
+                        {authTab === 'LOGIN' ? 'Đăng Nhập Tài Khoản' : 'Tạo Tài Khoản Giáo Viên'}
+                      </h3>
+                      <p className="text-xs text-slate-400">Hệ thống Trợ lý AI Bộ môn Công nghệ & Hướng nghiệp</p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setShowAuthModal(false)}
+                    className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800"
+                  >
+                    <i data-lucide="x" className="w-5 h-5"></i>
+                  </button>
+                </div>
+
+                {/* Switch Tabs */}
+                <div className="flex border-b border-slate-800 bg-slate-950/60">
+                  <button
+                    onClick={() => { setAuthTab('LOGIN'); setAuthError(''); setAuthSuccess(''); }}
+                    className={`flex-1 py-3 text-xs font-bold text-center border-b-2 transition-all ${
+                      authTab === 'LOGIN' ? 'border-emerald-500 text-emerald-400 bg-slate-900' : 'border-transparent text-slate-400 hover:text-slate-200'
+                    }`}
+                  >
+                    ĐĂNG NHẬP
+                  </button>
+                  <button
+                    onClick={() => { setAuthTab('REGISTER'); setAuthError(''); setAuthSuccess(''); }}
+                    className={`flex-1 py-3 text-xs font-bold text-center border-b-2 transition-all ${
+                      authTab === 'REGISTER' ? 'border-emerald-500 text-emerald-400 bg-slate-900' : 'border-transparent text-slate-400 hover:text-slate-200'
+                    }`}
+                  >
+                    ĐĂNG KÝ MỚI
+                  </button>
+                </div>
+
+                {/* Form Body */}
+                <form onSubmit={handleAuthSubmit} className="p-6 space-y-4">
+                  {authError && (
+                    <div className="bg-rose-500/10 border border-rose-500/30 text-rose-300 p-3 rounded-xl text-xs flex items-center gap-2">
+                      <i data-lucide="alert-circle" className="w-4 h-4 shrink-0 text-rose-400"></i>
+                      <span>{authError}</span>
+                    </div>
+                  )}
+
+                  {authSuccess && (
+                    <div className="bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 p-3 rounded-xl text-xs flex items-center gap-2">
+                      <i data-lucide="check-circle-2" className="w-4 h-4 shrink-0 text-emerald-400"></i>
+                      <span>{authSuccess}</span>
+                    </div>
+                  )}
+
+                  {authTab === 'REGISTER' && (
+                    <>
+                      <div>
+                        <label className="block text-xs font-semibold text-slate-300 mb-1">Họ và Tên Giáo Viên *</label>
+                        <div className="relative">
+                          <i data-lucide="user" className="w-4 h-4 absolute left-3 top-3 text-slate-400"></i>
+                          <input
+                            type="text"
+                            required
+                            value={authForm.fullName}
+                            onChange={(e) => setAuthForm({ ...authForm, fullName: e.target.value })}
+                            className="w-full pl-9 pr-3 py-2 text-sm bg-slate-800 border border-slate-700 rounded-xl text-white focus:outline-none focus:border-emerald-500"
+                            placeholder="Thầy/Cô Nguyễn Văn A"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-xs font-semibold text-slate-300 mb-1">Trường Công Tác</label>
+                          <input
+                            type="text"
+                            value={authForm.schoolName}
+                            onChange={(e) => setAuthForm({ ...authForm, schoolName: e.target.value })}
+                            className="w-full px-3 py-2 text-sm bg-slate-800 border border-slate-700 rounded-xl text-white focus:outline-none focus:border-emerald-500"
+                            placeholder="THCS Chu Văn An"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-semibold text-slate-300 mb-1">Phân Môn</label>
+                          <select
+                            value={authForm.subject}
+                            onChange={(e) => setAuthForm({ ...authForm, subject: e.target.value })}
+                            className="w-full px-3 py-2 text-sm bg-slate-800 border border-slate-700 rounded-xl text-white focus:outline-none focus:border-emerald-500"
+                          >
+                            <option value="Công nghệ">Công nghệ</option>
+                            <option value="Hoạt động trải nghiệm, hướng nghiệp">HĐTN, Hướng nghiệp</option>
+                            <option value="Công nghệ & Hướng nghiệp">Cả 2 phân môn</option>
+                          </select>
+                        </div>
+                      </div>
+                    </>
+                  )}
+
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-300 mb-1">Địa chỉ Email *</label>
+                    <div className="relative">
+                      <i data-lucide="mail" className="w-4 h-4 absolute left-3 top-3 text-slate-400"></i>
+                      <input
+                        type="email"
+                        required
+                        value={authForm.email}
+                        onChange={(e) => setAuthForm({ ...authForm, email: e.target.value })}
+                        className="w-full pl-9 pr-3 py-2 text-sm bg-slate-800 border border-slate-700 rounded-xl text-white focus:outline-none focus:border-emerald-500"
+                        placeholder="teacher@edu.vn"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-300 mb-1">Mật khẩu *</label>
+                    <div className="relative">
+                      <i data-lucide="lock" className="w-4 h-4 absolute left-3 top-3 text-slate-400"></i>
+                      <input
+                        type="password"
+                        required
+                        value={authForm.password}
+                        onChange={(e) => setAuthForm({ ...authForm, password: e.target.value })}
+                        className="w-full pl-9 pr-3 py-2 text-sm bg-slate-800 border border-slate-700 rounded-xl text-white focus:outline-none focus:border-emerald-500"
+                        placeholder="••••••••"
+                      />
+                    </div>
+                  </div>
+
+                  {authTab === 'REGISTER' && (
+                    <div>
+                      <label className="block text-xs font-semibold text-slate-300 mb-1">Nhập lại Mật khẩu *</label>
+                      <div className="relative">
+                        <i data-lucide="shield-check" className="w-4 h-4 absolute left-3 top-3 text-slate-400"></i>
+                        <input
+                          type="password"
+                          required
+                          value={authForm.confirmPassword}
+                          onChange={(e) => setAuthForm({ ...authForm, confirmPassword: e.target.value })}
+                          className="w-full pl-9 pr-3 py-2 text-sm bg-slate-800 border border-slate-700 rounded-xl text-white focus:outline-none focus:border-emerald-500"
+                          placeholder="••••••••"
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  <button
+                    type="submit"
+                    className="w-full mt-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm py-2.5 rounded-xl shadow-lg transition-all flex items-center justify-center gap-2"
+                  >
+                    <i data-lucide={authTab === 'LOGIN' ? 'log-in' : 'user-plus'} className="w-4 h-4"></i>
+                    <span>{authTab === 'LOGIN' ? 'Xác Nhận Đăng Nhập' : 'Tạo Tài Khoản Mới'}</span>
+                  </button>
+
+                  {authTab === 'LOGIN' && (
+                    <div className="text-center pt-2 text-xs text-slate-400">
+                      Chưa có tài khoản?{' '}
+                      <button
+                        type="button"
+                        onClick={() => { setAuthTab('REGISTER'); setAuthError(''); setAuthSuccess(''); }}
+                        className="text-emerald-400 font-semibold hover:underline"
+                      >
+                        Đăng ký ngay tại đây
+                      </button>
+                      <div className="mt-2 text-[11px] bg-slate-950/70 p-2.5 rounded-lg border border-slate-800 space-y-1 text-left">
+                        <p className="text-emerald-400 font-semibold flex items-center gap-1">
+                          <i data-lucide="shield-check" className="w-3.5 h-3.5"></i>
+                          <span>Tài khoản Admin: <strong>dangvansach86@gmail.com</strong> (hoặc <strong>dangvansach86</strong>) | MK: <strong>20121984@</strong></span>
+                        </p>
+                        <p className="text-slate-400">
+                          💡 Tài khoản Demo Giáo viên: <strong>teacher.demo@edu.vn</strong> | MK: <strong>123456</strong>
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </form>
+              </div>
+            </div>
+          )}
 
           {/* FOOTER - STUDENT & SYSTEM CREDITS FROM DIAGRAM */}
           <footer className="bg-slate-900 text-slate-400 border-t border-slate-800 py-4 text-xs mt-auto">
             <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-2">
               <div className="flex items-center space-x-2">
-                <i data-lucide="graduation-cap" className="w-4 h-4 text-emerald-400"></i>
-                <span>Học viên: <strong className="text-white">dangvansach86</strong></span>
+                <i data-lucide="crown" className="w-4 h-4 text-amber-400"></i>
+                <span>Admin Quản Trị Hệ Thống: <strong className="text-white">Đặng Văn Sạch (dangvansach86)</strong></span>
               </div>
               <p className="text-slate-500">Dự án Classroom App • Tự động hóa Giảng dạy Môn Công nghệ & Hướng nghiệp GDPT 2018</p>
               <div>Xuất bản: 24/08/2026 19:39</div>
