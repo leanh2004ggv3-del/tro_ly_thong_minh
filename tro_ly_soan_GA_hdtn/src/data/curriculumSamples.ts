@@ -395,6 +395,26 @@ Nhóm 3 & 4: Sắm vai xử lý Tình huống 2 (Một nhóm bạn lơ là giờ
 + Dặn dò học sinh chuẩn bị bài cho tiết Sinh hoạt lớp cuối tuần.`,
           expectedProduct: `- 100% học sinh hoàn thành thông điệp cam kết hành động cá nhân dán lên "Cây văn hóa lớp học".
 [NLS] & [NLAI] - Học sinh ghi nhớ và thẩm thấu hai quy tắc cốt lõi về Năng lực số và Năng lực AI trong đời sống.`
+        },
+        {
+          stepId: 'hdgd-5',
+          stepName: '5. Hoạt động 5: Tổng kết nội dung 1 trên lớp (5 phút)',
+          objective: 'Củng cố toàn bộ bài học, đánh giá mức độ đạt được mục tiêu của học sinh; dặn dò chuẩn bị cho tiết Sinh hoạt lớp.',
+          method: 'Tổng kết sư phạm, đàm thoại củng cố, giao nhiệm vụ rèn luyện.',
+          teacherStudentAction: `* Mục tiêu: Củng cố toàn bộ bài học, đánh giá mức độ đạt được mục tiêu của học sinh; dặn dò chuẩn bị cho tiết Sinh hoạt lớp.
+* Phương pháp thực hiện: Tổng kết sư phạm, đàm thoại củng cố, giao nhiệm vụ rèn luyện.
+* Tổ chức thực hiện:
+- Bước 1: Chuyển giao nhiệm vụ
++ Giáo viên đặt câu hỏi tổng kết: "Sau tiết học hôm nay, bài học lớn nhất em rút ra cho bản thân trong mối quan hệ với bạn bè, thầy cô và khi sử dụng mạng xã hội là gì?".
+- Bước 2: Thực hiện nhiệm vụ
++ Học sinh suy ngẫm nhanh và xung phong phát biểu.
+- Bước 3: Báo cáo, thảo luận
++ 2 học sinh đại diện đứng dậy phát biểu bài học tâm đắc nhất.
+- Bước 4: Kết luận, nhận định
++ Giáo viên kết luận chung toàn bài: Sống hài hoà và tôn trọng sự khác biệt là chìa khóa để xây dựng tập thể lớp 9 hạnh phúc, đoàn kết. [NLS] Luôn giữ gìn văn hóa số: "Dừng lại và suy nghĩ" trước khi tương tác. [NLAI] Làm chủ công nghệ, giữ trọn trái tim và cảm xúc con người. Dặn dò thực hiện cam kết trong tuần để báo cáo trong Tiết 3 Sinh hoạt lớp.`,
+          expectedProduct: `- Học sinh nắm vững hệ thống kiến thức toàn bài.
+- Khắc sâu thông điệp sống hài hòa, tôn trọng sự khác biệt.
+[NLS] & [NLAI] - Cam kết rèn luyện quy tắc ứng xử văn minh số và làm chủ công nghệ bằng sự đồng cảm con người.`
         }
       ]
     },
