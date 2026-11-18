@@ -1,0 +1,504 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CN 9 · Bài 8. Dự án: Trồng cây ăn quả</title>
+<style>
+:root{--xanh:#2e7d32;--xanh2:#e8f5e9;--cam:#ef6c00;--do:#c62828;--chu:#1f2a1f;--mo:#5f6b5f;--nen:#f6f8f4;--the:#fff;--vien:#d5ded2}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Segoe UI",Arial,sans-serif;font-size:17px;line-height:1.55;color:var(--chu);background:var(--nen)}
+header{background:var(--xanh);color:#fff;padding:12px 16px;position:sticky;top:0;z-index:5}
+header h1{margin:0;font-size:18px}
+header .phu{font-size:13px;opacity:.9}
+.thanh{height:6px;background:#a5d6a7;border-radius:3px;margin-top:8px;overflow:hidden}
+.thanh i{display:block;height:100%;width:0;background:#fff;transition:width .3s}
+.nhap{background:#fff8e1;color:#6d4c00;font-size:13px;padding:6px 16px;border-bottom:1px solid #ffe082}
+.khung{display:flex;max-width:1100px;margin:0 auto}
+nav{width:250px;flex:none;padding:14px 10px;position:sticky;top:78px;align-self:flex-start;max-height:calc(100vh - 90px);overflow:auto}
+nav button{display:block;width:100%;text-align:left;border:0;background:none;padding:8px 10px;border-radius:8px;font:inherit;font-size:15px;color:var(--chu);cursor:pointer}
+nav button.dang{background:var(--xanh2);font-weight:600}
+nav button.xong::after{content:" ✓";color:var(--xanh)}
+main{flex:1;min-width:0;padding:14px 16px 90px}
+section{display:none;background:var(--the);border:1px solid var(--vien);border-radius:14px;padding:18px 18px 22px}
+section.hien{display:block}
+h2{color:var(--xanh);margin:0 0 10px;font-size:22px}
+h3{margin:18px 0 6px;font-size:18px}
+img{max-width:100%;border-radius:10px;display:block;margin:8px auto}
+.chu-hinh{text-align:center;font-size:13px;color:var(--mo);font-style:italic;margin-top:-2px}
+.hop{border-radius:10px;padding:10px 14px;margin:12px 0}
+.hop.muc-tieu{background:var(--xanh2);border-left:5px solid var(--xanh)}
+.hop.an-toan{background:#fff3e0;border-left:5px solid var(--cam)}
+.hop.mo-rong{background:#e3f2fd;border-left:5px solid #1565c0}
+.hop.nho{background:#f3e5f5;border-left:5px solid #6a1b9a}
+.tab{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}
+.tab button{border:1px solid var(--xanh);background:#fff;color:var(--xanh);border-radius:20px;padding:6px 14px;font:inherit;font-size:15px;cursor:pointer}
+.tab button.dang{background:var(--xanh);color:#fff}
+table{border-collapse:collapse;width:100%;font-size:15px}
+td,th{border:1px solid var(--vien);padding:6px 8px;vertical-align:top;text-align:left}
+th{background:var(--xanh2)}
+.buoc{display:flex;gap:10px;margin:8px 0;align-items:flex-start}
+.buoc b.so{flex:none;width:34px;height:34px;border-radius:50%;background:var(--xanh);color:#fff;display:flex;align-items:center;justify-content:center}
+.so-lieu{background:#fffde7;padding:0 4px;border-radius:4px;font-weight:600}
+.cau{border:1px solid var(--vien);border-radius:10px;padding:10px 12px;margin:10px 0}
+.cau p{margin:0 0 6px;font-weight:600}
+.lc{display:block;width:100%;text-align:left;margin:5px 0;padding:9px 12px;border:1px solid var(--vien);border-radius:8px;background:#fff;font:inherit;font-size:16px;cursor:pointer}
+.lc:hover{border-color:var(--xanh)}
+.lc.dung{background:#e8f5e9;border-color:var(--xanh)}
+.lc.sai{background:#ffebee;border-color:var(--do)}
+.giai{display:none;font-size:15px;margin-top:6px;padding:6px 10px;border-radius:6px;background:#f1f8e9}
+.giai.hien{display:block}
+.ds-dung-sai{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:6px 0}
+.ds-dung-sai span{flex:1 1 260px}
+.nut{display:inline-block;border:0;border-radius:10px;padding:10px 18px;font:inherit;font-size:16px;cursor:pointer;background:var(--xanh);color:#fff;margin:4px 6px 4px 0}
+.nut.phu{background:#fff;color:var(--xanh);border:1px solid var(--xanh)}
+.nut.nho{padding:6px 12px;font-size:14px}
+select{font:inherit;font-size:15px;padding:5px;border-radius:6px;border:1px solid var(--vien);max-width:100%}
+.xep{display:flex;flex-direction:column;gap:6px;margin:8px 0}
+.xep button{text-align:left}
+.ket{font-weight:600;margin-top:8px}
+textarea{width:100%;min-height:70px;font:inherit;font-size:15px;padding:8px;border-radius:8px;border:1px solid var(--vien)}
+.dieu-huong{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--vien);display:flex;justify-content:space-between;align-items:center;padding:8px 16px;z-index:5}
+.dieu-huong span{font-size:14px;color:var(--mo)}
+.app{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin:10px 0}
+.app a{display:block;border:1px solid var(--vien);border-radius:10px;padding:10px 12px;text-decoration:none;color:var(--chu);background:#fafff8}
+.app a b{color:var(--xanh)}
+.menu-dt{display:none}
+.nls{color:#c62828}
+.nlai{color:#1565c0}
+.nhan{display:inline-block;font-size:13px;font-weight:700;border-radius:12px;padding:2px 10px;margin:0 0 8px;border:1px solid currentColor}
+.hop.tich-hop-nls{background:#ffebee;border-left:5px solid #c62828}
+.hop.tich-hop-nlai{background:#e3f2fd;border-left:5px solid #1565c0}
+.cau-lenh{font-family:Consolas,monospace;font-size:15px;background:#263238;color:#e0f2f1;border-radius:8px;padding:10px 12px;white-space:pre-wrap;margin:8px 0}
+.nhan-dien{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:8px;margin:8px 0}
+footer{font-size:13px;color:var(--mo);text-align:center;margin:16px 0}
+@media (max-width:800px){
+  header{position:static}
+  nav{display:none;position:fixed;top:0;left:0;bottom:0;background:#fff;z-index:9;max-height:none;width:260px;box-shadow:2px 0 12px #0003;padding-top:20px}
+  nav.mo{display:block}
+  .menu-dt{display:inline-block;background:none;border:1px solid #fff;color:#fff;border-radius:8px;padding:2px 10px;font:inherit;font-size:14px;margin-top:6px;cursor:pointer}
+  main{padding:10px 10px 90px}
+  section{padding:14px 12px 18px}
+}
+@media print{
+  header,nav,.dieu-huong,.nhap,.khong-in,footer{display:none!important}
+  section{display:none!important;border:0}
+  section.in{display:block!important}
+  body{background:#fff}
+}
+</style>
+</head>
+<body data-ma="cn9-b08">
+<header>
+  <h1>Công nghệ 9 · Bài 8. Dự án: Trồng cây ăn quả</h1>
+  <div class="phu">Bài tự học E-Learning · SGK Công nghệ 9 – Trồng cây ăn quả (KNTT) · khoảng 40 phút</div>
+  <button class="menu-dt" onclick="moMenu()">☰ Mục lục</button>
+  <div class="thanh"><i id="tien-do"></i></div>
+</header>
+<div class="nhap" id="ban-nhap">✅ BẢN NHÁP — thầy/cô duyệt trước khi dùng. (Tổ duyệt xong thì xoá dòng này.)</div>
+<div class="khung">
+<nav id="menu"></nav>
+<main>
+<section data-ten="Bắt đầu">
+  <h2>Dự án: Trồng cây ăn quả</h2>
+  <div class="hop muc-tieu">
+    <b>Sau bài học này, em sẽ:</b>
+    <ul style="margin:6px 0">
+      <li>Tính toán được chi phí và hiệu quả kinh tế khi trồng cây ăn quả.</li>
+      <li>Trồng và chăm sóc được một loại cây ăn quả.</li>
+      <li>Có ý thức bảo vệ môi trường và an toàn lao động.</li>
+    </ul>
+    <small>(Yêu cầu cần đạt — SGK tr.61)</small>
+    <div style="margin-top:8px"><b>Em còn rèn thêm:</b></div>
+    <ul style="margin:6px 0">
+      <li class="nls"><b>Năng lực số (NLS 3.1.TC2a):</b> Sử dụng thiết bị số đơn giản để chụp ảnh, ghi lại quá trình và kết quả thực hiện dự án. <small>→ Phần 5</small></li>
+    </ul>
+  </div>
+  <h3>Dự án này là gì?</h3>
+  <p>Dự án là cơ hội để em vận dụng, tổng hợp kiến thức, kĩ năng trồng và chăm sóc cây ăn quả vào thực tiễn, rèn sức khoẻ, tinh thần vui vẻ và năng lực về <b>giáo dục tài chính</b>.</p>
+  <h3>Nhiệm vụ của nhóm em</h3>
+  <div class="buoc"><b class="so">1</b><div>Lập kế hoạch, <b>dự tính chi phí và hiệu quả kinh tế</b> cho một dự án trồng cây ăn quả.</div></div>
+  <div class="buoc"><b class="so">2</b><div><b>Trồng, chăm sóc</b> một loại cây ăn quả phù hợp với thực tiễn nhà trường, địa phương.</div></div>
+</section>
+
+<section data-ten="1a–b. Thu thập thông tin, chọn cây">
+  <h2>1. Lập kế hoạch</h2>
+  <h3>a) Thu thập thông tin</h3>
+  <p>Tra cứu internet kết hợp <b>khảo sát thực tế</b> tại cửa hàng vật tư nông nghiệp. Đánh dấu khi nhóm đã tìm hiểu xong:</p>
+  <div class="soat" data-bo="thongtin"></div>
+  <h3>b) Lựa chọn đối tượng, dụng cụ, thiết bị</h3>
+  <p>Từ thông tin thu được, chọn loại cây ăn quả phù hợp thực tiễn nhà trường, địa phương và chọn dụng cụ, thiết bị phù hợp với cây đó. Gợi ý: xem lại yêu cầu ngoại cảnh của từng cây ở Bài 3 – 7.</p>
+  <div class="cau">
+    <p>Nhóm em chọn cây gì? Vì sao (khí hậu, đất, nơi trồng, thời gian cho quả)?</p>
+    <textarea placeholder="Cây … · Lí do: …"></textarea>
+  </div>
+</section>
+
+<section data-ten="1c. Dự tính chi phí, hiệu quả">
+  <h2>c) Dự tính chi phí và hiệu quả kinh tế</h2>
+  <p>Nhập <b>số lượng</b> và <b>đơn giá</b> nhóm em khảo sát được, máy tự tính thành tiền, tổng và lãi thuần theo công thức SGK. Không biết đơn giá thì để trống, hỏi cửa hàng rồi điền sau.</p>
+  <div class="tab" data-nhom="th">
+    <button onclick="chonTab(this,0)" class="dang">Trường hợp 1: cây hằng năm</button><button onclick="chonTab(this,1)">Trường hợp 2: cây lâu năm</button>
+  </div>
+  <div class="the-pp" data-nhom="th">
+    <p style="font-size:15px">Bước 1: chi phí (Bảng 8.1) → A1 · Bước 2: nguồn thu (Bảng 8.2) → B1 · Bước 3: lãi thuần <b>C1 = B1 – A1</b>.</p>
+    <div class="bang-tinh" data-bo="th1"></div>
+  </div>
+  <div class="the-pp" data-nhom="th">
+    <p style="font-size:15px">Bước 1: chi phí thời kì kiến thiết cơ bản (Bảng 8.3) → A2 · Bước 2: chi phí 3 năm đầu thời kì kinh doanh (Bảng 8.4) → B2 · Bước 3: nguồn thu 3 năm đầu (Bảng 8.5) → C2 · Bước 4: lãi thuần <b>D = C2 – (A2 + B2)</b>.</p>
+    <div class="bang-tinh" data-bo="th2"></div>
+    <p style="font-size:13px;color:var(--mo)">Ghi chú SGK: có thể dự tính với thời gian dài hơn.</p>
+  </div>
+  <h3>✍️ Kiểm tra cách tính</h3>
+  <div class="trac-nghiem" data-bo="tinh"></div>
+</section>
+
+<section data-ten="2. Thực hành trồng cây">
+  <h2>2. Thực hành trồng cây ăn quả</h2>
+  <h3>a) Chuẩn bị</h3>
+  <ul>
+    <li><b>Dụng cụ:</b> cuốc, xẻng, bình tưới, cọc giữ cây, dây buộc…</li>
+    <li><b>Phân bón:</b> phù hợp từng loại cây; thêm vôi nếu đất chua.</li>
+    <li><b>Cây giống:</b> phù hợp thực tiễn; khoẻ mạnh, không sâu bệnh.</li>
+  </ul>
+  <h3>b) Quy trình thực hành</h3>
+  <div class="buoc"><b class="so">1</b><div><b>Đào hố:</b> kích thước phù hợp từng loại cây, từng loại đất.</div></div>
+  <div class="buoc"><b class="so">2</b><div><b>Bón phân lót:</b> lượng tuỳ loại cây; trộn đều với đất đào lên rồi lấp lại hố.</div></div>
+  <div class="buoc"><b class="so">3</b><div><b>Trồng cây:</b> khơi hố nhỏ giữa hố, xé bỏ vỏ bầu (nếu có), đặt cây, lấp đất cao hơn mặt bầu <span class="so-lieu">2 – 3 cm</span>; tưới đẫm, cắm cọc, phủ gốc bằng rơm, rạ, lá khô.</div></div>
+  <div class="buoc"><b class="so">4</b><div><b>Chăm sóc:</b> tưới nước, bón thúc, phòng trừ sâu bệnh phù hợp từng loại cây.</div></div>
+  <div class="hop an-toan">⚠️ Cầm cuốc, xẻng đúng cách, giữ khoảng cách với bạn; không đùa nghịch; đeo găng khi bón phân; rửa tay sau khi làm; dọn dẹp sạch sẽ.</div>
+  <h3>✍️ Xếp đúng thứ tự</h3>
+  <div class="xep-thu-tu" data-bo="tt"></div>
+  <div class="app"><a href="App - Trong cay 3D CN9/Trong cay 3D CN9.html"><b>🌳 Luyện trồng cây trên app 3D</b><br><small>Đào hố, bón lót, trồng cây bưởi theo số đo SGK (máy tính)</small></a></div>
+</section>
+
+<section data-ten="Ghi lại dự án bằng ảnh số">
+  <h2>Ghi lại quá trình và kết quả dự án bằng ảnh số</h2>
+  <span class="nhan nls">Tích hợp năng lực số · NLS 3.1.TC2a</span>
+  <div class="hop tich-hop-nls nls"><b>NLS 3.1.TC2a:</b> Sử dụng thiết bị số đơn giản để chụp ảnh, ghi lại quá trình và kết quả thực hiện dự án.</div>
+  <h3 class="nls">Nhiệm vụ 1. Chụp đủ ảnh minh chứng</h3>
+  <p class="nls">Mỗi nhóm cử 1 bạn giữ điện thoại/máy tính bảng (của nhà trường hoặc gia đình cho phép). Đánh dấu khi đã chụp:</p>
+  <div class="soat nls" data-bo="anh"></div>
+  <h3 class="nls">Nhiệm vụ 2. Chụp đẹp, đúng quy tắc</h3>
+  <ul class="nls">
+    <li>Chụp <b>ngang</b>, đủ sáng, cây và việc đang làm ở giữa khung hình; chụp cùng một góc qua các ngày để so sánh cây lớn lên.</li>
+    <li>Đặt một vật làm thước (thước kẻ, cọc có vạch) cạnh hố, cạnh cây để thấy kích thước.</li>
+    <li>Ưu tiên chụp <b>tay và cây</b>; không chụp mặt bạn khi chưa được bạn và thầy cô đồng ý; không đăng lên mạng.</li>
+  </ul>
+  <h3 class="nls">Nhiệm vụ 3. Đặt tên và lưu ảnh</h3>
+  <p class="nls">Đặt tên file theo mẫu để dễ tìm: <code>Nhom2_B3_TrongCay_2026-12-05.jpg</code> (nhóm – bước – việc – ngày). Lưu vào một thư mục chung của nhóm do thầy cô hướng dẫn.</p>
+  <div class="trac-nghiem nls" data-bo="nls"></div>
+  <div class="hop tich-hop-nls nls">💡 Cuối dự án, nhóm chọn 4 – 6 ảnh tiêu biểu (mỗi bước 1 ảnh + ảnh kết quả) để báo cáo trước lớp.</div>
+</section>
+
+<section data-ten="IV. Đánh giá kết quả">
+  <h2>IV. Đánh giá kết quả</h2>
+  <p>Nhóm tự đánh giá, rồi đánh giá nhóm bạn theo hướng dẫn của thầy cô. Tiêu chí gợi ý (SGK tr.65):</p>
+  <div class="soat" data-bo="dg"></div>
+  <h3>Nhật kí dự án của nhóm</h3>
+  <p>Nhóm: ………… Lớp: ………… Loại cây: ………………</p>
+  <table>
+    <tr><th style="width:90px">Ngày</th><th>Việc đã làm</th><th>Quan sát cây</th><th style="width:150px">Tên file ảnh</th></tr>
+    <tr><td>&nbsp;</td><td></td><td></td><td></td></tr><tr><td>&nbsp;</td><td></td><td></td><td></td></tr><tr><td>&nbsp;</td><td></td><td></td><td></td></tr><tr><td>&nbsp;</td><td></td><td></td><td></td></tr><tr><td>&nbsp;</td><td></td><td></td><td></td></tr>
+  </table>
+  <div class="khong-in"><button class="nut" onclick="inPhieu(this)">🖨️ In nhật kí</button></div>
+</section>
+
+<section data-ten="Luyện tập tổng hợp">
+  <h2>Luyện tập tổng hợp</h2>
+  <p>Mỗi lần bấm <b>Làm đề mới</b>, máy lấy ngẫu nhiên câu hỏi. Làm hết rồi bấm <b>Chấm điểm</b>.</p>
+  <div class="de-tong"></div>
+</section>
+
+<section data-ten="Tổng kết">
+  <h2>Ghi nhớ 3 ý</h2>
+  <div class="buoc"><b class="so">1</b><div><b>Lập kế hoạch:</b> thu thập thông tin (cây giống, dụng cụ, phân bón, kĩ thuật) → chọn cây phù hợp địa phương.</div></div>
+  <div class="buoc"><b class="so">2</b><div><b>Tính hiệu quả:</b> cây hằng năm C1 = B1 – A1; cây lâu năm D = C2 – (A2 + B2).</div></div>
+  <div class="buoc"><b class="so">3</b><div><b>Thực hành:</b> đào hố → bón lót → trồng cây → chăm sóc; an toàn lao động, giữ vệ sinh; ghi lại bằng ảnh số.</div></div>
+  <div id="tong-ket-diem" class="hop nho"></div>
+  <h3>Nguồn</h3>
+  <ul style="font-size:14px">
+    <li>Nội dung, Bảng 8.1 – 8.5, công thức: SGK Công nghệ 9 – Trải nghiệm nghề nghiệp, mô đun Trồng cây ăn quả (Kết nối tri thức với cuộc sống), tr.61 – 65.</li>
+    <li>Mã và nội dung tích hợp NLS 3.1.TC2a: Phân phối chương trình Công nghệ 9 năm học 2026 – 2027 của Tổ Công nghệ – HN (bài này PPCT không ghi NLAI).</li>
+    <li>Số liệu trong câu hỏi tính toán là ví dụ giả định để luyện công thức, không phải giá thị trường.</li>
+  </ul>
+</section>
+
+<footer>Học liệu số Tổ Công nghệ – HN · Trường THCS Tịnh Biên · Năm học 2026–2027<br>Chỉ dùng nội bộ cho học sinh của trường. <a href="00 - MUC LUC KHO E-LEARNING CN9.html">↩ Về mục lục kho bài</a></footer>
+</main>
+</div>
+<div class="dieu-huong">
+  <button class="nut phu nho" onclick="sang(-1)">← Trước</button>
+  <span id="vi-tri"></span>
+  <button class="nut nho" onclick="sang(1)">Tiếp →</button>
+</div>
+<script>
+/* CN9 · Bài 8. Dự án: Trồng cây ăn quả — theo SGK Trồng cây ăn quả tr.61–65. Số trong câu hỏi tính toán là GIẢ ĐỊNH để luyện công thức. */
+const BO = {
+  tinh: [
+    {h:"Với dự án cây hằng năm, lãi thuần được tính theo công thức:", c:["C1 = A1 – B1","C1 = B1 – A1","C1 = A1 + B1","C1 = B1 : A1"], d:1, g:"B1 là tổng nguồn thu, A1 là tổng chi phí (SGK tr.62)."},
+    {h:"Ví dụ giả định: tổng chi phí A1 = 900 000 đ, tổng nguồn thu B1 = 1 500 000 đ. Lãi thuần C1 bằng:", c:["2 400 000 đ","600 000 đ","– 600 000 đ","1 500 000 đ"], d:1, g:"C1 = 1 500 000 – 900 000 = 600 000 đ."},
+    {h:"Với dự án cây lâu năm, lãi thuần tính đến hết 3 năm đầu thời kì kinh doanh là:", c:["D = C2 – (A2 + B2)","D = A2 + B2 + C2","D = C2 – A2","D = (A2 + B2) – C2"], d:0, g:"A2: chi phí kiến thiết cơ bản; B2: chi phí 3 năm đầu kinh doanh; C2: nguồn thu 3 năm đầu (SGK tr.64)."},
+    {h:"Ví dụ giả định: A2 = 2 000 000 đ, B2 = 3 000 000 đ, C2 = 9 000 000 đ. Lãi thuần D bằng:", c:["4 000 000 đ","14 000 000 đ","9 000 000 đ","– 4 000 000 đ"], d:0, g:"D = 9 000 000 – (2 000 000 + 3 000 000) = 4 000 000 đ."}
+  ],
+  th: [
+    {h:"Khi trồng cây, lấp đất so với mặt bầu:", c:["Thấp hơn 10 cm","Cao hơn 2 – 3 cm","Bằng mặt đất xung quanh, không nén","Cao hơn 20 cm"], d:1, g:"SGK tr.65, Bước 3."},
+    {h:"Nếu trồng trên đất chua, khi chuẩn bị phân bón cần:", c:["Chuẩn bị thêm vôi","Bỏ hết phân lót","Chỉ dùng phân đạm","Tưới nước muối"], d:0, g:"SGK tr.64."},
+    {h:"Sau khi trồng xong cần làm gì để giữ ẩm cho cây?", c:["Phơi khô gốc","Phủ gốc bằng rơm, rạ, lá khô","Tưới nước sôi","Đào hết đất quanh gốc"], d:1, g:"Tưới đẫm, cắm cọc, phủ gốc (SGK tr.65)."},
+    {h:"Tiêu chí 'Sản phẩm' khi đánh giá dự án gồm:", c:["Cây đủ số lượng, đúng khoảng cách, ngay ngắn, chắc chắn, phủ gốc, đất đủ ẩm","Chỉ cần cây cao","Ảnh chụp thật đẹp","Chi phí thấp nhất"], d:0, g:"SGK tr.65."}
+  ],
+  nls: [
+    {h:"Tên file ảnh nào giúp nhóm dễ tìm, dễ sắp xếp nhất?", c:["IMG_20261205_1.jpg","anh dep.jpg","Nhom2_B3_TrongCay_2026-12-05.jpg","123.jpg"], d:2, g:"Tên có nhóm – bước – việc – ngày giúp tìm nhanh, xếp đúng thứ tự."},
+    {h:"Khi chụp ảnh minh chứng dự án, việc nào KHÔNG nên làm?", c:["Chụp cùng một góc qua các ngày","Đặt thước cạnh cây để thấy kích thước","Chụp mặt bạn rồi đăng lên mạng khi chưa được đồng ý","Chụp đủ sáng, cây ở giữa khung hình"], d:2, g:"Phải được bạn và thầy cô đồng ý; ảnh dự án dùng để báo cáo trong lớp."}
+  ]
+};
+const THU_TU = { tt:["Đào hố trồng cây","Bón phân lót, trộn đều với đất rồi lấp hố","Trồng cây, tưới đẫm, cắm cọc, phủ gốc","Chăm sóc: tưới nước, bón thúc, phòng trừ sâu bệnh"] };
+const SOAT = {
+  thongtin: { ten:"Thu thập thông tin", nhan:["Đã tìm hiểu"], ds:[
+    "Đối tượng cây ăn quả: chủng loại, giá cây giống, yêu cầu ngoại cảnh, năng suất, giá sản phẩm.",
+    "Dụng cụ trồng và chăm sóc: chủng loại, mục đích sử dụng, giá cả.",
+    "Phân bón: chủng loại, thành phần, giá cả.",
+    "Kĩ thuật trồng và chăm sóc loại cây đã chọn." ] },
+  anh: { ten:"NLS – ảnh minh chứng", nhan:["Đã chụp"], ket:"Đủ ảnh rồi! Đặt tên và lưu đúng thư mục nhé.", ds:[
+    "Dụng cụ, phân bón, cây giống đã chuẩn bị.",
+    "Bước 1: hố đã đào (có thước đo).",
+    "Bước 2: trộn phân lót với đất.",
+    "Bước 3: cây vừa trồng xong (đã cắm cọc, phủ gốc).",
+    "Bước 4: các lần chăm sóc (tưới, bón thúc, kiểm tra sâu bệnh).",
+    "Kết quả: cây sau 2 – 4 tuần, chụp cùng góc với ảnh bước 3.",
+    "Khu thực hành sau khi dọn dẹp sạch sẽ." ] },
+  dg: { ten:"Tự đánh giá dự án", nhan:["Đạt","Chưa đạt"], ds:[
+    "Chuẩn bị: đầy đủ chủng loại, số lượng vật liệu, vật dụng, dụng cụ.",
+    "Quy trình: tuân thủ các bước, thao tác thành thạo, đúng kĩ thuật.",
+    "Sản phẩm: cây đủ số lượng, đúng khoảng cách, ngay ngắn, chắc chắn, phủ gốc phù hợp, độ ẩm đất thích hợp.",
+    "An toàn lao động: dụng cụ dùng đúng chức năng, đúng cách, cất giữ đúng quy định.",
+    "Vệ sinh môi trường: tuân thủ nội quy, không vương vãi, dọn dẹp sạch sẽ." ] }
+};
+const CP = [["Cây giống","cây"],["Phân hữu cơ","kg"],["Phân đạm","kg"],["Phân lân","kg"],["Phân kali","kg"],["Thuốc bảo vệ thực vật","…"],["Công lao động","…"],["Chi phí khác","…"]];
+const BANG_TINH = {
+  th1: { diem:"Lãi thuần C1 (cây hằng năm)", bang:[
+      {ma:"A1", ten:"Bảng 8.1. Chi phí", tongTen:"Tổng chi phí (A1)", dong:CP},
+      {ma:"B1", ten:"Bảng 8.2. Nguồn thu", tongTen:"Tổng nguồn thu (B1)", dong:[["Sản lượng quả","kg"]]} ],
+    cong_thuc:{ten:"C1 = B1 – A1", bieu_thuc:"B1-A1"} },
+  th2: { diem:"Lãi thuần D (cây lâu năm)", bang:[
+      {ma:"A2", ten:"Bảng 8.3. Chi phí thời kì kiến thiết cơ bản", tongTen:"Tổng chi phí (A2)", dong:CP},
+      {ma:"B2", ten:"Bảng 8.4. Chi phí 3 năm đầu thời kì kinh doanh", tongTen:"Tổng chi phí (B2)", dong:CP.slice(1)},
+      {ma:"C2", ten:"Bảng 8.5. Nguồn thu 3 năm đầu thời kì kinh doanh", tongTen:"Tổng thu 3 năm (C2)", dong:[["Năm thứ nhất","kg"],["Năm thứ hai","kg"],["Năm thứ ba","kg"]]} ],
+    cong_thuc:{ten:"D = C2 – (A2 + B2)", bieu_thuc:"C2-(A2+B2)"} }
+};
+
+</script>
+<script>
+/* ====== BỘ MÁY CHUNG bài E-Learning (Tổ CN-HN) — không sửa theo từng bài; nội dung bài ở bXX.js + bXX_phan.html ====== */
+"use strict";
+const $ = (s, g) => (g || document).querySelector(s);
+const $$ = (s, g) => [...(g || document).querySelectorAll(s)];
+const lay = (ten) => { try { return eval(ten); } catch (e) { return {}; } };
+const D = { BO: lay("BO"), GHEP: lay("GHEP"), THU_TU: lay("THU_TU"), DUNG_SAI: lay("DUNG_SAI"), NHAN_DIEN: lay("NHAN_DIEN"),
+            BAT_LOI: lay("BAT_LOI"), SOAT: lay("SOAT"), CAU_LENH: lay("CAU_LENH") };
+const KHOA = "el-" + document.body.dataset.ma;
+let doc = {}; try { doc = JSON.parse(localStorage.getItem(KHOA) || "{}"); } catch (e) { doc = {}; }
+function luu() { try { localStorage.setItem(KHOA, JSON.stringify(doc)); } catch (e) {} }
+function ghiDiem(ten, gt) { doc.diem = doc.diem || {}; doc.diem[ten] = gt; luu(); }
+function tao(the, lop, chu) { const e = document.createElement(the); if (lop) e.className = lop; if (chu != null) e.textContent = chu; return e; }
+function nutKiem(noi, fn, chu) { const b = tao("button", "nut nho", chu || "Kiểm tra"); b.onclick = fn; const k = tao("div", "ket"); noi.append(b, k); return k; }
+function tron(a) { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+function to(el, ok) { el.style.borderColor = ok ? "#2e7d32" : "#c62828"; el.style.background = ok ? "#e8f5e9" : "#ffebee"; }
+
+/* ---- điều hướng ---- */
+const S = $$("section"), menu = $("#menu"); let hienTai = 0;
+S.forEach((s, i) => { const b = tao("button", "", (i + 1) + ". " + s.dataset.ten); b.onclick = () => { moTrang(i); menu.classList.remove("mo"); }; menu.appendChild(b); });
+function moTrang(i) {
+  hienTai = Math.max(0, Math.min(S.length - 1, i));
+  S.forEach((s, k) => s.classList.toggle("hien", k === hienTai));
+  doc.xem = doc.xem || {}; doc.xem[hienTai] = 1; doc.trang = hienTai; luu();
+  [...menu.children].forEach((b, k) => { b.classList.toggle("dang", k === hienTai); b.classList.toggle("xong", !!doc.xem[k]); });
+  $("#tien-do").style.width = (Object.keys(doc.xem).length / S.length * 100) + "%";
+  $("#vi-tri").textContent = "Phần " + (hienTai + 1) + " / " + S.length;
+  const tk = $("#tong-ket-diem", S[hienTai]); if (tk) veTongKet(tk);
+  window.scrollTo(0, 0);
+}
+function sang(d) { moTrang(hienTai + d); }
+function moMenu() { menu.classList.toggle("mo"); }
+function chonTab(b, i) { const n = b.parentNode.dataset.nhom;
+  [...b.parentNode.children].forEach((x, k) => x.classList.toggle("dang", k === i));
+  $$('.the-pp[data-nhom="' + n + '"]').forEach((t, k) => t.style.display = k === i ? "" : "none"); }
+function hienGiai(b) { b.nextElementSibling.classList.add("hien"); }
+function phongTo(im) { const w = tao("div"); w.style.cssText = "position:fixed;inset:0;background:#000d;z-index:20;display:flex;align-items:center;justify-content:center;cursor:zoom-out;padding:10px";
+  const i2 = new Image(); i2.src = im.src; i2.style.cssText = "max-width:100%;max-height:100%;border-radius:8px"; w.appendChild(i2); w.onclick = () => w.remove(); document.body.appendChild(w); }
+$$("img[data-lay-anh]").forEach(im => { const g = document.getElementById("anh-" + im.dataset.layAnh); if (g) im.src = g.src; });
+$$("main img").forEach(im => { im.style.cursor = "zoom-in"; im.addEventListener("click", () => phongTo(im)); });
+$$(".the-pp[data-nhom]").forEach(t => { const cung = $$('.the-pp[data-nhom="' + t.dataset.nhom + '"]'); if (cung.indexOf(t) > 0) t.style.display = "none"; });
+
+/* ---- trắc nghiệm ---- */
+function veCau(q, noi, thi) {
+  const d = tao("div", "cau"); d.appendChild(tao("p", "", q.h));
+  const g = tao("div", "giai");
+  q.c.forEach((c, k) => { const b = tao("button", "lc", String.fromCharCode(65 + k) + ". " + c);
+    b.onclick = () => { if (thi) { $$(".lc", d).forEach(x => x.style.outline = ""); b.style.outline = "3px solid #90caf9"; d.dataset.chon = k; return; }
+      $$(".lc", d).forEach(x => x.classList.remove("dung", "sai")); b.classList.add(k === q.d ? "dung" : "sai"); g.classList.add("hien");
+      g.textContent = k === q.d ? "✅ Chính xác! " + q.g : "❌ Chưa đúng, em thử lại."; };
+    d.appendChild(b); });
+  d.appendChild(g); noi.appendChild(d); return d;
+}
+$$(".trac-nghiem").forEach(n => (D.BO[n.dataset.bo] || []).forEach(q => veCau(q, n)));
+
+/* ---- ghép nối (chọn nhóm cho từng ý) ---- */
+$$(".ghep-noi").forEach(n => { const o = D.GHEP[n.dataset.bo]; if (!o) return;
+  const ss = o.ds.map(r => { const d = tao("div", "ds-dung-sai"); d.appendChild(tao("span", "", r[0]));
+    const s = tao("select"); s.innerHTML = '<option value="">— chọn —</option>' + o.ten.map((t, k) => '<option value="' + k + '">' + t + '</option>').join("");
+    d.appendChild(s); n.appendChild(d); return s; });
+  const kq = nutKiem(n, () => { let dung = 0; ss.forEach((s, i) => { const ok = s.value !== "" && +s.value === o.ds[i][1]; if (ok) dung++; to(s, ok); });
+    kq.textContent = "Em đúng " + dung + "/" + ss.length + (dung === ss.length ? " 🎉" : " — ô đỏ là chưa đúng, xem lại phần trên nhé."); ghiDiem(o.diem || "Ghép nối", dung + "/" + ss.length); }); });
+
+/* ---- xếp thứ tự ---- */
+$$(".xep-thu-tu").forEach(n => { const ten = n.dataset.bo, dung = D.THU_TU[ten]; if (!dung) return;
+  function ve() { n.innerHTML = ""; n.appendChild(tao("p", "", "Bấm lần lượt theo đúng thứ tự:")).style.fontSize = "15px";
+    const da = [], x = tao("div", "xep"), kq = tao("div", "ket");
+    tron(dung).forEach(b => { const nut = tao("button", "lc", b);
+      nut.onclick = () => { if (nut.disabled) return;
+        if (b === dung[da.length]) { da.push(b); nut.disabled = true; nut.classList.add("dung"); nut.textContent = da.length + ". " + b;
+          if (da.length === dung.length) { kq.textContent = "🎉 Đúng hết thứ tự!"; ghiDiem("Thứ tự: " + ten, "đúng"); } }
+        else { nut.classList.add("sai"); setTimeout(() => nut.classList.remove("sai"), 600); kq.textContent = "Chưa phải ý số " + (da.length + 1) + ", em nghĩ lại nhé."; } };
+      x.appendChild(nut); });
+    const lai = tao("button", "nut phu nho", "Làm lại"); lai.onclick = ve; n.append(x, kq, lai); }
+  ve(); });
+
+/* ---- đúng / sai ---- */
+$$(".dung-sai").forEach(n => { const o = D.DUNG_SAI[n.dataset.bo]; if (!o) return; const k = n.dataset.bo;
+  const hang = o.ds.map((r, i) => { const d = tao("div", "ds-dung-sai"); d.appendChild(tao("span", "", (i + 1) + ". " + r[0]));
+    d.insertAdjacentHTML("beforeend", '<label><input type="radio" name="ds-' + k + i + '" value="1"> Đúng</label><label><input type="radio" name="ds-' + k + i + '" value="0"> Sai</label>');
+    const g = tao("div", "giai"); g.style.flexBasis = "100%"; d.appendChild(g); n.appendChild(d); return d; });
+  const kq = nutKiem(n, () => { let dung = 0; hang.forEach((d, i) => { const c = $("input:checked", d); const ok = !!c && (c.value === "1") === o.ds[i][1]; if (ok) dung++;
+      const g = $(".giai", d); g.classList.add("hien"); g.textContent = (ok ? "✅ " : "❌ ") + o.ds[i][2]; });
+    kq.textContent = "Em đúng " + dung + "/" + hang.length + "."; ghiDiem(o.ten || "Đúng – sai", dung + "/" + hang.length); }); });
+
+/* ---- nhận ra bước/đối tượng qua ảnh (NLS) ---- */
+$$(".nhan-dien").forEach(n => { const o = D.NHAN_DIEN[n.dataset.bo]; if (!o) return;
+  const ss = o.anh.map(a => { const d = tao("label", "cau"); d.style.margin = "0"; d.appendChild(tao("b", "", a[0])); d.appendChild(tao("br"));
+    const s = tao("select"); s.innerHTML = '<option value="">— chọn —</option>' + o.buoc.map((b, j) => '<option value="' + j + '">' + b + '</option>').join("");
+    d.appendChild(s); n.appendChild(d); return s; });
+  const vo = tao("div"); n.after(vo);
+  const kq = nutKiem(vo, () => { let dung = 0; ss.forEach((s, i) => { const ok = s.value !== "" && +s.value === o.anh[i][1]; if (ok) dung++; to(s, ok); });
+    kq.textContent = "Em nhận đúng " + dung + "/" + ss.length + "." + (dung === ss.length ? " 🎉 Mắt rất tinh!" : " Ô đỏ: em xem lại bài rồi nhìn lại ảnh nhé." + (o.goiY ? " Gợi ý: " + o.goiY : ""));
+    ghiDiem(o.ten || "Nhận diện qua ảnh", dung + "/" + ss.length); }); });
+
+/* ---- mỗi ảnh một câu chọn (VD: đây là cây gì?) ---- */
+D.NHAN_DIEN_ANH = lay("NHAN_DIEN_ANH");
+$$(".nhan-dien-anh").forEach(n => { const o = D.NHAN_DIEN_ANH[n.dataset.bo]; if (!o) return;
+  const luoi = tao("div", "nhan-dien"); n.appendChild(luoi);
+  const ss = o.anh.map((a, i) => { const d = tao("div", "cau"); d.style.margin = "0"; const im = new Image(); im.src = a[0]; im.alt = "Ảnh " + (i + 1); im.style.cssText = "height:150px;object-fit:cover;width:100%;cursor:zoom-in"; im.onclick = () => phongTo(im);
+    const s = tao("select"); s.innerHTML = '<option value="">— chọn —</option>' + o.chon.map((b, j) => '<option value="' + j + '">' + b + '</option>').join("");
+    d.append(im, tao("b", "", "Ảnh " + (i + 1) + ": "), s); luoi.appendChild(d); return s; });
+  const kq = nutKiem(n, () => { let dung = 0; ss.forEach((s, i) => { const ok = s.value !== "" && +s.value === o.anh[i][1]; if (ok) dung++; to(s, ok); });
+    kq.textContent = "Em nhận đúng " + dung + "/" + ss.length + "." + (dung === ss.length ? " 🎉" : " Ô đỏ: em nhìn kĩ lá, quả rồi chọn lại nhé."); ghiDiem(o.ten || "Nhận biết qua ảnh", dung + "/" + ss.length); }); });
+
+/* ---- bắt lỗi (đánh dấu dòng sai) ---- */
+$$(".bat-loi").forEach(n => { const o = D.BAT_LOI[n.dataset.bo]; if (!o) return;
+  const hang = o.ds.map(r => { const d = tao("div", "ds-dung-sai"); const l = tao("label"); l.style.flex = "1 1 260px";
+    const c = tao("input"); c.type = "checkbox"; l.append(c, " ", tao("span", "", r[0])); const g = tao("div", "giai"); g.style.flexBasis = "100%";
+    d.append(l, g); n.appendChild(d); return { c, g }; });
+  const kq = nutKiem(n, () => { let dung = 0; hang.forEach((h, i) => { const ok = h.c.checked === o.ds[i][1]; if (ok) dung++; h.g.classList.add("hien"); h.g.textContent = (ok ? "✅ " : "❌ ") + o.ds[i][2]; });
+    kq.textContent = "Em xử lí đúng " + dung + "/" + hang.length + " dòng. Có " + o.ds.filter(r => r[1]).length + " dòng sai."; ghiDiem(o.ten || "Bắt lỗi", dung + "/" + hang.length); }); });
+
+/* ---- soát theo danh mục (tự đánh giá, không chấm) ---- */
+$$(".soat").forEach(n => { const o = D.SOAT[n.dataset.bo]; if (!o) return; const k = n.dataset.bo; const kq = tao("div", "ket");
+  function dem() { let da = 0, sua = 0; o.ds.forEach((s, i) => { const c = $('input[name="sa-' + k + i + '"]:checked'); if (c) { da++; if (c.value === "0") sua++; } });
+    kq.textContent = "Em đã soát " + da + "/" + o.ds.length + " điểm" + (o.nhan.length > 1 ? ", " + o.nhan[1].toLowerCase() + ": " + sua : "") + "." + (da === o.ds.length && o.ket ? " " + o.ket : "");
+    ghiDiem(o.ten || "Tự soát", da + "/" + o.ds.length + (o.nhan.length > 1 ? " (" + sua + " điểm sửa)" : "")); }
+  o.ds.forEach((s, i) => { const d = tao("div", "ds-dung-sai"); d.appendChild(tao("span", "", (i + 1) + ". " + s));
+    o.nhan.forEach((nh, j) => { const l = tao("label"); const r = tao("input"); r.type = o.nhan.length > 1 ? "radio" : "checkbox"; r.name = "sa-" + k + i; r.value = j === 0 ? "1" : "0"; r.onchange = dem; l.append(r, " " + nh); d.appendChild(l); });
+    n.appendChild(d); });
+  n.appendChild(kq); });
+
+/* ---- tạo câu lệnh AI ---- */
+$$(".tao-cau-lenh").forEach(n => { const o = D.CAU_LENH[n.dataset.bo]; if (!o) return;
+  const luoi = tao("div"); luoi.style.cssText = "display:grid;gap:6px;max-width:600px"; const sel = {}, chk = [];
+  Object.keys(o.chon || {}).forEach(k => { const l = tao("label", "", o.chon[k].nhan + ": "); const s = tao("select"); o.chon[k].ds.forEach(v => s.appendChild(tao("option", "", v))); sel[k] = s; l.appendChild(s); luoi.appendChild(l); s.onchange = ve; });
+  (o.them || []).forEach(t => { const l = tao("label"); const c = tao("input"); c.type = "checkbox"; c.checked = !!t[2]; c.onchange = ve; chk.push([c, t[1]]); l.append(c, " " + t[0]); luoi.appendChild(l); });
+  const ra = tao("div", "cau-lenh"), chep = tao("button", "nut phu nho", "📋 Chép câu lệnh"), bao = tao("span"); bao.style.fontSize = "14px";
+  function ve() { let m = typeof o.mau === "string" ? o.mau : o.mau[sel[o.theoChon].value];
+    chk.forEach(([c, t]) => { if (c.checked) m += t; }); Object.keys(sel).forEach(k => m = m.split("{" + k + "}").join(sel[k].value)); ra.textContent = m; bao.textContent = ""; }
+  chep.onclick = () => { const loi = () => bao.textContent = " Máy không cho chép tự động, em bôi đen câu lệnh rồi chép tay nhé.";
+    try { navigator.clipboard.writeText(ra.textContent).then(() => bao.textContent = " Đã chép ✓", loi); } catch (e) { loi(); } };
+  n.append(luoi, ra, chep, bao); ve(); });
+
+/* ---- tự đánh giá theo thang điểm (VD trắc nghiệm Holland) — không có đúng/sai ---- */
+D.TU_DANH_GIA = lay("TU_DANH_GIA");
+$$(".tu-danh-gia").forEach(n => { const o = D.TU_DANH_GIA[n.dataset.bo]; if (!o) return;
+  const bang = tao("table"); bang.innerHTML = "<tr><th style='width:40px'>STT</th><th>" + (o.cot || "Tiêu chí") + "</th><th style='width:170px'>Em tự cho điểm</th></tr>";
+  const ss = o.ds.map((t, i) => { const r = bang.insertRow(); r.insertCell().textContent = i + 1; r.insertCell().textContent = t;
+    const s = tao("select"); s.innerHTML = '<option value="">—</option>' + o.thang.map((m, k) => '<option value="' + k + '">' + k + " – " + m + '</option>').join(""); s.onchange = tinh; r.insertCell().appendChild(s); return s; });
+  const kq = tao("div", "hop muc-tieu"); n.append(bang, kq);
+  function tinh() { if (ss.some(s => s.value === "")) { kq.textContent = "Em cho điểm đủ " + ss.length + " tiêu chí, máy sẽ tự tính."; return; }
+    const v = ss.map(s => +s.value); kq.innerHTML = "";
+    o.nhom.forEach(g => { const B = v.slice(g.tu - 1, g.den).reduce((a, b) => a + b, 0); const A = Math.round(B / g.toiDa * 1000) / 10;
+      kq.appendChild(tao("div", "", g.ten + ": " + g.B + " = " + B + " điểm → " + g.A + " = (" + B + " : " + g.toiDa + ") × 100 = " + A + "%")); ghiDiem(g.ten, A + "%"); });
+    if (o.loiKet) kq.appendChild(tao("div", "", o.loiKet)); }
+  tinh(); });
+
+/* ---- bảng tính chi phí – nguồn thu – lãi (Bài 8) ---- */
+D.BANG_TINH = lay("BANG_TINH");
+const tien = v => (Math.round(v) || 0).toLocaleString("vi-VN") + " đ";
+$$(".bang-tinh").forEach(n => { const o = D.BANG_TINH[n.dataset.bo]; if (!o) return; const tong = {}; const kq = tao("div", "hop muc-tieu");
+  function tinh() {
+    o.bang.forEach(b => { let s = 0; b._hang.forEach(h => { const v = (+h.sl.value || 0) * (+h.dg.value || 0); h.tt.textContent = tien(v); s += v; }); tong[b.ma] = s; b._tong.textContent = tien(s); });
+    let bt = o.cong_thuc.bieu_thuc; Object.keys(tong).forEach(k => bt = bt.split(k).join("(" + tong[k] + ")"));
+    let v = 0; try { v = Function('"use strict";return (' + bt + ")")(); } catch (e) {}
+    kq.innerHTML = "<b>" + o.cong_thuc.ten + "</b><br>" + o.cong_thuc.ten.split("=")[0].trim() + " = " + tien(v) + (v < 0 ? " (lỗ — em xem lại chi phí, giá bán)" : v > 0 ? " (có lãi)" : "");
+    ghiDiem(o.diem || "Dự tính lãi thuần", tien(v)); }
+  o.bang.forEach(b => { n.appendChild(tao("h4", "", b.ten)); const t = tao("table");
+    t.innerHTML = "<tr><th>Nội dung</th><th style='width:70px'>Đơn vị</th><th style='width:95px'>Số lượng</th><th style='width:110px'>Đơn giá (đ)</th><th style='width:120px'>Thành tiền</th></tr>";
+    b._hang = b.dong.map(d => { const r = t.insertRow(); r.insertCell().textContent = d[0]; r.insertCell().textContent = d[1];
+      const sl = tao("input"); sl.type = "number"; sl.min = 0; sl.style.width = "80px"; sl.oninput = tinh; if (d[2] != null) sl.value = d[2];
+      const dg = tao("input"); dg.type = "number"; dg.min = 0; dg.style.width = "95px"; dg.oninput = tinh; if (d[3] != null) dg.value = d[3];
+      r.insertCell().appendChild(sl); r.insertCell().appendChild(dg); const tt = r.insertCell(); return { sl, dg, tt }; });
+    const r = t.insertRow(); const c = r.insertCell(); c.colSpan = 4; c.innerHTML = "<b>" + b.tongTen + "</b>"; b._tong = r.insertCell(); b._tong.style.fontWeight = "700";
+    n.appendChild(t); });
+  n.appendChild(kq); tinh(); });
+
+/* ---- bảng đánh giá mức độ phù hợp nghề (ĐHNN Bài 5): trùng khớp = 1 điểm ---- */
+D.BANG_PH = lay("BANG_PH");
+$$(".bang-phu-hop").forEach(n => { const o = D.BANG_PH[n.dataset.bo]; if (!o) return; const k = n.dataset.bo;
+  const t = tao("table"); t.innerHTML = "<tr><th style='width:80px'></th><th>Đặc điểm của bản thân (1)</th><th>Đặc điểm, yêu cầu nghề KT-CN (2)</th><th style='width:70px'>Trùng khớp (3)</th><th style='width:70px'>Không trùng khớp (4)</th></tr>";
+  const kq = tao("div", "hop muc-tieu");
+  function tinh() { let d = 0; o.dong.forEach((r, i) => { const c = $('input[name="ph-' + k + i + '"]:checked'); if (c && c.value === "1") d++; });
+    const x = o.xep.find(m => d >= m[0] && d <= m[1]); kq.innerHTML = "<b>Tổng điểm cột (3): " + d + "/" + o.dong.length + "</b> → " + (x ? x[2] : "");
+    ghiDiem(o.ten || "Mức độ phù hợp", d + "/" + o.dong.length + " – " + (x ? x[2] : "")); }
+  o.dong.forEach((r, i) => { const h = t.insertRow(); const c0 = h.insertCell(); c0.innerHTML = "<b>" + r[0] + "</b>";
+    const c1 = h.insertCell(); c1.appendChild(tao("div", "", r[1])); const ta = tao("textarea"); ta.style.minHeight = "40px"; c1.appendChild(ta);
+    const c2 = h.insertCell(); c2.textContent = r[2];
+    ["1", "0"].forEach(v => { const c = h.insertCell(); c.style.textAlign = "center"; const ip = tao("input"); ip.type = "radio"; ip.name = "ph-" + k + i; ip.value = v; ip.onchange = tinh; c.appendChild(ip); }); });
+  n.append(t, kq); tinh(); });
+
+/* ---- đề tổng hợp ---- */
+let DE = [];
+$$(".de-tong").forEach(n => {
+  const moi = tao("button", "nut phu nho", "🔄 Làm đề mới"), vung = tao("div"), cham = tao("button", "nut", "Chấm điểm"), kq = tao("div", "ket");
+  const tai = tao("div", "khong-in"); const bt = tao("button", "nut phu nho", "⬇️ Tải phiếu kết quả tự học"); bt.onclick = taiKetQua; tai.append(bt, " "); tai.appendChild(tao("small", "", "(chỉ ghi điểm từng phần, không ghi tên)"));
+  const kho = [].concat(...Object.keys(D.BO).filter(k => k !== "ai").map(k => D.BO[k]));   /* bộ "ai" (tình huống AI) không đưa vào đề */ const so = Math.min(10, kho.length);
+  n.parentNode.querySelector("h2").textContent = "Luyện tập tổng hợp (" + so + " câu)";
+  function taoDe() { DE = tron(kho).slice(0, so); vung.innerHTML = ""; DE.forEach((q, i) => { const d = veCau({ h: (i + 1) + ". " + q.h, c: q.c, d: q.d, g: q.g }, vung, true); d.dataset.i = i; }); kq.textContent = ""; }
+  moi.onclick = taoDe;
+  cham.onclick = () => { let dung = 0, chua = 0;
+    $$(".cau", vung).forEach(d => { const q = DE[+d.dataset.i], c = d.dataset.chon; if (c === undefined) { chua++; return; }
+      const ls = $$(".lc", d); ls.forEach(x => { x.classList.remove("dung", "sai"); x.style.outline = ""; }); ls[q.d].classList.add("dung"); if (+c !== q.d) ls[+c].classList.add("sai"); else dung++;
+      const g = $(".giai", d); g.classList.add("hien"); g.textContent = q.g; });
+    if (chua) { kq.textContent = "Em còn " + chua + " câu chưa chọn đáp án."; return; }
+    const tl = dung / so; const nx = tl >= .9 ? "Rất tốt!" : tl >= .7 ? "Khá tốt, xem lại các câu sai nhé." : tl >= .5 ? "Cần ôn thêm các phần có câu sai." : "Em học lại các phần trước rồi làm đề mới nhé.";
+    kq.textContent = "Kết quả: " + dung + "/" + so + " câu đúng. " + nx; ghiDiem("Luyện tập tổng hợp", dung + "/" + so); };
+  n.append(moi, vung, cham, kq, tai); taoDe(); });
+
+function veTongKet(el) { const d = doc.diem || {}, k = Object.keys(d);
+  el.innerHTML = "<b>Kết quả tự học của em:</b><br>" + (k.length ? k.map(x => "• " + x + ": " + d[x]).join("<br>") : "Em chưa làm phần luyện tập nào."); }
+function taiKetQua() { const d = doc.diem || {};
+  const t = "PHIẾU KẾT QUẢ TỰ HỌC — " + document.title + "\nNgày: " + new Date().toLocaleDateString("vi-VN") + "\nLớp: ........  Mã HS: ........\n\n" +
+    (Object.keys(d).map(x => "- " + x + ": " + d[x]).join("\n") || "(chưa làm phần luyện tập nào)") + "\nĐã xem: " + Object.keys(doc.xem || {}).length + "/" + S.length + " phần\n";
+  const a = tao("a"); a.href = URL.createObjectURL(new Blob([t], { type: "text/plain;charset=utf-8" })); a.download = "ket-qua-tu-hoc-" + document.body.dataset.ma + ".txt"; document.body.appendChild(a); a.click(); a.remove(); }
+function inPhieu(b) { const s = b.closest("section"); s.classList.add("in"); window.print(); setTimeout(() => s.classList.remove("in"), 500); }
+
+moTrang(doc.trang || 0);
+
+</script>
+</body>
+</html>

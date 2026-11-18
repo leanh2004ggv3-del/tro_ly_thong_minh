@@ -1,0 +1,557 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Vườn ghép 3D – Ghép mắt nhỏ có gỗ (Công nghệ 9)</title>
+<!-- VƯỜN GHÉP 3D · Thực hành ảo ghép mắt nhỏ có gỗ · SGK Công nghệ 9 Trồng cây ăn quả (KNTT) Bài 2, tr.16–18.
+     3D tự viết trên canvas, không dùng thư viện ngoài, không cần mạng. Dữ liệu chỉ lưu mã nhóm, trong trình duyệt máy này.
+     Làm cho tổ CN – HN · Triway giáo viên (Thầy Bùi Duy Phương). ✅ BẢN NHÁP — thầy/cô duyệt trước khi dùng -->
+<style>
+:root{--bg:#0f1f17;--panel:#ffffff;--ink:#1f2a24;--muted:#5d6b63;--line:#dfe7e1;--go:#1f9d55;--go2:#e8f7ee;--bad:#d64545;--bad2:#fdecec;--warn:#e0a400;--wood:#efe3b8;--sky1:#e9f6ff;--sky2:#d7efd9;--accent:#0e9f8a}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;font-family:"Segoe UI",system-ui,Arial,sans-serif;color:var(--ink);background:#f4f8f5}
+header{display:flex;align-items:center;gap:14px;padding:10px 16px;background:linear-gradient(90deg,#0b3d2c,#126b4a 60%,#1b8a5a);color:#fff;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px}
+.brand h1{margin:0;font-size:22px;letter-spacing:.5px;background:linear-gradient(90deg,#d9ffb0,#7ef0c9,#fff2a8);-webkit-background-clip:text;background-clip:text;color:transparent;font-weight:800}
+.brand small{display:block;font-size:12px;opacity:.85;color:#e6fff2}
+.pills{display:flex;gap:6px;flex-wrap:wrap;margin-left:auto}
+.pill{font-size:12px;padding:5px 10px;border-radius:99px;background:rgba(255,255,255,.12);color:#dff;border:1px solid rgba(255,255,255,.18);white-space:nowrap}
+.pill.on{background:#fff;color:#0b3d2c;font-weight:700}
+.pill.done{background:#2fbf71;color:#fff;border-color:#2fbf71}
+.hbtn{background:rgba(255,255,255,.14);color:#fff;border:1px solid rgba(255,255,255,.3);border-radius:8px;padding:6px 10px;font-size:13px;cursor:pointer}
+.hbtn:hover{background:rgba(255,255,255,.25)}
+.nav{position:relative}
+#navMenu{display:none;position:absolute;right:0;top:36px;background:#fff;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.25);padding:6px;min-width:250px;z-index:30}
+#navMenu a{display:block;padding:9px 12px;border-radius:8px;color:#0b3d2c;text-decoration:none;font-size:14px}
+#navMenu a:hover{background:#e8f7ee}#navMenu a.cur{background:#0b3d2c;color:#fff}
+header{position:relative;z-index:5}
+main{display:grid;grid-template-columns:1fr 380px;height:calc(100vh - 60px - 34px)}
+#stage{position:relative;overflow:hidden;background:radial-gradient(ellipse at 50% 35%,#f7fbff 0%,#e3f2ea 55%,#cfe6d6 100%)}
+#cv{width:100%;height:100%;display:block;touch-action:none;cursor:grab}
+#hud{position:absolute;left:12px;top:12px;display:flex;flex-direction:column;gap:6px;pointer-events:none}
+.tag{background:rgba(255,255,255,.92);border:1px solid var(--line);border-radius:10px;padding:6px 10px;font-size:13px;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.tag b{color:#0b6b45}
+#legend{position:absolute;right:12px;bottom:12px;display:flex;gap:10px;font-size:12px;background:rgba(255,255,255,.9);padding:6px 10px;border-radius:10px;border:1px solid var(--line);pointer-events:none;flex-wrap:wrap}
+#legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:4px;vertical-align:-2px}
+#viewbtn{position:absolute;right:12px;top:12px}
+#viewbtn button{background:#fff;border:1px solid var(--line);border-radius:8px;padding:6px 9px;cursor:pointer;font-size:13px}
+#toast{position:absolute;left:50%;top:16px;transform:translateX(-50%);padding:8px 16px;border-radius:99px;font-weight:700;font-size:15px;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap}
+#toast.ok{background:#1f9d55;color:#fff;opacity:1}#toast.err{background:#d64545;color:#fff;opacity:1}#toast.info{background:#0b3d2c;color:#fff;opacity:1}
+aside{background:var(--panel);border-left:1px solid var(--line);display:flex;flex-direction:column;overflow:auto}
+.ph{padding:14px 16px 8px;border-bottom:1px solid var(--line)}
+.ph .no{display:inline-block;background:var(--accent);color:#fff;border-radius:8px;padding:2px 8px;font-size:12px;font-weight:700}
+.ph h2{margin:6px 0 2px;font-size:19px}
+.ph .sgk{font-size:12px;color:var(--muted)}
+.pb{padding:12px 16px;display:flex;flex-direction:column;gap:10px}
+.guide{font-size:14px;line-height:1.5;background:#f3faf6;border:1px solid #d5eee0;border-radius:10px;padding:10px 12px}
+.guide ol{margin:4px 0 0 18px;padding:0}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.btn{border:none;border-radius:10px;padding:10px 14px;font-size:14px;font-weight:600;cursor:pointer;background:#eef3f0;color:var(--ink);transition:transform .08s,background .2s}
+.btn:active{transform:scale(.97)}
+.btn.main{background:linear-gradient(90deg,#14a06a,#0e9f8a);color:#fff;box-shadow:0 3px 10px rgba(20,160,106,.3)}
+.btn.sel{background:#0b6b45;color:#fff}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.small{padding:7px 10px;font-size:13px}
+.meter{font-size:15px;padding:8px 12px;border-radius:10px;background:#fffbea;border:1px solid #f1e2a6}
+.meter b{font-size:20px;color:#8a5a00}
+.fb{border-radius:10px;padding:10px 12px;font-size:14px;line-height:1.45;display:none}
+.fb.ok{display:block;background:var(--go2);border:1px solid #9bdbb5;color:#145c34}
+.fb.err{display:block;background:var(--bad2);border:1px solid #f1b2b2;color:#8b1f1f}
+.fb.info{display:block;background:#eef6ff;border:1px solid #c6dcf5;color:#1d3f66}
+.fb ul{margin:4px 0 0 18px;padding:0}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font-size:12px;padding:4px 8px;border-radius:99px;background:#e8f7ee;color:#145c34;border:1px solid #bfe6cf}
+.foot{margin-top:auto;padding:10px 16px;border-top:1px solid var(--line);display:flex;gap:8px;flex-wrap:wrap}
+input[type=range]{width:100%}
+.timeline{position:relative;height:30px;background:#eef3f0;border-radius:8px;overflow:hidden}
+.timeline .fill{position:absolute;left:0;top:0;bottom:0;background:linear-gradient(90deg,#9be7b8,#2fbf71)}
+.timeline .band{position:absolute;top:0;bottom:0;background:repeating-linear-gradient(45deg,rgba(224,164,0,.35) 0 6px,rgba(224,164,0,.15) 6px 12px);border-left:2px solid #e0a400;border-right:2px solid #e0a400}
+.timeline .lab{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px}
+footer{height:34px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;font-size:12px;background:#0b3d2c;color:#d6f5e4;gap:10px;overflow:hidden;white-space:nowrap}
+footer b{color:#fff2a8}
+.ov{position:fixed;inset:0;background:rgba(5,25,15,.6);display:flex;align-items:center;justify-content:center;z-index:20;padding:16px}
+.card{background:#fff;border-radius:18px;max-width:560px;width:100%;padding:22px;box-shadow:0 20px 60px rgba(0,0,0,.3);max-height:90vh;overflow:auto}
+.card h2{margin:6px 0 6px;font-size:24px}
+.card p{color:var(--muted);line-height:1.5;margin:6px 0}
+.card input[type=text]{width:100%;font-size:17px;padding:10px 12px;border-radius:10px;border:2px solid #cfe3d7;margin:6px 0}
+.steps4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:12px 0}
+.steps4 div{background:#f1faf5;border:1px solid #d5eee0;border-radius:10px;padding:8px;text-align:center;font-size:12px}
+.steps4 svg{display:block;margin:0 auto 4px}
+table.hist{width:100%;border-collapse:collapse;font-size:13px}
+table.hist th,table.hist td{border-bottom:1px solid var(--line);padding:6px 4px;text-align:center}
+.res-ok{color:#1f9d55;font-weight:700}.res-bad{color:#d64545;font-weight:700}
+@media (max-width:900px){html,body{overflow-x:hidden}#legend{display:none}header{gap:8px}main{grid-template-columns:1fr;height:auto;width:100%}#stage{height:58vh}aside{border-left:none;border-top:1px solid var(--line)}.pills{display:none}footer{font-size:11px}}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">
+    <svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="19" fill="#0b2e21" stroke="#7ef0c9" stroke-width="1.5"/><rect x="18" y="8" width="4" height="26" rx="2" fill="#a07a4a"/><rect x="16.5" y="17" width="7" height="7" rx="2" fill="#efe3b8"/><ellipse cx="20" cy="20.5" rx="2.2" ry="2.6" fill="#5fbf4a"/><path d="M21 19 C27 13 32 14 33 10 C28 10 24 12 21 17Z" fill="#7ef0c9"/><path d="M19 22 C13 18 9 20 7 17 C11 15 16 17 19 20Z" fill="#9be7b8"/></svg>
+    <div><h1>VƯỜN GHÉP 3D</h1><small>Thực hành ảo · Ghép mắt nhỏ có gỗ · Công nghệ 9 (KNTT) – Bài 2</small></div>
+  </div>
+  <div class="pills" id="pills"></div>
+<div class="nav"><button class="hbtn" id="btnNav">📚 Bài khác ▾</button><div id="navMenu"><a href="../App%20-%20Ghep%20mat%203D%20CN9/Vuon%20ghep%203D%20-%20Ghep%20mat%20CN9.html" class="cur">🌿 Ghép mắt nhỏ có gỗ (tr.16–18)</a><a href="../App%20-%20Chiet%20canh%203D%20CN9/Chiet%20canh%203D%20CN9.html">🟤 Chiết cành (tr.15–16)</a><a href="../App%20-%20Giam%20canh%203D%20CN9/Giam%20canh%203D%20CN9.html">🌱 Giâm cành (tr.13–14)</a><a href="../App%20-%20Trong%20cay%203D%20CN9/Trong%20cay%203D%20CN9.html">🌳 Trồng cây ăn quả (tr.64–65)</a></div></div>
+  <button class="hbtn" id="btnDemo">▶ Làm mẫu (GV)</button>
+  <button class="hbtn" id="btnHist">📋 Các lượt đã lưu</button>
+</header>
+<main>
+  <div id="stage">
+    <canvas id="cv"></canvas>
+    <div id="hud"></div>
+    <div id="toast"></div>
+    <div id="viewbtn"><button id="btnView" title="Đưa góc nhìn về mặc định">↺ Góc nhìn</button></div>
+    <div id="legend"><span><i style="background:#5fae45"></i>mắt ghép, mầm sống</span><span><i style="background:#efe3b8"></i>phần gỗ, miệng cắt</span><span><i style="background:#f5c400"></i>vùng đang chọn, thước đo</span><span><i style="background:#d64545"></i>lỗi</span></div>
+  </div>
+  <aside>
+    <div class="ph"><span class="no" id="pNo">Bước 0</span><h2 id="pTitle">Chuẩn bị</h2><div class="sgk" id="pSgk"></div></div>
+    <div class="pb" id="pBody"></div>
+    <div class="foot">
+      <button class="btn small" data-act="hint">💡 Gợi ý</button>
+      <button class="btn small" data-act="redo">↩ Làm lại bước</button>
+    </div>
+  </aside>
+</main>
+<footer><span><b>✅ BẢN NHÁP — thầy/cô duyệt trước khi dùng</b> · Căn cứ: SGK Công nghệ 9 – Trồng cây ăn quả (KNTT), tr.16–18</span><span>Kéo để xoay · cuộn để phóng to · Triway giáo viên</span></footer>
+
+<div class="ov" id="ovStart">
+  <div class="card">
+    <span class="no" style="background:#0e9f8a;color:#fff;border-radius:8px;padding:2px 8px;font-size:12px;font-weight:700">Công nghệ 9 · Bài 2 · Mục II.3</span>
+    <h2>🌿 Thực hành ảo: Ghép mắt nhỏ có gỗ</h2>
+    <p>Luyện đủ 4 bước theo SGK trước khi ghép thật ở vườn. App bắt lỗi từng thao tác và chỉ trang SGK để đọc lại.</p>
+    <div class="steps4">
+      <div><svg width="44" height="34"><rect x="4" y="14" width="36" height="6" rx="3" fill="#8b7a4a"/><ellipse cx="22" cy="13" rx="4" ry="3.5" fill="#5fae45"/><rect x="17" y="10" width="10" height="8" fill="none" stroke="#f5c400" stroke-width="2" stroke-dasharray="3 2"/></svg>1. Lấy mắt ghép</div>
+      <div><svg width="44" height="34"><rect x="19" y="2" width="6" height="30" rx="3" fill="#8b7a4a"/><rect x="19" y="12" width="6" height="8" fill="#efe3b8"/><line x1="30" y1="32" x2="30" y2="16" stroke="#f5c400" stroke-width="2"/></svg>2. Tạo miệng ghép</div>
+      <div><svg width="44" height="34"><rect x="19" y="2" width="6" height="30" rx="3" fill="#8b7a4a"/><g stroke="#cfe6f5" stroke-width="2.4"><line x1="16" y1="12" x2="28" y2="14"/><line x1="16" y1="15" x2="28" y2="17"/><line x1="16" y1="18" x2="28" y2="20"/><line x1="16" y1="21" x2="28" y2="23"/></g><ellipse cx="22" cy="17" rx="2.5" ry="3" fill="#5fae45"/></svg>3. Ghép mắt</div>
+      <div><svg width="44" height="34"><rect x="19" y="14" width="6" height="18" rx="3" fill="#8b7a4a"/><path d="M24 18 C30 14 30 8 32 3" stroke="#5fae45" stroke-width="2.5" fill="none"/><ellipse cx="33" cy="6" rx="4" ry="2" fill="#7fd36a"/></svg>4. Chăm sóc</div>
+    </div>
+    <label for="inNhom"><b>Mã nhóm</b> (chỉ ghi mã nhóm, lớp — <u>không ghi họ tên</u>)</label>
+    <input type="text" id="inNhom" maxlength="30" placeholder="VD: Nhóm 3 – 9A1">
+    <div class="row" style="margin-top:8px">
+      <button class="btn main" id="btnGo">Bắt đầu luyện tập</button>
+      <button class="btn" id="btnGoDemo">▶ Xem làm mẫu (GV chiếu)</button>
+    </div>
+    <p style="font-size:12px;margin-top:12px">✅ BẢN NHÁP — thầy/cô duyệt trước khi dùng. App không thay buổi ghép thật; kết quả chỉ để GV xem nhóm hay sai ở đâu, không dùng để cho điểm.</p>
+  </div>
+</div>
+<div class="ov" id="ovHist" style="display:none"><div class="card" id="histCard"></div></div>
+
+<script>
+"use strict";
+/* ========== TOÁN 3D ========== */
+const add=(a,b)=>[a[0]+b[0],a[1]+b[1],a[2]+b[2]],sub=(a,b)=>[a[0]-b[0],a[1]-b[1],a[2]-b[2]],mul=(a,s)=>[a[0]*s,a[1]*s,a[2]*s];
+const dot=(a,b)=>a[0]*b[0]+a[1]*b[1]+a[2]*b[2],cross=(a,b)=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]];
+const nrm=a=>{const l=Math.hypot(a[0],a[1],a[2])||1;return [a[0]/l,a[1]/l,a[2]/l]};
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),lerp=(a,b,t)=>a+(b-a)*t,lerp3=(a,b,t)=>[lerp(a[0],b[0],t),lerp(a[1],b[1],t),lerp(a[2],b[2],t)];
+const mixc=(a,b,t)=>[lerp(a[0],b[0],t),lerp(a[1],b[1],t),lerp(a[2],b[2],t)];
+const rotY=(v,a)=>[v[0]*Math.cos(a)+v[2]*Math.sin(a),v[1],-v[0]*Math.sin(a)+v[2]*Math.cos(a)];
+const r1=v=>Math.round(v*10)/10, fmt=v=>(Math.round(v*10)/10).toFixed(1).replace('.',',');
+function newell(p){let n=[0,0,0];for(let i=0;i<p.length;i++){const a=p[i],b=p[(i+1)%p.length];n[0]+=(a[1]-b[1])*(a[2]+b[2]);n[1]+=(a[2]-b[2])*(a[0]+b[0]);n[2]+=(a[0]-b[0])*(a[1]+b[1]);}return nrm(n)}
+
+/* ========== BỘ VẼ 3D TỰ VIẾT (canvas 2D + chiếu phối cảnh + sắp mặt theo chiều sâu) ========== */
+const cv=document.getElementById('cv'),ctx=cv.getContext('2d');
+let W=0,H=0,DPR=1,F=[],OV=[],DRAWN=[],PART=[];
+const cam={yaw:.5,pitch:.28,dist:70,tgt:[0,8,0]},camT={yaw:.5,pitch:.28,dist:70,tgt:[0,8,0]};
+let EYE=[0,0,0],FW=[0,0,1],RT=[1,0,0],UP=[0,1,0],FOC=600;
+let BGM=0;function poly(p,c,o){o=o||{};F.push({p,c,id:o.id||null,ds:!!o.ds,a:o.a==null?1:o.a,gl:o.gl||0,n:o.n||null,bg:BGM})}
+function tube(path,rad,seg,col,o){o=o||{};const R=[],N=path.length;
+  for(let i=0;i<N;i++){const t=nrm(sub(path[Math.min(i+1,N-1)],path[Math.max(i-1,0)]));const ref=Math.abs(t[1])<.9?[0,1,0]:[1,0,0];
+    const n1=nrm(cross(t,ref)),n2=cross(t,n1),r=typeof rad==='function'?rad(i,N):rad,ring=[];
+    for(let k=0;k<seg;k++){const a=k/seg*Math.PI*2;ring.push(add(path[i],add(mul(n1,Math.cos(a)*r),mul(n2,Math.sin(a)*r))))}R.push(ring)}
+  for(let i=0;i<N-1;i++){const c=typeof col==='function'?col(i,N):col;for(let k=0;k<seg;k++){const k2=(k+1)%seg,q=[R[i][k],R[i][k2],R[i+1][k2],R[i+1][k]];
+    const cen=mul(add(add(q[0],q[1]),add(q[2],q[3])),.25),ax=mul(add(path[i],path[i+1]),.5);poly(q,c,{id:o.id,gl:o.gl,n:nrm(sub(cen,ax)),a:o.a})}}
+  if(o.cap1){const t=nrm(sub(path[N-1],path[N-2]));poly(R[N-1].slice().reverse(),o.cap1,{id:o.id,n:t})}
+  if(o.cap0){const t=nrm(sub(path[0],path[1]));poly(R[0].slice(),o.cap0,{id:o.id,n:t})}}
+function ell(c,rx,ry,rz,col,o,su,sv){o=o||{};su=su||10;sv=sv||6;const P=(u,v)=>{const th=u/su*Math.PI*2,ph=v/sv*Math.PI;let p=[Math.sin(ph)*Math.cos(th)*rx,Math.cos(ph)*ry,Math.sin(ph)*Math.sin(th)*rz];if(o.rot)p=o.rot(p);return add(c,p)};
+  for(let v=0;v<sv;v++)for(let u=0;u<su;u++){const q=[P(u,v),P(u,v+1),P(u+1,v+1),P(u+1,v)];const cen=mul(add(add(q[0],q[1]),add(q[2],q[3])),.25);poly(v===0?[q[0],q[1],q[2]]:(v===sv-1?[q[0],q[1],q[3]]:q),col,{id:o.id,gl:o.gl,n:nrm(sub(cen,c))})}}
+function box(c,sx,sy,sz,col,o){o=o||{};const yaw=o.yaw||0,h=[sx/2,sy/2,sz/2];const V=(x,y,z)=>add(c,rotY([x*h[0],y*h[1],z*h[2]],yaw));
+  const fs=[[[-1,-1,1],[1,-1,1],[1,1,1],[-1,1,1],[0,0,1]],[[1,-1,-1],[-1,-1,-1],[-1,1,-1],[1,1,-1],[0,0,-1]],[[-1,1,1],[1,1,1],[1,1,-1],[-1,1,-1],[0,1,0]],[[-1,-1,-1],[1,-1,-1],[1,-1,1],[-1,-1,1],[0,-1,0]],[[1,-1,1],[1,-1,-1],[1,1,-1],[1,1,1],[1,0,0]],[[-1,-1,-1],[-1,-1,1],[-1,1,1],[-1,1,-1],[-1,0,0]]];
+  fs.forEach((f,i)=>{const cc=Array.isArray(col[0])?col[i]||col[0]:col;poly(f.slice(0,4).map(v=>V(v[0],v[1],v[2])),cc,{id:o.id,gl:o.gl,n:rotY(f[4],yaw),a:o.a})})}
+function leaf(base,dir,side,L,Wd,col,o){o=o||{};dir=nrm(dir);side=nrm(side);const nn=nrm(cross(side,dir)),n=7;let prevL,prevR,prevM;
+  for(let i=0;i<=n;i++){const s=i/n,w=Wd*Math.sin(Math.PI*Math.pow(s,.85))*.5,m=add(add(base,mul(dir,L*s)),mul(nn,-(o.droop==null?.18:o.droop)*L*s*s));
+    const l=add(add(m,mul(side,w)),mul(nn,-.12*w)),r=add(add(m,mul(side,-w)),mul(nn,-.12*w));
+    if(i>0){poly([prevL,l,m,prevM],col,{ds:true,id:o.id});poly([prevM,m,r,prevR],mixc(col,[0,0,0],.08),{ds:true,id:o.id})}prevL=l;prevR=r;prevM=m}}
+function disk(c,r,col,o,seg){seg=seg||28;const p=[];for(let k=0;k<seg;k++){const a=-k/seg*Math.PI*2;p.push(add(c,[Math.cos(a)*r,0,Math.sin(a)*r]))}poly(p,col,Object.assign({n:[0,1,0]},o||{}))}
+function line3(a,b,col,w,dash){OV.push({t:'l',a,b,col,w:w||1.5,dash})}
+function text3(p,s,o){OV.push(Object.assign({t:'x',p,s},o||{}))}
+function proj(p){const d=sub(p,EYE),z=dot(d,FW);if(z<.5)return null;return [W/2+FOC*dot(d,RT)/z,H/2-FOC*dot(d,UP)/z,z]}
+const LIGHT=nrm([.45,.85,.55]);
+function draw(){
+  const cp=Math.cos(cam.pitch);EYE=add(cam.tgt,[cam.dist*cp*Math.sin(cam.yaw),cam.dist*Math.sin(cam.pitch),cam.dist*cp*Math.cos(cam.yaw)]);
+  FW=nrm(sub(cam.tgt,EYE));RT=nrm(cross(FW,[0,1,0]));UP=cross(RT,FW);FOC=Math.min(W,H*1.35)*1.05;
+  ctx.setTransform(DPR,0,0,DPR,0,0);ctx.clearRect(0,0,W,H);
+  const L=[];
+  for(const f of F){let n=f.n||newell(f.p);let cen=[0,0,0];for(const p of f.p)cen=add(cen,p);cen=mul(cen,1/f.p.length);const vd=sub(EYE,cen),dn=dot(n,vd);
+    if(dn<0){if(!f.ds)continue;n=mul(n,-1)}
+    const q=[];let z=0,ok=true;for(const p of f.p){const r=proj(p);if(!r){ok=false;break}q.push(r[0],r[1]);z+=r[2]}if(!ok)continue;
+    const vn=nrm(vd);let lum=.34+.56*Math.max(0,dot(n,LIGHT))+.14*Math.max(0,dot(n,vn));
+    if(f.gl)lum+=f.gl*Math.pow(Math.max(0,dot(n,nrm(add(LIGHT,vn)))),24);
+    L.push({q,z:z/f.p.length,c:f.c,lum,a:f.a,id:f.id,bg:f.bg})}
+  L.sort((a,b)=>(b.bg-a.bg)||(b.z-a.z));DRAWN=L;
+  for(const f of L){ctx.beginPath();ctx.moveTo(f.q[0],f.q[1]);for(let i=2;i<f.q.length;i+=2)ctx.lineTo(f.q[i],f.q[i+1]);ctx.closePath();
+    const c=`rgba(${clamp(f.c[0]*f.lum,0,255)|0},${clamp(f.c[1]*f.lum,0,255)|0},${clamp(f.c[2]*f.lum,0,255)|0},${f.a})`;ctx.fillStyle=c;ctx.fill();if(f.a>=1){ctx.strokeStyle=c;ctx.lineWidth=.6;ctx.stroke()}}
+  for(const o of OV){
+    if(o.t==='l'){const a=proj(o.a),b=proj(o.b);if(!a||!b)continue;ctx.beginPath();ctx.moveTo(a[0],a[1]);ctx.lineTo(b[0],b[1]);ctx.strokeStyle=o.col;ctx.lineWidth=o.w;ctx.setLineDash(o.dash?[5,4]:[]);ctx.stroke();ctx.setLineDash([])}
+    else if(o.t==='x'){const a=proj(o.p);if(!a)continue;const fs=o.size||13;ctx.font=`${o.bold?'700 ':''}${fs}px "Segoe UI",Arial`;const w=ctx.measureText(o.s).width;let x=a[0]+(o.dx||0),y=a[1]+(o.dy||0);
+      if(o.align==='l')x+=w/2+6;
+      if(o.bg){ctx.fillStyle=o.bg;rr(x-w/2-7,y-fs/2-6,w+14,fs+12,8);ctx.fill();if(o.bd){ctx.strokeStyle=o.bd;ctx.lineWidth=1.5;ctx.stroke()}}
+      ctx.fillStyle=o.col||'#1f2a24';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(o.s,x,y+1)}}
+  const now=performance.now();PART=PART.filter(p=>now-p.t0<900);
+  for(const p of PART){const a=proj(p.p);if(!a)continue;const k=(now-p.t0)/900;ctx.globalAlpha=1-k;ctx.fillStyle=p.c;ctx.beginPath();ctx.arc(a[0]+p.vx*k*60,a[1]+p.vy*k*60-20*k,4*(1-k)+1.5,0,7);ctx.fill();ctx.globalAlpha=1}
+}
+function rr(x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath()}
+function pick(x,y){for(let i=DRAWN.length-1;i>=0;i--){const f=DRAWN[i];if(!f.id)continue;if(inPoly(x,y,f.q))return f.id}return null}
+function inPoly(x,y,q){let c=false;for(let i=0,j=q.length-2;i<q.length;j=i,i+=2){const xi=q[i],yi=q[i+1],xj=q[j],yj=q[j+1];if(((yi>y)!==(yj>y))&&(x<(xj-xi)*(y-yi)/(yj-yi)+xi))c=!c}return c}
+function sparkle(p,col){for(let i=0;i<14;i++){const a=Math.random()*7;PART.push({p,t0:performance.now(),vx:Math.cos(a)*(.4+Math.random()),vy:Math.sin(a)*(.4+Math.random()),c:col||'#3ddc84'})}}
+
+/* ========== ÂM THANH (tự tạo, không tải file) ========== */
+let AC=null;function beep(ok){try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();const t=AC.currentTime;const seq=ok?[[660,0],[880,.09],[1175,.18]]:[[300,0],[220,.14]];
+  for(const [f,d] of seq){const o=AC.createOscillator(),g=AC.createGain();o.type=ok?'sine':'square';o.frequency.value=f;g.gain.setValueAtTime(.0001,t+d);g.gain.exponentialRampToValueAtTime(ok?.18:.07,t+d+.02);g.gain.exponentialRampToValueAtTime(.0001,t+d+.16);o.connect(g).connect(AC.destination);o.start(t+d);o.stop(t+d+.2)}}catch(e){}}
+
+/* ========== SỐ LIỆU THEO SGK (tr.16–17) ========== */
+const SGK={matMin:1.5,matMax:2.0,hMin:15,hMax:20,ngayMin:15,ngayMax:20,catMin:1.5,catMax:2.0};
+const RONG_TOI_DA=.5; // miệng ghép "lớn hơn một ít" so với mắt ghép: app chấp nhận lớn hơn từ 0,1 đến 0,5 cm (mức do app đặt, GV chỉnh được)
+const CROOK=[[8.5,13.5],[23,29]];
+const stemX=y=>.95*Math.exp(-Math.pow((y-11)/1.7,2))-1.05*Math.exp(-Math.pow((y-26)/1.9,2));
+const stemR=y=>.8-.0062*y;
+const ITEMS=[
+ {k:'goc',ten:'Gốc ghép bưởi (trong bầu)',ok:true},
+ {k:'mat',ten:'Cành bưởi bánh tẻ – cây đầu dòng',ok:true},
+ {k:'xoai',ten:'Cành xoài',ok:false,ly:'Cây làm gốc ghép và cây để lấy mắt ghép phải cùng họ với nhau (xoài khác họ với bưởi).'},
+ {k:'benh',ten:'Cành bưởi bị sâu, bệnh',ok:false,ly:'Phải chọn cành bánh tẻ, sinh trưởng tốt, không bị sâu, bệnh để lấy mắt ghép.'},
+ {k:'dao',ten:'Dao ghép',ok:true},
+ {k:'keo',ten:'Kéo cắt cành',ok:true},
+ {k:'day',ten:'Dây buộc tự huỷ / nylon',ok:true},
+ {k:'thuoc',ten:'Thuốc kích thích ra rễ',ok:false,ly:'Thuốc kích thích ra rễ dùng khi giâm cành, chiết cành; ghép mắt không cần.'},
+ {k:'tui',ten:'Túi nylon + giá thể bó bầu',ok:false,ly:'Túi nylon và giá thể dùng để bó bầu khi chiết cành, không dùng khi ghép mắt.'}];
+const BUDS=[{x:-12,t:'hong'},{x:-7.5,t:'ngu'},{x:-3,t:'nay'},{x:1.5,t:'ngu'},{x:6,t:'hong'},{x:10.5,t:'ngu'}];
+const SHOOT_DAYS=[{d:6,y:4.5,a:.9},{d:12,y:8.5,a:-2.2},{d:23,y:12.5,a:2.6}];
+
+/* ========== TRẠNG THÁI ========== */
+const STEPS=[
+ {name:'Chuẩn bị',sgk:'SGK tr.16 – mục a) Chuẩn bị (mẫu thực vật, vật liệu, dụng cụ)'},
+ {name:'Lấy mắt ghép',sgk:'SGK tr.17 – Bước 1. Lấy mắt ghép'},
+ {name:'Chọn vị trí ghép, tạo miệng ghép',sgk:'SGK tr.17 – Bước 2. Chọn vị trí ghép và tạo miệng ghép'},
+ {name:'Ghép mắt',sgk:'SGK tr.17 – Bước 3. Ghép mắt'},
+ {name:'Chăm sóc cây ghép',sgk:'SGK tr.17 – Bước 4. Chăm sóc cây ghép'},
+ {name:'Kết quả',sgk:'Đối chiếu tiêu chí đánh giá – SGK tr.18'}];
+function fresh(){return{step:0,sel:{},focus:null,cut:null,depth:null,chipLen:null,chipDone:false,h:null,hOk:false,mouth:1.2,mouthDone:false,flip:true,placed:false,placeK:0,turns:0,tied:null,
+  day:0,shoots:SHOOT_DAYS.map(s=>({...s,born:false,cut:false,flag:false})),topCut:null,untied:null,npk:null,sproutDay:null,sproutL:0,failed:null,failDay:null,cutMode:false,cutY:null,ended:false,hint:0,draft:null}}
+let S=fresh(),E={},SNAP=null,MODE='luyen',NHOM='',T0=0,BUSY=false,FAST=false;
+function err(step,code,msg){E[step]=E[step]||{};E[step][code]=E[step][code]||{msg,n:0};E[step][code].n++}
+const sleep=ms=>FAST?Promise.resolve():new Promise(r=>setTimeout(r,ms));
+
+/* ========== DỰNG CẢNH THEO BƯỚC ========== */
+function ground(y){BGM=1;const p=[];const R=60;for(let k=0;k<40;k++){const a=-k/40*Math.PI*2;p.push([Math.cos(a)*R,y,Math.sin(a)*R])}poly(p,[196,222,196],{n:[0,1,0]});
+  for(let i=-3;i<=3;i++){line3([i*12,y+.02,-40],[i*12,y+.02,40],'rgba(80,130,90,.12)',1);line3([-40,y+.02,i*12],[40,y+.02,i*12],'rgba(80,130,90,.12)',1)}BGM=0}
+function table(){BGM=1;box([0,-2.2,0],86,2.4,48,[[196,150,98],[180,136,88],[214,168,112],[150,110,70],[190,145,95],[190,145,95]]);for(const x of [-38,38])for(const z of [-20,20])box([x,-12,z],2.4,18,2.4,[140,100,64]);BGM=0}
+function pot(o,s){s=s||1;const path=[add(o,[0,-14*s,0]),add(o,[0,0,0])];tube(path,(i)=>i?7*s:6.1*s,22,[40,42,44],{gl:.25});disk(add(o,[0,.02,0]),6.95*s,[96,68,44]);
+  for(let k=0;k<6;k++){const a=k*1.1;ell(add(o,[Math.cos(a)*3.8*s,.15,Math.sin(a)*3.8*s]),.6*s,.25*s,.5*s,[118,84,54],{},6,3)}}
+function stemPath(top){const p=[];for(let y=0;y<=top+1e-6;y+=.5)p.push([stemX(y),y,0]);if(p[p.length-1][1]<top)p.push([stemX(top),top,0]);return p}
+function barkCol(y){return mixc([118,98,62],[92,128,62],clamp(y/45,0,1))}
+function gocTree(o,opt){opt=opt||{};const top=opt.top||55,s=opt.s||1;const P=stemPath(top).map(p=>add(o,mul(p,s)));
+  tube(P,(i,N)=>stemR(i*.5)*s,12,(i)=>barkCol(i*.5),{id:opt.id,cap1:[226,214,170],gl:.08});
+  if(top>31)for(let i=0;i<9;i++){const y=32+i*2.6;if(y>top-1)break;const a=i*2.4,d=[Math.cos(a),0,Math.sin(a)];const b=add(o,mul([stemX(y)+d[0]*.4,y,d[2]*.4],s));
+    leaf(b,add(d,[0,.35,0]),[ -d[2],0,d[0]],(8.5-i*.25)*s,(3.8-i*.1)*s,[44,112,52],{id:opt.id,droop:.22})}
+  if(top>31){leaf(add(o,mul([stemX(top),top,0],s)),[.2,1,.1],[1,0,0],5*s,2.4*s,[64,140,60],{id:opt.id,droop:.1})}}
+function mouthPatch(h,m,col,off,a,id){const y0=h-m/2,y1=h+m/2,A=.55,ny=6,na=4;for(let i=0;i<ny;i++)for(let j=0;j<na;j++){const ya=lerp(y0,y1,i/ny),yb=lerp(y0,y1,(i+1)/ny),aa=lerp(-A,A,j/na),ab=lerp(-A,A,(j+1)/na);
+  const P=(y,an)=>[stemX(y)+Math.sin(an)*(stemR(y)+off),y,Math.cos(an)*(stemR(y)+off)];poly([P(ya,aa),P(ya,ab),P(yb,ab),P(yb,aa)],col,{n:nrm([Math.sin((aa+ab)/2),0,Math.cos((aa+ab)/2)]),a:a==null?1:a,id})}}
+function budOn(c,dirOut,up,col,scale,id){scale=scale||1;ell(c,.32*scale,.36*scale,.32*scale,col,{gl:.3,id},8,5);const tip=add(c,add(mul(dirOut,.15*scale),mul(up,.42*scale)));tube([add(c,mul(up,.2*scale)),tip],(i)=>i?.04:.16*scale,6,mixc(col,[40,60,20],.25),{id});}
+function chipColor(){if(S.failDay!=null&&S.day>=S.failDay){const k=clamp((S.day-S.failDay)/4,0,1);return mixc([96,140,72],[58,40,26],k)}return [96,140,72]}
+
+function buildScene(){F=[];OV=[];const st=S.step;
+  if(st===0){table();buildItems()}
+  else if(st===1){table();buildBranch()}
+  else {ground(-14);pot([0,0,0]);buildStock()}
+}
+function buildItems(){const pos=[[-28,-11],[0,-11],[28,-11],[-28,3],[0,3],[28,3],[-28,15],[0,15],[28,15]];
+  ITEMS.forEach((it,i)=>{const [x,z]=pos[i],o=[x,-1,z],id='it_'+it.k;itemMesh(it.k,o,id);
+    const on=!!S.sel[it.k];if(on){const p=[];for(let k=0;k<24;k++){const a=-k/24*Math.PI*2;p.push(add(o,[Math.cos(a)*9.5,.05,Math.sin(a)*5.5]))}poly(p,[120,230,160],{n:[0,1,0],a:.55})}
+    text3(add(o,[0,it.k==='goc'?15:3.2,4.2]),(on?'✓ ':'')+it.ten,{bg:on?'#1f9d55':'rgba(255,255,255,.95)',col:on?'#fff':'#1f2a24',size:12,bd:on?null:'#cfe3d7',bold:on})})}
+function itemMesh(k,o,id){
+  if(k==='goc'){const s=.32;tube([add(o,[0,0,0]),add(o,[0,14*s,0])],(i)=>i?7*s:6.1*s,16,[40,42,44],{id,cap1:[96,68,44]});const b=add(o,[0,14*s,0]);
+    tube([b,add(b,[0,13,0])],(i)=>i?.2:.35,8,[110,110,66],{id});for(let i=0;i<4;i++){const a=i*2.3;leaf(add(b,[0,6+i*1.8,0]),[Math.cos(a),.5,Math.sin(a)],[-Math.sin(a),0,Math.cos(a)],4,1.9,[44,112,52],{id})}}
+  else if(k==='mat'||k==='xoai'||k==='benh'){const c=k==='mat'?[100,124,64]:k==='xoai'?[120,96,70]:[128,120,70];const p=[];for(let i=0;i<=10;i++)p.push(add(o,[-8+i*1.6,.9+Math.sin(i*.7)*.15,0]));tube(p,.42,8,c,{id,cap0:[220,205,160],cap1:[220,205,160]});
+    for(let i=0;i<4;i++){const x=-6+i*4;ell(add(o,[x,1.5,0]),.32,.3,.3,k==='benh'?[90,80,50]:[118,140,62],{id},6,4);tube([add(o,[x+.3,1.2,0]),add(o,[x+.9,1.5,.5])],.12,5,c,{id})}
+    if(k==='xoai'){for(let i=0;i<3;i++){const x=-5+i*5;leaf(add(o,[x,1.4,0]),[.4,.25,.8],[1,0,-.4],6.5,1.6,[150,82,52],{id,droop:.05})}}
+    if(k==='benh'){for(let i=0;i<9;i++)ell(add(o,[-7+i*1.7,1.2+(i%2)*.2,.3]),.26,.18,.2,[40,30,24],{id},5,3)}}
+  else if(k==='dao'){box(add(o,[-3,1,0]),9,.16,1.5,[205,212,220],{id,gl:.9,yaw:.15});box(add(o,[4.6,1,-1.2]),6.5,1.1,1.5,[120,74,40],{id,yaw:.15})}
+  else if(k==='keo'){box(add(o,[-2.5,1,-.6]),7,.18,1.1,[200,206,214],{id,gl:.9,yaw:.25});box(add(o,[-2.5,1.25,.6]),7,.18,1.1,[200,206,214],{id,gl:.9,yaw:-.25});box(add(o,[3.5,1,1.5]),5,.9,1.1,[210,50,50],{id,yaw:.35});box(add(o,[3.5,1,-1.5]),5,.9,1.1,[210,50,50],{id,yaw:-.35})}
+  else if(k==='day'){const p=[];for(let i=0;i<=24;i++){const a=i/24*Math.PI*2;p.push(add(o,[Math.cos(a)*2.4,1,Math.sin(a)*2.4]))}tube(p,.85,8,[214,232,244],{id,gl:.4})}
+  else if(k==='thuoc'){tube([add(o,[0,0,0]),add(o,[0,5,0])],1.6,14,[190,120,40],{id,cap1:[190,120,40],gl:.5,a:1});tube([add(o,[0,5,0]),add(o,[0,6.4,0])],.9,10,[240,240,240],{id,cap1:[240,240,240]});box(add(o,[0,2.6,1.55]),2.2,2,.1,[250,246,230],{id})}
+  else if(k==='tui'){box(add(o,[-1,.2,0]),9,.12,6,[34,34,36],{id,gl:.5,yaw:.1});ell(add(o,[3.5,.9,1]),2.4,1.2,2,[110,80,52],{id},8,4)}}
+function buildBranch(){const p=[];for(let x=-16;x<=16.01;x+=1)p.push([x,0,0]);
+  tube(p,.42,12,(i)=>mixc([96,118,62],[118,110,70],i/32),{id:'branch',cap0:[226,214,170],cap1:[226,214,170],gl:.1});
+  BUDS.forEach((b,i)=>{const id='bud'+i,c=[b.x,.5,0],up=[0,1,0];
+    if(b.t==='ngu')budOn(c,[0,0,1],up,[112,150,60],1.05,id);
+    else if(b.t==='hong'){ell(c,.24,.2,.24,[64,46,32],{id},7,4);ell(add(c,[.05,.12,.1]),.1,.08,.1,[40,28,20],{id},5,3)}
+    else {budOn(c,[0,0,1],up,[120,170,70],1,id);const t=[[b.x,.8,0],[b.x+.1,1.8,.1],[b.x+.25,2.8,.2]];tube(t,(i)=>.11-.03*i,6,[120,190,80],{id});leaf([b.x+.25,2.6,.2],[.8,.6,.2],[0,0,1],1.6,.8,[140,205,95],{id,droop:.05});leaf([b.x+.25,2.4,.2],[-.8,.5,-.1],[0,0,1],1.3,.7,[140,205,95],{id,droop:.05})}
+    tube([[b.x+.25,.2,.25],[b.x+.7,-.15,.95]],.13,5,[104,120,66],{id,cap1:[200,190,140]});
+    if(S.focus===i&&!S.chipDone)text3([b.x,3.6,0],b.t==='ngu'?'mắt đang chọn':'mắt đang chọn',{bg:'#0b3d2c',col:'#fff',size:12})});
+  // thước vàng
+  box([0,-1.25,1.1],32,.25,1.4,[245,200,60],{gl:.2});
+  for(let x=0;x<=32;x+=.5){const X=-16+x,big=Math.abs(x-Math.round(x))<1e-6;line3([X,-1.1,.45],[X,-1.1,big?1.15:.85],'#5a4300',big?1.4:.8);if(big&&x%2===0)text3([X,-1.1,1.55],String(x),{size:10,col:'#5a4300'})}
+  const c=S.cut||S.draft;
+  if(c){const a=Math.min(c.a,c.b),b=Math.max(c.a,c.b),len=b-a;
+    const patch=(col,al,off,id)=>{for(let i=0;i<6;i++)for(let j=0;j<4;j++){const xa=lerp(a,b,i/6),xb=lerp(a,b,(i+1)/6),A=-.9,B=.9,aa=lerp(A,B,j/4),ab=lerp(A,B,(j+1)/4);const P=(x,an)=>[x,Math.cos(an)*(.42+off),Math.sin(an)*(.42+off)];
+      poly([P(xa,aa),P(xa,ab),P(xb,ab),P(xb,aa)],col,{n:[0,Math.cos((aa+ab)/2),Math.sin((aa+ab)/2)],a:al,id})}};
+    if(S.chipDone){patch([236,224,180],1,.01);}else patch([245,196,0],.55,.06);
+    line3([a,-1.1,1.25],[a,1.2,.6],'#c79400',1.5,true);line3([b,-1.1,1.25],[b,1.2,.6],'#c79400',1.5,true);
+    text3([(a+b)/2,-2.8,1.3],fmt(len)+' cm',{bg:'#fff2a8',bd:'#e0a400',col:'#5a4300',size:14,bold:true})}
+  if(S.chipDone){const t=performance.now()/1000,cx=S.chipX,c0=[cx,4.2,0],yaw=t*.8,L=S.chipLen;
+    box(c0,L,.9,.18,[96,140,72],{yaw,gl:.2});box(add(c0,rotY([0,0,-.14],yaw)),L*.94,.8,.12,[236,224,180],{yaw});
+    const fwd=rotY([0,0,1],yaw);budOn(add(c0,mul(fwd,.25)),fwd,[1,0,0].map((v,i)=>rotY([1,0,0],yaw)[i]),[112,150,60],.8);
+    text3([cx,6.3,0],'Mắt ghép '+fmt(L)+' cm · có ít gỗ',{bg:'#1f9d55',col:'#fff',size:13,bold:true})}}
+function buildStock(){const st=S.step,top=S.topCut?S.topCut.y:55,h=S.h;
+  gocTree([0,0,0],{top,id:'stem'});
+  // thước đứng
+  if(st===2||(st===4&&S.cutMode)){const X=4.2;box([X,13,0],.7,28,.25,[245,200,60],{gl:.2});for(let y=0;y<=26;y++){line3([X-.35,y,.15],[X-(y%5?.0:-.5),y,.15],'#5a4300',y%5?1:1.6);if(y%5===0)text3([X+1.3,y,0],y+' cm',{size:11,col:'#5a4300'})}}
+  if(st===2&&!S.mouthDone){const y=S.h!=null?S.h:null;if(y!=null){const p=[];for(let k=0;k<=20;k++){const a=k/20*Math.PI*2;p.push([stemX(y)+Math.cos(a)*(stemR(y)+.25),y,Math.sin(a)*(stemR(y)+.25)])}
+      for(let k=0;k<20;k++)line3(p[k],p[k+1],'#f5c400',3);line3([stemX(y)+1,y,0],[4.2,y,.2],'#c79400',1.5,true);
+      text3([stemX(y)-6,y+1.6,0],'cách mặt bầu '+fmt(y)+' cm',{bg:'#fff2a8',bd:'#e0a400',col:'#5a4300',size:14,bold:true});
+      if(S.hOk)mouthPatch(y,S.mouth,[245,196,0],.06,.5)}}
+  if(h!=null&&S.mouthDone){
+    if(!S.placed||S.placeK<1)mouthPatch(h,S.mouth,[236,224,180],.01);
+    if(st>=3){const L=S.chipLen,surf=[stemX(h),h,stemR(h)+.1],fl=[stemX(h)+5,h+1,4];
+      if(S.placed&&S.placeK>=1){mouthPatch(h,L,chipColor(),.1,1,'chip');const dirUp=S.flip?[0,-1,0]:[0,1,0];budOn(add(surf,[0,0,.25]),[0,0,1],dirUp,chipColor(),1)}
+      else {const k=S.placed?S.placeK:0,c=lerp3(fl,surf,k);box(c,.9,L,.2,chipColor(),{id:'chip',gl:.2});box(add(c,[0,0,-.14]),.84,L*.94,.12,[236,224,180],{id:'chip'});budOn(add(c,[0,0,.25]),[0,0,1],S.flip?[0,-1,0]:[0,1,0],chipColor(),1,'chip');
+        if(!S.placed){const tip=add(c,[0,S.flip?-2.4:2.4,.3]);line3(add(c,[0,0,.3]),tip,S.flip?'#d64545':'#1f9d55',3);text3(add(tip,[0,S.flip?-.8:.8,0]),S.flip?'mầm hướng xuống':'mầm hướng lên',{bg:S.flip?'#d64545':'#1f9d55',col:'#fff',size:12,bold:true})}}
+      if(S.turns>0&&!S.untied){const y0=h-S.mouth/2-.6;for(let t=0;t<S.turns;t++){const seg=16;for(let k=0;k<seg;k++){const a0=k/seg*Math.PI*2,a1=(k+1)/seg*Math.PI*2,ya=y0+t*.4+.4*k/seg,yb=y0+t*.4+.4*(k+1)/seg,R=y=>stemR(y)+.32;
+        const P=(a,y)=>[stemX(y)+Math.sin(a)*R(y),y,Math.cos(a)*R(y)];poly([P(a0,ya),P(a1,yb),P(a1,yb+.42),P(a0,ya+.42)],S.tied==='long'?[200,220,236]:[214,232,246],{n:nrm([Math.sin((a0+a1)/2),0,Math.cos((a0+a1)/2)]),a:.82,gl:.6})}}}}}
+  if(st>=4){if(st===4)S.shoots.forEach((s,i)=>{if(!s.born||s.cut)return;const age=S.day-s.d,len=clamp(age*.55,.4,4.5),d=[Math.cos(s.a),0,Math.sin(s.a)],b=[stemX(s.y)+d[0]*stemR(s.y),s.y,d[2]*stemR(s.y)];
+      const tip=add(b,mul(nrm([d[0]*.7,1,d[2]*.7]),len));tube([b,tip],(k)=>k?.08:.16,6,[130,150,70],{id:'sh'+i});if(len>1){leaf(tip,add(d,[0,.6,0]),[-d[2],0,d[0]],1.4+len*.3,.8+len*.15,[150,120,60],{id:'sh'+i,droop:.05})}
+      if(age>=3)text3(add(tip,[0,1.2,0]),'mầm mọc ở gốc ghép',{size:11,bg:'rgba(255,255,255,.9)',bd:'#e0a400'})});
+    if(S.sproutDay!=null&&S.sproutL>0&&S.failed==null){const L=S.sproutL,b=[stemX(h),h+.2,stemR(h)+.5],P=[];for(let i=0;i<=8;i++){const t=i/8;P.push(add(b,[0,L*t,Math.min(1.4,L*.25)*Math.sin(t*Math.PI/2)]))}
+      tube(P,(i,N)=>.22-.12*i/N,8,[96,170,64],{gl:.2});const nl=Math.min(6,Math.floor(L/1.6)+1);for(let i=0;i<nl;i++){const t=.35+.65*i/Math.max(1,nl-1),p=P[Math.round(t*8)],a=i*2.4;leaf(p,[Math.cos(a),.6,Math.sin(a)],[-Math.sin(a),0,Math.cos(a)],clamp(L*.45,1.2,5.5),clamp(L*.22,.6,2.6),[96,186,72],{droop:.12})}
+      if(S.step===4)text3(add(P[8],[0,1.6,0]),'mầm ghép',{bg:'#1f9d55',col:'#fff',size:12,bold:true})}
+    if(S.cutMode&&S.cutY!=null){const y=S.cutY,p=[];for(let k=0;k<=20;k++){const a=k/20*Math.PI*2;p.push([stemX(y)+Math.cos(a)*(stemR(y)+.3),y,Math.sin(a)*(stemR(y)+.3)])}for(let k=0;k<20;k++)line3(p[k],p[k+1],'#d64545',3);
+      line3([stemX(h)+1.2,h,.6],[stemX(h)+1.2,y,.6],'#c79400',2);text3([stemX(y)+6.5,y+.2,0],'trên mắt ghép '+fmt(y-h)+' cm',{bg:'#fff2a8',bd:'#e0a400',col:'#5a4300',size:14,bold:true})}
+    if(S.failed!=null&&S.day>=S.failDay+2)text3([stemX(h)-5,h,0],'mắt ghép khô đen',{bg:'#d64545',col:'#fff',size:12,bold:true})}
+}
+
+/* ========== GÓC NHÌN ========== */
+const VIEWS=[{yaw:0,pitch:.62,dist:105,tgt:[0,0,2]},{yaw:.15,pitch:.45,dist:42,tgt:[0,0,0]},{yaw:.35,pitch:.12,dist:62,tgt:[0,17,0]},{yaw:.3,pitch:.1,dist:24,tgt:[0,17.5,0]},{yaw:.45,pitch:.15,dist:58,tgt:[0,16,0]},{yaw:.6,pitch:.2,dist:62,tgt:[0,16,0]}];
+function setView(v){Object.assign(camT,JSON.parse(JSON.stringify(v)))}
+function viewFor(st){const v=JSON.parse(JSON.stringify(VIEWS[st]));if(st===3&&S.h!=null)v.tgt=[0,S.h,0];if(st===1&&S.focus!=null){v.tgt=[BUDS[S.focus].x,0,0];v.dist=22;v.pitch=.35}return v}
+
+/* ========== GIAO DIỆN BƯỚC ========== */
+const $=id=>document.getElementById(id);
+function pills(){$('pills').innerHTML=STEPS.map((s,i)=>`<span class="pill ${i===S.step?'on':(i<S.step?'done':'')}">${i<5?(i===0?'Chuẩn bị':'B'+i+'. '+s.name.split(',')[0]):'Kết quả'}</span>`).join('')}
+let LASTFB=null;function fb(kind,html){LASTFB={kind,html};const el=$('fb');if(!el)return;el.className='fb '+kind;el.innerHTML=html;}
+function toast(kind,s){const t=$('toast');t.className=kind;t.textContent=s;clearTimeout(toast._t);toast._t=setTimeout(()=>{t.className='';setTimeout(()=>{if(!t.className)t.textContent=''},350)},1800)}
+function ok(msg,p){beep(true);toast('ok','Đúng rồi!');fb('ok',msg);if(p)sparkle(p)}
+function bad(list){beep(false);toast('err','Chưa đúng – xem lỗi bên phải');fb('err','<b>Cần sửa:</b><ul>'+list.map(s=>'<li>'+s+'</li>').join('')+'</ul>')}
+function render(){pills();const st=S.step,s=STEPS[st];$('pNo').textContent=st===0?'Chuẩn bị':(st<5?'Bước '+st:'Tổng kết');$('pTitle').textContent=s.name;$('pSgk').textContent=s.sgk;
+  let h='';const dis=BUSY?'disabled':'';
+  if(st===0){h=`<div class="guide">Bấm vào đồ vật trên bàn để chọn <b>những thứ cần</b> cho buổi ghép mắt nhỏ có gỗ (bấm lần nữa để bỏ chọn). Chọn xong bấm <b>Kiểm tra</b>.</div>
+    <div class="chips">${ITEMS.filter(i=>S.sel[i.k]).map(i=>`<span class="chip">✓ ${i.ten}</span>`).join('')||'<span style="color:#888;font-size:13px">Chưa chọn đồ vật nào</span>'}</div>
+    <button class="btn main" data-act="check0" ${dis}>Kiểm tra</button>`}
+  else if(st===1){const c=S.cut||S.draft,len=c?Math.abs(c.b-c.a):0;
+    h=`<div class="guide"><ol><li>Xoay cành, <b>bấm vào một mắt</b> để phóng to. Chọn <b>mắt ngủ nổi rõ</b>.</li><li><b>Kéo dọc cành</b> qua mắt đó để vạch đường dao (thước vàng đo chiều dài).</li><li>Chọn lát dao rồi bấm <b>Cắt lấy mắt ghép</b>.</li></ol></div>
+    <div class="meter">Miếng vỏ định cắt: <b id="mLen">${c?fmt(len):'–'}</b> cm</div>
+    <div><div style="font-size:13px;margin-bottom:4px">Lát dao:</div><div class="row">
+      <button class="btn small ${S.depth==='vo'?'sel':''}" data-act="depth" data-v="vo" ${dis}>Chỉ lấy vỏ</button>
+      <button class="btn small ${S.depth==='go'?'sel':''}" data-act="depth" data-v="go" ${dis}>Vỏ + một ít gỗ</button>
+      <button class="btn small ${S.depth==='sau'?'sel':''}" data-act="depth" data-v="sau" ${dis}>Cắt sâu vào lõi</button></div></div>
+    ${S.chipDone?`<button class="btn main" data-act="next" ${dis}>Sang Bước 2 →</button>`:`<button class="btn main" data-act="cut1" ${dis}>✂ Cắt lấy mắt ghép</button>`}`}
+  else if(st===2){if(!S.hOk)h=`<div class="guide"><b>Kéo dọc thân gốc ghép</b> (rê chuột/ngón tay sát thân cây) để chọn chỗ đặt mắt ghép. Vòng vàng cho biết khoảng cách tới mặt bầu. Chọn xong bấm <b>Chọn vị trí này</b>.</div>
+      <div class="meter">Cách mặt bầu: <b id="mH">${S.h!=null?fmt(S.h):'–'}</b> cm</div><button class="btn main" data-act="pos2" ${dis}>Chọn vị trí này</button>`;
+    else if(!S.mouthDone)h=`<div class="guide">Đặt chiều dài <b>miệng ghép</b> (miếng vỏ cắt trên gốc ghép) cho phù hợp với mắt ghép vừa lấy, rồi bấm <b>Mở miệng ghép</b>.</div>
+      <div class="meter">Mắt ghép: <b>${fmt(S.chipLen)}</b> cm · Miệng ghép: <b id="mM">${fmt(S.mouth)}</b> cm</div>
+      <input type="range" id="rgM" min="1" max="3" step="0.1" value="${S.mouth}" ${dis}><button class="btn main" data-act="open2" ${dis}>✂ Mở miệng ghép</button>`;
+    else h=`<div class="guide">Miệng ghép đã mở đúng chỗ.</div><button class="btn main" data-act="next" ${dis}>Sang Bước 3 →</button>`}
+  else if(st===3){if(!S.placed)h=`<div class="guide">Xem mũi tên: mầm của mắt ghép đang hướng về đâu? Lật cho đúng chiều rồi <b>áp mắt ghép vào miệng ghép</b>.</div>
+      <div class="row"><button class="btn" data-act="flip3" ${dis}>⟲ Lật mắt ghép</button><button class="btn main" data-act="place3" ${dis}>Áp vào miệng ghép</button></div>`;
+    else if(!S.tied)h=`<div class="guide">Quấn dây buộc từ dưới lên cho đến khi <b>kín</b> cả miệng ghép, rồi chọn cách buộc.</div>
+      <div class="meter">Đã quấn: <b>${S.turns}</b> vòng</div>
+      <div class="row"><button class="btn" data-act="wrap3" ${dis}>🧵 Quấn thêm 1 vòng</button><button class="btn" data-act="unwrap3" ${dis}>Gỡ 1 vòng</button></div>
+      <div class="row"><button class="btn main" data-act="tie3" data-v="chat" ${dis}>Ép chặt, buộc nút</button><button class="btn" data-act="tie3" data-v="long" ${dis}>Buộc lỏng tay</button></div>`;
+    else h=`<div class="guide">Mắt ghép đã được áp và buộc.</div><button class="btn main" data-act="next" ${dis}>Sang Bước 4 →</button>`}
+  else if(st===4){const band=(S.hint>=2||MODE==='mau')?`<div class="band" style="left:${15/35*100}%;width:${5/35*100}%"></div>`:'';
+    h=`<div class="guide">Cho thời gian trôi bằng các nút bên dưới. Làm đúng việc, <b>đúng lúc</b>. Thấy mầm nào <b>không phải mầm ghép</b> thì bấm vào nó để cắt bỏ.</div>
+    <div class="timeline"><div class="fill" style="width:${S.day/35*100}%"></div>${band}<div class="lab">Ngày thứ ${S.day} sau khi ghép</div></div>
+    <div class="row"><button class="btn small" data-act="adv" data-v="1" ${dis||(S.ended?'disabled':'')}>+1 ngày</button><button class="btn small" data-act="adv" data-v="5" ${dis||(S.ended?'disabled':'')}>+5 ngày</button><button class="btn small" data-act="play" ${dis||(S.ended?'disabled':'')}>${PLAY?'⏸ Dừng':'▶ Tua'}</button></div>`+
+    (S.cutMode?`<div class="meter">Rê sát thân, <b>phía trên mắt ghép</b>, để chọn chỗ cắt: <b id="mC">${S.cutY!=null?fmt(S.cutY-S.h):'–'}</b> cm</div><div class="row"><button class="btn main" data-act="cutTop" ${dis}>✂ Xác nhận cắt</button><button class="btn" data-act="cancelCut" ${dis}>Huỷ</button></div>`:
+    `<div class="row"><button class="btn" data-act="cutMode" ${dis||(S.topCut||S.ended?'disabled':'')}>✂ Cắt ngọn gốc ghép</button><button class="btn" data-act="untie" ${dis||(S.untied!=null||S.ended?'disabled':'')}>Tháo dây buộc</button><button class="btn" data-act="npk" ${dis||(S.npk!=null||S.ended?'disabled':'')}>💧 Tưới phân NPK</button></div>`)+
+    (S.ended?`<button class="btn main" data-act="result" ${dis}>Xem kết quả →</button>`:'')}
+  else if(st===5){h=resultHTML()}
+  h+='<div class="fb" id="fb"></div>';$('pBody').innerHTML=h;if(LASTFB&&st<5){$('fb').className='fb '+LASTFB.kind;$('fb').innerHTML=LASTFB.html}
+  const rg=$('rgM');if(rg)rg.oninput=()=>{S.mouth=+rg.value;$('mM').textContent=fmt(S.mouth)};
+  hud()}
+function hud(){const st=S.step;let h='';
+  if(st===0)h=`<div class="tag">Đã chọn <b>${Object.values(S.sel).filter(Boolean).length}</b> đồ vật</div>`;
+  if(st===1)h=`<div class="tag">Cành lấy mắt ghép (bưởi, cây đầu dòng)</div>`;
+  if(st>=2&&st<5)h=`<div class="tag">Gốc ghép bưởi trong bầu</div>`;
+  if(st===4)h+=`<div class="tag">📅 Ngày <b>${S.day}</b> sau khi ghép${S.npk!=null?' · đã tưới NPK':''}${S.untied!=null?' · đã tháo dây':''}</div>`;
+  if(MODE==='mau')h+=`<div class="tag" style="background:#0b3d2c;color:#fff">▶ GV làm mẫu</div>`;
+  if(NHOM)h+=`<div class="tag">${esc(NHOM)}</div>`;$('hud').innerHTML=h}
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+/* ========== HÀNH ĐỘNG ========== */
+const ACT={};
+function goStep(n){S.step=n;S.hint=0;LASTFB=null;SNAP=JSON.stringify(S);setView(viewFor(n));render();if(n===5)saveResult()}
+ACT.next=()=>goStep(S.step+1);
+ACT.redo=()=>{if(BUSY||S.step===5)return;const st=S.step;S=JSON.parse(SNAP);S.step=st;setView(viewFor(st));render();fb('info','Đã đưa bước này về lúc bắt đầu. Lỗi đã mắc vẫn được ghi lại.')};
+ACT.check0=()=>{const L=[];ITEMS.forEach(it=>{if(it.ok&&!S.sel[it.k]){L.push('Còn thiếu: <b>'+it.ten+'</b>.');err(0,'thieu_'+it.k,'Thiếu '+it.ten)}
+    if(!it.ok&&S.sel[it.k]){L.push('<b>'+it.ten+'</b>: '+it.ly);err(0,'thua_'+it.k,'Chọn '+it.ten+' – '+it.ly)}});
+  if(L.length)return bad(L);ok('Đủ mẫu thực vật, vật liệu và dụng cụ theo SGK tr.16.',[0,2,0]);setTimeout(()=>{if(S.step===0)goStep(1)},FAST?0:1100)};
+ACT.depth=b=>{S.depth=b.dataset.v;render()};
+ACT.cut1=()=>{const c=S.cut||S.draft;const L=[];if(!c){return bad(['Hãy kéo dọc cành qua một mắt để vạch đường dao.'])}
+  const a=Math.min(c.a,c.b),b=Math.max(c.a,c.b),len=r1(b-a),inside=BUDS.map((u,i)=>({u,i})).filter(o=>o.u.x>a&&o.u.x<b);
+  if(inside.length===0){L.push('Miếng cắt <b>không chứa mắt</b> nào – miếng vỏ phải có chứa mầm ngủ.');err(1,'khongmat','Miếng cắt không chứa mắt')}
+  else if(inside.length>1){L.push('Miếng cắt chứa tới '+inside.length+' mắt – chỉ lấy <b>một</b> mắt.');err(1,'haimat','Miếng cắt chứa nhiều mắt')}
+  else{const t=inside[0].u.t;if(t==='nay'){L.push('Mắt này <b>đã nảy mầm</b>. Chọn mắt ngủ nổi rõ, chưa nảy mầm.');err(1,'matnay','Chọn mắt đã nảy mầm')}if(t==='hong'){L.push('Mắt này <b>khô, đen</b>, không còn sống. Chọn mắt ngủ nổi rõ.');err(1,'mathong','Chọn mắt khô hỏng')}}
+  if(len<SGK.matMin){L.push('Miếng vỏ dài '+fmt(len)+' cm là <b>quá ngắn</b>. SGK: dài khoảng 1,5 – 2,0 cm.');err(1,'ngan','Mắt ghép quá ngắn')}
+  if(len>SGK.matMax){L.push('Miếng vỏ dài '+fmt(len)+' cm là <b>quá dài</b>. SGK: dài khoảng 1,5 – 2,0 cm.');err(1,'dai','Mắt ghép quá dài')}
+  if(!S.depth)L.push('Chưa chọn lát dao.');
+  else if(S.depth==='vo'){L.push('Chỉ lấy vỏ là chưa đủ: miếng vỏ cần có <b>một ít gỗ</b> (ghép mắt nhỏ <i>có gỗ</i>).');err(1,'vo','Lát dao chỉ lấy vỏ')}
+  else if(S.depth==='sau'){L.push('Cắt sâu vào lõi là quá dày: chỉ lấy <b>một ít gỗ</b>.');err(1,'sau','Lát dao cắt sâu vào lõi')}
+  if(L.length)return bad(L);
+  S.cut={a,b};S.chipLen=len;S.chipX=(a+b)/2;S.chipDone=true;S.mouth=Math.max(1,r1(len-.3));ok('Lấy được mắt ghép dài '+fmt(len)+' cm, có mầm ngủ và một ít gỗ – đúng SGK tr.17, Bước 1.',[S.chipX,4,0]);render()};
+ACT.pos2=()=>{const y=S.h,L=[];if(y==null)return bad(['Rê sát thân cây để chọn vị trí trước.']);
+  if(y<SGK.hMin){L.push('Vị trí '+fmt(y)+' cm là <b>quá thấp</b>. SGK: cách mặt bầu khoảng 15 – 20 cm.');err(2,'thap','Vị trí ghép quá thấp')}
+  if(y>SGK.hMax){L.push('Vị trí '+fmt(y)+' cm là <b>quá cao</b>. SGK: cách mặt bầu khoảng 15 – 20 cm.');err(2,'cao','Vị trí ghép quá cao')}
+  if(CROOK.some(z=>y>=z[0]&&y<=z[1])){L.push('Chỗ này <b>thân bị cong</b>. Chọn chỗ thân tương đối thẳng.');err(2,'cong','Chọn chỗ thân cong')}
+  if(L.length)return bad(L);S.hOk=true;ok('Chỗ thân thẳng, cách mặt bầu '+fmt(y)+' cm – đúng SGK tr.17, Bước 2.',[stemX(y),y,1]);render()};
+ACT.open2=()=>{const d=r1(S.mouth-S.chipLen),L=[];
+  if(d<=0){L.push('Miệng ghép '+fmt(S.mouth)+' cm <b>không lớn hơn</b> mắt ghép '+fmt(S.chipLen)+' cm – mắt ghép sẽ không đặt vừa. SGK: miệng ghép lớn hơn một ít so với mắt ghép.');err(2,'nho','Miệng ghép không lớn hơn mắt ghép')}
+  else if(d>RONG_TOI_DA){L.push('Miệng ghép rộng hơn mắt ghép tới '+fmt(d)+' cm – <b>quá rộng</b>, mắt ghép không áp kín. Chỉ lớn hơn <b>một ít</b>.');err(2,'rong','Miệng ghép quá rộng')}
+  if(L.length)return bad(L);S.mouthDone=true;ok('Miệng ghép '+fmt(S.mouth)+' cm, lớn hơn mắt ghép một ít – đúng SGK tr.17, Bước 2.',[stemX(S.h),S.h,1]);render()};
+ACT.flip3=()=>{S.flip=!S.flip;render()};
+ACT.place3=async()=>{if(S.flip){bad(['Mắt ghép đang <b>ngược chiều</b> (mầm hướng xuống). Lật lại cho mầm hướng lên rồi mới áp.']);err(3,'nguoc','Đặt mắt ghép ngược chiều');return}
+  S.placed=true;BUSY=true;render();const t0=performance.now();await new Promise(r=>{const f=()=>{S.placeK=FAST?1:clamp((performance.now()-t0)/700,0,1);S.placeK<1?requestAnimationFrame(f):r()};f()});BUSY=false;
+  ok('Đã áp mắt ghép vào miệng ghép, đúng chiều. Giờ quấn dây.',[stemX(S.h),S.h,1]);render()};
+ACT.wrap3=()=>{S.turns=Math.min(14,S.turns+1);render()};ACT.unwrap3=()=>{S.turns=Math.max(0,S.turns-1);render()};
+function covered(){const y0=S.h-S.mouth/2-.6,top=y0+(S.turns-1)*.4+.82;return S.turns>0&&top>=S.h+S.mouth/2+.3}
+ACT.tie3=b=>{const L=[];if(!covered()){L.push('Dây buộc <b>chưa quấn kín</b> miệng ghép ('+S.turns+' vòng). SGK: dùng dây buộc quấn kín.');err(3,'ho','Quấn dây chưa kín')}
+  if(b.dataset.v==='long'){L.push('Buộc lỏng tay thì mắt ghép không áp sát gỗ. SGK: quấn kín và <b>ép chặt</b> mắt ghép vào gốc ghép.');err(3,'long','Buộc lỏng tay')}
+  if(L.length)return bad(L);S.tied='chat';ok('Quấn kín, ép chặt – đúng SGK tr.17, Bước 3.',[stemX(S.h),S.h,1]);render()};
+let PLAY=false;
+function adv(n){for(let i=0;i<n;i++){if(S.day>=35)break;S.day++;
+  S.shoots.forEach(s=>{if(!s.born&&S.day>=s.d)s.born=true;if(s.born&&!s.cut&&!s.flag&&S.day-s.d>7){s.flag=true;err(4,'mamdai','Để mầm mọc ở gốc ghép lâu không cắt');fb('err','Có mầm mọc ở gốc ghép đã hơn 7 ngày chưa cắt – SGK: thường xuyên cắt bỏ các mầm không phải là mầm ghép.');beep(false)}});
+  if(S.topCut&&S.failed==null&&S.sproutDay==null&&S.day>=S.topCut.day+4){S.sproutDay=S.day;S.sproutL=.3;toast('ok','Mắt ghép bật mầm!');sparkle([stemX(S.h),S.h+1,1])}
+  else if(S.sproutDay!=null&&S.failed==null){const wild=S.shoots.filter(s=>s.born&&!s.cut).length;S.sproutL=Math.min(14,S.sproutL+.75*(S.npk!=null?1.45:1)*(1-.2*wild))}
+  if(S.day>=35)end4()}}
+function end4(){if(S.ended)return;S.ended=true;PLAY=false;const L=[];
+  if(!S.topCut){err(4,'khongcat','Không cắt ngọn gốc ghép');L.push('Chưa cắt ngọn gốc ghép – mắt ghép khó bật mầm.')}
+  if(S.untied==null){err(4,'quenthao','Không tháo dây buộc');L.push('Chưa tháo dây buộc – dây sẽ thắt vào thân.')}
+  if(S.npk==null&&S.sproutDay!=null){err(4,'thieunpk','Không tưới NPK bổ sung');L.push('Mắt ghép bật mầm nhưng chưa tưới NPK bổ sung.')}
+  if(S.shoots.some(s=>s.born&&!s.cut)){err(4,'conmam','Còn mầm ở gốc ghép chưa cắt');L.push('Vẫn còn mầm mọc ở gốc ghép chưa cắt bỏ.')}
+  render();L.length?fb('err','<b>Đã hết 35 ngày.</b><ul>'+L.map(s=>'<li>'+s+'</li>').join('')+'</ul>'):fb('ok','Đã hết 35 ngày. Bấm <b>Xem kết quả</b>.')}
+ACT.adv=b=>{adv(+b.dataset.v);render()};
+ACT.play=async()=>{PLAY=!PLAY;render();while(PLAY&&S.day<35&&S.step===4){adv(1);render();await sleep(380)}PLAY=false;if(S.step===4)render()};
+ACT.cutMode=()=>{PLAY=false;S.cutMode=true;S.cutY=r1(S.h+1);setView({yaw:.35,pitch:.1,dist:24,tgt:[0,S.h+1,0]});render()};
+ACT.cancelCut=()=>{S.cutMode=false;setView(viewFor(4));render()};
+ACT.cutTop=()=>{const above=r1(S.cutY-S.h),L=[];if(above<=0)return bad(['Đường cắt phải nằm <b>phía trên</b> mắt ghép.']);
+  if(S.day<SGK.ngayMin){L.push('Mới ghép được '+S.day+' ngày – mắt ghép <b>chưa liền</b> với gốc ghép. SGK: cắt ngọn sau khi ghép khoảng 15 – 20 ngày.');err(4,'somcat','Cắt ngọn quá sớm');S.failed='Cắt ngọn khi mắt ghép chưa liền';S.failDay=S.day+1}
+  else if(S.day>SGK.ngayMax){L.push('Đã '+S.day+' ngày – cắt ngọn <b>muộn</b>. SGK: khoảng 15 – 20 ngày sau khi ghép.');err(4,'muon','Cắt ngọn muộn')}
+  if(above<SGK.catMin){L.push('Cắt cách mắt ghép '+fmt(above)+' cm là <b>quá sát</b>. SGK: phía trên mắt ghép khoảng 1,5 – 2,0 cm.');err(4,'sat','Cắt ngọn quá sát mắt ghép')}
+  if(above>SGK.catMax){L.push('Cắt cách mắt ghép '+fmt(above)+' cm là <b>quá xa</b>, để lại đoạn gốc thừa. SGK: khoảng 1,5 – 2,0 cm.');err(4,'xa','Cắt ngọn quá xa mắt ghép')}
+  S.topCut={day:S.day,y:S.cutY};S.cutMode=false;setView(viewFor(4));
+  if(L.length){bad(L);render();fb('err','<ul>'+L.map(s=>'<li>'+s+'</li>').join('')+'</ul>')}else{ok('Cắt ngọn đúng lúc, cách mắt ghép '+fmt(above)+' cm – đúng SGK tr.17, Bước 4.',[stemX(S.cutY),S.cutY,0]);render()}};
+ACT.untie=()=>{if(S.day<SGK.ngayMin){err(4,'somthao','Tháo dây quá sớm');S.untied=S.day;S.failed=S.failed||'Tháo dây khi mắt ghép chưa liền';S.failDay=S.failDay!=null?S.failDay:S.day+1;render();bad(['Mới '+S.day+' ngày, mắt ghép <b>chưa liền</b> mà đã tháo dây – mắt ghép dễ bong, khô. SGK: tháo dây sau khi ghép khoảng 15 – 20 ngày.']);return}
+  S.untied=S.day;ok('Đã tháo dây buộc.',[stemX(S.h),S.h,1]);render()};
+ACT.npk=()=>{if(S.sproutDay==null){err(4,'somnpk','Tưới NPK khi mắt ghép chưa bật mầm');render();bad(['Mắt ghép <b>chưa bật mầm</b>. SGK: khi mắt ghép bắt đầu bật mầm thì tưới phân NPK bổ sung.']);return}
+  S.npk=S.day;ok('Tưới NPK bổ sung đúng lúc mắt ghép bật mầm – mầm sẽ lớn nhanh hơn.',[stemX(S.h),S.h+2,1]);render()};
+ACT.result=()=>goStep(5);
+ACT.hint=()=>{if(BUSY||S.step===5)return;S.hint++;const H=[
+  ['Cần đủ 3 nhóm: mẫu thực vật, vật liệu khác và dụng cụ.','SGK tr.16: cây gốc ghép và cây lấy mắt ghép phải <b>cùng họ</b>; mắt lấy từ <b>cây đầu dòng</b>, cành bánh tẻ không sâu bệnh. Vật liệu: dây buộc. Dụng cụ: dao ghép, kéo cắt cành.'],
+  ['Mắt ngủ là mắt nổi rõ, chưa nảy mầm, không khô đen.','SGK tr.17, Bước 1: cắt lấy một miếng vỏ dài khoảng <b>1,5 – 2,0 cm</b>, có chứa mầm ngủ và <b>một ít gỗ</b>.'],
+  ['Thân cây có hai chỗ cong; nhìn thước vàng để đo.','SGK tr.17, Bước 2: chọn chỗ thân tương đối thẳng, cách mặt bầu <b>15 – 20 cm</b>; miệng ghép <b>lớn hơn một ít</b> so với mắt ghép.'],
+  ['Mầm của mắt ghép phải hướng về phía ngọn cây.','SGK tr.17, Bước 3: đặt mắt ghép áp vào miệng ghép, dùng dây buộc <b>quấn kín</b> và <b>ép chặt</b>.'],
+  ['Mắt ghép cần thời gian để liền với gốc ghép; đừng vội cắt.','SGK tr.17, Bước 4: sau <b>15 – 20 ngày</b> cắt bỏ phần ngọn gốc ghép phía trên mắt ghép <b>1,5 – 2,0 cm</b>, tháo dây buộc; thường xuyên cắt mầm không phải mầm ghép; mắt ghép bật mầm thì tưới NPK bổ sung.']][S.step];
+  if(S.hint<=2){render();fb('info','💡 '+H[S.hint-1]+(S.hint===2?'<br><small>Bấm Gợi ý lần nữa để xem làm mẫu bước này.</small>':''))}else{AUTO[S.step]()}};
+
+/* ========== LÀM MẪU (dùng cho GV và gợi ý mức 3) ========== */
+const AUTO={};
+AUTO[0]=async()=>{BUSY=true;render();for(const it of ITEMS){S.sel[it.k]=false}for(const it of ITEMS.filter(i=>i.ok)){S.sel[it.k]=true;render();await sleep(380)}BUSY=false;ACT.check0()};
+AUTO[1]=async()=>{BUSY=true;S.focus=3;setView(viewFor(1));S.depth=null;render();await sleep(800);const x=BUDS[3].x;S.draft={a:x-.9,b:x-.9};
+  for(let k=0;k<=18;k++){S.draft.b=r1(x-.9+k*.1);render();await sleep(40)}S.depth='go';render();await sleep(500);BUSY=false;ACT.cut1()};
+AUTO[2]=async()=>{BUSY=true;render();for(let y=10;y<=17.5;y+=.5){S.h=y;render();await sleep(60)}BUSY=false;ACT.pos2();await sleep(700);S.mouth=r1(S.chipLen+.2);render();await sleep(500);ACT.open2()};
+AUTO[3]=async()=>{if(!S.placed){if(S.flip){await sleep(400);ACT.flip3()}await sleep(500);await ACT.place3()}BUSY=true;render();while(!covered()){S.turns++;render();await sleep(220)}BUSY=false;await sleep(300);ACT.tie3({dataset:{v:'chat'}})};
+AUTO[4]=async()=>{BUSY=true;render();while(S.day<35){adv(1);S.shoots.forEach(s=>{if(s.born&&!s.cut&&S.day-s.d>=2){s.cut=true;toast('info','Cắt bỏ mầm mọc ở gốc ghép')}});
+    if(S.day===17&&!S.topCut){render();await sleep(500);S.cutMode=true;S.cutY=r1(S.h+1.8);render();await sleep(900);BUSY=false;ACT.cutTop();BUSY=true;await sleep(400);BUSY=false;ACT.untie();BUSY=true}
+    if(S.sproutDay!=null&&S.npk==null&&S.day>=S.sproutDay+1){BUSY=false;ACT.npk();BUSY=true}
+    render();await sleep(260)}BUSY=false;render()};
+async function demoAll(){MODE='mau';S=fresh();E={};T0=Date.now();goStep(0);await sleep(600);for(let i=0;i<5;i++){if(S.step!==i)goStep(i);await AUTO[i]();await sleep(1200);if(i<4&&S.step===i)goStep(i+1)}goStep(5)}
+
+/* ========== KẾT QUẢ, LƯU, XUẤT ========== */
+const KEY='vuonghep3d_cn9_v1';
+function loadH(){try{return JSON.parse(localStorage.getItem(KEY)||'[]')}catch(e){return []}}
+function saveH(a){try{localStorage.setItem(KEY,JSON.stringify(a))}catch(e){}}
+function cnt(st){return Object.values(E[st]||{}).reduce((s,o)=>s+o.n,0)}
+function success(){return S.failed==null&&!!S.topCut&&S.untied!=null&&S.sproutDay!=null}
+function saveResult(){if(MODE!=='luyen'||saveResult._done)return;saveResult._done=true;const H=loadH(),luot=H.filter(r=>r.nhom===NHOM).length+1,d=new Date();
+  H.push({tg:d.toLocaleString('vi-VN'),nhom:NHOM||'(chưa ghi mã)',luot,b0:cnt(0),b1:cnt(1),b2:cnt(2),b3:cnt(3),b4:cnt(4),tong:[0,1,2,3,4].reduce((s,i)=>s+cnt(i),0),giay:Math.round((Date.now()-T0)/1000),kq:success()?'Sống, bật mầm':'Không sống/chưa xong',loi:[0,1,2,3,4].flatMap(i=>Object.values(E[i]||{}).map(o=>o.msg)).join('; ')});saveH(H)}
+function resultHTML(){const okk=success(),tong=[0,1,2,3,4].reduce((s,i)=>s+cnt(i),0),sec=Math.round((Date.now()-T0)/1000);
+  let h=`<div class="fb ${okk?'ok':'err'}" style="display:block;font-size:16px">${okk?'🌱 <b>Mắt ghép sống và bật mầm!</b>':'🥀 <b>Mắt ghép không sống'+(S.failed?'</b> – '+S.failed:'</b> hoặc chưa làm đủ bước')}</div>
+  <div class="meter">Tổng số lỗi: <b>${tong}</b> · Thời gian: <b>${Math.floor(sec/60)} phút ${sec%60} giây</b></div>`;
+  for(let i=0;i<5;i++){const L=Object.values(E[i]||{});h+=`<div style="font-size:14px"><b>${i===0?'Chuẩn bị':'Bước '+i+'. '+STEPS[i].name}</b> – ${L.length?'<span class="res-bad">'+cnt(i)+' lỗi</span>':'<span class="res-ok">không lỗi</span>'}${L.length?'<ul style="margin:4px 0 0 18px;padding:0">'+L.map(o=>'<li>'+o.msg+(o.n>1?' (×'+o.n+')':'')+'</li>').join('')+'</ul>':''}</div>`}
+  h+=`<div class="guide" style="font-size:13px">Đọc lại: SGK tr.16 (chuẩn bị), tr.17 (4 bước), tr.18 (tiêu chí đánh giá: số lượng gốc ghép hoàn thành, đường kính gốc ghép, vị trí ghép, kích thước mắt ghép…). Ra vườn ghép thật để hoàn thành bài thực hành.</div>
+  <div class="row"><button class="btn main" data-act="again">↻ Luyện lại từ đầu</button><button class="btn" data-act="hist">📋 Các lượt đã lưu</button></div>`;
+  if(MODE==='mau')h+='<div style="font-size:12px;color:#666">Lượt làm mẫu không được lưu.</div>';return h}
+ACT.again=()=>{MODE='luyen';S=fresh();E={};T0=Date.now();saveResult._done=false;goStep(0)};
+ACT.hist=()=>showHist();
+function showHist(){const H=loadH();$('histCard').innerHTML=`<h2>📋 Các lượt đã lưu</h2><p>Dữ liệu nằm trong trình duyệt <b>máy này</b>. Cuối buổi bấm <b>Xuất CSV</b> để GV lưu; xoá lịch sử trình duyệt là mất.</p>
+  ${H.length?`<div style="overflow:auto"><table class="hist"><tr><th>Thời điểm</th><th>Mã nhóm</th><th>Lượt</th><th>CB</th><th>B1</th><th>B2</th><th>B3</th><th>B4</th><th>Tổng lỗi</th><th>Kết quả</th></tr>${H.slice(-30).reverse().map(r=>`<tr><td>${esc(r.tg)}</td><td>${esc(r.nhom)}</td><td>${r.luot}</td><td>${r.b0}</td><td>${r.b1}</td><td>${r.b2}</td><td>${r.b3}</td><td>${r.b4}</td><td><b>${r.tong}</b></td><td class="${/Sống/.test(r.kq)?'res-ok':'res-bad'}">${esc(r.kq)}</td></tr>`).join('')}</table></div>`:'<p><i>Chưa có lượt nào.</i></p>'}
+  <div class="row" style="margin-top:12px"><button class="btn main" id="hCsv">⬇ Xuất CSV</button><button class="btn" id="hClose">Đóng</button></div>`;
+  $('ovHist').style.display='flex';$('hClose').onclick=()=>$('ovHist').style.display='none';$('hCsv').onclick=exportCSV}
+function exportCSV(){const H=loadH(),cols=['tg','nhom','luot','b0','b1','b2','b3','b4','tong','giay','kq','loi'],head=['Thời điểm','Mã nhóm','Lượt','Lỗi chuẩn bị','Lỗi B1','Lỗi B2','Lỗi B3','Lỗi B4','Tổng lỗi','Số giây','Kết quả','Chi tiết lỗi'];
+  const q=v=>'"'+String(v==null?'':v).replace(/"/g,'""')+'"';const csv='﻿'+[head.map(q).join(',')].concat(H.map(r=>cols.map(c=>q(r[c])).join(','))).join('\r\n');
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));a.download='vuon-ghep-3d-ket-qua.csv';document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500)}
+
+/* ========== CHUỘT, CHẠM ========== */
+let drag=null,last=null;
+function ptr(e){const r=cv.getBoundingClientRect();return [e.clientX-r.left,e.clientY-r.top]}
+function nearAxis(m,samples){let best=null;for(const s of samples){const p=proj(s.p);if(!p)continue;const d=Math.hypot(p[0]-m[0],p[1]-m[1]);if(!best||d<best.d)best={d,v:s.v}}return best}
+const branchSamples=()=>{const a=[];for(let x=-16;x<=16;x+=.05)a.push({p:[x,.3,0],v:x});return a};
+const stemSamples=(y0,y1)=>{const a=[];for(let y=y0;y<=y1;y+=.05)a.push({p:[stemX(y),y,.6],v:y});return a};
+function toolDown(m){if(BUSY)return true;const st=S.step,id=pick(m[0],m[1]);
+  if(st===0&&id&&id.startsWith('it_')){const k=id.slice(3);S.sel[k]=!S.sel[k];beep(true);render();return 'click'}
+  if(st===1&&!S.chipDone){if(id&&id.startsWith('bud')){const i=+id.slice(3);if(S.focus!==i){S.focus=i;setView(viewFor(1));render();return 'click'}}
+    const n=nearAxis(m,branchSamples());if(n&&n.d<40){S.draft={a:r1(n.v),b:r1(n.v)};S.cut=null;return 'cut'}}
+  if(st===2&&!S.hOk){const n=nearAxis(m,stemSamples(0,40));if(n&&n.d<45){S.h=r1(n.v);render();return 'h'}}
+  if(st===4){if(id&&id.startsWith('sh')){const s=S.shoots[+id.slice(2)];s.cut=true;ok('Đã cắt bỏ mầm mọc ở gốc ghép (không phải mầm ghép).',[stemX(s.y),s.y+1,0]);render();return 'click'}
+    if(S.cutMode){const n=nearAxis(m,stemSamples(S.h+.2,Math.min(S.h+8,55)));if(n&&n.d<45){S.cutY=r1(n.v);upd();return 'top'}}}
+  return false}
+function upd(){const a=$('mLen'),c=S.cut||S.draft;if(a&&c)a.textContent=fmt(Math.abs(c.b-c.a));const b=$('mH');if(b&&S.h!=null)b.textContent=fmt(S.h);const d=$('mC');if(d&&S.cutY!=null)d.textContent=fmt(S.cutY-S.h)}
+function toolMove(m){const st=S.step;if(drag==='cut'){const n=nearAxis(m,branchSamples());if(n)S.draft.b=r1(n.v);upd()}
+  if(drag==='h'){const n=nearAxis(m,stemSamples(0,40));if(n){S.h=r1(n.v);upd()}}
+  if(drag==='top'){const n=nearAxis(m,stemSamples(S.h+.2,Math.min(S.h+8,55)));if(n){S.cutY=r1(n.v);upd()}}}
+cv.addEventListener('pointerdown',e=>{const m=ptr(e);const t=toolDown(m);cv.setPointerCapture(e.pointerId);if(t===true||t==='click'){drag=null;return}if(t){drag=t;return}drag='cam';last=m;cv.style.cursor='grabbing'});
+cv.addEventListener('pointermove',e=>{const m=ptr(e);if(drag==='cam'){camT.yaw-=(m[0]-last[0])*.008;camT.pitch=clamp(camT.pitch+(m[1]-last[1])*.006,-.25,1.3);last=m;return}if(drag){toolMove(m);return}
+  const id=pick(m[0],m[1]);cv.style.cursor=id&&(/^(it_|bud|sh)/.test(id))?'pointer':'grab'});
+cv.addEventListener('pointerup',()=>{if(drag==='cut'||drag==='h'||drag==='top')render();drag=null;cv.style.cursor='grab'});
+cv.addEventListener('wheel',e=>{e.preventDefault();camT.dist=clamp(camT.dist*Math.exp(e.deltaY*.001),10,160)},{passive:false});
+document.querySelector('aside').addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(!b||b.disabled)return;if(BUSY&&b.dataset.act!=='play')return;const f=ACT[b.dataset.act];if(f)f(b)});
+$('btnView').onclick=()=>setView(viewFor(S.step));
+$('btnHist').onclick=showHist;
+$('btnNav').onclick=e=>{e.stopPropagation();const m=$('navMenu');m.style.display=m.style.display==='block'?'none':'block'};
+document.addEventListener('click',()=>{$('navMenu').style.display='none'});
+$('btnDemo').onclick=()=>{if(BUSY)return;$('ovStart').style.display='none';demoAll()};
+$('btnGo').onclick=()=>{NHOM=$('inNhom').value.trim().slice(0,30);MODE='luyen';T0=Date.now();$('ovStart').style.display='none';beep(true);goStep(0)};
+$('btnGoDemo').onclick=()=>{$('ovStart').style.display='none';demoAll()};
+
+/* ========== VÒNG VẼ ========== */
+function resize(){const r=cv.getBoundingClientRect();DPR=Math.min(2,window.devicePixelRatio||1);if(W!==r.width||H!==r.height){W=r.width;H=r.height;cv.width=W*DPR;cv.height=H*DPR}}
+function loop(){resize();cam.yaw=lerp(cam.yaw,camT.yaw,.12);cam.pitch=lerp(cam.pitch,camT.pitch,.12);cam.dist=lerp(cam.dist,camT.dist,.12);cam.tgt=lerp3(cam.tgt,camT.tgt,.12);
+  if(S.step===5)camT.yaw+=.003;buildScene();draw();requestAnimationFrame(loop)}
+
+/* ========== CHẾ ĐỘ CHỤP: #b0 · #b1 · #b1&keo · #b2 · #b2&mieng · #b3 · #b3&quan · #b4&ngay=18 · #kq ========== */
+async function snapMode(){const hs=location.hash.slice(1);if(!hs)return false;const [scr,...ps]=hs.split('&');const P={};ps.forEach(p=>{const [k,v]=p.split('=');P[k]=v==null?true:v});
+  FAST=true;$('ovStart').style.display='none';MODE='luyen';NHOM='Nhóm 3 – 9A1';T0=Date.now()-312000;saveResult._done=true;
+  const to=n=>{for(let i=0;i<n;i++){if(S.step!==i)goStep(i)}};
+  const runTo=async n=>{for(let i=0;i<n;i++){if(S.step!==i)goStep(i);await AUTO[i]();if(S.step===i)goStep(i+1)}};
+  if(scr==='start'){FAST=false;$('ovStart').style.display='flex';return true}
+  if(scr==='b0'){goStep(0);if(P.chon){S.sel={goc:true,mat:true,xoai:true,dao:true};render();ACT.check0()}}
+  if(scr==='b1'){await runTo(1);S.focus=3;setView(viewFor(1));if(P.keo){S.draft={a:.6,b:2.5};S.depth='go'}if(P.xong){S.draft={a:.6,b:2.4};S.depth='go';ACT.cut1()}render()}
+  if(scr==='b2'){await runTo(2);S.h=+(P.h||17.5);if(P.mieng){ACT.pos2();S.mouth=r1(S.chipLen+.2)}render()}
+  if(scr==='b3'){await runTo(3);if(P.quan){S.flip=false;await ACT.place3();S.turns=4}render()}
+  if(scr==='b4'){await runTo(4);const n=+(P.ngay||10);if(P.dung){for(let d=0;d<n;d++){adv(1);S.shoots.forEach(s=>{if(s.born&&!s.cut&&S.day-s.d>=2)s.cut=true});if(S.day===17){S.cutY=r1(S.h+1.8);ACT.cutTop();ACT.untie()}if(S.sproutDay!=null&&S.npk==null)ACT.npk()}}else adv(n);if(P.cat){ACT.cutMode();S.cutY=r1(S.h+1.8)}render()}
+  if(scr==='kq'){await runTo(4);await AUTO[4]();goStep(5)}
+  for(const k in camT)cam[k]=JSON.parse(JSON.stringify(camT[k]));FAST=false;return true}
+pills();render();snapMode().then(()=>{for(const k in camT)cam[k]=JSON.parse(JSON.stringify(camT[k]))});
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>

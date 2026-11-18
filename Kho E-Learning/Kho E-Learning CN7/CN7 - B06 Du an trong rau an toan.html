@@ -1,0 +1,416 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CN 7 · Bài 6. Dự án trồng rau an toàn</title>
+<style>
+:root{--xanh:#2e7d32;--xanh2:#e8f5e9;--cam:#ef6c00;--do:#c62828;--chu:#1f2a1f;--mo:#5f6b5f;--nen:#f6f8f4;--the:#fff;--vien:#d5ded2}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Segoe UI",Arial,sans-serif;font-size:17px;line-height:1.55;color:var(--chu);background:var(--nen)}
+header{background:var(--xanh);color:#fff;padding:12px 16px;position:sticky;top:0;z-index:5}
+header h1{margin:0;font-size:18px}
+header .phu{font-size:13px;opacity:.9}
+.thanh{height:6px;background:#a5d6a7;border-radius:3px;margin-top:8px;overflow:hidden}
+.thanh i{display:block;height:100%;width:0;background:#fff;transition:width .3s}
+.nhap{background:#fff8e1;color:#6d4c00;font-size:13px;padding:6px 16px;border-bottom:1px solid #ffe082}
+.khung{display:flex;max-width:1100px;margin:0 auto}
+nav{width:250px;flex:none;padding:14px 10px;position:sticky;top:78px;align-self:flex-start;max-height:calc(100vh - 90px);overflow:auto}
+nav button{display:block;width:100%;text-align:left;border:0;background:none;padding:8px 10px;border-radius:8px;font:inherit;font-size:15px;color:var(--chu);cursor:pointer}
+nav button.dang{background:var(--xanh2);font-weight:600}
+nav button.xong::after{content:" ✓";color:var(--xanh)}
+main{flex:1;min-width:0;padding:14px 16px 90px}
+section{display:none;background:var(--the);border:1px solid var(--vien);border-radius:14px;padding:18px 18px 22px}
+section.hien{display:block}
+h2{color:var(--xanh);margin:0 0 10px;font-size:22px}
+h3{margin:18px 0 6px;font-size:18px}
+img{max-width:100%;border-radius:10px;display:block;margin:8px auto}
+.chu-hinh{text-align:center;font-size:13px;color:var(--mo);font-style:italic;margin-top:-2px}
+.hop{border-radius:10px;padding:10px 14px;margin:12px 0}
+.hop.muc-tieu{background:var(--xanh2);border-left:5px solid var(--xanh)}
+.hop.an-toan{background:#fff3e0;border-left:5px solid var(--cam)}
+.hop.mo-rong{background:#e3f2fd;border-left:5px solid #1565c0}
+.hop.nho{background:#f3e5f5;border-left:5px solid #6a1b9a}
+.tab{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}
+.tab button{border:1px solid var(--xanh);background:#fff;color:var(--xanh);border-radius:20px;padding:6px 14px;font:inherit;font-size:15px;cursor:pointer}
+.tab button.dang{background:var(--xanh);color:#fff}
+table{border-collapse:collapse;width:100%;font-size:15px}
+td,th{border:1px solid var(--vien);padding:6px 8px;vertical-align:top;text-align:left}
+th{background:var(--xanh2)}
+.buoc{display:flex;gap:10px;margin:8px 0;align-items:flex-start}
+.buoc b.so{flex:none;width:34px;height:34px;border-radius:50%;background:var(--xanh);color:#fff;display:flex;align-items:center;justify-content:center}
+.so-lieu{background:#fffde7;padding:0 4px;border-radius:4px;font-weight:600}
+.cau{border:1px solid var(--vien);border-radius:10px;padding:10px 12px;margin:10px 0}
+.cau p{margin:0 0 6px;font-weight:600}
+.lc{display:block;width:100%;text-align:left;margin:5px 0;padding:9px 12px;border:1px solid var(--vien);border-radius:8px;background:#fff;font:inherit;font-size:16px;cursor:pointer}
+.lc:hover{border-color:var(--xanh)}
+.lc.dung{background:#e8f5e9;border-color:var(--xanh)}
+.lc.sai{background:#ffebee;border-color:var(--do)}
+.giai{display:none;font-size:15px;margin-top:6px;padding:6px 10px;border-radius:6px;background:#f1f8e9}
+.giai.hien{display:block}
+.ds-dung-sai{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:6px 0}
+.ds-dung-sai span{flex:1 1 260px}
+.nut{display:inline-block;border:0;border-radius:10px;padding:10px 18px;font:inherit;font-size:16px;cursor:pointer;background:var(--xanh);color:#fff;margin:4px 6px 4px 0}
+.nut.phu{background:#fff;color:var(--xanh);border:1px solid var(--xanh)}
+.nut.nho{padding:6px 12px;font-size:14px}
+select{font:inherit;font-size:15px;padding:5px;border-radius:6px;border:1px solid var(--vien);max-width:100%}
+.xep{display:flex;flex-direction:column;gap:6px;margin:8px 0}
+.xep button{text-align:left}
+.ket{font-weight:600;margin-top:8px}
+textarea{width:100%;min-height:70px;font:inherit;font-size:15px;padding:8px;border-radius:8px;border:1px solid var(--vien)}
+.dieu-huong{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--vien);display:flex;justify-content:space-between;align-items:center;padding:8px 16px;z-index:5}
+.dieu-huong span{font-size:14px;color:var(--mo)}
+.app{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin:10px 0}
+.app a{display:block;border:1px solid var(--vien);border-radius:10px;padding:10px 12px;text-decoration:none;color:var(--chu);background:#fafff8}
+.app a b{color:var(--xanh)}
+.menu-dt{display:none}
+.nls{color:#c62828}
+.nlai{color:#1565c0}
+.nhan{display:inline-block;font-size:13px;font-weight:700;border-radius:12px;padding:2px 10px;margin:0 0 8px;border:1px solid currentColor}
+.hop.tich-hop-nls{background:#ffebee;border-left:5px solid #c62828}
+.hop.tich-hop-nlai{background:#e3f2fd;border-left:5px solid #1565c0}
+.cau-lenh{font-family:Consolas,monospace;font-size:15px;background:#263238;color:#e0f2f1;border-radius:8px;padding:10px 12px;white-space:pre-wrap;margin:8px 0}
+.nhan-dien{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:8px;margin:8px 0}
+footer{font-size:13px;color:var(--mo);text-align:center;margin:16px 0}
+@media (max-width:800px){
+  header{position:static}
+  nav{display:none;position:fixed;top:0;left:0;bottom:0;background:#fff;z-index:9;max-height:none;width:260px;box-shadow:2px 0 12px #0003;padding-top:20px}
+  nav.mo{display:block}
+  .menu-dt{display:inline-block;background:none;border:1px solid #fff;color:#fff;border-radius:8px;padding:2px 10px;font:inherit;font-size:14px;margin-top:6px;cursor:pointer}
+  main{padding:10px 10px 90px}
+  section{padding:14px 12px 18px}
+}
+@media print{
+  header,nav,.dieu-huong,.nhap,.khong-in,footer{display:none!important}
+  section{display:none!important;border:0}
+  section.in{display:block!important}
+  body{background:#fff}
+}
+</style>
+</head>
+<body data-ma="cn7-b06">
+<header>
+  <h1>Công nghệ 7 · Bài 6. Dự án trồng rau an toàn</h1>
+  <div class="phu">Bài tự học E-Learning · SGK Công nghệ 7 (KNTT) tr.24–26 · khoảng 30 phút</div>
+  <button class="menu-dt" onclick="moMenu()">☰ Mục lục</button>
+  <div class="thanh"><i id="tien-do"></i></div>
+</header>
+<div class="nhap" id="ban-nhap">✅ BẢN NHÁP — thầy/cô duyệt trước khi dùng. (Tổ duyệt xong thì xoá dòng này.)</div>
+<div class="khung">
+<nav id="menu"></nav>
+<main>
+<section data-ten="Bắt đầu">
+  <h2>Dự án trồng rau an toàn</h2>
+  <div class="hop muc-tieu"><b>Sau bài học này, em sẽ:</b><ul style="margin:6px 0"><li>Lập được kế hoạch, tính toán được chi phí cho việc trồng một loại rau trong khay hoặc thùng xốp.</li><li>Thực hiện được một số công việc trong quy trình trồng và chăm sóc rau an toàn.</li><li>Đảm bảo an toàn lao động và vệ sinh môi trường trong và sau quá trình thực hiện dự án.</li></ul><small>(Yêu cầu cần đạt — SGK Công nghệ 7 tr.24)</small>
+    <div style="margin-top:8px"><b>Em còn rèn thêm:</b></div>
+    <ul style="margin:6px 0">
+      <li class="nls"><b>NLS 3.1TC1a:</b> Phát triển nội dung số; tạo nhật kí/báo cáo số về trồng rau an toàn. <small>→ Phần 4</small></li>
+      <li class="nlai"><b>NLAI 7.B3.1:</b> Khi dùng AI gợi ý kế hoạch, HS tự lựa chọn, hoàn thiện sản phẩm và khai báo trung thực việc sử dụng AI; kiểm chứng thông tin bằng SGK/nguồn chính thống. <small>→ Phần 3</small></li>
+    </ul></div>
+  <p>Rau tự trồng: chất lượng, an toàn vệ sinh thực phẩm, tiết kiệm chi phí; trồng rau giúp nâng cao sức khoẻ, tinh thần vui vẻ, tạo không gian xanh mát.</p>
+  <p><b>Nhiệm vụ:</b> lập kế hoạch, tính chi phí cho dự án trồng rau an toàn quy mô phù hợp; trồng, chăm sóc, thu hoạch rau đúng quy trình kĩ thuật.</p>
+</section>
+
+<section data-ten="1. Kế hoạch, chi phí">
+  <h2>1. Lập kế hoạch và tính toán chi phí</h2>
+  <ul>
+    <li><b>Thu thập thông tin</b> (internet, sách báo, khảo sát thực tế): cây/hạt giống, chậu nhựa hoặc thùng xốp, dụng cụ, đất hoặc giá thể, phân bón; kĩ thuật gieo trồng, chăm sóc.</li>
+    <li><b>Lựa chọn</b> loại rau, dụng cụ, thiết bị phù hợp sở thích, mùa vụ, điều kiện kinh tế, không gian trồng.</li>
+    <li><b>Tính chi phí</b> theo bảng (đơn giá theo khảo sát thực tế của nhóm). Khuyến khích tận dụng thùng xốp đã qua sử dụng.</li>
+  </ul>
+  <div class="bang-tinh" data-bo="cp"></div>
+</section>
+
+<section data-ten="Dùng AI gợi ý kế hoạch – trung thực">
+  <h2>Nhờ AI gợi ý kế hoạch – tự quyết định, khai báo trung thực</h2>
+  <span class="nhan nlai">Tích hợp năng lực AI · NLAI 7.B3.1</span>
+  <div class="hop tich-hop-nlai nlai"><b>NLAI 7.B3.1:</b> Khi dùng AI gợi ý kế hoạch, HS tự lựa chọn, hoàn thiện sản phẩm và khai báo trung thực việc sử dụng AI; kiểm chứng thông tin bằng SGK/nguồn chính thống.</div>
+  <div class="hop an-toan">🔐 Dùng AI theo hướng dẫn của thầy cô; không nhập họ tên, địa chỉ.</div>
+  <div class="tao-cau-lenh nlai" data-bo="kh"></div>
+  <h3 class="nlai">Kiểm chứng gợi ý của AI</h3>
+  <div class="soat nlai" data-bo="kc"></div>
+  <h3 class="nlai">Dòng khai báo sử dụng AI (ghi vào kế hoạch, báo cáo)</h3>
+  <div class="cau nlai"><textarea placeholder="VD: Nhóm có dùng Gemini để gợi ý lịch tưới và loại rau dễ trồng; nhóm đã đối chiếu SGK tr.25 – 26, bỏ ý … vì …, tự điều chỉnh …"></textarea></div>
+  <div class="hop tich-hop-nlai nlai">💡 <b>Ghi nhớ:</b> AI chỉ gợi ý; kế hoạch là của nhóm. Khai báo trung thực phần nào có dùng AI, phần nào nhóm tự làm.</div>
+</section>
+
+<section data-ten="2 – 3. Chuẩn bị, trồng, chăm sóc; nhật kí số">
+  <h2>2. Chuẩn bị nguyên vật liệu, dụng cụ</h2>
+  <ul>
+    <li>Cây/hạt giống mua ở cửa hàng uy tín: cây khoẻ, không mầm bệnh; bao bì hạt nguyên vẹn, rõ nguồn gốc; xử lí hạt theo hướng dẫn trên bao bì.</li>
+    <li>Chậu nhựa/thùng xốp sạch; thùng xốp đục lỗ ở bên thành (sát mặt trong của đáy) để thoát nước.</li>
+    <li>Đất sạch trồng rau hoặc đất hữu cơ (xơ dừa, vỏ trấu); phân bón phù hợp, tốt nhất phân vi sinh; dụng cụ trồng rau, bình tưới.</li>
+  </ul>
+  <h2>3. Trồng, chăm sóc và thu hoạch</h2>
+  <div class="xep-thu-tu" data-bo="buoc"></div>
+  <ul style="font-size:15px">
+    <li>Bước 1: cho đất vào chậu/thùng, cách miệng khoảng <span class="so-lieu">5 – 7 cm</span>.</li>
+    <li>Bước 3: tưới nước hằng ngày vào sáng sớm hoặc chiều mát; bón phân định kì đúng liều lượng; kiểm tra sâu bệnh, xử lí kịp thời.</li>
+    <li>Bước 4: thu hoạch một lần hoặc nhiều lần, tránh làm rau giập nát.</li>
+  </ul>
+  <h2>Nhật kí số trồng rau</h2>
+  <span class="nhan nls">Tích hợp năng lực số · NLS 3.1TC1a</span>
+  <div class="hop tich-hop-nls nls"><b>NLS 3.1TC1a:</b> Phát triển nội dung số; tạo nhật kí/báo cáo số về trồng rau an toàn.</div>
+  <div class="soat nls" data-bo="nk"></div>
+  <table class="nls"><tr><th>Ngày</th><th>Việc đã làm</th><th>Quan sát rau</th><th>Tên file ảnh</th></tr>
+  <tr><td>&nbsp;</td><td></td><td></td><td></td></tr><tr><td>&nbsp;</td><td></td><td></td><td></td></tr><tr><td>&nbsp;</td><td></td><td></td><td></td></tr></table>
+  <div class="khong-in"><button class="nut" onclick="inPhieu(this)">🖨️ In trang này</button></div>
+</section>
+
+<section data-ten="Luyện tập tổng hợp"><h2>Luyện tập tổng hợp</h2><div class="de-tong"></div></section>
+
+<section data-ten="Tổng kết">
+  <h2>Ghi nhớ</h2>
+  <div class="buoc"><b class="so">1</b><div>Lập kế hoạch: thu thập thông tin → chọn loại rau, dụng cụ → tính chi phí.</div></div>
+  <div class="buoc"><b class="so">2</b><div>Trồng: chuẩn bị đất → gieo/trồng → chăm sóc → thu hoạch; ghi nhật kí số.</div></div>
+  <div class="buoc"><b class="so">3</b><div>Dùng AI có kiểm chứng và khai báo trung thực.</div></div>
+  <div id="tong-ket-diem" class="hop nho"></div>
+  <h3>Nguồn</h3>
+  <ul style="font-size:14px"><li>Nội dung: SGK Công nghệ 7 (Kết nối tri thức với cuộc sống), tr.24 – 26.</li><li>Mã và nội dung tích hợp NLS 3.1TC1a, NLAI 7.B3.1: Phân phối chương trình Công nghệ 7 năm học 2026 – 2027 của Tổ Công nghệ – HN.</li></ul>
+</section>
+
+<footer>Học liệu số Tổ Công nghệ – HN · Trường THCS Tịnh Biên · Năm học 2026–2027<br>Chỉ dùng nội bộ cho học sinh của trường. <a href="00 - MUC LUC KHO E-LEARNING CN7.html">↩ Về mục lục kho bài</a></footer>
+</main>
+</div>
+<div class="dieu-huong">
+  <button class="nut phu nho" onclick="sang(-1)">← Trước</button>
+  <span id="vi-tri"></span>
+  <button class="nut nho" onclick="sang(1)">Tiếp →</button>
+</div>
+<script>
+/* CN7 · Bài 6. Dự án trồng rau an toàn — SGK tr.24–26 */
+const BO = { them: [
+  {h:"Khi dùng thùng xốp trồng rau, cần đục lỗ ở:", c:["Nắp thùng","Bên thành, sát mặt trong của đáy thùng","Giữa đáy thật to","Không cần đục"], d:1, g:"SGK tr.25."},
+  {h:"Cho đất vào chậu/thùng xốp cách miệng khoảng:", c:["1 cm","5 – 7 cm","20 cm","Đầy miệng"], d:1, g:"Bước 1, SGK tr.25."},
+  {h:"Tưới rau nên vào thời điểm:", c:["Buổi trưa nắng","Sáng sớm hoặc chiều mát","Nửa đêm","Không cần tưới"], d:1, g:"Bước 3."},
+  {h:"Phân bón tốt nhất cho rau an toàn theo SGK là:", c:["Phân vi sinh","Thuốc trừ sâu","Phân tươi chưa ủ","Không bón"], d:0, g:"SGK tr.25."},
+  {h:"Khi dùng AI gợi ý kế hoạch, nhóm cần:", c:["Chép nguyên câu trả lời","Kiểm chứng bằng SGK, tự hoàn thiện và khai báo trung thực","Giấu việc dùng AI","Không cần đọc lại"], d:1, g:"NLAI 7.B3.1."}
+] };
+const THU_TU = { buoc:["Chuẩn bị đất trồng rau","Gieo hạt hoặc trồng cây con","Chăm sóc","Thu hoạch"] };
+const BANG_TINH = { cp: { diem:"Tổng chi phí dự án rau", bang:[
+  {ma:"A1", ten:"Bảng dự tính chi phí", tongTen:"Tổng chi phí", dong:[["Cây giống/hạt giống","…"],["Thùng xốp/chậu","cái"],["Đất trồng/giá thể","kg"],["Phân bón","kg"],["Dụng cụ (bình tưới, bay…)","cái"],["Chi phí khác","…"]]} ],
+  cong_thuc:{ten:"Tổng chi phí = tổng thành tiền các dòng", bieu_thuc:"A1", khongLai:true} } };
+const CAU_LENH = { kh: { chon:{ rau:{nhan:"Loại rau", ds:["rau cải","rau muống","xà lách","rau mầm"]}, noi:{nhan:"Nơi trồng", ds:["thùng xốp trên ban công","khay nhựa ở sân trường"]} },
+  mau:"Em là học sinh lớp 7. Hãy gợi ý kế hoạch trồng {rau} trong {noi} khoảng 1 tháng: chuẩn bị, các bước trồng, lịch tưới, chăm sóc, khi nào thu hoạch.", them:[["Yêu cầu an toàn"," Chỉ dùng biện pháp an toàn, không dùng thuốc hoá học.",true]] } };
+const SOAT = {
+  kc: { ten:"NLAI – kiểm chứng gợi ý AI", nhan:["Khớp SGK","Chưa khớp/em sửa"], ds:[
+    "Các bước trồng khớp 4 bước SGK (chuẩn bị đất → gieo/trồng → chăm sóc → thu hoạch).","Thùng xốp có đục lỗ thoát nước đúng vị trí.","Lịch tưới: sáng sớm hoặc chiều mát.","Không dùng thuốc hoá học bừa bãi; ưu tiên phân vi sinh." ] },
+  nk: { ten:"NLS – nhật kí số", nhan:["Đã làm"], ds:[
+    "Ghi nhật kí ít nhất 10 ngày (ngày, việc làm, quan sát).","Mỗi lần ghi có ảnh tự chụp rau (không chụp mặt người).","Đặt tên file ảnh có ngày (VD Nhom2_Rau_2026-12-01.jpg).","Làm báo cáo số (slide/tài liệu) có tên thành viên và phần việc." ] }
+};
+
+</script>
+<script>
+/* ====== BỘ MÁY CHUNG bài E-Learning (Tổ CN-HN) — không sửa theo từng bài; nội dung bài ở bXX.js + bXX_phan.html ====== */
+"use strict";
+const $ = (s, g) => (g || document).querySelector(s);
+const $$ = (s, g) => [...(g || document).querySelectorAll(s)];
+const lay = (ten) => { try { return eval(ten); } catch (e) { return {}; } };
+const D = { BO: lay("BO"), GHEP: lay("GHEP"), THU_TU: lay("THU_TU"), DUNG_SAI: lay("DUNG_SAI"), NHAN_DIEN: lay("NHAN_DIEN"),
+            BAT_LOI: lay("BAT_LOI"), SOAT: lay("SOAT"), CAU_LENH: lay("CAU_LENH") };
+const KHOA = "el-" + document.body.dataset.ma;
+let doc = {}; try { doc = JSON.parse(localStorage.getItem(KHOA) || "{}"); } catch (e) { doc = {}; }
+function luu() { try { localStorage.setItem(KHOA, JSON.stringify(doc)); } catch (e) {} }
+function ghiDiem(ten, gt) { doc.diem = doc.diem || {}; doc.diem[ten] = gt; luu(); }
+function tao(the, lop, chu) { const e = document.createElement(the); if (lop) e.className = lop; if (chu != null) e.textContent = chu; return e; }
+function nutKiem(noi, fn, chu) { const b = tao("button", "nut nho", chu || "Kiểm tra"); b.onclick = fn; const k = tao("div", "ket"); noi.append(b, k); return k; }
+function tron(a) { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+function to(el, ok) { el.style.borderColor = ok ? "#2e7d32" : "#c62828"; el.style.background = ok ? "#e8f5e9" : "#ffebee"; }
+
+/* ---- điều hướng ---- */
+const S = $$("section"), menu = $("#menu"); let hienTai = 0;
+S.forEach((s, i) => { const b = tao("button", "", (i + 1) + ". " + s.dataset.ten); b.onclick = () => { moTrang(i); menu.classList.remove("mo"); }; menu.appendChild(b); });
+function moTrang(i) {
+  hienTai = Math.max(0, Math.min(S.length - 1, i));
+  S.forEach((s, k) => s.classList.toggle("hien", k === hienTai));
+  doc.xem = doc.xem || {}; doc.xem[hienTai] = 1; doc.trang = hienTai; luu();
+  [...menu.children].forEach((b, k) => { b.classList.toggle("dang", k === hienTai); b.classList.toggle("xong", !!doc.xem[k]); });
+  $("#tien-do").style.width = (Object.keys(doc.xem).length / S.length * 100) + "%";
+  $("#vi-tri").textContent = "Phần " + (hienTai + 1) + " / " + S.length;
+  const tk = $("#tong-ket-diem", S[hienTai]); if (tk) veTongKet(tk);
+  window.scrollTo(0, 0);
+}
+function sang(d) { moTrang(hienTai + d); }
+function moMenu() { menu.classList.toggle("mo"); }
+function chonTab(b, i) { const n = b.parentNode.dataset.nhom;
+  [...b.parentNode.children].forEach((x, k) => x.classList.toggle("dang", k === i));
+  $$('.the-pp[data-nhom="' + n + '"]').forEach((t, k) => t.style.display = k === i ? "" : "none"); }
+function hienGiai(b) { b.nextElementSibling.classList.add("hien"); }
+function phongTo(im) { const w = tao("div"); w.style.cssText = "position:fixed;inset:0;background:#000d;z-index:20;display:flex;align-items:center;justify-content:center;cursor:zoom-out;padding:10px";
+  const i2 = new Image(); i2.src = im.src; i2.style.cssText = "max-width:100%;max-height:100%;border-radius:8px"; w.appendChild(i2); w.onclick = () => w.remove(); document.body.appendChild(w); }
+$$("img[data-lay-anh]").forEach(im => { const g = document.getElementById("anh-" + im.dataset.layAnh); if (g) im.src = g.src; });
+$$("main img").forEach(im => { im.style.cursor = "zoom-in"; im.addEventListener("click", () => phongTo(im)); });
+$$(".the-pp[data-nhom]").forEach(t => { const cung = $$('.the-pp[data-nhom="' + t.dataset.nhom + '"]'); if (cung.indexOf(t) > 0) t.style.display = "none"; });
+
+/* ---- trắc nghiệm ---- */
+function veCau(q, noi, thi) {
+  const d = tao("div", "cau"); d.appendChild(tao("p", "", q.h));
+  const g = tao("div", "giai");
+  q.c.forEach((c, k) => { const b = tao("button", "lc", String.fromCharCode(65 + k) + ". " + c);
+    b.onclick = () => { if (thi) { $$(".lc", d).forEach(x => x.style.outline = ""); b.style.outline = "3px solid #90caf9"; d.dataset.chon = k; return; }
+      $$(".lc", d).forEach(x => x.classList.remove("dung", "sai")); b.classList.add(k === q.d ? "dung" : "sai"); g.classList.add("hien");
+      g.textContent = k === q.d ? "✅ Chính xác! " + q.g : "❌ Chưa đúng, em thử lại."; };
+    d.appendChild(b); });
+  d.appendChild(g); noi.appendChild(d); return d;
+}
+$$(".trac-nghiem").forEach(n => (D.BO[n.dataset.bo] || []).forEach(q => veCau(q, n)));
+
+/* ---- ghép nối (chọn nhóm cho từng ý) ---- */
+$$(".ghep-noi").forEach(n => { const o = D.GHEP[n.dataset.bo]; if (!o) return;
+  const ss = o.ds.map(r => { const d = tao("div", "ds-dung-sai"); d.appendChild(tao("span", "", r[0]));
+    const s = tao("select"); s.innerHTML = '<option value="">— chọn —</option>' + o.ten.map((t, k) => '<option value="' + k + '">' + t + '</option>').join("");
+    d.appendChild(s); n.appendChild(d); return s; });
+  const kq = nutKiem(n, () => { let dung = 0; ss.forEach((s, i) => { const ok = s.value !== "" && +s.value === o.ds[i][1]; if (ok) dung++; to(s, ok); });
+    kq.textContent = "Em đúng " + dung + "/" + ss.length + (dung === ss.length ? " 🎉" : " — ô đỏ là chưa đúng, xem lại phần trên nhé."); ghiDiem(o.diem || "Ghép nối", dung + "/" + ss.length); }); });
+
+/* ---- xếp thứ tự ---- */
+$$(".xep-thu-tu").forEach(n => { const ten = n.dataset.bo, dung = D.THU_TU[ten]; if (!dung) return;
+  function ve() { n.innerHTML = ""; n.appendChild(tao("p", "", "Bấm lần lượt theo đúng thứ tự:")).style.fontSize = "15px";
+    const da = [], x = tao("div", "xep"), kq = tao("div", "ket");
+    tron(dung).forEach(b => { const nut = tao("button", "lc", b);
+      nut.onclick = () => { if (nut.disabled) return;
+        if (b === dung[da.length]) { da.push(b); nut.disabled = true; nut.classList.add("dung"); nut.textContent = da.length + ". " + b;
+          if (da.length === dung.length) { kq.textContent = "🎉 Đúng hết thứ tự!"; ghiDiem("Thứ tự: " + ten, "đúng"); } }
+        else { nut.classList.add("sai"); setTimeout(() => nut.classList.remove("sai"), 600); kq.textContent = "Chưa phải ý số " + (da.length + 1) + ", em nghĩ lại nhé."; } };
+      x.appendChild(nut); });
+    const lai = tao("button", "nut phu nho", "Làm lại"); lai.onclick = ve; n.append(x, kq, lai); }
+  ve(); });
+
+/* ---- đúng / sai ---- */
+$$(".dung-sai").forEach(n => { const o = D.DUNG_SAI[n.dataset.bo]; if (!o) return; const k = n.dataset.bo;
+  const hang = o.ds.map((r, i) => { const d = tao("div", "ds-dung-sai"); d.appendChild(tao("span", "", (i + 1) + ". " + r[0]));
+    d.insertAdjacentHTML("beforeend", '<label><input type="radio" name="ds-' + k + i + '" value="1"> Đúng</label><label><input type="radio" name="ds-' + k + i + '" value="0"> Sai</label>');
+    const g = tao("div", "giai"); g.style.flexBasis = "100%"; d.appendChild(g); n.appendChild(d); return d; });
+  const kq = nutKiem(n, () => { let dung = 0; hang.forEach((d, i) => { const c = $("input:checked", d); const ok = !!c && (c.value === "1") === o.ds[i][1]; if (ok) dung++;
+      const g = $(".giai", d); g.classList.add("hien"); g.textContent = (ok ? "✅ " : "❌ ") + o.ds[i][2]; });
+    kq.textContent = "Em đúng " + dung + "/" + hang.length + "."; ghiDiem(o.ten || "Đúng – sai", dung + "/" + hang.length); }); });
+
+/* ---- nhận ra bước/đối tượng qua ảnh (NLS) ---- */
+$$(".nhan-dien").forEach(n => { const o = D.NHAN_DIEN[n.dataset.bo]; if (!o) return;
+  const ss = o.anh.map(a => { const d = tao("label", "cau"); d.style.margin = "0"; d.appendChild(tao("b", "", a[0])); d.appendChild(tao("br"));
+    const s = tao("select"); s.innerHTML = '<option value="">— chọn —</option>' + o.buoc.map((b, j) => '<option value="' + j + '">' + b + '</option>').join("");
+    d.appendChild(s); n.appendChild(d); return s; });
+  const vo = tao("div"); n.after(vo);
+  const kq = nutKiem(vo, () => { let dung = 0; ss.forEach((s, i) => { const ok = s.value !== "" && +s.value === o.anh[i][1]; if (ok) dung++; to(s, ok); });
+    kq.textContent = "Em nhận đúng " + dung + "/" + ss.length + "." + (dung === ss.length ? " 🎉 Mắt rất tinh!" : " Ô đỏ: em xem lại bài rồi nhìn lại ảnh nhé." + (o.goiY ? " Gợi ý: " + o.goiY : ""));
+    ghiDiem(o.ten || "Nhận diện qua ảnh", dung + "/" + ss.length); }); });
+
+/* ---- mỗi ảnh một câu chọn (VD: đây là cây gì?) ---- */
+D.NHAN_DIEN_ANH = lay("NHAN_DIEN_ANH");
+$$(".nhan-dien-anh").forEach(n => { const o = D.NHAN_DIEN_ANH[n.dataset.bo]; if (!o) return;
+  const luoi = tao("div", "nhan-dien"); n.appendChild(luoi);
+  const ss = o.anh.map((a, i) => { const d = tao("div", "cau"); d.style.margin = "0"; const im = new Image(); im.src = a[0]; im.alt = "Ảnh " + (i + 1); im.style.cssText = "height:150px;object-fit:cover;width:100%;cursor:zoom-in"; im.onclick = () => phongTo(im);
+    const s = tao("select"); s.innerHTML = '<option value="">— chọn —</option>' + o.chon.map((b, j) => '<option value="' + j + '">' + b + '</option>').join("");
+    d.append(im, tao("b", "", "Ảnh " + (i + 1) + ": "), s); luoi.appendChild(d); return s; });
+  const kq = nutKiem(n, () => { let dung = 0; ss.forEach((s, i) => { const ok = s.value !== "" && +s.value === o.anh[i][1]; if (ok) dung++; to(s, ok); });
+    kq.textContent = "Em nhận đúng " + dung + "/" + ss.length + "." + (dung === ss.length ? " 🎉" : " Ô đỏ: em nhìn kĩ lá, quả rồi chọn lại nhé."); ghiDiem(o.ten || "Nhận biết qua ảnh", dung + "/" + ss.length); }); });
+
+/* ---- bắt lỗi (đánh dấu dòng sai) ---- */
+$$(".bat-loi").forEach(n => { const o = D.BAT_LOI[n.dataset.bo]; if (!o) return;
+  const hang = o.ds.map(r => { const d = tao("div", "ds-dung-sai"); const l = tao("label"); l.style.flex = "1 1 260px";
+    const c = tao("input"); c.type = "checkbox"; l.append(c, " ", tao("span", "", r[0])); const g = tao("div", "giai"); g.style.flexBasis = "100%";
+    d.append(l, g); n.appendChild(d); return { c, g }; });
+  const kq = nutKiem(n, () => { let dung = 0; hang.forEach((h, i) => { const ok = h.c.checked === o.ds[i][1]; if (ok) dung++; h.g.classList.add("hien"); h.g.textContent = (ok ? "✅ " : "❌ ") + o.ds[i][2]; });
+    kq.textContent = "Em xử lí đúng " + dung + "/" + hang.length + " dòng. Có " + o.ds.filter(r => r[1]).length + " dòng sai."; ghiDiem(o.ten || "Bắt lỗi", dung + "/" + hang.length); }); });
+
+/* ---- soát theo danh mục (tự đánh giá, không chấm) ---- */
+$$(".soat").forEach(n => { const o = D.SOAT[n.dataset.bo]; if (!o) return; const k = n.dataset.bo; const kq = tao("div", "ket");
+  function dem() { let da = 0, sua = 0; o.ds.forEach((s, i) => { const c = $('input[name="sa-' + k + i + '"]:checked'); if (c) { da++; if (c.value === "0") sua++; } });
+    kq.textContent = "Em đã soát " + da + "/" + o.ds.length + " điểm" + (o.nhan.length > 1 ? ", " + o.nhan[1].toLowerCase() + ": " + sua : "") + "." + (da === o.ds.length && o.ket ? " " + o.ket : "");
+    ghiDiem(o.ten || "Tự soát", da + "/" + o.ds.length + (o.nhan.length > 1 ? " (" + sua + " điểm sửa)" : "")); }
+  o.ds.forEach((s, i) => { const d = tao("div", "ds-dung-sai"); d.appendChild(tao("span", "", (i + 1) + ". " + s));
+    o.nhan.forEach((nh, j) => { const l = tao("label"); const r = tao("input"); r.type = o.nhan.length > 1 ? "radio" : "checkbox"; r.name = "sa-" + k + i; r.value = j === 0 ? "1" : "0"; r.onchange = dem; l.append(r, " " + nh); d.appendChild(l); });
+    n.appendChild(d); });
+  n.appendChild(kq); });
+
+/* ---- tạo câu lệnh AI ---- */
+$$(".tao-cau-lenh").forEach(n => { const o = D.CAU_LENH[n.dataset.bo]; if (!o) return;
+  const luoi = tao("div"); luoi.style.cssText = "display:grid;gap:6px;max-width:600px"; const sel = {}, chk = [];
+  Object.keys(o.chon || {}).forEach(k => { const l = tao("label", "", o.chon[k].nhan + ": "); const s = tao("select"); o.chon[k].ds.forEach(v => s.appendChild(tao("option", "", v))); sel[k] = s; l.appendChild(s); luoi.appendChild(l); s.onchange = ve; });
+  (o.them || []).forEach(t => { const l = tao("label"); const c = tao("input"); c.type = "checkbox"; c.checked = !!t[2]; c.onchange = ve; chk.push([c, t[1]]); l.append(c, " " + t[0]); luoi.appendChild(l); });
+  const ra = tao("div", "cau-lenh"), chep = tao("button", "nut phu nho", "📋 Chép câu lệnh"), bao = tao("span"); bao.style.fontSize = "14px";
+  function ve() { let m = typeof o.mau === "string" ? o.mau : o.mau[sel[o.theoChon].value];
+    chk.forEach(([c, t]) => { if (c.checked) m += t; }); Object.keys(sel).forEach(k => m = m.split("{" + k + "}").join(sel[k].value)); ra.textContent = m; bao.textContent = ""; }
+  chep.onclick = () => { const loi = () => bao.textContent = " Máy không cho chép tự động, em bôi đen câu lệnh rồi chép tay nhé.";
+    try { navigator.clipboard.writeText(ra.textContent).then(() => bao.textContent = " Đã chép ✓", loi); } catch (e) { loi(); } };
+  n.append(luoi, ra, chep, bao); ve(); });
+
+/* ---- tự đánh giá theo thang điểm (VD trắc nghiệm Holland) — không có đúng/sai ---- */
+D.TU_DANH_GIA = lay("TU_DANH_GIA");
+$$(".tu-danh-gia").forEach(n => { const o = D.TU_DANH_GIA[n.dataset.bo]; if (!o) return;
+  const bang = tao("table"); bang.innerHTML = "<tr><th style='width:40px'>STT</th><th>" + (o.cot || "Tiêu chí") + "</th><th style='width:170px'>Em tự cho điểm</th></tr>";
+  const ss = o.ds.map((t, i) => { const r = bang.insertRow(); r.insertCell().textContent = i + 1; r.insertCell().textContent = t;
+    const s = tao("select"); s.innerHTML = '<option value="">—</option>' + o.thang.map((m, k) => '<option value="' + k + '">' + k + " – " + m + '</option>').join(""); s.onchange = tinh; r.insertCell().appendChild(s); return s; });
+  const kq = tao("div", "hop muc-tieu"); n.append(bang, kq);
+  function tinh() { if (ss.some(s => s.value === "")) { kq.textContent = "Em cho điểm đủ " + ss.length + " tiêu chí, máy sẽ tự tính."; return; }
+    const v = ss.map(s => +s.value); kq.innerHTML = "";
+    o.nhom.forEach(g => { const B = v.slice(g.tu - 1, g.den).reduce((a, b) => a + b, 0); const A = Math.round(B / g.toiDa * 1000) / 10;
+      kq.appendChild(tao("div", "", g.ten + ": " + g.B + " = " + B + " điểm → " + g.A + " = (" + B + " : " + g.toiDa + ") × 100 = " + A + "%")); ghiDiem(g.ten, A + "%"); });
+    if (o.loiKet) kq.appendChild(tao("div", "", o.loiKet)); }
+  tinh(); });
+
+/* ---- bảng tính chi phí – nguồn thu – lãi (Bài 8) ---- */
+D.BANG_TINH = lay("BANG_TINH");
+const tien = v => (Math.round(v) || 0).toLocaleString("vi-VN") + " đ";
+$$(".bang-tinh").forEach(n => { const o = D.BANG_TINH[n.dataset.bo]; if (!o) return; const tong = {}; const kq = tao("div", "hop muc-tieu");
+  function tinh() {
+    o.bang.forEach(b => { let s = 0; b._hang.forEach(h => { const v = (+h.sl.value || 0) * (+h.dg.value || 0); h.tt.textContent = tien(v); s += v; }); tong[b.ma] = s; b._tong.textContent = tien(s); });
+    let bt = o.cong_thuc.bieu_thuc; Object.keys(tong).forEach(k => bt = bt.split(k).join("(" + tong[k] + ")"));
+    let v = 0; try { v = Function('"use strict";return (' + bt + ")")(); } catch (e) {}
+    kq.innerHTML = "<b>" + o.cong_thuc.ten + "</b><br>" + o.cong_thuc.ten.split("=")[0].trim() + " = " + tien(v) + (o.cong_thuc.khongLai ? "" : v < 0 ? " (lỗ — em xem lại chi phí, giá bán)" : v > 0 ? " (có lãi)" : "");
+    ghiDiem(o.diem || "Dự tính lãi thuần", tien(v)); }
+  o.bang.forEach(b => { n.appendChild(tao("h4", "", b.ten)); const t = tao("table");
+    t.innerHTML = "<tr><th>Nội dung</th><th style='width:70px'>Đơn vị</th><th style='width:95px'>Số lượng</th><th style='width:110px'>Đơn giá (đ)</th><th style='width:120px'>Thành tiền</th></tr>";
+    b._hang = b.dong.map(d => { const r = t.insertRow(); r.insertCell().textContent = d[0]; r.insertCell().textContent = d[1];
+      const sl = tao("input"); sl.type = "number"; sl.min = 0; sl.style.width = "80px"; sl.oninput = tinh; if (d[2] != null) sl.value = d[2];
+      const dg = tao("input"); dg.type = "number"; dg.min = 0; dg.style.width = "95px"; dg.oninput = tinh; if (d[3] != null) dg.value = d[3];
+      r.insertCell().appendChild(sl); r.insertCell().appendChild(dg); const tt = r.insertCell(); return { sl, dg, tt }; });
+    const r = t.insertRow(); const c = r.insertCell(); c.colSpan = 4; c.innerHTML = "<b>" + b.tongTen + "</b>"; b._tong = r.insertCell(); b._tong.style.fontWeight = "700";
+    n.appendChild(t); });
+  n.appendChild(kq); tinh(); });
+
+/* ---- bảng đánh giá mức độ phù hợp nghề (ĐHNN Bài 5): trùng khớp = 1 điểm ---- */
+D.BANG_PH = lay("BANG_PH");
+$$(".bang-phu-hop").forEach(n => { const o = D.BANG_PH[n.dataset.bo]; if (!o) return; const k = n.dataset.bo;
+  const t = tao("table"); t.innerHTML = "<tr><th style='width:80px'></th><th>Đặc điểm của bản thân (1)</th><th>Đặc điểm, yêu cầu nghề KT-CN (2)</th><th style='width:70px'>Trùng khớp (3)</th><th style='width:70px'>Không trùng khớp (4)</th></tr>";
+  const kq = tao("div", "hop muc-tieu");
+  function tinh() { let d = 0; o.dong.forEach((r, i) => { const c = $('input[name="ph-' + k + i + '"]:checked'); if (c && c.value === "1") d++; });
+    const x = o.xep.find(m => d >= m[0] && d <= m[1]); kq.innerHTML = "<b>Tổng điểm cột (3): " + d + "/" + o.dong.length + "</b> → " + (x ? x[2] : "");
+    ghiDiem(o.ten || "Mức độ phù hợp", d + "/" + o.dong.length + " – " + (x ? x[2] : "")); }
+  o.dong.forEach((r, i) => { const h = t.insertRow(); const c0 = h.insertCell(); c0.innerHTML = "<b>" + r[0] + "</b>";
+    const c1 = h.insertCell(); c1.appendChild(tao("div", "", r[1])); const ta = tao("textarea"); ta.style.minHeight = "40px"; c1.appendChild(ta);
+    const c2 = h.insertCell(); c2.textContent = r[2];
+    ["1", "0"].forEach(v => { const c = h.insertCell(); c.style.textAlign = "center"; const ip = tao("input"); ip.type = "radio"; ip.name = "ph-" + k + i; ip.value = v; ip.onchange = tinh; c.appendChild(ip); }); });
+  n.append(t, kq); tinh(); });
+
+/* ---- đề tổng hợp ---- */
+let DE = [];
+$$(".de-tong").forEach(n => {
+  const moi = tao("button", "nut phu nho", "🔄 Làm đề mới"), vung = tao("div"), cham = tao("button", "nut", "Chấm điểm"), kq = tao("div", "ket");
+  const tai = tao("div", "khong-in"); const bt = tao("button", "nut phu nho", "⬇️ Tải phiếu kết quả tự học"); bt.onclick = taiKetQua; tai.append(bt, " "); tai.appendChild(tao("small", "", "(chỉ ghi điểm từng phần, không ghi tên)"));
+  const kho = [].concat(...Object.keys(D.BO).filter(k => k !== "ai").map(k => D.BO[k]));   /* bộ "ai" (tình huống AI) không đưa vào đề */ const so = Math.min(10, kho.length);
+  n.parentNode.querySelector("h2").textContent = "Luyện tập tổng hợp (" + so + " câu)";
+  function taoDe() { DE = tron(kho).slice(0, so); vung.innerHTML = ""; DE.forEach((q, i) => { const d = veCau({ h: (i + 1) + ". " + q.h, c: q.c, d: q.d, g: q.g }, vung, true); d.dataset.i = i; }); kq.textContent = ""; }
+  moi.onclick = taoDe;
+  cham.onclick = () => { let dung = 0, chua = 0;
+    $$(".cau", vung).forEach(d => { const q = DE[+d.dataset.i], c = d.dataset.chon; if (c === undefined) { chua++; return; }
+      const ls = $$(".lc", d); ls.forEach(x => { x.classList.remove("dung", "sai"); x.style.outline = ""; }); ls[q.d].classList.add("dung"); if (+c !== q.d) ls[+c].classList.add("sai"); else dung++;
+      const g = $(".giai", d); g.classList.add("hien"); g.textContent = q.g; });
+    if (chua) { kq.textContent = "Em còn " + chua + " câu chưa chọn đáp án."; return; }
+    const tl = dung / so; const nx = tl >= .9 ? "Rất tốt!" : tl >= .7 ? "Khá tốt, xem lại các câu sai nhé." : tl >= .5 ? "Cần ôn thêm các phần có câu sai." : "Em học lại các phần trước rồi làm đề mới nhé.";
+    kq.textContent = "Kết quả: " + dung + "/" + so + " câu đúng. " + nx; ghiDiem("Luyện tập tổng hợp", dung + "/" + so); };
+  n.append(moi, vung, cham, kq, tai); taoDe(); });
+
+function veTongKet(el) { const d = doc.diem || {}, k = Object.keys(d);
+  el.innerHTML = "<b>Kết quả tự học của em:</b><br>" + (k.length ? k.map(x => "• " + x + ": " + d[x]).join("<br>") : "Em chưa làm phần luyện tập nào."); }
+function taiKetQua() { const d = doc.diem || {};
+  const t = "PHIẾU KẾT QUẢ TỰ HỌC — " + document.title + "\nNgày: " + new Date().toLocaleDateString("vi-VN") + "\nLớp: ........  Mã HS: ........\n\n" +
+    (Object.keys(d).map(x => "- " + x + ": " + d[x]).join("\n") || "(chưa làm phần luyện tập nào)") + "\nĐã xem: " + Object.keys(doc.xem || {}).length + "/" + S.length + " phần\n";
+  const a = tao("a"); a.href = URL.createObjectURL(new Blob([t], { type: "text/plain;charset=utf-8" })); a.download = "ket-qua-tu-hoc-" + document.body.dataset.ma + ".txt"; document.body.appendChild(a); a.click(); a.remove(); }
+function inPhieu(b) { const s = b.closest("section"); s.classList.add("in"); window.print(); setTimeout(() => s.classList.remove("in"), 500); }
+
+moTrang(doc.trang || 0);
+
+</script>
+</body>
+</html>

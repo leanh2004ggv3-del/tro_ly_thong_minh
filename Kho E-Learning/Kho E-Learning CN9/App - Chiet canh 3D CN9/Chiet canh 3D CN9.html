@@ -1,0 +1,495 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Chiết cành 3D – Chiết cành cây ăn quả (Công nghệ 9)</title>
+<!-- CHIẾT CÀNH 3D · Thực hành ảo · Chiết cành cây ăn quả · SGK Công nghệ 9 – Trồng cây ăn quả (KNTT), tr.15–16.
+     3D tự viết trên canvas, không dùng thư viện ngoài, không cần mạng. Dữ liệu chỉ lưu mã nhóm, trong trình duyệt máy này.
+     Làm cho tổ CN – HN · Triway giáo viên (Thầy Bùi Duy Phương). ✅ BẢN NHÁP — thầy/cô duyệt trước khi dùng -->
+<style>
+:root{--panel:#ffffff;--ink:#1f2a24;--muted:#5d6b63;--line:#dfe7e1;--go2:#e8f7ee;--bad2:#fdecec;--accent:#0e9f8a}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;font-family:"Segoe UI",system-ui,Arial,sans-serif;color:var(--ink);background:#f4f8f5}
+header{display:flex;align-items:center;gap:12px;padding:10px 16px;background:linear-gradient(90deg,#0b3d2c,#126b4a 60%,#1b8a5a);color:#fff;flex-wrap:wrap;position:relative;z-index:5}
+.brand{display:flex;align-items:center;gap:10px}
+.brand h1{margin:0;font-size:22px;letter-spacing:.5px;background:linear-gradient(90deg,#d9ffb0,#7ef0c9,#fff2a8);-webkit-background-clip:text;background-clip:text;color:transparent;font-weight:800}
+.brand small{display:block;font-size:12px;opacity:.85;color:#e6fff2}
+.pills{display:flex;gap:6px;flex-wrap:wrap;margin-left:auto}
+.pill{font-size:12px;padding:5px 10px;border-radius:99px;background:rgba(255,255,255,.12);color:#dff;border:1px solid rgba(255,255,255,.18);white-space:nowrap}
+.pill.on{background:#fff;color:#0b3d2c;font-weight:700}
+.pill.done{background:#2fbf71;color:#fff;border-color:#2fbf71}
+.hbtn{background:rgba(255,255,255,.14);color:#fff;border:1px solid rgba(255,255,255,.3);border-radius:8px;padding:6px 10px;font-size:13px;cursor:pointer}
+.hbtn:hover{background:rgba(255,255,255,.25)}
+.nav{position:relative}
+#navMenu{display:none;position:absolute;right:0;top:36px;background:#fff;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.25);padding:6px;min-width:250px;z-index:30}
+#navMenu a{display:block;padding:9px 12px;border-radius:8px;color:#0b3d2c;text-decoration:none;font-size:14px}
+#navMenu a:hover{background:#e8f7ee}#navMenu a.cur{background:#0b3d2c;color:#fff}
+main{display:grid;grid-template-columns:1fr 380px;height:calc(100vh - 60px - 34px)}
+#stage{position:relative;overflow:hidden;background:radial-gradient(ellipse at 50% 35%,#f7fbff 0%,#e3f2ea 55%,#cfe6d6 100%)}
+#cv{width:100%;height:100%;display:block;touch-action:none;cursor:grab}
+#hud{position:absolute;left:12px;top:12px;display:flex;flex-direction:column;gap:6px;pointer-events:none}
+.tag{background:rgba(255,255,255,.92);border:1px solid var(--line);border-radius:10px;padding:6px 10px;font-size:13px;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.tag b{color:#0b6b45}
+#legend{position:absolute;right:12px;bottom:12px;display:flex;gap:10px;font-size:12px;background:rgba(255,255,255,.9);padding:6px 10px;border-radius:10px;border:1px solid var(--line);pointer-events:none;flex-wrap:wrap}
+#legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:4px;vertical-align:-2px}
+#viewbtn{position:absolute;right:12px;top:12px}
+#viewbtn button{background:#fff;border:1px solid var(--line);border-radius:8px;padding:6px 9px;cursor:pointer;font-size:13px}
+#toast{position:absolute;left:50%;top:16px;transform:translateX(-50%);padding:8px 16px;border-radius:99px;font-weight:700;font-size:15px;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap}
+#toast.ok{background:#1f9d55;color:#fff;opacity:1}#toast.err{background:#d64545;color:#fff;opacity:1}#toast.info{background:#0b3d2c;color:#fff;opacity:1}
+aside{background:var(--panel);border-left:1px solid var(--line);display:flex;flex-direction:column;overflow:auto}
+.ph{padding:14px 16px 8px;border-bottom:1px solid var(--line)}
+.no{display:inline-block;background:var(--accent);color:#fff;border-radius:8px;padding:2px 8px;font-size:12px;font-weight:700}
+.ph h2{margin:6px 0 2px;font-size:19px}
+.ph .sgk{font-size:12px;color:var(--muted)}
+.pb{padding:12px 16px;display:flex;flex-direction:column;gap:10px}
+.guide{font-size:14px;line-height:1.5;background:#f3faf6;border:1px solid #d5eee0;border-radius:10px;padding:10px 12px}
+.guide ol{margin:4px 0 0 18px;padding:0}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.btn{border:none;border-radius:10px;padding:10px 14px;font-size:14px;font-weight:600;cursor:pointer;background:#eef3f0;color:var(--ink);transition:transform .08s,background .2s}
+.btn:active{transform:scale(.97)}
+.btn.main{background:linear-gradient(90deg,#14a06a,#0e9f8a);color:#fff;box-shadow:0 3px 10px rgba(20,160,106,.3)}
+.btn.sel{background:#0b6b45;color:#fff}
+.btn.done{background:#dff3e7;color:#145c34}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.small{padding:7px 10px;font-size:13px}
+.meter{font-size:15px;padding:8px 12px;border-radius:10px;background:#fffbea;border:1px solid #f1e2a6}
+.meter b{font-size:20px;color:#8a5a00}
+.ctl{display:grid;grid-template-columns:1fr auto;gap:4px 10px;align-items:center;font-size:14px}
+.ctl b{color:#8a5a00;font-size:16px;min-width:64px;text-align:right}
+.ctl input{grid-column:1/3}
+.fb{border-radius:10px;padding:10px 12px;font-size:14px;line-height:1.45;display:none}
+.fb.ok{display:block;background:var(--go2);border:1px solid #9bdbb5;color:#145c34}
+.fb.err{display:block;background:var(--bad2);border:1px solid #f1b2b2;color:#8b1f1f}
+.fb.info{display:block;background:#eef6ff;border:1px solid #c6dcf5;color:#1d3f66}
+.fb ul{margin:4px 0 0 18px;padding:0}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font-size:12px;padding:4px 8px;border-radius:99px;background:#e8f7ee;color:#145c34;border:1px solid #bfe6cf}
+.foot{margin-top:auto;padding:10px 16px;border-top:1px solid var(--line);display:flex;gap:8px;flex-wrap:wrap}
+input[type=range]{width:100%}
+.timeline{position:relative;height:30px;background:#eef3f0;border-radius:8px;overflow:hidden}
+.timeline .fill{position:absolute;left:0;top:0;bottom:0;background:linear-gradient(90deg,#9be7b8,#2fbf71)}
+.timeline .band{position:absolute;top:0;bottom:0;background:repeating-linear-gradient(45deg,rgba(224,164,0,.35) 0 6px,rgba(224,164,0,.15) 6px 12px);border-left:2px solid #e0a400;border-right:2px solid #e0a400}
+.timeline .lab{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px}
+.bar{height:12px;border-radius:6px;background:#eef3f0;overflow:hidden}.bar i{display:block;height:100%;border-radius:6px}
+footer{height:34px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;font-size:12px;background:#0b3d2c;color:#d6f5e4;gap:10px;overflow:hidden;white-space:nowrap}
+footer b{color:#fff2a8}
+.ov{position:fixed;inset:0;background:rgba(5,25,15,.6);display:flex;align-items:center;justify-content:center;z-index:20;padding:16px}
+.card{background:#fff;border-radius:18px;max-width:580px;width:100%;padding:22px;box-shadow:0 20px 60px rgba(0,0,0,.3);max-height:90vh;overflow:auto}
+.card h2{margin:6px 0 6px;font-size:24px}
+.card p{color:var(--muted);line-height:1.5;margin:6px 0}
+.card input[type=text]{width:100%;font-size:17px;padding:10px 12px;border-radius:10px;border:2px solid #cfe3d7;margin:6px 0}
+.stepsN{display:grid;grid-template-columns:repeat(auto-fit,minmax(86px,1fr));gap:8px;margin:12px 0}
+.stepsN div{background:#f1faf5;border:1px solid #d5eee0;border-radius:10px;padding:8px;text-align:center;font-size:12px}
+.stepsN svg{display:block;margin:0 auto 4px}
+table.hist{width:100%;border-collapse:collapse;font-size:13px}
+table.hist th,table.hist td{border-bottom:1px solid var(--line);padding:6px 4px;text-align:center}
+.res-ok{color:#1f9d55;font-weight:700}.res-bad{color:#d64545;font-weight:700}
+@media (max-width:900px){html,body{overflow-x:hidden}#legend{display:none}header{gap:8px}main{grid-template-columns:1fr;height:auto;width:100%}#stage{height:58vh}aside{border-left:none;border-top:1px solid var(--line)}.pills{display:none}footer{font-size:11px}}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand"><svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="19" fill="#0b2e21" stroke="#7ef0c9" stroke-width="1.5"/><rect x="6" y="18" width="28" height="4" rx="2" fill="#a07a4a"/><ellipse cx="22" cy="20" rx="6" ry="5" fill="#8a6440"/><ellipse cx="22" cy="20" rx="7.5" ry="6.2" fill="none" stroke="#e6f3ff" stroke-width="1.2"/><path d="M30 18 C34 12 36 10 37 6" stroke="#7ef0c9" stroke-width="2" fill="none"/></svg><div><h1>CHIẾT CÀNH 3D</h1><small>Thực hành ảo · Chiết cành cây ăn quả · Công nghệ 9 (KNTT)</small></div></div>
+  <div class="pills" id="pills"></div>
+  <div class="nav"><button class="hbtn" id="btnNav">📚 Bài khác ▾</button><div id="navMenu"><a href="../App%20-%20Ghep%20mat%203D%20CN9/Vuon%20ghep%203D%20-%20Ghep%20mat%20CN9.html" class="">🌿 Ghép mắt nhỏ có gỗ (tr.16–18)</a><a href="../App%20-%20Chiet%20canh%203D%20CN9/Chiet%20canh%203D%20CN9.html" class="cur">🟤 Chiết cành (tr.15–16)</a><a href="../App%20-%20Giam%20canh%203D%20CN9/Giam%20canh%203D%20CN9.html" class="">🌱 Giâm cành (tr.13–14)</a><a href="../App%20-%20Trong%20cay%203D%20CN9/Trong%20cay%203D%20CN9.html" class="">🌳 Trồng cây ăn quả (tr.64–65)</a></div></div>
+  <button class="hbtn" id="btnDemo">▶ Làm mẫu (GV)</button>
+  <button class="hbtn" id="btnHist">📋 Các lượt đã lưu</button>
+</header>
+<main>
+  <div id="stage">
+    <canvas id="cv"></canvas>
+    <div id="hud"></div>
+    <div id="toast"></div>
+    <div id="viewbtn"><button id="btnView" title="Đưa góc nhìn về mặc định">↺ Góc nhìn</button></div>
+    <div id="legend"><span><i style="background:#f5c400"></i>vùng đang chọn, thước đo</span><span><i style="background:#efe3b8"></i>phần gỗ đã cạo</span><span><i style="background:#e8822a"></i>thuốc kích thích ra rễ</span><span><i style="background:#8a6440"></i>bầu giá thể</span><span><i style="background:#d64545"></i>lỗi</span></div>
+  </div>
+  <aside>
+    <div class="ph"><span class="no" id="pNo">Chuẩn bị</span><h2 id="pTitle"></h2><div class="sgk" id="pSgk"></div></div>
+    <div class="pb" id="pBody"></div>
+    <div class="foot">
+      <button class="btn small" data-act="hint">💡 Gợi ý</button>
+      <button class="btn small" data-act="redo">↩ Làm lại bước</button>
+    </div>
+  </aside>
+</main>
+<footer><span><b>✅ BẢN NHÁP — thầy/cô duyệt trước khi dùng</b> · Căn cứ: SGK Công nghệ 9 – Trồng cây ăn quả (KNTT), tr.15–16</span><span>Kéo để xoay · cuộn để phóng to · Triway giáo viên</span></footer>
+
+<div class="ov" id="ovStart">
+  <div class="card">
+    <span class="no">Công nghệ 9 · Bài 2 · Mục II.2</span>
+    <h2>🟤 Thực hành ảo: Chiết cành</h2>
+    <p>Luyện trộn giá thể và đủ 4 bước chiết cành theo SGK trước khi chiết thật ở vườn. App bắt lỗi từng thao tác, cho tua thời gian 30 – 60 ngày để xem rễ mọc.</p>
+    <div class="stepsN"><div><svg width="44" height="34" viewBox="0 0 44 34"><ellipse cx="22" cy="22" rx="16" ry="6" fill="#999"/><ellipse cx="22" cy="19" rx="13" ry="5" fill="#6b4a2e"/></svg>Trộn giá thể</div><div><svg width="44" height="34" viewBox="0 0 44 34"><rect x="20" y="4" width="4" height="28" fill="#8a6a40"/><line x1="22" y1="16" x2="40" y2="8" stroke="#8a6a40" stroke-width="3"/><circle cx="34" cy="10" r="4" fill="none" stroke="#f5c400" stroke-width="2"/></svg>1. Chọn cành</div><div><svg width="44" height="34" viewBox="0 0 44 34"><rect x="2" y="14" width="40" height="6" rx="3" fill="#8a6a40"/><rect x="18" y="14" width="8" height="6" fill="#efe3b8"/></svg>2. Khoanh vỏ</div><div><svg width="44" height="34" viewBox="0 0 44 34"><rect x="2" y="14" width="40" height="6" rx="3" fill="#8a6a40"/><ellipse cx="22" cy="17" rx="9" ry="7" fill="#6b4a2e"/><ellipse cx="22" cy="17" rx="10.5" ry="8.5" fill="none" stroke="#cfe6f5" stroke-width="1.5"/></svg>3. Bó bầu</div><div><svg width="44" height="34" viewBox="0 0 44 34"><path d="M6 30 L38 30 L22 18 Z" fill="#9fd3b0"/><rect x="18" y="22" width="8" height="8" fill="#333"/><line x1="22" y1="22" x2="22" y2="8" stroke="#8a6a40" stroke-width="2"/><ellipse cx="26" cy="9" rx="4" ry="2" fill="#5fae45"/></svg>4. Cắt, giâm</div></div>
+    <label for="inNhom"><b>Mã nhóm</b> (chỉ ghi mã nhóm, lớp — <u>không ghi họ tên</u>)</label>
+    <input type="text" id="inNhom" maxlength="30" placeholder="VD: Nhóm 3 – 9A1">
+    <div class="row" style="margin-top:8px">
+      <button class="btn main" id="btnGo">Bắt đầu luyện tập</button>
+      <button class="btn" id="btnGoDemo">▶ Xem làm mẫu (GV chiếu)</button>
+    </div>
+    <p style="font-size:12px;margin-top:12px">✅ BẢN NHÁP — thầy/cô duyệt trước khi dùng. App không thay buổi thực hành thật; kết quả chỉ để GV xem nhóm hay sai ở đâu, không dùng để cho điểm.</p>
+  </div>
+</div>
+<div class="ov" id="ovHist" style="display:none"><div class="card" id="histCard"></div></div>
+
+<script>
+"use strict";
+/* ===================== KHUNG CHUNG (bộ vẽ 3D tự viết + giao diện bước + lưu, xuất) ===================== */
+const add=(a,b)=>[a[0]+b[0],a[1]+b[1],a[2]+b[2]],sub=(a,b)=>[a[0]-b[0],a[1]-b[1],a[2]-b[2]],mul=(a,s)=>[a[0]*s,a[1]*s,a[2]*s];
+const dot=(a,b)=>a[0]*b[0]+a[1]*b[1]+a[2]*b[2],cross=(a,b)=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]];
+const nrm=a=>{const l=Math.hypot(a[0],a[1],a[2])||1;return [a[0]/l,a[1]/l,a[2]/l]};
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),lerp=(a,b,t)=>a+(b-a)*t,lerp3=(a,b,t)=>[lerp(a[0],b[0],t),lerp(a[1],b[1],t),lerp(a[2],b[2],t)];
+const mixc=(a,b,t)=>[lerp(a[0],b[0],t),lerp(a[1],b[1],t),lerp(a[2],b[2],t)];
+const rotY=(v,a)=>[v[0]*Math.cos(a)+v[2]*Math.sin(a),v[1],-v[0]*Math.sin(a)+v[2]*Math.cos(a)];
+const r1=v=>Math.round(v*10)/10,fmt=v=>(Math.round(v*10)/10).toFixed(1).replace('.',','),fmt0=v=>String(Math.round(v*100)/100).replace('.',',');
+function newell(p){let n=[0,0,0];for(let i=0;i<p.length;i++){const a=p[i],b=p[(i+1)%p.length];n[0]+=(a[1]-b[1])*(a[2]+b[2]);n[1]+=(a[2]-b[2])*(a[0]+b[0]);n[2]+=(a[0]-b[0])*(a[1]+b[1]);}return nrm(n)}
+function basis(t){t=nrm(t);const ref=Math.abs(t[1])<.9?[0,1,0]:[1,0,0];const n1=nrm(cross(t,ref));return [t,n1,cross(t,n1)]}
+const cv=document.getElementById('cv'),ctx=cv.getContext('2d');
+let W=0,H=0,DPR=1,F=[],OV=[],DRAWN=[],PART=[],BGM=0,DIRTY=true,NOROT=false;
+const cam={yaw:.5,pitch:.28,dist:70,tgt:[0,8,0]},camT={yaw:.5,pitch:.28,dist:70,tgt:[0,8,0]};
+let EYE=[0,0,0],FW=[0,0,1],RT=[1,0,0],UP=[0,1,0],FOC=600;
+function poly(p,c,o){o=o||{};F.push({p,c,id:o.id||null,ds:!!o.ds,a:o.a==null?1:o.a,gl:o.gl||0,n:o.n||null,bg:o.bg!=null?o.bg:BGM})}
+function tube(path,rad,seg,col,o){o=o||{};const R=[],N=path.length;
+  for(let i=0;i<N;i++){const t=nrm(sub(path[Math.min(i+1,N-1)],path[Math.max(i-1,0)]));const ref=Math.abs(t[1])<.9?[0,1,0]:[1,0,0];
+    const n1=nrm(cross(t,ref)),n2=cross(t,n1),r=typeof rad==='function'?rad(i,N):rad,ring=[];
+    for(let k=0;k<seg;k++){const a=k/seg*Math.PI*2;ring.push(add(path[i],add(mul(n1,Math.cos(a)*r),mul(n2,Math.sin(a)*r))))}R.push(ring)}
+  for(let i=0;i<N-1;i++){const c=typeof col==='function'?col(i,N):col;for(let k=0;k<seg;k++){const k2=(k+1)%seg,q=[R[i][k],R[i][k2],R[i+1][k2],R[i+1][k]];
+    const cen=mul(add(add(q[0],q[1]),add(q[2],q[3])),.25),ax=mul(add(path[i],path[i+1]),.5);poly(q,c,{id:o.id,gl:o.gl,n:nrm(sub(cen,ax)),a:o.a})}}
+  if(o.cap1){const t=nrm(sub(path[N-1],path[N-2]));poly(R[N-1].slice().reverse(),o.cap1,{id:o.id,n:t})}
+  if(o.cap0){const t=nrm(sub(path[0],path[1]));poly(R[0].slice(),o.cap0,{id:o.id,n:t})}}
+function ell(c,rx,ry,rz,col,o,su,sv){o=o||{};su=su||10;sv=sv||6;const P=(u,v)=>{const th=u/su*Math.PI*2,ph=v/sv*Math.PI;let p=[Math.sin(ph)*Math.cos(th)*rx,Math.cos(ph)*ry,Math.sin(ph)*Math.sin(th)*rz];if(o.rot)p=o.rot(p);return add(c,p)};
+  for(let v=0;v<sv;v++)for(let u=0;u<su;u++){const q=[P(u,v),P(u,v+1),P(u+1,v+1),P(u+1,v)];const cen=mul(add(add(q[0],q[1]),add(q[2],q[3])),.25);poly(v===0?[q[0],q[1],q[2]]:(v===sv-1?[q[0],q[1],q[3]]:q),col,{id:o.id,gl:o.gl,n:nrm(sub(cen,c)),a:o.a})}}
+function box(c,sx,sy,sz,col,o){o=o||{};const yaw=o.yaw||0,h=[sx/2,sy/2,sz/2];const V=(x,y,z)=>add(c,rotY([x*h[0],y*h[1],z*h[2]],yaw));
+  const fs=[[[-1,-1,1],[1,-1,1],[1,1,1],[-1,1,1],[0,0,1]],[[1,-1,-1],[-1,-1,-1],[-1,1,-1],[1,1,-1],[0,0,-1]],[[-1,1,1],[1,1,1],[1,1,-1],[-1,1,-1],[0,1,0]],[[-1,-1,-1],[1,-1,-1],[1,-1,1],[-1,-1,1],[0,-1,0]],[[1,-1,1],[1,-1,-1],[1,1,-1],[1,1,1],[1,0,0]],[[-1,-1,-1],[-1,-1,1],[-1,1,1],[-1,1,-1],[-1,0,0]]];
+  fs.forEach((f,i)=>{const cc=Array.isArray(col[0])?col[i]||col[0]:col;poly(f.slice(0,4).map(v=>V(v[0],v[1],v[2])),cc,{id:o.id,gl:o.gl,n:rotY(f[4],yaw),a:o.a})})}
+function leaf(base,dir,side,L,Wd,col,o){o=o||{};dir=nrm(dir);side=nrm(side);const nn=nrm(cross(side,dir)),n=6;let pL,pR,pM;
+  for(let i=0;i<=n;i++){const s=i/n,w=Wd*Math.sin(Math.PI*Math.pow(s,.85))*.5,m=add(add(base,mul(dir,L*s)),mul(nn,-(o.droop==null?.18:o.droop)*L*s*s));
+    const l=add(add(m,mul(side,w)),mul(nn,-.12*w)),r=add(add(m,mul(side,-w)),mul(nn,-.12*w));
+    if(i>0){poly([pL,l,m,pM],col,{ds:true,id:o.id,a:o.a});poly([pM,m,r,pR],mixc(col,[0,0,0],.08),{ds:true,id:o.id,a:o.a})}pL=l;pR=r;pM=m}}
+function disk(c,r,col,o,seg){seg=seg||28;const p=[];for(let k=0;k<seg;k++){const a=-k/seg*Math.PI*2;p.push(add(c,[Math.cos(a)*r,0,Math.sin(a)*r]))}poly(p,col,Object.assign({n:[0,1,0]},o||{}))}
+function line3(a,b,col,w,dash){OV.push({t:'l',a,b,col,w:w||1.5,dash})}
+function text3(p,s,o){OV.push(Object.assign({t:'x',p,s},o||{}))}
+function proj(p){const d=sub(p,EYE),z=dot(d,FW);if(z<.5)return null;return [W/2+FOC*dot(d,RT)/z,H/2-FOC*dot(d,UP)/z,z]}
+const LIGHT=nrm([.45,.85,.55]);
+function draw(){
+  const cp=Math.cos(cam.pitch);EYE=add(cam.tgt,[cam.dist*cp*Math.sin(cam.yaw),cam.dist*Math.sin(cam.pitch),cam.dist*cp*Math.cos(cam.yaw)]);
+  FW=nrm(sub(cam.tgt,EYE));RT=nrm(cross(FW,[0,1,0]));UP=cross(RT,FW);FOC=Math.min(W,H*1.35)*1.05;
+  ctx.setTransform(DPR,0,0,DPR,0,0);ctx.clearRect(0,0,W,H);
+  const L=[];
+  for(const f of F){let n=f.n||newell(f.p);let cen=[0,0,0];for(const p of f.p)cen=add(cen,p);cen=mul(cen,1/f.p.length);const vd=sub(EYE,cen),dn=dot(n,vd);
+    if(dn<0){if(!f.ds)continue;n=mul(n,-1)}
+    const q=[];let z=0,ok=true;for(const p of f.p){const r=proj(p);if(!r){ok=false;break}q.push(r[0],r[1]);z+=r[2]}if(!ok)continue;
+    const vn=nrm(vd);let lum=.34+.56*Math.max(0,dot(n,LIGHT))+.14*Math.max(0,dot(n,vn));
+    if(f.gl)lum+=f.gl*Math.pow(Math.max(0,dot(n,nrm(add(LIGHT,vn)))),24);
+    L.push({q,z:z/f.p.length,c:f.c,lum,a:f.a,id:f.id,bg:f.bg})}
+  L.sort((a,b)=>(b.bg-a.bg)||(b.z-a.z));DRAWN=L;
+  for(const f of L){ctx.beginPath();ctx.moveTo(f.q[0],f.q[1]);for(let i=2;i<f.q.length;i+=2)ctx.lineTo(f.q[i],f.q[i+1]);ctx.closePath();
+    const c=`rgba(${clamp(f.c[0]*f.lum,0,255)|0},${clamp(f.c[1]*f.lum,0,255)|0},${clamp(f.c[2]*f.lum,0,255)|0},${f.a})`;ctx.fillStyle=c;ctx.fill();if(f.a>=1){ctx.strokeStyle=c;ctx.lineWidth=.6;ctx.stroke()}}
+  for(const o of OV){
+    if(o.t==='l'){const a=proj(o.a),b=proj(o.b);if(!a||!b)continue;ctx.beginPath();ctx.moveTo(a[0],a[1]);ctx.lineTo(b[0],b[1]);ctx.strokeStyle=o.col;ctx.lineWidth=o.w;ctx.setLineDash(o.dash?[5,4]:[]);ctx.stroke();ctx.setLineDash([])}
+    else if(o.t==='x'){const a=proj(o.p);if(!a)continue;const fs=o.size||13;ctx.font=`${o.bold?'700 ':''}${fs}px "Segoe UI",Arial`;const w=ctx.measureText(o.s).width;let x=a[0]+(o.dx||0),y=a[1]+(o.dy||0);
+      if(o.bg){ctx.fillStyle=o.bg;rr(x-w/2-7,y-fs/2-6,w+14,fs+12,8);ctx.fill();if(o.bd){ctx.strokeStyle=o.bd;ctx.lineWidth=1.5;ctx.stroke()}}
+      ctx.fillStyle=o.col||'#1f2a24';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(o.s,x,y+1)}}
+  const now=performance.now();PART=PART.filter(p=>(p.f=(p.f||0)+1)<60&&now-p.t0<900);
+  for(const p of PART){const a=proj(p.p);if(!a)continue;const k=(now-p.t0)/900;ctx.globalAlpha=1-k;ctx.fillStyle=p.c;ctx.beginPath();ctx.arc(a[0]+p.vx*k*60,a[1]+p.vy*k*60+(p.down?40*k:-20*k),4*(1-k)+1.5,0,7);ctx.fill();ctx.globalAlpha=1}
+}
+function rr(x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath()}
+function pick(x,y){for(let i=DRAWN.length-1;i>=0;i--){const f=DRAWN[i];if(!f.id)continue;if(inPoly(x,y,f.q))return f.id}return null}
+function inPoly(x,y,q){let c=false;for(let i=0,j=q.length-2;i<q.length;j=i,i+=2){const xi=q[i],yi=q[i+1],xj=q[j],yj=q[j+1];if(((yi>y)!==(yj>y))&&(x<(xj-xi)*(y-yi)/(yj-yi)+xi))c=!c}return c}
+function sparkle(p,col,down){for(let i=0;i<14;i++){const a=Math.random()*7;PART.push({p,t0:performance.now(),vx:Math.cos(a)*(.4+Math.random()),vy:Math.sin(a)*(.4+Math.random()),c:col||'#3ddc84',down})}}
+let AC=null;function beep(ok){try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();const t=AC.currentTime;const seq=ok?[[660,0],[880,.09],[1175,.18]]:[[300,0],[220,.14]];
+  for(const [f,d] of seq){const o=AC.createOscillator(),g=AC.createGain();o.type=ok?'sine':'square';o.frequency.value=f;g.gain.setValueAtTime(.0001,t+d);g.gain.exponentialRampToValueAtTime(ok?.18:.07,t+d+.02);g.gain.exponentialRampToValueAtTime(.0001,t+d+.16);o.connect(g).connect(AC.destination);o.start(t+d);o.stop(t+d+.2)}}catch(e){}}
+
+/* ---------- cảnh dùng chung ---------- */
+function table(){BGM=1;box([0,-2.2,0],96,2.4,50,[[196,150,98],[180,136,88],[214,168,112],[150,110,70],[190,145,95],[190,145,95]]);for(const x of [-43,43])for(const z of [-21,21])box([x,-12,z],2.4,18,2.4,[140,100,64]);BGM=0}
+function ground(y,R,col,grid){BGM=1;R=R||60;const n=16,sz=2*R/n,c0=col||[196,222,196];for(let i=0;i<n;i++)for(let j=0;j<n;j++){const x0=-R+i*sz,z0=-R+j*sz;if(Math.hypot(x0+sz/2,z0+sz/2)>R)continue;poly([[x0,y,z0],[x0,y,z0+sz],[x0+sz,y,z0+sz],[x0+sz,y,z0]],c0,{n:[0,1,0]})}
+  if(grid){const g=grid;for(let i=-3;i<=3;i++){line3([i*g,y+.02,-3.3*g],[i*g,y+.02,3.3*g],'rgba(80,130,90,.12)',1);line3([-3.3*g,y+.02,i*g],[3.3*g,y+.02,i*g],'rgba(80,130,90,.12)',1)}}BGM=0}
+function ringBand(c,t,r,len,col,o){const [d]=basis(t);tube([add(c,mul(d,-len/2)),add(c,mul(d,len/2))],r,14,col,o)}
+/* thư viện đồ vật trên bàn (đặt tại o, cao khoảng 0–8) */
+function itemMesh(k,o,id){
+  if(APP.itemMesh&&APP.itemMesh(k,o,id))return;
+  const A=(v)=>add(o,v);
+  if(k==='dao'){box(A([-3,1,0]),9,.16,1.5,[205,212,220],{id,gl:.9,yaw:.15});box(A([4.6,1,-1.2]),6.5,1.1,1.5,[120,74,40],{id,yaw:.15})}
+  else if(k==='daoghep'){box(A([-3,1,0]),8,.16,1.3,[205,212,220],{id,gl:.9,yaw:-.2});box(A([4,1,1]),6,1.1,1.6,[40,40,44],{id,yaw:-.2});ell(A([-6.8,1,1.2]),.8,.3,.8,[205,212,220],{id},6,3)}
+  else if(k==='keo'){box(A([-2.5,1,-.6]),7,.18,1.1,[200,206,214],{id,gl:.9,yaw:.25});box(A([-2.5,1.25,.6]),7,.18,1.1,[200,206,214],{id,gl:.9,yaw:-.25});box(A([3.5,1,1.5]),5,.9,1.1,[210,50,50],{id,yaw:.35});box(A([3.5,1,-1.5]),5,.9,1.1,[210,50,50],{id,yaw:-.35})}
+  else if(k==='day'){const p=[];for(let i=0;i<=24;i++){const a=i/24*Math.PI*2;p.push(A([Math.cos(a)*2.4,1,Math.sin(a)*2.4]))}tube(p,.85,8,[214,232,244],{id,gl:.4})}
+  else if(k==='thuoc'){tube([A([0,0,0]),A([0,5,0])],1.6,14,[190,120,40],{id,cap1:[190,120,40],gl:.5});tube([A([0,5,0]),A([0,6.4,0])],.9,10,[240,240,240],{id,cap1:[240,240,240]});box(A([0,2.6,1.55]),2.2,2,.1,[250,246,230],{id})}
+  else if(k==='tuinylon'){box(A([0,.15,0]),10,.1,7,[235,240,245],{id,a:.75,gl:.8,yaw:.1});box(A([1,.3,.5]),8,.1,5,[235,240,245],{id,a:.6,gl:.8,yaw:-.2})}
+  else if(k==='tuibau'){for(let i=0;i<3;i++){const c=A([-3.5+i*3.5,0,0]);tube([c,add(c,[0,4.5,0])],1.5,12,[30,30,32],{id,gl:.4});disk(add(c,[0,4.5,0]),1.45,[60,60,62],{id})}}
+  else if(k==='giathe'||k==='datset'){tube([A([0,0,0]),A([0,3,0])],(i)=>i?6:4.6,18,[150,150,150],{id,gl:.3});const cl=k==='giathe'?[102,74,48]:[150,128,96];ell(A([0,3,0]),5.4,1.8,5.4,cl,{id},12,4);
+    if(k==='giathe'){for(let i=0;i<8;i++){const a=i*.8;ell(A([Math.cos(a)*3,4.2,Math.sin(a)*3]),.5,.3,.5,[60,44,30],{id},5,3)}}else{disk(A([1,4.7,.5]),2.2,[120,170,210],{id,a:.85,gl:.8})}}
+  else if(k==='nuoc'){tube([A([0,0,0]),A([0,6,0])],(i)=>i?3.4:2.9,16,[60,130,200],{id,gl:.5});disk(A([0,5.6,0]),3.2,[150,205,240],{id,gl:.8});const p=[];for(let i=0;i<=12;i++){const a=i/12*Math.PI;p.push(A([Math.cos(a)*3.4,6+Math.sin(a)*3,0]))}tube(p,.15,5,[90,90,90],{id})}
+  else if(k==='lo'){tube([A([0,0,0]),A([0,5,0])],2,16,[200,230,240],{id,a:.55,gl:.9});tube([A([0,.05,0]),A([0,2.6,0])],1.9,16,[200,140,50],{id,a:.8});disk(A([0,2.6,0]),1.9,[220,160,70],{id,a:.85})}
+  else if(k==='binhtuoi'){tube([A([0,0,0]),A([0,5,0])],2.6,16,[40,150,90],{id,gl:.5,cap1:[40,150,90]});tube([A([2,1.5,0]),A([6.5,6,0])],.45,8,[40,150,90],{id});tube([A([6.3,5.8,0]),A([7.2,6.6,0])],(i)=>i?1.3:.5,10,[220,190,60],{id,cap1:[200,170,50]});const p=[];for(let i=0;i<=10;i++){const a=i/10*Math.PI;p.push(A([-2.6-Math.sin(a)*2.2,1+ (1-Math.cos(a))*1.8,0]))}tube(p,.35,6,[40,150,90],{id})}
+  else if(k==='cuoc'){box(A([0,.6,0]),14,.9,.9,[150,110,70],{id,yaw:.3});box(A([-6.4,.9,-2]),1.2,.5,4,[120,120,128],{id,gl:.8,yaw:.3});box(A([1,.6,4]),12,.8,.8,[150,110,70],{id,yaw:-.1});box(A([-6,.6,4.6]),3.6,.3,3,[150,155,165],{id,gl:.8,yaw:-.1})}
+  else if(k==='coc'){for(let i=0;i<3;i++)tube([A([-5,.6,-1.5+i*1.4]),A([7,.6,-1.5+i*1.4])],.45,7,[200,175,110],{id,cap0:[220,200,140],cap1:[220,200,140]});const p=[];for(let i=0;i<=20;i++){const a=i/20*Math.PI*2;p.push(A([3+Math.cos(a)*1.8,.7,3.5+Math.sin(a)*1.8]))}tube(p,.5,6,[120,160,90],{id})}
+  else if(k==='phan'){const cs=[[120,90,60],[230,230,225],[200,70,60],[245,245,240]];cs.forEach((c,i)=>box(A([-5.5+i*3.7,1.8,0]),3.2,3.6,2.4,c,{id,yaw:.1*(i-1.5)}))}
+  else if(k==='cay'||k==='caybenh'){tube([A([0,0,0]),A([0,4,0])],(i)=>i?2.2:1.9,14,[30,30,32],{id,cap1:[96,68,44]});tube([A([0,4,0]),A([0,15,0])],(i)=>i?.25:.45,8,[110,104,66],{id});
+    for(let i=0;i<7;i++){const a=i*2.4,y=8+i*1.1,d=[Math.cos(a),.45,Math.sin(a)];leaf(A([0,y,0]),d,[-Math.sin(a),0,Math.cos(a)],3.6-i*.2,1.7,k==='cay'?[44,120,52]:mixc([190,170,60],[44,120,52],i%3?.2:.6),{id})}
+    if(k==='caybenh'){for(let i=0;i<6;i++){const a=i*1.3;ell(A([Math.cos(a)*2.2,9+i,Math.sin(a)*2.2]),.35,.25,.35,[70,50,30],{id},5,3)}}}
+  else {box(A([0,1.5,0]),8,3,6,[180,180,180],{id})}}
+function itemsScene(){table();const its=APP.items,n=its.length,cols=Math.ceil(n/2),sp=Math.min(30,86/cols);
+  its.forEach((it,i)=>{const c=i%cols,r=Math.floor(i/cols);const o=[(c-(cols-1)/2)*sp,-1,r===0?-9:11],id='it_'+it.k;itemMesh(it.mesh||it.k,o,id);
+    const on=!!S.sel[it.k];if(on){const p=[];for(let k=0;k<24;k++){const a=-k/24*Math.PI*2;p.push(add(o,[Math.cos(a)*sp*.42,.05,Math.sin(a)*5.5]))}poly(p,[120,230,160],{n:[0,1,0],a:.55})}
+    text3(add(o,[0,it.lh||3.2,4.4]),(on?'✓ ':'')+it.ten,{bg:on?'#1f9d55':'rgba(255,255,255,.95)',col:on?'#fff':'#1f2a24',size:12,bd:on?null:'#cfe3d7',bold:on})})}
+
+/* ---------- trạng thái, phản hồi ---------- */
+const $=id=>document.getElementById(id);
+let APP=null,S=null,E={},SNAP=null,MODE='luyen',NHOM='',T0=0,BUSY=false,FAST=false,LASTFB=null,PLAY=false;
+const LAST=()=>APP.steps.length-1;
+function err(st,code,msg){E[st]=E[st]||{};E[st][code]=E[st][code]||{msg,n:0};E[st][code].n++}
+const sleep=ms=>FAST?Promise.resolve():new Promise(r=>setTimeout(r,ms));
+function fb(kind,html){LASTFB={kind,html};const el=$('fb');if(!el)return;el.className='fb '+kind;el.innerHTML=html}
+function toast(kind,s){const t=$('toast');t.className=kind;t.textContent=s;clearTimeout(toast._t);toast._t=setTimeout(()=>{t.className='';setTimeout(()=>{if(!t.className)t.textContent=''},350)},1800)}
+function ok(msg,p){beep(true);toast('ok','Đúng rồi!');fb('ok',msg);if(p)sparkle(p)}
+function bad(list){beep(false);toast('err','Chưa đúng – xem lỗi bên phải');fb('err','<b>Cần sửa:</b><ul>'+list.map(s=>'<li>'+s+'</li>').join('')+'</ul>')}
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function tlHTML(v,max,lab,band){const sh=band&&(S.hint>=2||MODE==='mau');return `<div class="timeline"><div class="fill" style="width:${v/max*100}%"></div>${sh?`<div class="band" style="left:${band[0]/max*100}%;width:${(band[1]-band[0])/max*100}%"></div>`:''}<div class="lab">${lab}</div></div>`}
+function ctl(id,lab,val,min,max,step,unit){return `<div class="ctl"><span>${lab}</span><b id="v_${id}">${fmt0(val)} ${unit}</b><input type="range" id="${id}" min="${min}" max="${max}" step="${step}" value="${val}" ${BUSY?'disabled':''}></div>`}
+function wireCtl(id,key,unit,cb){const e=$(id);if(!e)return;e.oninput=()=>{S[key]=+e.value;DIRTY=true;$('v_'+id).textContent=fmt0(S[key])+' '+unit;if(cb)cb()}}
+function pills(){$('pills').innerHTML=APP.steps.map((s,i)=>`<span class="pill ${i===S.step?'on':(i<S.step?'done':'')}">${s.pill}</span>`).join('')}
+function render(){DIRTY=true;pills();const st=S.step,s=APP.steps[st],L=LAST();$('pNo').textContent=st===0?'Chuẩn bị':(st<L?'Bước '+st:'Tổng kết');$('pTitle').textContent=s.name;$('pSgk').textContent=s.sgk;
+  const dis=BUSY?'disabled':'';let h=st<L?(st===0&&!S.prepItems?panel0(dis):APP.panel(st,dis)):resultHTML();h+='<div class="fb" id="fb"></div>';$('pBody').innerHTML=h;
+  if(LASTFB&&st<L){$('fb').className='fb '+LASTFB.kind;$('fb').innerHTML=LASTFB.html}if(APP.wire&&st<L)APP.wire(st);hud()}
+function hud(){let h=APP.hud?APP.hud(S.step):'';if(S.step===0&&!S.prepItems)h=`<div class="tag">Đã chọn <b>${Object.values(S.sel).filter(Boolean).length}</b> đồ vật</div>`;if(MODE==='mau')h+=`<div class="tag" style="background:#0b3d2c;color:#fff">▶ GV làm mẫu</div>`;if(NHOM)h+=`<div class="tag">${esc(NHOM)}</div>`;$('hud').innerHTML=h}
+function panel0(dis){return `<div class="guide">Bấm vào đồ vật trên bàn để chọn <b>những thứ cần</b> cho buổi ${APP.viec} (bấm lần nữa để bỏ chọn). Chọn xong bấm <b>Kiểm tra</b>.</div>
+  <div class="chips">${APP.items.filter(i=>S.sel[i.k]).map(i=>`<span class="chip">✓ ${i.ten}</span>`).join('')||'<span style="color:#888;font-size:13px">Chưa chọn đồ vật nào</span>'}</div>
+  <button class="btn main" data-act="check0" ${dis}>Kiểm tra</button>`}
+const ACT={},AUTO={};
+function goStep(n){S.step=n;S.hint=0;LASTFB=null;PLAY=false;SNAP=JSON.stringify(S);setView(APP.view(n));render();if(n===LAST())saveResult()}
+ACT.next=()=>goStep(S.step+1);
+ACT.redo=()=>{if(BUSY||S.step===LAST())return;PLAY=false;const st=S.step;S=JSON.parse(SNAP);S.step=st;setView(APP.view(st));render();fb('info','Đã đưa bước này về lúc bắt đầu. Lỗi đã mắc vẫn được ghi lại.')};
+ACT.hint=()=>{if(BUSY||S.step===LAST())return;S.hint++;const H=APP.hints[S.step];if(S.hint<=2){render();fb('info','💡 '+H[S.hint-1]+(S.hint===2?'<br><small>Bấm Gợi ý lần nữa để xem làm mẫu bước này.</small>':''))}else AUTO[S.step]()};
+ACT.check0=()=>{const L=[];APP.items.forEach(it=>{if(it.ok&&!S.sel[it.k]){L.push('Còn thiếu: <b>'+it.ten+'</b>.');err(0,'thieu_'+it.k,'Thiếu '+it.ten)}
+    if(!it.ok&&S.sel[it.k]){L.push('<b>'+it.ten+'</b>: '+it.ly);err(0,'thua_'+it.k,'Chọn '+it.ten+' – '+it.ly)}});
+  if(L.length)return bad(L);ok(APP.prepOk,[0,2,0]);if(APP.prep2){S.prepItems=true;setView(APP.view(0));render();return}setTimeout(()=>{if(S.step===0)goStep(1)},FAST?0:1100)};
+ACT.adv=b=>{APP.adv(+b.dataset.v);render()};
+ACT.play=async()=>{PLAY=!PLAY;render();const st=S.step;while(PLAY&&!S.ended&&S.step===st){APP.adv(1);render();await sleep(APP.playMs||380)}PLAY=false;if(S.step===st)render()};
+ACT.result=()=>goStep(LAST());
+async function auto0(){BUSY=true;render();for(const it of APP.items)S.sel[it.k]=false;for(const it of APP.items.filter(i=>i.ok)){S.sel[it.k]=true;render();await sleep(300)}BUSY=false;ACT.check0()}
+async function demoAll(){MODE='mau';S=APP.fresh();E={};T0=Date.now();goStep(0);await sleep(600);for(let i=0;i<LAST();i++){if(S.step!==i)goStep(i);await AUTO[i]();await sleep(1200);if(S.step===i)goStep(i+1)}if(S.step!==LAST())goStep(LAST())}
+
+/* ---------- kết quả, lưu, xuất ---------- */
+const KEY=()=>'vuon3d_cn9_'+APP.key;
+function loadH(){try{return JSON.parse(localStorage.getItem(KEY())||'[]')}catch(e){return []}}
+function saveH(a){try{localStorage.setItem(KEY(),JSON.stringify(a))}catch(e){}}
+function cnt(st){return Object.values(E[st]||{}).reduce((s,o)=>s+o.n,0)}
+const stepIdx=()=>APP.steps.slice(0,-1).map((_,i)=>i);
+function saveResult(){if(MODE!=='luyen'||saveResult._done)return;saveResult._done=true;const H=loadH(),luot=H.filter(r=>r.nhom===NHOM).length+1,d=new Date(),rec={tg:d.toLocaleString('vi-VN'),nhom:NHOM||'(chưa ghi mã)',luot};
+  stepIdx().forEach(i=>rec['b'+i]=cnt(i));rec.tong=stepIdx().reduce((s,i)=>s+cnt(i),0);rec.giay=Math.round((Date.now()-T0)/1000);rec.kq=APP.success()?APP.okShort:'Chưa đạt';rec.loi=stepIdx().flatMap(i=>Object.values(E[i]||{}).map(o=>o.msg)).join('; ');H.push(rec);saveH(H)}
+function resultHTML(){const okk=APP.success(),tong=stepIdx().reduce((s,i)=>s+cnt(i),0),sec=Math.round((Date.now()-T0)/1000);
+  let h=`<div class="fb ${okk?'ok':'err'}" style="display:block;font-size:16px">${okk?APP.okText:APP.badText()}</div><div class="meter">Tổng số lỗi: <b>${tong}</b> · Thời gian: <b>${Math.floor(sec/60)} phút ${sec%60} giây</b></div>`;
+  stepIdx().forEach(i=>{const L=Object.values(E[i]||{});h+=`<div style="font-size:14px"><b>${i===0?'Chuẩn bị':'Bước '+i+'. '+APP.steps[i].name}</b> – ${L.length?'<span class="res-bad">'+cnt(i)+' lỗi</span>':'<span class="res-ok">không lỗi</span>'}${L.length?'<ul style="margin:4px 0 0 18px;padding:0">'+L.map(o=>'<li>'+o.msg+(o.n>1?' (×'+o.n+')':'')+'</li>').join('')+'</ul>':''}</div>`});
+  h+=`<div class="guide" style="font-size:13px">${APP.resultNote}</div><div class="row"><button class="btn main" data-act="again">↻ Luyện lại từ đầu</button><button class="btn" data-act="hist">📋 Các lượt đã lưu</button></div>`;
+  if(MODE==='mau')h+='<div style="font-size:12px;color:#666">Lượt làm mẫu không được lưu.</div>';return h}
+ACT.again=()=>{MODE='luyen';S=APP.fresh();E={};T0=Date.now();saveResult._done=false;goStep(0)};
+ACT.hist=()=>showHist();
+function showHist(){const H=loadH(),ix=stepIdx();$('histCard').innerHTML=`<h2>📋 Các lượt đã lưu</h2><p>Dữ liệu nằm trong trình duyệt <b>máy này</b>. Cuối buổi bấm <b>Xuất CSV</b> để GV lưu; xoá lịch sử trình duyệt là mất.</p>
+  ${H.length?`<div style="overflow:auto"><table class="hist"><tr><th>Thời điểm</th><th>Mã nhóm</th><th>Lượt</th>${ix.map(i=>`<th>${i?'B'+i:'CB'}</th>`).join('')}<th>Tổng lỗi</th><th>Kết quả</th></tr>${H.slice(-30).reverse().map(r=>`<tr><td>${esc(r.tg)}</td><td>${esc(r.nhom)}</td><td>${r.luot}</td>${ix.map(i=>`<td>${r['b'+i]==null?'':r['b'+i]}</td>`).join('')}<td><b>${r.tong}</b></td><td class="${r.kq==='Chưa đạt'?'res-bad':'res-ok'}">${esc(r.kq)}</td></tr>`).join('')}</table></div>`:'<p><i>Chưa có lượt nào.</i></p>'}
+  <div class="row" style="margin-top:12px"><button class="btn main" id="hCsv">⬇ Xuất CSV</button><button class="btn" id="hClose">Đóng</button></div>`;
+  $('ovHist').style.display='flex';$('hClose').onclick=()=>$('ovHist').style.display='none';$('hCsv').onclick=exportCSV}
+function exportCSV(){const H=loadH(),ix=stepIdx(),cols=['tg','nhom','luot',...ix.map(i=>'b'+i),'tong','giay','kq','loi'],head=['Thời điểm','Mã nhóm','Lượt',...ix.map(i=>i?'Lỗi B'+i:'Lỗi chuẩn bị'),'Tổng lỗi','Số giây','Kết quả','Chi tiết lỗi'];
+  const q=v=>'"'+String(v==null?'':v).replace(/"/g,'""')+'"';const csv='﻿'+[head.map(q).join(',')].concat(H.map(r=>cols.map(c=>q(r[c])).join(','))).join('\r\n');
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));a.download=APP.key+'-3d-ket-qua.csv';document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500)}
+
+/* ---------- góc nhìn, chuột, chạm ---------- */
+function setView(v){Object.assign(camT,JSON.parse(JSON.stringify(v)))}
+let drag=null,last=null;
+function ptr(e){const r=cv.getBoundingClientRect();return [e.clientX-r.left,e.clientY-r.top]}
+function nearAxis(m,samples){let best=null;for(const s of samples){const p=proj(s.p);if(!p)continue;const d=Math.hypot(p[0]-m[0],p[1]-m[1]);if(!best||d<best.d)best={d,v:s.v}}return best}
+function lineSamples(a,b,v0,v1,step){const n=Math.max(2,Math.round(Math.abs(v1-v0)/step)),r=[];for(let i=0;i<=n;i++){const t=i/n;r.push({p:lerp3(a,b,t),v:lerp(v0,v1,t)})}return r}
+function toolDown(m){if(BUSY)return true;const id=pick(m[0],m[1]);
+  if(S.step===0&&!S.prepItems&&id&&id.startsWith('it_')){const k=id.slice(3);S.sel[k]=!S.sel[k];beep(true);render();return 'click'}
+  return APP.down?APP.down(m,id):false}
+cv.addEventListener('pointerdown',e=>{const m=ptr(e);const t=toolDown(m);try{cv.setPointerCapture(e.pointerId)}catch(x){}if(t===true||t==='click'){drag=null;return}if(t){drag=t;return}drag='cam';last=m;cv.style.cursor='grabbing'});
+cv.addEventListener('pointermove',e=>{const m=ptr(e);if(drag==='cam'){camT.yaw-=(m[0]-last[0])*.008;camT.pitch=clamp(camT.pitch+(m[1]-last[1])*.006,-.25,1.45);last=m;return}if(drag){if(APP.move)APP.move(m,drag);DIRTY=true;return}
+  const id=pick(m[0],m[1]);cv.style.cursor=id&&(APP.pickable||/^it_/).test(id)?'pointer':'grab'});
+cv.addEventListener('pointerup',()=>{if(drag&&drag!=='cam')render();drag=null;cv.style.cursor='grab'});
+cv.addEventListener('wheel',e=>{e.preventDefault();camT.dist=clamp(camT.dist*Math.exp(e.deltaY*.001),APP.zoom?APP.zoom[0]:10,APP.zoom?APP.zoom[1]:200)},{passive:false});
+document.querySelector('aside').addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(!b||b.disabled)return;if(BUSY&&b.dataset.act!=='play')return;const f=ACT[b.dataset.act];if(f)f(b)});
+$('btnView').onclick=()=>setView(APP.view(S.step));
+$('btnHist').onclick=showHist;
+$('btnNav').onclick=e=>{e.stopPropagation();const m=$('navMenu');m.style.display=m.style.display==='block'?'none':'block'};
+document.addEventListener('click',()=>{$('navMenu').style.display='none'});
+$('btnDemo').onclick=()=>{if(BUSY)return;$('ovStart').style.display='none';demoAll()};
+$('btnGo').onclick=()=>{NHOM=$('inNhom').value.trim().slice(0,30);MODE='luyen';T0=Date.now();saveResult._done=false;$('ovStart').style.display='none';beep(true);goStep(0)};
+$('btnGoDemo').onclick=()=>{$('ovStart').style.display='none';demoAll()};
+function resize(){const r=cv.getBoundingClientRect();DPR=Math.min(2,window.devicePixelRatio||1);if(W!==r.width||H!==r.height){W=r.width;H=r.height;cv.width=W*DPR;cv.height=H*DPR;DIRTY=true}}
+function loop(){resize();if(S.step===LAST()&&!NOROT)camT.yaw+=.003;
+  const mv=Math.abs(cam.yaw-camT.yaw)+Math.abs(cam.pitch-camT.pitch)+Math.abs(cam.dist-camT.dist)/50+Math.hypot(...sub(cam.tgt,camT.tgt))/50;
+  cam.yaw=lerp(cam.yaw,camT.yaw,.12);cam.pitch=lerp(cam.pitch,camT.pitch,.12);cam.dist=lerp(cam.dist,camT.dist,.12);cam.tgt=lerp3(cam.tgt,camT.tgt,.12);
+  if(mv>1e-4||DIRTY||PART.length||(APP.anim&&APP.anim())){DIRTY=false;F=[];OV=[];if(S.step===0&&!S.prepItems)itemsScene();else APP.scene();draw()}requestAnimationFrame(loop)}
+/* chế độ chụp: #start · #b0 · #bN&tham-so · #kq */
+async function snapMode(){const hs=location.hash.slice(1);if(!hs)return;const [scr,...ps]=hs.split('&');const P={};ps.forEach(p=>{const [k,v]=p.split('=');P[k]=v==null?true:v});
+  if(scr==='start')return;FAST=true;NOROT=true;$('ovStart').style.display='none';MODE='luyen';NHOM='Nhóm 3 – 9A1';T0=Date.now()-312000;saveResult._done=true;
+  const runTo=async n=>{for(let i=0;i<n;i++){if(S.step!==i)goStep(i);await AUTO[i]();if(S.step===i)goStep(i+1)}};
+  if(scr==='kq')await runTo(LAST());
+  else if(/^b\d$/.test(scr)){const n=+scr[1];await runTo(n);if(S.step!==n)goStep(n);if(APP.snap)await APP.snap(n,P)}
+  PART=[];render();FAST=false}
+function init(){S=APP.fresh();Object.assign(AUTO,APP.auto);if(!AUTO[0])AUTO[0]=auto0;pills();render();setView(APP.view(0));
+  snapMode().then(()=>{for(const k in camT)cam[k]=JSON.parse(JSON.stringify(camT[k]))});requestAnimationFrame(loop)}
+/* ===================== HẾT KHUNG CHUNG ===================== */
+/* ===================== APP CHIẾT CÀNH 3D · SGK CN9 Trồng cây ăn quả (KNTT) tr.15–16 ===================== */
+const BR=[
+ {y:38,a:.35,e:.08,L:80,d:1.6,lo:4,ok:false,ly:'Cành ở <b>tầng dưới</b>, sát đất, bị tán che. SGK: chọn cành ở <b>giữa tầng tán</b> và vươn ra ánh sáng.'},
+ {y:78,a:1.25,e:.32,L:85,d:1.6,lo:4,ok:true},
+ {y:84,a:2.35,e:.28,L:78,d:.7,lo:9,ok:false,ly:'Cành <b>nhỏ, gầy</b> (đường kính 0,7 cm), lóng dài. SGK: đường kính khoảng <b>1 – 2 cm</b>, lóng ngắn, cành mập.'},
+ {y:128,a:1.9,e:.75,L:50,d:.8,lo:6,ok:false,ly:'Cành ở <b>ngọn</b>, còn non, nhỏ. SGK: chọn cành ở <b>giữa tầng tán</b>, đường kính khoảng 1 – 2 cm.'},
+ {y:70,a:2.95,e:.22,L:90,d:3.0,lo:5,ok:false,ly:'Cành <b>quá to</b> (đường kính 3,0 cm). SGK: đường kính khoảng <b>1 – 2 cm</b>.'},
+ {y:96,a:.55,e:.38,L:80,d:1.3,lo:4,ok:true}];
+const DECOR=[{y:60,a:4.2,e:.3,L:80,d:1.8},{y:100,a:3.6,e:.45,L:70,d:1.4},{y:112,a:5.3,e:.5,L:65,d:1.2},{y:52,a:5.6,e:.2,L:75,d:2}];
+const trR=y=>6-.02*y;
+function brBase(b){return [Math.cos(b.a)*trR(b.y)*.8,b.y,Math.sin(b.a)*trR(b.y)*.8]}
+function brDir(b){return nrm([Math.cos(b.a)*Math.cos(b.e),Math.sin(b.e),Math.sin(b.a)*Math.cos(b.e)])}
+function bP(b,s){return add(brBase(b),mul(brDir(b),s))}
+const bR=(b,s)=>b.d/2*(1-.4*s/b.L);
+const SH=[-115,0,55],SUN=[95,0,75];
+function brView(b,s,dist){let yaw=-b.a;if(Math.cos(yaw)<0)yaw=Math.PI-b.a;return {yaw,pitch:.22,dist:dist||40,tgt:bP(b,s)}}
+function drawBranch(b,id,hide){if(hide)return;const N=10,P=[];for(let i=0;i<=N;i++)P.push(bP(b,b.L*i/N));
+  tube(P,(i)=>bR(b,b.L*i/N),10,(i)=>mixc([104,92,62],[92,118,62],i/N),{id,gl:.08});
+  if(b.lo)for(let s=3;s<Math.min(45,b.L*.6);s+=b.lo)ringBand(bP(b,s),brDir(b),bR(b,s)+.04,.25,[70,62,44],{id});
+  const up=[0,1,0];ell(add(bP(b,b.L*.78),[0,9,0]),17,11,17,[48,118,56],{gl:.05},8,5);ell(add(bP(b,b.L),[0,4,0]),13,10,13,[56,128,60],{gl:.05},8,5)}
+APP={key:'chiet-canh',viec:'chiết cành',prep2:true,prepOk:'Đủ vật liệu và dụng cụ theo SGK tr.15. Giờ trộn giá thể bó bầu.',
+ okText:'🌱 <b>Cành chiết ra rễ, sống tốt trong nhà giâm!</b>',okShort:'Cành chiết sống',
+ badText:()=>'🥀 <b>Cành chiết không sống'+(S.failed?'</b> – '+S.failed:'</b> hoặc chưa làm đủ bước'),
+ resultNote:'Đọc lại: SGK tr.15 (chuẩn bị, 4 bước), tr.16 (thực hiện, đánh giá: vị trí, kích thước cành chiết phù hợp, kích thước bầu phù hợp, nút buộc chắc chắn). Ra vườn chiết thật 2 – 3 cành/loại cây để hoàn thành bài thực hành.',
+ pickable:/^(it_|br)/,zoom:[15,700],playMs:160,
+ items:[{k:'giathe',ten:'Giá thể (đất + mùn hữu cơ)',ok:true},{k:'tuinylon',ten:'Túi nylon',ok:true},{k:'day',ten:'Dây nylon',ok:true},{k:'thuoc',ten:'Thuốc kích thích ra rễ',ok:true},
+   {k:'dao',ten:'Dao',ok:true},{k:'keo',ten:'Kéo chiết cành',ok:true},{k:'cuoc',ten:'Cuốc, xẻng',ok:false,ly:'Cuốc, xẻng dùng khi đào hố trồng cây; chiết cành không cần.'},
+   {k:'lo',ten:'Lọ thuỷ tinh, khay cắm cành',ok:false,ly:'Lọ, khay cắm cành dùng khi giâm cành; chiết cành không cần.'}],
+ steps:[{name:'Chuẩn bị',pill:'Chuẩn bị',sgk:'SGK tr.15 – mục a) Chuẩn bị (mẫu thực vật, giá thể, vật liệu, dụng cụ)'},
+   {name:'Chọn cành chiết',pill:'B1. Chọn cành',sgk:'SGK tr.15 – Bước 1. Chọn cành chiết'},
+   {name:'Khoanh vỏ',pill:'B2. Khoanh vỏ',sgk:'SGK tr.15 – Bước 2. Khoanh vỏ'},
+   {name:'Bó bầu',pill:'B3. Bó bầu',sgk:'SGK tr.15 – Bước 3. Bó bầu'},
+   {name:'Cắt và giâm cành chiết',pill:'B4. Cắt, giâm',sgk:'SGK tr.15 – Bước 4. Cắt và giâm cành chiết'},
+   {name:'Kết quả',pill:'Kết quả',sgk:'Đối chiếu tiêu chí đánh giá – SGK tr.16'}],
+ fresh(){return{step:0,sel:{},prepItems:false,dat:1,mun:1,am:50,mixOk:false,br:null,bi:null,draft:null,ring:null,ringDone:false,cao:false,dry:0,
+   thuoc:null,thuocLate:false,bauMode:false,bauC:null,bauSet:false,tui:false,b1:false,b2:false,day:0,R:32+Math.floor(Math.random()*9),cut:false,peel:false,place:null,failed:null,ended:false,hint:0}},
+ view(st){if(st===0)return S.prepItems?{yaw:0,pitch:.62,dist:100,tgt:[0,2,0]}:{yaw:0,pitch:.62,dist:115,tgt:[0,0,2]};
+   if(st===1)return {yaw:.35,pitch:.1,dist:430,tgt:[0,85,0]};const b=BR[S.bi];
+   if(st===2)return brView(b,14,42);if(st===3)return brView(b,S.ring?(S.ring.a+S.ring.b)/2:14,48);
+   if(st===4)return S.cut?{yaw:.3,pitch:.25,dist:150,tgt:add(S.place==='nang'?SUN:SH,[0,30,0])}:brView(b,S.bauC||14,55);
+   return {yaw:.3,pitch:.22,dist:170,tgt:add(S.place==='nang'?SUN:SH,[0,30,0])}},
+ hud(st){let h='';if(st===0)h='<div class="tag">Trộn giá thể bó bầu</div>';else if(st<5)h='<div class="tag">Cây bưởi mẹ trong vườn</div>';if(st===4)h+=`<div class="tag">📅 Ngày <b>${S.day}</b> sau khi bó bầu</div>`;return h},
+ scene(){const st=S.step;
+   if(st===0){table();const mixc0=mixc([150,110,70],[60,44,30],S.mun/(S.dat+S.mun)),wet=mixc(mixc0,[30,22,16],clamp((S.am-40)/70,0,1)*.6);
+     tube([[0,-1,0],[0,5,0]],(i)=>i?14:10,24,[150,150,150],{gl:.3});ell([0,5,0],13,3+ .5*(S.dat+S.mun),13,wet,{},14,5);
+     for(let i=0;i<S.dat;i++)ell([-28+i*4.5,0,6],2.2,1.6,2.2,[150,110,70],{},8,4);for(let i=0;i<S.mun;i++)ell([24+i*4.5,0,6],2.2,1.6,2.2,[60,44,30],{},8,4);
+     text3([-24,4,6],'Đất × '+S.dat,{bg:'#fff',bd:'#cfe3d7',size:13,bold:true});text3([27,4,6],'Mùn hữu cơ × '+S.mun,{bg:'#fff',bd:'#cfe3d7',size:13,bold:true});
+     text3([0,15,0],'Độ ẩm '+S.am+' %',{bg:'#e6f3ff',bd:'#7fb6e6',col:'#1d3f66',size:14,bold:true});itemMesh('binhtuoi',[30,-1,-12],null);return}
+   ground(0,520,[160,196,128],80);
+   tube([[0,0,0],[0,60,0],[0,120,0],[0,150,0]],(i)=>trR(i*50),12,[96,82,60],{gl:.05});ell([0,165,0],34,24,34,[46,114,54],{gl:.05},10,6);
+   DECOR.forEach(b=>drawBranch(b,null));
+   BR.forEach((b,i)=>{const cutAway=S.cut&&i===S.bi;drawBranch(b,'br'+i,cutAway);
+     if(st===1&&S.br===i){ringBand(bP(b,12),brDir(b),bR(b,12)+.6,1,[245,196,0],{a:.7});text3(add(bP(b,12),[0,10,0]),'cành đang chọn · đường kính '+fmt(b.d)+' cm',{bg:'#0b3d2c',col:'#fff',size:13,bold:true})}});
+   if(st===1)return;const b=BR[S.bi];if(b==null)return;const d=brDir(b);let dn=nrm(sub([0,-1,0],mul(d,dot([0,-1,0],d))));
+   if(!S.cut){if(st===2||st===3){for(let s=0;s<=30;s+=1){const p=add(bP(b,s),mul(dn,bR(b,s)+1.2));line3(p,add(p,mul(dn,s%5?.6:1.2)),'#5a4300',s%5?1:1.8);if(s%5===0)text3(add(p,mul(dn,2.4)),s+' cm',{size:11,col:'#5a4300'})}
+       line3(add(bP(b,0),mul(dn,bR(b,0)+1.2)),add(bP(b,30),mul(dn,bR(b,30)+1.2)),'#c79400',3);text3(add(bP(b,0),[0,4,0]),'chạc cành',{bg:'#fff',bd:'#e0a400',size:12})}
+     const R=S.ring||S.draft;if(R){const a=Math.min(R.a,R.b),c=Math.max(R.a,R.b);
+       if(!S.ringDone){tube([bP(b,a),bP(b,c)],bR(b,a)+.12,12,[245,196,0],{a:.55});text3(add(bP(b,(a+c)/2),[0,5,0]),'cách chạc '+fmt(a)+' cm · dài '+fmt(c-a)+' cm',{bg:'#fff2a8',bd:'#e0a400',col:'#5a4300',size:13,bold:true})}
+       else{const col=S.cao?mixc([236,224,180],[190,170,120],clamp(S.dry/4,0,1)):[120,165,85];tube([bP(b,a),bP(b,c)],bR(b,a)*.86,12,col,{});ringBand(bP(b,a),d,bR(b,a)+.03,.15,[60,50,35]);ringBand(bP(b,c),d,bR(b,c)+.03,.15,[60,50,35]);
+         if(S.thuoc==='tren'||S.thuoc==='duoi'){const s0=S.thuoc==='tren'?c-.2:a-.8;tube([bP(b,s0),bP(b,s0+1)],bR(b,s0)+.08,12,[235,140,40],{a:.9})}
+         if(S.bauC!=null){const C=bP(b,S.bauC),[t,n1,n2]=basis(d),rot=p=>add(add(mul(n1,p[0]),mul(t,p[1])),mul(n2,p[2]));
+           ell(C,4.2,5,4.2,S.thuoc==='tron'?[96,70,46]:[110,80,52],{rot,a:S.bauSet?1:.6},12,7);
+           if(S.tui){ell(C,4.8,6.2,4.8,[235,242,248],{rot,a:.42,gl:.9},12,7);if(S.b1)ringBand(bP(b,S.bauC+5.6),d,bR(b,S.bauC+5.6)+.35,.5,[40,40,44]);if(S.b2)ringBand(bP(b,S.bauC-5.6),d,bR(b,S.bauC-5.6)+.35,.5,[40,40,44])}
+           if(!S.bauSet)text3(add(C,[0,8,0]),'bầu dài 10 cm – kéo dọc cành để đặt',{bg:'#fff2a8',bd:'#e0a400',col:'#5a4300',size:12,bold:true});
+           if(st===4&&S.day>18){const n=Math.min(26,Math.floor((S.day-18)*1.4)),rr=Math.min(1,(S.day-18)/(S.R-18))*4.4,col=S.day>=S.R+6?'#e8c86a':'#ffffff';
+             for(let k=0;k<n;k++){const an=k*2.399,v=((k*37)%10)/10-.5,p0=add(C,rot([Math.cos(an)*.9,v*7,Math.sin(an)*.9])),p1=add(C,rot([Math.cos(an)*rr,v*7+.6,Math.sin(an)*rr]));line3(p0,p1,col,2.2)}
+             if(S.day>=S.R)text3(add(C,[0,-8,0]),S.day>=S.R+6?'rễ ra ngoài bầu, màu vàng ngà':'rễ trắng đã chạm túi',{bg:'#fff',bd:'#e0a400',size:12})}}}}}
+   if(S.cut){BGM=1;BGM=0;// nhà giâm
+     for(const x of [-28,28])for(const z of [-22,22])box(add(SH,[x,32,z]),2,64,2,[150,120,80]);box(add(SH,[0,65,0]),64,1.2,52,[130,190,150],{a:.55,gl:.6});box(add(SH,[0,22,0]),44,3,22,[170,130,85]);
+     text3(add(SH,[0,74,0]),'nhà giâm có mái che',{bg:'#fff',bd:'#cfe3d7',size:12});text3(add(SUN,[0,62,0]),'☀ ngoài trời nắng',{bg:'#fff8d6',bd:'#e0a400',size:12});
+     if(S.place){const base=S.place==='nang'?add(SUN,[0,0,0]):add(SH,[0,23.5,0]);tube([base,add(base,[0,9,0])],(i)=>i?6:5,16,[30,30,32],{cap1:[96,68,44]});
+       const dead=!!S.failed,top=add(base,[0,9,0]);tube([top,add(top,[2,26,0])],(i)=>i?.5:.8,8,[100,110,64]);
+       const lc=dead?[130,95,50]:[52,130,60];for(let i=0;i<6;i++){const an=i*1.1,p=add(top,[1.6,12+i*2.4,0]);leaf(p,[Math.cos(an),dead?-.6:.4,Math.sin(an)],[-Math.sin(an),0,Math.cos(an)],6,2.6,lc,{droop:dead?.5:.15})}
+       if(!dead&&S.ended){for(let i=0;i<3;i++){const an=i*2.1;leaf(add(top,[2,27,0]),[Math.cos(an),.9,Math.sin(an)],[-Math.sin(an),0,Math.cos(an)],3.5,1.6,[120,205,90],{droop:.05})}text3(add(top,[0,36,0]),'lá non mới mọc',{bg:'#1f9d55',col:'#fff',size:12,bold:true})}}}},
+ panel(st,dis){
+   if(st===0)return `<div class="guide">Trộn giá thể bó bầu theo SGK: chọn số phần <b>đất</b> và <b>mùn hữu cơ</b>, rồi bổ sung nước đến độ ẩm phù hợp.</div>
+     <div class="row"><span style="min-width:120px">Đất (phù sa, bùn ao…)</span><button class="btn small" data-act="dat" data-v="-1" ${dis}>−</button><b style="font-size:18px">${S.dat}</b><button class="btn small" data-act="dat" data-v="1" ${dis}>+</button> phần</div>
+     <div class="row"><span style="min-width:120px">Mùn hữu cơ</span><button class="btn small" data-act="mun" data-v="-1" ${dis}>−</button><b style="font-size:18px">${S.mun}</b><button class="btn small" data-act="mun" data-v="1" ${dis}>+</button> phần</div>
+     ${ctl('rgAm','Độ ẩm giá thể',S.am,40,100,5,'%')}<button class="btn main" data-act="mix" ${dis}>Trộn giá thể &amp; kiểm tra</button>`;
+   if(st===1){const b=S.br!=null?BR[S.br]:null;return `<div class="guide">Xoay quanh cây bưởi mẹ, <b>bấm vào một cành</b> để xem đường kính. Chọn cành phù hợp rồi bấm <b>Chọn cành này để chiết</b>.</div>
+     <div class="meter">${b?`Cành đang chọn: đường kính <b>${fmt(b.d)}</b> cm · lóng dài khoảng <b>${b.lo}</b> cm`:'Chưa chọn cành'}</div><button class="btn main" data-act="pick1" ${dis}>Chọn cành này để chiết</button>`}
+   if(st===2){const R=S.ring||S.draft,a=R?Math.min(R.a,R.b):null,len=R?Math.abs(R.b-R.a):null;
+     if(!S.ringDone)return `<div class="guide"><b>Kéo dọc cành</b> (sát cành, trên thước vàng) để vạch đoạn khoanh vỏ. Thước tính từ <b>chạc cành</b>.</div>
+       <div class="meter">Cách chạc: <b id="mA">${a!=null?fmt(a):'–'}</b> cm · Dài: <b id="mL">${len!=null?fmt(len):'–'}</b> cm</div><button class="btn main" data-act="ring2" ${dis}>✂ Khoanh vỏ, bóc vỏ</button>`;
+     return `<div class="guide">Đã khoanh và bóc vỏ. Làm tiếp cho đúng SGK rồi mới sang bó bầu.</div>
+       <button class="btn ${S.cao?'done':''}" data-act="cao2" ${dis||(S.cao?'disabled':'')}>🪒 ${S.cao?'Đã cạo sạch':'Cạo sạch phần vỏ sát gỗ'}</button>
+       <div class="meter">Để khô vết khoanh: <b>${S.dry}</b> ngày</div><div class="row"><button class="btn small" data-act="dry2" ${dis}>+1 ngày</button><button class="btn main" data-act="next2" ${dis}>Sang bó bầu →</button></div>`}
+   if(st===3)return `<div class="guide">Bó bầu: dùng thuốc kích thích ra rễ, đắp giá thể phủ kín vết khoanh, bọc túi nylon và buộc.</div>
+     <div style="font-size:13px">Thuốc kích thích ra rễ:</div><div class="row"><button class="btn small ${S.thuoc==='tren'?'sel':''}" data-act="thuoc" data-v="tren" ${dis}>Bôi phần trên vết khoanh</button><button class="btn small ${S.thuoc==='duoi'?'sel':''}" data-act="thuoc" data-v="duoi" ${dis}>Bôi phần dưới vết khoanh</button><button class="btn small ${S.thuoc==='tron'?'sel':''}" data-act="thuoc" data-v="tron" ${dis}>Trộn vào giá thể</button></div>
+     ${S.bauSet?'<button class="btn done" disabled>✓ Đã đắp giá thể</button>':(S.bauMode?`<div class="meter">Kéo dọc cành để đặt bầu, rồi bấm Đặt bầu</div><button class="btn main" data-act="setBau" ${dis}>Đặt bầu ở đây</button>`:`<button class="btn" data-act="bauMode" ${dis}>🟤 Đắp giá thể (bó bầu)</button>`)}
+     <div class="row"><button class="btn ${S.tui?'done':''}" data-act="tui" ${dis||(!S.bauSet||S.tui?'disabled':'')}>Bọc túi nylon</button><button class="btn ${S.b1?'done':''}" data-act="tie" data-v="b1" ${dis||(!S.tui||S.b1?'disabled':'')}>Buộc chặt đầu trên</button><button class="btn ${S.b2?'done':''}" data-act="tie" data-v="b2" ${dis||(!S.tui||S.b2?'disabled':'')}>Buộc chặt đầu dưới</button></div>
+     <button class="btn main" data-act="done3" ${dis}>Hoàn thành bó bầu</button>`;
+   if(st===4){const end=S.ended?'disabled':'';let h=`<div class="guide">Cho thời gian trôi, <b>nhìn qua túi nylon</b> theo dõi rễ. Cắt cành chiết đúng lúc rồi đem giâm.</div>${tlHTML(S.day,75,'Ngày thứ '+S.day+' sau khi bó bầu',[30,60])}`;
+     if(!S.cut)h+=`<div class="row"><button class="btn small" data-act="adv" data-v="1" ${dis||end}>+1 ngày</button><button class="btn small" data-act="adv" data-v="5" ${dis||end}>+5 ngày</button><button class="btn small" data-act="play" ${dis||end}>${PLAY?'⏸ Dừng':'▶ Tua'}</button></div><button class="btn main" data-act="cut4" ${dis||end}>✂ Cắt cành chiết khỏi cây</button>`;
+     else if(!S.place)h+=`<button class="btn ${S.peel?'done':''}" data-act="peel" ${dis||(S.peel?'disabled':'')}>Bóc bỏ túi nylon</button><div style="font-size:13px">Đem giâm cành chiết ở đâu?</div><div class="row"><button class="btn" data-act="place" data-v="mai" ${dis}>🏠 Trong nhà có mái che</button><button class="btn" data-act="place" data-v="nang" ${dis}>☀ Ngoài trời nắng</button></div>`;
+     if(S.ended)h+=`<button class="btn main" data-act="result" ${dis}>Xem kết quả →</button>`;return h}
+   return ''},
+ wire(st){if(st===0)wireCtl('rgAm','am','%')},
+ hints:[['Đất và mùn trộn theo tỉ lệ ghi trong SGK; giá thể đủ ẩm nhưng không sũng nước.','SGK tr.15: trộn <b>2 phần đất + 1 phần mùn hữu cơ</b>; bổ sung nước sao cho giá thể có độ ẩm từ <b>70 % đến 80 %</b>.'],
+   ['Xem đường kính, vị trí trong tán, độ dài lóng của từng cành.','SGK tr.15, Bước 1: chọn cành có đường kính khoảng <b>1 – 2 cm</b>, ở <b>giữa tầng tán</b> và vươn ra ánh sáng, lóng ngắn, cành mập.'],
+   ['Đo từ chạc cành; xem cả độ dài đoạn khoanh.','SGK tr.15, Bước 2: khoanh vỏ cách chạc cành khoảng <b>10 – 15 cm</b>, độ dài phần khoanh <b>3 – 5 cm</b>; bóc hết vỏ, <b>cạo sạch</b> phần vỏ sát gỗ; để <b>2 – 3 ngày</b> cho khô vết khoanh.'],
+   ['Rễ mọc ra từ mép vết khoanh phía trên (phía ngọn cành).','SGK tr.15, Bước 3: bôi thuốc kích thích ra rễ vào <b>phần trên</b> của vết khoanh hoặc trộn cùng giá thể; bó giá thể vào phần đã khoanh, bọc túi nylon và <b>buộc chặt hai đầu</b>.'],
+   ['Nhìn màu và vị trí của rễ qua túi nylon.','SGK tr.15, Bước 4: khi thấy rễ xuất hiện <b>ở ngoài bầu</b>, có màu <b>vàng ngà</b> (khoảng <b>30 – 60 ngày</b> sau khi bó bầu) thì cắt cành chiết, bóc túi nylon rồi đem giâm trong <b>nhà có mái che</b>.']],
+ adv(n){for(let i=0;i<n;i++){if(S.day>=75){break}S.day++}if(S.day>=75&&!S.cut&&!S.ended){S.ended=true;PLAY=false;err(4,'khongcat','Không cắt cành chiết');fb('err','Đã 75 ngày mà chưa cắt cành chiết.')}},
+ down(m,id){const st=S.step;if(st===1&&id&&id.startsWith('br')){S.br=+id.slice(2);beep(true);render();return 'click'}
+   const b=BR[S.bi];if(!b)return false;const smp=lineSamples(bP(b,0),bP(b,40),0,40,.1);
+   if(st===2&&!S.ringDone){const n=nearAxis(m,smp);if(n&&n.d<40){const v=Math.round(n.v*2)/2;S.draft={a:v,b:v};S.ring=null;return 'ring'}}
+   if(st===3&&S.bauMode&&!S.bauSet){const n=nearAxis(m,smp);if(n&&n.d<50){S.bauC=Math.round(n.v*2)/2;return 'bau'}}
+   return false},
+ move(m,dr){const b=BR[S.bi];const smp=lineSamples(bP(b,0),bP(b,40),0,40,.1),n=nearAxis(m,smp);if(!n)return;const v=Math.round(n.v*2)/2;
+   if(dr==='ring'){S.draft.b=v;const a=Math.min(S.draft.a,S.draft.b);if($('mA'))$('mA').textContent=fmt(a);if($('mL'))$('mL').textContent=fmt(Math.abs(S.draft.b-S.draft.a))}
+   if(dr==='bau')S.bauC=v},
+ success(){return !S.failed&&S.cut&&S.place==='mai'},
+ auto:{},
+ async snap(n,P){if(n===0&&P.tron){APP.items.forEach(i=>S.sel[i.k]=i.ok);S.prepItems=true;S.dat=3;S.mun=1;S.am=60}if(n===1&&P.chon){S.br=1}if(n===2&&P.keo){S.draft={a:12,b:16}}if(n===3&&P.bau){ACT.thuoc({dataset:{v:'tren'}});S.bauMode=true;S.bauC=(S.ring.a+S.ring.b)/2}
+   if(n===4){APP.adv(+(P.ngay||20))}setView(APP.view(n))}
+};
+ACT.dat=b=>{S.dat=clamp(S.dat+ +b.dataset.v,1,4);render()};ACT.mun=b=>{S.mun=clamp(S.mun+ +b.dataset.v,1,4);render()};
+ACT.mix=()=>{const L=[];if(S.dat!==2*S.mun){L.push('Tỉ lệ đang là <b>'+S.dat+' phần đất : '+S.mun+' phần mùn</b>. SGK: <b>2 phần đất + 1 phần mùn hữu cơ</b>.');err(0,'tile','Trộn giá thể sai tỉ lệ đất : mùn')}
+  if(S.am<70){L.push('Độ ẩm '+S.am+' % là <b>khô quá</b>. SGK: độ ẩm từ 70 % đến 80 %.');err(0,'kho','Giá thể quá khô')}if(S.am>80){L.push('Độ ẩm '+S.am+' % là <b>ướt quá</b>. SGK: độ ẩm từ 70 % đến 80 %.');err(0,'uot','Giá thể quá ướt')}
+  if(L.length)return bad(L);ok('Giá thể trộn đúng 2 : 1, độ ẩm '+S.am+' % – đúng SGK tr.15.',[0,8,0]);setTimeout(()=>{if(S.step===0)goStep(1)},FAST?0:1100)};
+ACT.pick1=()=>{if(S.br==null)return bad(['Bấm vào một cành trên cây để chọn.']);const b=BR[S.br];if(!b.ok){err(1,'canh'+S.br,'Chọn cành chưa phù hợp');return bad([b.ly])}
+  S.bi=S.br;ok('Cành đường kính '+fmt(b.d)+' cm, giữa tầng tán, vươn ra ánh sáng, lóng ngắn – đúng SGK tr.15, Bước 1.',bP(b,12));setTimeout(()=>{if(S.step===1)goStep(2)},FAST?0:1100)};
+ACT.ring2=()=>{const R=S.draft;if(!R)return bad(['Kéo dọc cành để vạch đoạn khoanh vỏ.']);const a=Math.min(R.a,R.b),len=Math.abs(R.b-R.a),L=[];
+  if(a<10){L.push('Cách chạc '+fmt(a)+' cm là <b>quá gần</b>. SGK: cách chạc cành khoảng 10 – 15 cm.');err(2,'gan','Khoanh vỏ quá gần chạc')}
+  if(a>15){L.push('Cách chạc '+fmt(a)+' cm là <b>quá xa</b>. SGK: cách chạc cành khoảng 10 – 15 cm.');err(2,'xa','Khoanh vỏ quá xa chạc')}
+  if(len<3){L.push('Đoạn khoanh dài '+fmt(len)+' cm là <b>quá ngắn</b>, vỏ dễ liền lại. SGK: 3 – 5 cm.');err(2,'ngan','Đoạn khoanh quá ngắn')}
+  if(len>5){L.push('Đoạn khoanh dài '+fmt(len)+' cm là <b>quá dài</b>. SGK: 3 – 5 cm.');err(2,'dai','Đoạn khoanh quá dài')}
+  if(L.length)return bad(L);S.ring={a,b:a+len};S.ringDone=true;ok('Khoanh vỏ cách chạc '+fmt(a)+' cm, dài '+fmt(len)+' cm. Còn lớp vỏ xanh sát gỗ – làm tiếp nhé.',bP(BR[S.bi],a));render()};
+ACT.cao2=()=>{S.cao=true;ok('Đã cạo sạch phần vỏ sát gỗ (lớp xanh đã hết).',bP(BR[S.bi],S.ring.a));render()};
+ACT.dry2=()=>{S.dry++;render()};
+ACT.next2=()=>{const L=[];if(!S.cao){L.push('Chưa <b>cạo sạch</b> phần vỏ sát gỗ – vỏ dễ liền lại, cành khó ra rễ.');err(2,'chuacao','Chưa cạo sạch vỏ sát gỗ')}
+  if(S.dry<2){L.push('Mới để khô '+S.dry+' ngày. SGK: để từ <b>2 đến 3 ngày</b> cho khô vết khoanh.');err(2,'khosom','Bó bầu khi vết khoanh chưa khô')}
+  if(L.length)return bad(L);if(S.dry>3)err(2,'kholau','Để khô vết khoanh quá 3 ngày');goStep(3)};
+ACT.thuoc=b=>{S.thuoc=b.dataset.v;S.thuocLate=S.bauSet;render()};
+ACT.bauMode=()=>{S.bauMode=true;S.bauC=S.ring.b+6;render()};
+ACT.setBau=()=>{S.bauSet=true;S.bauMode=false;render()};
+ACT.tui=()=>{S.tui=true;render()};ACT.tie=b=>{S[b.dataset.v]=true;render()};
+ACT.done3=()=>{const L=[];if(!S.thuoc){L.push('Chưa dùng <b>thuốc kích thích ra rễ</b>.');err(3,'khongthuoc','Không dùng thuốc kích thích ra rễ')}
+  else if(S.thuoc==='duoi'){L.push('Bôi thuốc ở <b>phần dưới</b> vết khoanh. SGK: bôi vào <b>phần trên</b> của vết khoanh (hoặc trộn cùng giá thể).');err(3,'thuocduoi','Bôi thuốc ở phần dưới vết khoanh')}
+  if(S.thuoc&&S.thuocLate){L.push('Thuốc phải dùng <b>trước</b> khi đắp giá thể.');err(3,'thutu','Dùng thuốc sau khi đã đắp giá thể')}
+  if(!S.bauSet){L.push('Chưa đắp giá thể (bó bầu).');err(3,'khongbau','Chưa đắp giá thể')}
+  else if(!(S.bauC-5<=S.ring.a&&S.bauC+5>=S.ring.b)){L.push('Bầu <b>chưa phủ kín</b> vết khoanh. SGK: bó giá thể vào phần đã khoanh vỏ.');err(3,'hobau','Bầu không phủ kín vết khoanh')}
+  if(!S.tui){L.push('Chưa bọc túi nylon ra ngoài.');err(3,'khongtui','Chưa bọc túi nylon')}
+  if(!(S.b1&&S.b2)){L.push('Chưa buộc chặt <b>cả hai đầu</b> bầu.');err(3,'buoc','Chưa buộc chặt hai đầu bầu')}
+  if(L.length)return bad(L);ok('Bó bầu đúng: có thuốc kích thích ra rễ, bầu phủ kín vết khoanh, bọc túi, buộc chặt hai đầu.',bP(BR[S.bi],S.bauC));setTimeout(()=>{if(S.step===3)goStep(4)},FAST?0:1100)};
+ACT.cut4=()=>{PLAY=false;const L=[];if(S.day<S.R){L.push('Ngày '+S.day+': rễ <b>chưa xuất hiện ở ngoài bầu</b>. Cắt bây giờ cành chiết sẽ héo.');err(4,'som','Cắt cành chiết khi rễ chưa ra ngoài bầu');S.failed='Cắt khi rễ chưa ra ngoài bầu'}
+  else if(S.day<S.R+6){L.push('Rễ đã ra ngoài bầu nhưng còn <b>trắng, non</b>. SGK: chờ rễ có màu <b>vàng ngà</b>.');err(4,'renon','Cắt khi rễ còn trắng, non')}
+  if(S.day>60){L.push('Đã '+S.day+' ngày – cắt <b>muộn</b>. SGK: khoảng 30 – 60 ngày sau khi bó bầu.');err(4,'muon','Cắt cành chiết muộn')}
+  S.cut=true;setView(APP.view(4));if(L.length){bad(L)}else ok('Cắt đúng lúc: rễ ra ngoài bầu, màu vàng ngà (ngày '+S.day+').',add(SH,[0,30,0]));render()};
+ACT.peel=()=>{S.peel=true;ok('Đã bóc bỏ túi nylon.',add(SH,[0,30,0]));render()};
+ACT.place=b=>{const v=b.dataset.v,L=[];if(!S.peel){L.push('Chưa <b>bóc túi nylon</b> trước khi giâm.');err(4,'chuaboc','Giâm khi chưa bóc túi nylon')}
+  if(v==='nang'){L.push('Để ngoài trời nắng, cành chiết mới cắt dễ <b>héo</b>. SGK: giâm trong <b>nhà có mái che</b>.');err(4,'nang','Giâm cành chiết ngoài trời nắng');S.failed=S.failed||'Giâm ngoài trời nắng nên cành héo'}
+  S.place=v;S.ended=true;setView(APP.view(4));if(L.length)bad(L);else ok('Giâm cành chiết trong nhà có mái che – đúng SGK tr.15, Bước 4.',add(SH,[0,30,0]));render()};
+APP.auto[0]=async()=>{await auto0();await sleep(500);S.dat=2;S.mun=1;S.am=75;render();await sleep(600);ACT.mix()};
+APP.auto[1]=async()=>{S.br=1;render();await sleep(800);ACT.pick1()};
+APP.auto[2]=async()=>{BUSY=true;render();S.draft={a:12,b:12};for(let k=0;k<=8;k++){S.draft.b=12+k*.5;render();await sleep(70)}BUSY=false;ACT.ring2();await sleep(700);ACT.cao2();await sleep(500);ACT.dry2();await sleep(300);ACT.dry2();await sleep(400);ACT.next2()};
+APP.auto[3]=async()=>{ACT.thuoc({dataset:{v:'tren'}});await sleep(500);ACT.bauMode();S.bauC=(S.ring.a+S.ring.b)/2;render();await sleep(600);ACT.setBau();await sleep(400);ACT.tui();await sleep(400);ACT.tie({dataset:{v:'b1'}});ACT.tie({dataset:{v:'b2'}});await sleep(400);ACT.done3()};
+APP.auto[4]=async()=>{BUSY=true;render();while(S.day<S.R+7){APP.adv(1);render();await sleep(110)}BUSY=false;ACT.cut4();await sleep(800);ACT.peel();await sleep(500);ACT.place({dataset:{v:'mai'}})};
+
+init();
+</script>
+</body>
+</html>

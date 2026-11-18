@@ -1,0 +1,493 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Đo nước ao 3D – Đo nhiệt độ, độ trong nước ao nuôi (Công nghệ 7)</title>
+<!-- ĐO NƯỚC AO 3D · Thực hành ảo · Đo nhiệt độ, độ trong nước ao nuôi · SGK Công nghệ 7 (KNTT), Bài 15 mục IV tr.77–78.
+     3D tự viết trên canvas, không dùng thư viện ngoài, không cần mạng. Dữ liệu chỉ lưu mã nhóm, trong trình duyệt máy này.
+     Làm cho tổ CN – HN · Triway giáo viên (Thầy Bùi Duy Phương). ✅ BẢN NHÁP — thầy/cô duyệt trước khi dùng -->
+<style>
+:root{--panel:#ffffff;--ink:#1f2a24;--muted:#5d6b63;--line:#dfe7e1;--go2:#e8f7ee;--bad2:#fdecec;--accent:#0e9f8a}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;font-family:"Segoe UI",system-ui,Arial,sans-serif;color:var(--ink);background:#f4f8f5}
+header{display:flex;align-items:center;gap:12px;padding:10px 16px;background:linear-gradient(90deg,#0b3d2c,#126b4a 60%,#1b8a5a);color:#fff;flex-wrap:wrap;position:relative;z-index:5}
+.brand{display:flex;align-items:center;gap:10px}
+.brand h1{margin:0;font-size:22px;letter-spacing:.5px;background:linear-gradient(90deg,#d9ffb0,#7ef0c9,#fff2a8);-webkit-background-clip:text;background-clip:text;color:transparent;font-weight:800}
+.brand small{display:block;font-size:12px;opacity:.85;color:#e6fff2}
+.pills{display:flex;gap:6px;flex-wrap:wrap;margin-left:auto}
+.pill{font-size:12px;padding:5px 10px;border-radius:99px;background:rgba(255,255,255,.12);color:#dff;border:1px solid rgba(255,255,255,.18);white-space:nowrap}
+.pill.on{background:#fff;color:#0b3d2c;font-weight:700}
+.pill.done{background:#2fbf71;color:#fff;border-color:#2fbf71}
+.hbtn{background:rgba(255,255,255,.14);color:#fff;border:1px solid rgba(255,255,255,.3);border-radius:8px;padding:6px 10px;font-size:13px;cursor:pointer}
+.hbtn:hover{background:rgba(255,255,255,.25)}
+.nav{position:relative}
+#navMenu{display:none;position:absolute;right:0;top:36px;background:#fff;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.25);padding:6px;min-width:250px;z-index:30}
+#navMenu a{display:block;padding:9px 12px;border-radius:8px;color:#0b3d2c;text-decoration:none;font-size:14px}
+#navMenu a:hover{background:#e8f7ee}#navMenu a.cur{background:#0b3d2c;color:#fff}
+main{display:grid;grid-template-columns:1fr 380px;height:calc(100vh - 60px - 34px)}
+#stage{position:relative;overflow:hidden;background:radial-gradient(ellipse at 50% 35%,#f7fbff 0%,#e3f2ea 55%,#cfe6d6 100%)}
+#cv{width:100%;height:100%;display:block;touch-action:none;cursor:grab}
+#hud{position:absolute;left:12px;top:12px;display:flex;flex-direction:column;gap:6px;pointer-events:none}
+.tag{background:rgba(255,255,255,.92);border:1px solid var(--line);border-radius:10px;padding:6px 10px;font-size:13px;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.tag b{color:#0b6b45}
+#legend{position:absolute;right:12px;bottom:12px;display:flex;gap:10px;font-size:12px;background:rgba(255,255,255,.9);padding:6px 10px;border-radius:10px;border:1px solid var(--line);pointer-events:none;flex-wrap:wrap}
+#legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:4px;vertical-align:-2px}
+#viewbtn{position:absolute;right:12px;top:12px}
+#viewbtn button{background:#fff;border:1px solid var(--line);border-radius:8px;padding:6px 9px;cursor:pointer;font-size:13px}
+#toast{position:absolute;left:50%;top:16px;transform:translateX(-50%);padding:8px 16px;border-radius:99px;font-weight:700;font-size:15px;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap}
+#toast.ok{background:#1f9d55;color:#fff;opacity:1}#toast.err{background:#d64545;color:#fff;opacity:1}#toast.info{background:#0b3d2c;color:#fff;opacity:1}
+aside{background:var(--panel);border-left:1px solid var(--line);display:flex;flex-direction:column;overflow:auto}
+.ph{padding:14px 16px 8px;border-bottom:1px solid var(--line)}
+.no{display:inline-block;background:var(--accent);color:#fff;border-radius:8px;padding:2px 8px;font-size:12px;font-weight:700}
+.ph h2{margin:6px 0 2px;font-size:19px}
+.ph .sgk{font-size:12px;color:var(--muted)}
+.pb{padding:12px 16px;display:flex;flex-direction:column;gap:10px}
+.guide{font-size:14px;line-height:1.5;background:#f3faf6;border:1px solid #d5eee0;border-radius:10px;padding:10px 12px}
+.guide ol{margin:4px 0 0 18px;padding:0}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.btn{border:none;border-radius:10px;padding:10px 14px;font-size:14px;font-weight:600;cursor:pointer;background:#eef3f0;color:var(--ink);transition:transform .08s,background .2s}
+.btn:active{transform:scale(.97)}
+.btn.main{background:linear-gradient(90deg,#14a06a,#0e9f8a);color:#fff;box-shadow:0 3px 10px rgba(20,160,106,.3)}
+.btn.sel{background:#0b6b45;color:#fff}
+.btn.done{background:#dff3e7;color:#145c34}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.small{padding:7px 10px;font-size:13px}
+.meter{font-size:15px;padding:8px 12px;border-radius:10px;background:#fffbea;border:1px solid #f1e2a6}
+.meter b{font-size:20px;color:#8a5a00}
+.ctl{display:grid;grid-template-columns:1fr auto;gap:4px 10px;align-items:center;font-size:14px}
+.ctl b{color:#8a5a00;font-size:16px;min-width:64px;text-align:right}
+.ctl input{grid-column:1/3}
+.fb{border-radius:10px;padding:10px 12px;font-size:14px;line-height:1.45;display:none}
+.fb.ok{display:block;background:var(--go2);border:1px solid #9bdbb5;color:#145c34}
+.fb.err{display:block;background:var(--bad2);border:1px solid #f1b2b2;color:#8b1f1f}
+.fb.info{display:block;background:#eef6ff;border:1px solid #c6dcf5;color:#1d3f66}
+.fb ul{margin:4px 0 0 18px;padding:0}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font-size:12px;padding:4px 8px;border-radius:99px;background:#e8f7ee;color:#145c34;border:1px solid #bfe6cf}
+.foot{margin-top:auto;padding:10px 16px;border-top:1px solid var(--line);display:flex;gap:8px;flex-wrap:wrap}
+input[type=range]{width:100%}
+.timeline{position:relative;height:30px;background:#eef3f0;border-radius:8px;overflow:hidden}
+.timeline .fill{position:absolute;left:0;top:0;bottom:0;background:linear-gradient(90deg,#9be7b8,#2fbf71)}
+.timeline .band{position:absolute;top:0;bottom:0;background:repeating-linear-gradient(45deg,rgba(224,164,0,.35) 0 6px,rgba(224,164,0,.15) 6px 12px);border-left:2px solid #e0a400;border-right:2px solid #e0a400}
+.timeline .lab{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px}
+.bar{height:12px;border-radius:6px;background:#eef3f0;overflow:hidden}.bar i{display:block;height:100%;border-radius:6px}
+footer{height:34px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;font-size:12px;background:#0b3d2c;color:#d6f5e4;gap:10px;overflow:hidden;white-space:nowrap}
+footer b{color:#fff2a8}
+.ov{position:fixed;inset:0;background:rgba(5,25,15,.6);display:flex;align-items:center;justify-content:center;z-index:20;padding:16px}
+.card{background:#fff;border-radius:18px;max-width:580px;width:100%;padding:22px;box-shadow:0 20px 60px rgba(0,0,0,.3);max-height:90vh;overflow:auto}
+.card h2{margin:6px 0 6px;font-size:24px}
+.card p{color:var(--muted);line-height:1.5;margin:6px 0}
+.card input[type=text]{width:100%;font-size:17px;padding:10px 12px;border-radius:10px;border:2px solid #cfe3d7;margin:6px 0}
+.stepsN{display:grid;grid-template-columns:repeat(auto-fit,minmax(86px,1fr));gap:8px;margin:12px 0}
+.stepsN div{background:#f1faf5;border:1px solid #d5eee0;border-radius:10px;padding:8px;text-align:center;font-size:12px}
+.stepsN svg{display:block;margin:0 auto 4px}
+table.hist{width:100%;border-collapse:collapse;font-size:13px}
+table.hist th,table.hist td{border-bottom:1px solid var(--line);padding:6px 4px;text-align:center}
+.res-ok{color:#1f9d55;font-weight:700}.res-bad{color:#d64545;font-weight:700}
+@media (max-width:900px){html,body{overflow-x:hidden}#legend{display:none}header{gap:8px}main{grid-template-columns:1fr;height:auto;width:100%}#stage{height:58vh}aside{border-left:none;border-top:1px solid var(--line)}.pills{display:none}footer{font-size:11px}}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand"><svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="19" fill="#0b2e21" stroke="#7ef0c9" stroke-width="1.5"/><rect x="8" y="14" width="24" height="18" rx="3" fill="#6aa8e0"/><ellipse cx="20" cy="22" rx="7" ry="2.5" fill="#fff"/><path d="M13 22 h14" stroke="#222" stroke-width="2"/><line x1="20" y1="4" x2="20" y2="22" stroke="#334"/></svg><div><h1>ĐO NƯỚC AO 3D</h1><small>Thực hành ảo · Đo nhiệt độ, độ trong nước ao nuôi · Công nghệ 7 (KNTT)</small></div></div>
+  <div class="pills" id="pills"></div>
+  <div class="nav"><button class="hbtn" id="btnNav">📚 Bài khác ▾</button><div id="navMenu"><a href="Giam%20canh%203D%20CN7.html" class="">🌱 Giâm cành (Bài 5)</a><a href="Trong%20cay%20con%20co%20bau%203D%20CN7.html" class="">🌲 Trồng cây con có bầu (Bài 8)</a><a href="Do%20nuoc%20ao%20nuoi%203D%20CN7.html" class="cur">🐟 Đo nhiệt độ, độ trong (Bài 15)</a></div></div>
+  <button class="hbtn" id="btnDemo">▶ Làm mẫu (GV)</button>
+  <button class="hbtn" id="btnHist">📋 Các lượt đã lưu</button>
+</header>
+<main>
+  <div id="stage">
+    <canvas id="cv"></canvas>
+    <div id="hud"></div>
+    <div id="toast"></div>
+    <div id="viewbtn"><button id="btnView" title="Đưa góc nhìn về mặc định">↺ Góc nhìn</button></div>
+    <div id="legend"><span><i style="background:#f5c400"></i>thước, số đo</span><span><i style="background:#d64545"></i>cột đỏ nhiệt kế</span><span><i style="background:#6aa8e0"></i>nước ao</span></div>
+  </div>
+  <aside>
+    <div class="ph"><span class="no" id="pNo">Chuẩn bị</span><h2 id="pTitle"></h2><div class="sgk" id="pSgk"></div></div>
+    <div class="pb" id="pBody"></div>
+    <div class="foot">
+      <button class="btn small" data-act="hint">💡 Gợi ý</button>
+      <button class="btn small" data-act="redo">↩ Làm lại bước</button>
+    </div>
+  </aside>
+</main>
+<footer><span><b>✅ BẢN NHÁP — thầy/cô duyệt trước khi dùng</b> · Căn cứ: SGK Công nghệ 7 (KNTT), Bài 15 mục IV tr.77–78</span><span>Kéo để xoay · cuộn để phóng to · Triway giáo viên</span></footer>
+
+<div class="ov" id="ovStart">
+  <div class="card">
+    <span class="no">Công nghệ 7 · Bài 15 · Mục IV</span>
+    <h2>🐟 Thực hành ảo: Đo nhiệt độ và độ trong của nước ao nuôi</h2>
+    <p>Luyện đo nhiệt độ bằng nhiệt kế và đo độ trong bằng đĩa Secchi (2 lần đo, tính trung bình), so với khoảng thích hợp cho cá – theo SGK. Mỗi lượt nước có nhiệt độ, độ trong khác nhau.</p>
+    <div class="stepsN"><div><svg width="44" height="34" viewBox="0 0 44 34"><rect x="19" y="2" width="6" height="26" rx="3" fill="#eee" stroke="#999"/><rect x="20.5" y="12" width="3" height="16" fill="#d64545"/><circle cx="22" cy="29" r="4" fill="#d64545"/></svg>1. Nhiệt độ</div><div><svg width="44" height="34" viewBox="0 0 44 34"><rect x="6" y="10" width="32" height="22" fill="#6aa8e0"/><ellipse cx="22" cy="22" rx="9" ry="3" fill="#fff"/><path d="M13 22 h18" stroke="#222" stroke-width="2"/></svg>2. Độ trong</div><div><svg width="44" height="34" viewBox="0 0 44 34"><rect x="6" y="6" width="32" height="22" rx="3" fill="#fff2a8" stroke="#e0a400"/><text x="22" y="21" font-size="10" text-anchor="middle" fill="#5a4300">(d1+d2):2</text></svg>3. Đánh giá</div></div>
+    <label for="inNhom"><b>Mã nhóm</b> (chỉ ghi mã nhóm, lớp — <u>không ghi họ tên</u>)</label>
+    <input type="text" id="inNhom" maxlength="30" placeholder="VD: Nhóm 3 – 7A1">
+    <div class="row" style="margin-top:8px">
+      <button class="btn main" id="btnGo">Bắt đầu luyện tập</button>
+      <button class="btn" id="btnGoDemo">▶ Xem làm mẫu (GV chiếu)</button>
+    </div>
+    <p style="font-size:12px;margin-top:12px">✅ BẢN NHÁP — thầy/cô duyệt trước khi dùng. App không thay buổi thực hành thật; kết quả chỉ để GV xem nhóm hay sai ở đâu, không dùng để cho điểm.</p>
+  </div>
+</div>
+<div class="ov" id="ovHist" style="display:none"><div class="card" id="histCard"></div></div>
+
+<script>
+"use strict";
+/* ===================== KHUNG CHUNG (bộ vẽ 3D tự viết + giao diện bước + lưu, xuất) ===================== */
+const add=(a,b)=>[a[0]+b[0],a[1]+b[1],a[2]+b[2]],sub=(a,b)=>[a[0]-b[0],a[1]-b[1],a[2]-b[2]],mul=(a,s)=>[a[0]*s,a[1]*s,a[2]*s];
+const dot=(a,b)=>a[0]*b[0]+a[1]*b[1]+a[2]*b[2],cross=(a,b)=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]];
+const nrm=a=>{const l=Math.hypot(a[0],a[1],a[2])||1;return [a[0]/l,a[1]/l,a[2]/l]};
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),lerp=(a,b,t)=>a+(b-a)*t,lerp3=(a,b,t)=>[lerp(a[0],b[0],t),lerp(a[1],b[1],t),lerp(a[2],b[2],t)];
+const mixc=(a,b,t)=>[lerp(a[0],b[0],t),lerp(a[1],b[1],t),lerp(a[2],b[2],t)];
+const rotY=(v,a)=>[v[0]*Math.cos(a)+v[2]*Math.sin(a),v[1],-v[0]*Math.sin(a)+v[2]*Math.cos(a)];
+const r1=v=>Math.round(v*10)/10,fmt=v=>(Math.round(v*10)/10).toFixed(1).replace('.',','),fmt0=v=>String(Math.round(v*100)/100).replace('.',',');
+function newell(p){let n=[0,0,0];for(let i=0;i<p.length;i++){const a=p[i],b=p[(i+1)%p.length];n[0]+=(a[1]-b[1])*(a[2]+b[2]);n[1]+=(a[2]-b[2])*(a[0]+b[0]);n[2]+=(a[0]-b[0])*(a[1]+b[1]);}return nrm(n)}
+function basis(t){t=nrm(t);const ref=Math.abs(t[1])<.9?[0,1,0]:[1,0,0];const n1=nrm(cross(t,ref));return [t,n1,cross(t,n1)]}
+const cv=document.getElementById('cv'),ctx=cv.getContext('2d');
+let W=0,H=0,DPR=1,F=[],OV=[],DRAWN=[],PART=[],BGM=0,DIRTY=true,NOROT=false;
+const cam={yaw:.5,pitch:.28,dist:70,tgt:[0,8,0]},camT={yaw:.5,pitch:.28,dist:70,tgt:[0,8,0]};
+let EYE=[0,0,0],FW=[0,0,1],RT=[1,0,0],UP=[0,1,0],FOC=600;
+function poly(p,c,o){o=o||{};F.push({p,c,id:o.id||null,ds:!!o.ds,a:o.a==null?1:o.a,gl:o.gl||0,n:o.n||null,bg:o.bg!=null?o.bg:BGM})}
+function tube(path,rad,seg,col,o){o=o||{};const R=[],N=path.length;
+  for(let i=0;i<N;i++){const t=nrm(sub(path[Math.min(i+1,N-1)],path[Math.max(i-1,0)]));const ref=Math.abs(t[1])<.9?[0,1,0]:[1,0,0];
+    const n1=nrm(cross(t,ref)),n2=cross(t,n1),r=typeof rad==='function'?rad(i,N):rad,ring=[];
+    for(let k=0;k<seg;k++){const a=k/seg*Math.PI*2;ring.push(add(path[i],add(mul(n1,Math.cos(a)*r),mul(n2,Math.sin(a)*r))))}R.push(ring)}
+  for(let i=0;i<N-1;i++){const c=typeof col==='function'?col(i,N):col;for(let k=0;k<seg;k++){const k2=(k+1)%seg,q=[R[i][k],R[i][k2],R[i+1][k2],R[i+1][k]];
+    const cen=mul(add(add(q[0],q[1]),add(q[2],q[3])),.25),ax=mul(add(path[i],path[i+1]),.5);poly(q,c,{id:o.id,gl:o.gl,n:nrm(sub(cen,ax)),a:o.a})}}
+  if(o.cap1){const t=nrm(sub(path[N-1],path[N-2]));poly(R[N-1].slice().reverse(),o.cap1,{id:o.id,n:t})}
+  if(o.cap0){const t=nrm(sub(path[0],path[1]));poly(R[0].slice(),o.cap0,{id:o.id,n:t})}}
+function ell(c,rx,ry,rz,col,o,su,sv){o=o||{};su=su||10;sv=sv||6;const P=(u,v)=>{const th=u/su*Math.PI*2,ph=v/sv*Math.PI;let p=[Math.sin(ph)*Math.cos(th)*rx,Math.cos(ph)*ry,Math.sin(ph)*Math.sin(th)*rz];if(o.rot)p=o.rot(p);return add(c,p)};
+  for(let v=0;v<sv;v++)for(let u=0;u<su;u++){const q=[P(u,v),P(u,v+1),P(u+1,v+1),P(u+1,v)];const cen=mul(add(add(q[0],q[1]),add(q[2],q[3])),.25);poly(v===0?[q[0],q[1],q[2]]:(v===sv-1?[q[0],q[1],q[3]]:q),col,{id:o.id,gl:o.gl,n:nrm(sub(cen,c)),a:o.a})}}
+function box(c,sx,sy,sz,col,o){o=o||{};const yaw=o.yaw||0,h=[sx/2,sy/2,sz/2];const V=(x,y,z)=>add(c,rotY([x*h[0],y*h[1],z*h[2]],yaw));
+  const fs=[[[-1,-1,1],[1,-1,1],[1,1,1],[-1,1,1],[0,0,1]],[[1,-1,-1],[-1,-1,-1],[-1,1,-1],[1,1,-1],[0,0,-1]],[[-1,1,1],[1,1,1],[1,1,-1],[-1,1,-1],[0,1,0]],[[-1,-1,-1],[1,-1,-1],[1,-1,1],[-1,-1,1],[0,-1,0]],[[1,-1,1],[1,-1,-1],[1,1,-1],[1,1,1],[1,0,0]],[[-1,-1,-1],[-1,-1,1],[-1,1,1],[-1,1,-1],[-1,0,0]]];
+  fs.forEach((f,i)=>{const cc=Array.isArray(col[0])?col[i]||col[0]:col;poly(f.slice(0,4).map(v=>V(v[0],v[1],v[2])),cc,{id:o.id,gl:o.gl,n:rotY(f[4],yaw),a:o.a})})}
+function leaf(base,dir,side,L,Wd,col,o){o=o||{};dir=nrm(dir);side=nrm(side);const nn=nrm(cross(side,dir)),n=6;let pL,pR,pM;
+  for(let i=0;i<=n;i++){const s=i/n,w=Wd*Math.sin(Math.PI*Math.pow(s,.85))*.5,m=add(add(base,mul(dir,L*s)),mul(nn,-(o.droop==null?.18:o.droop)*L*s*s));
+    const l=add(add(m,mul(side,w)),mul(nn,-.12*w)),r=add(add(m,mul(side,-w)),mul(nn,-.12*w));
+    if(i>0){poly([pL,l,m,pM],col,{ds:true,id:o.id,a:o.a});poly([pM,m,r,pR],mixc(col,[0,0,0],.08),{ds:true,id:o.id,a:o.a})}pL=l;pR=r;pM=m}}
+function disk(c,r,col,o,seg){seg=seg||28;const p=[];for(let k=0;k<seg;k++){const a=-k/seg*Math.PI*2;p.push(add(c,[Math.cos(a)*r,0,Math.sin(a)*r]))}poly(p,col,Object.assign({n:[0,1,0]},o||{}))}
+function line3(a,b,col,w,dash){OV.push({t:'l',a,b,col,w:w||1.5,dash})}
+function text3(p,s,o){OV.push(Object.assign({t:'x',p,s},o||{}))}
+function proj(p){const d=sub(p,EYE),z=dot(d,FW);if(z<.5)return null;return [W/2+FOC*dot(d,RT)/z,H/2-FOC*dot(d,UP)/z,z]}
+const LIGHT=nrm([.45,.85,.55]);
+function draw(){
+  const cp=Math.cos(cam.pitch);EYE=add(cam.tgt,[cam.dist*cp*Math.sin(cam.yaw),cam.dist*Math.sin(cam.pitch),cam.dist*cp*Math.cos(cam.yaw)]);
+  FW=nrm(sub(cam.tgt,EYE));RT=nrm(cross(FW,[0,1,0]));UP=cross(RT,FW);FOC=Math.min(W,H*1.35)*1.05;
+  ctx.setTransform(DPR,0,0,DPR,0,0);ctx.clearRect(0,0,W,H);
+  const L=[];
+  for(const f of F){let n=f.n||newell(f.p);let cen=[0,0,0];for(const p of f.p)cen=add(cen,p);cen=mul(cen,1/f.p.length);const vd=sub(EYE,cen),dn=dot(n,vd);
+    if(dn<0){if(!f.ds)continue;n=mul(n,-1)}
+    const q=[];let z=0,ok=true;for(const p of f.p){const r=proj(p);if(!r){ok=false;break}q.push(r[0],r[1]);z+=r[2]}if(!ok)continue;
+    const vn=nrm(vd);let lum=.34+.56*Math.max(0,dot(n,LIGHT))+.14*Math.max(0,dot(n,vn));
+    if(f.gl)lum+=f.gl*Math.pow(Math.max(0,dot(n,nrm(add(LIGHT,vn)))),24);
+    L.push({q,z:z/f.p.length,c:f.c,lum,a:f.a,id:f.id,bg:f.bg})}
+  L.sort((a,b)=>(b.bg-a.bg)||(b.z-a.z));DRAWN=L;
+  for(const f of L){ctx.beginPath();ctx.moveTo(f.q[0],f.q[1]);for(let i=2;i<f.q.length;i+=2)ctx.lineTo(f.q[i],f.q[i+1]);ctx.closePath();
+    const c=`rgba(${clamp(f.c[0]*f.lum,0,255)|0},${clamp(f.c[1]*f.lum,0,255)|0},${clamp(f.c[2]*f.lum,0,255)|0},${f.a})`;ctx.fillStyle=c;ctx.fill();if(f.a>=1){ctx.strokeStyle=c;ctx.lineWidth=.6;ctx.stroke()}}
+  for(const o of OV){
+    if(o.t==='l'){const a=proj(o.a),b=proj(o.b);if(!a||!b)continue;ctx.beginPath();ctx.moveTo(a[0],a[1]);ctx.lineTo(b[0],b[1]);ctx.strokeStyle=o.col;ctx.lineWidth=o.w;ctx.setLineDash(o.dash?[5,4]:[]);ctx.stroke();ctx.setLineDash([])}
+    else if(o.t==='x'){const a=proj(o.p);if(!a)continue;const fs=o.size||13;ctx.font=`${o.bold?'700 ':''}${fs}px "Segoe UI",Arial`;const w=ctx.measureText(o.s).width;let x=a[0]+(o.dx||0),y=a[1]+(o.dy||0);
+      if(o.bg){ctx.fillStyle=o.bg;rr(x-w/2-7,y-fs/2-6,w+14,fs+12,8);ctx.fill();if(o.bd){ctx.strokeStyle=o.bd;ctx.lineWidth=1.5;ctx.stroke()}}
+      ctx.fillStyle=o.col||'#1f2a24';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(o.s,x,y+1)}}
+  const now=performance.now();PART=PART.filter(p=>(p.f=(p.f||0)+1)<60&&now-p.t0<900);
+  for(const p of PART){const a=proj(p.p);if(!a)continue;const k=(now-p.t0)/900;ctx.globalAlpha=1-k;ctx.fillStyle=p.c;ctx.beginPath();ctx.arc(a[0]+p.vx*k*60,a[1]+p.vy*k*60+(p.down?40*k:-20*k),4*(1-k)+1.5,0,7);ctx.fill();ctx.globalAlpha=1}
+}
+function rr(x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath()}
+function pick(x,y){for(let i=DRAWN.length-1;i>=0;i--){const f=DRAWN[i];if(!f.id)continue;if(inPoly(x,y,f.q))return f.id}return null}
+function inPoly(x,y,q){let c=false;for(let i=0,j=q.length-2;i<q.length;j=i,i+=2){const xi=q[i],yi=q[i+1],xj=q[j],yj=q[j+1];if(((yi>y)!==(yj>y))&&(x<(xj-xi)*(y-yi)/(yj-yi)+xi))c=!c}return c}
+function sparkle(p,col,down){for(let i=0;i<14;i++){const a=Math.random()*7;PART.push({p,t0:performance.now(),vx:Math.cos(a)*(.4+Math.random()),vy:Math.sin(a)*(.4+Math.random()),c:col||'#3ddc84',down})}}
+let AC=null;function beep(ok){try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();const t=AC.currentTime;const seq=ok?[[660,0],[880,.09],[1175,.18]]:[[300,0],[220,.14]];
+  for(const [f,d] of seq){const o=AC.createOscillator(),g=AC.createGain();o.type=ok?'sine':'square';o.frequency.value=f;g.gain.setValueAtTime(.0001,t+d);g.gain.exponentialRampToValueAtTime(ok?.18:.07,t+d+.02);g.gain.exponentialRampToValueAtTime(.0001,t+d+.16);o.connect(g).connect(AC.destination);o.start(t+d);o.stop(t+d+.2)}}catch(e){}}
+
+/* ---------- cảnh dùng chung ---------- */
+function table(){BGM=1;box([0,-2.2,0],96,2.4,50,[[196,150,98],[180,136,88],[214,168,112],[150,110,70],[190,145,95],[190,145,95]]);for(const x of [-43,43])for(const z of [-21,21])box([x,-12,z],2.4,18,2.4,[140,100,64]);BGM=0}
+function ground(y,R,col,grid){BGM=1;R=R||60;const n=16,sz=2*R/n,c0=col||[196,222,196];for(let i=0;i<n;i++)for(let j=0;j<n;j++){const x0=-R+i*sz,z0=-R+j*sz;if(Math.hypot(x0+sz/2,z0+sz/2)>R)continue;poly([[x0,y,z0],[x0,y,z0+sz],[x0+sz,y,z0+sz],[x0+sz,y,z0]],c0,{n:[0,1,0]})}
+  if(grid){const g=grid;for(let i=-3;i<=3;i++){line3([i*g,y+.02,-3.3*g],[i*g,y+.02,3.3*g],'rgba(80,130,90,.12)',1);line3([-3.3*g,y+.02,i*g],[3.3*g,y+.02,i*g],'rgba(80,130,90,.12)',1)}}BGM=0}
+function ringBand(c,t,r,len,col,o){const [d]=basis(t);tube([add(c,mul(d,-len/2)),add(c,mul(d,len/2))],r,14,col,o)}
+/* thư viện đồ vật trên bàn (đặt tại o, cao khoảng 0–8) */
+function itemMesh(k,o,id){
+  if(APP.itemMesh&&APP.itemMesh(k,o,id))return;
+  const A=(v)=>add(o,v);
+  if(k==='dao'){box(A([-3,1,0]),9,.16,1.5,[205,212,220],{id,gl:.9,yaw:.15});box(A([4.6,1,-1.2]),6.5,1.1,1.5,[120,74,40],{id,yaw:.15})}
+  else if(k==='daoghep'){box(A([-3,1,0]),8,.16,1.3,[205,212,220],{id,gl:.9,yaw:-.2});box(A([4,1,1]),6,1.1,1.6,[40,40,44],{id,yaw:-.2});ell(A([-6.8,1,1.2]),.8,.3,.8,[205,212,220],{id},6,3)}
+  else if(k==='keo'){box(A([-2.5,1,-.6]),7,.18,1.1,[200,206,214],{id,gl:.9,yaw:.25});box(A([-2.5,1.25,.6]),7,.18,1.1,[200,206,214],{id,gl:.9,yaw:-.25});box(A([3.5,1,1.5]),5,.9,1.1,[210,50,50],{id,yaw:.35});box(A([3.5,1,-1.5]),5,.9,1.1,[210,50,50],{id,yaw:-.35})}
+  else if(k==='day'){const p=[];for(let i=0;i<=24;i++){const a=i/24*Math.PI*2;p.push(A([Math.cos(a)*2.4,1,Math.sin(a)*2.4]))}tube(p,.85,8,[214,232,244],{id,gl:.4})}
+  else if(k==='thuoc'){tube([A([0,0,0]),A([0,5,0])],1.6,14,[190,120,40],{id,cap1:[190,120,40],gl:.5});tube([A([0,5,0]),A([0,6.4,0])],.9,10,[240,240,240],{id,cap1:[240,240,240]});box(A([0,2.6,1.55]),2.2,2,.1,[250,246,230],{id})}
+  else if(k==='tuinylon'){box(A([0,.15,0]),10,.1,7,[235,240,245],{id,a:.75,gl:.8,yaw:.1});box(A([1,.3,.5]),8,.1,5,[235,240,245],{id,a:.6,gl:.8,yaw:-.2})}
+  else if(k==='tuibau'){for(let i=0;i<3;i++){const c=A([-3.5+i*3.5,0,0]);tube([c,add(c,[0,4.5,0])],1.5,12,[30,30,32],{id,gl:.4});disk(add(c,[0,4.5,0]),1.45,[60,60,62],{id})}}
+  else if(k==='giathe'||k==='datset'){tube([A([0,0,0]),A([0,3,0])],(i)=>i?6:4.6,18,[150,150,150],{id,gl:.3});const cl=k==='giathe'?[102,74,48]:[150,128,96];ell(A([0,3,0]),5.4,1.8,5.4,cl,{id},12,4);
+    if(k==='giathe'){for(let i=0;i<8;i++){const a=i*.8;ell(A([Math.cos(a)*3,4.2,Math.sin(a)*3]),.5,.3,.5,[60,44,30],{id},5,3)}}else{disk(A([1,4.7,.5]),2.2,[120,170,210],{id,a:.85,gl:.8})}}
+  else if(k==='nuoc'){tube([A([0,0,0]),A([0,6,0])],(i)=>i?3.4:2.9,16,[60,130,200],{id,gl:.5});disk(A([0,5.6,0]),3.2,[150,205,240],{id,gl:.8});const p=[];for(let i=0;i<=12;i++){const a=i/12*Math.PI;p.push(A([Math.cos(a)*3.4,6+Math.sin(a)*3,0]))}tube(p,.15,5,[90,90,90],{id})}
+  else if(k==='lo'){tube([A([0,0,0]),A([0,5,0])],2,16,[200,230,240],{id,a:.55,gl:.9});tube([A([0,.05,0]),A([0,2.6,0])],1.9,16,[200,140,50],{id,a:.8});disk(A([0,2.6,0]),1.9,[220,160,70],{id,a:.85})}
+  else if(k==='binhtuoi'){tube([A([0,0,0]),A([0,5,0])],2.6,16,[40,150,90],{id,gl:.5,cap1:[40,150,90]});tube([A([2,1.5,0]),A([6.5,6,0])],.45,8,[40,150,90],{id});tube([A([6.3,5.8,0]),A([7.2,6.6,0])],(i)=>i?1.3:.5,10,[220,190,60],{id,cap1:[200,170,50]});const p=[];for(let i=0;i<=10;i++){const a=i/10*Math.PI;p.push(A([-2.6-Math.sin(a)*2.2,1+ (1-Math.cos(a))*1.8,0]))}tube(p,.35,6,[40,150,90],{id})}
+  else if(k==='cuoc'){box(A([0,.6,0]),14,.9,.9,[150,110,70],{id,yaw:.3});box(A([-6.4,.9,-2]),1.2,.5,4,[120,120,128],{id,gl:.8,yaw:.3});box(A([1,.6,4]),12,.8,.8,[150,110,70],{id,yaw:-.1});box(A([-6,.6,4.6]),3.6,.3,3,[150,155,165],{id,gl:.8,yaw:-.1})}
+  else if(k==='coc'){for(let i=0;i<3;i++)tube([A([-5,.6,-1.5+i*1.4]),A([7,.6,-1.5+i*1.4])],.45,7,[200,175,110],{id,cap0:[220,200,140],cap1:[220,200,140]});const p=[];for(let i=0;i<=20;i++){const a=i/20*Math.PI*2;p.push(A([3+Math.cos(a)*1.8,.7,3.5+Math.sin(a)*1.8]))}tube(p,.5,6,[120,160,90],{id})}
+  else if(k==='phan'){const cs=[[120,90,60],[230,230,225],[200,70,60],[245,245,240]];cs.forEach((c,i)=>box(A([-5.5+i*3.7,1.8,0]),3.2,3.6,2.4,c,{id,yaw:.1*(i-1.5)}))}
+  else if(k==='cay'||k==='caybenh'){tube([A([0,0,0]),A([0,4,0])],(i)=>i?2.2:1.9,14,[30,30,32],{id,cap1:[96,68,44]});tube([A([0,4,0]),A([0,15,0])],(i)=>i?.25:.45,8,[110,104,66],{id});
+    for(let i=0;i<7;i++){const a=i*2.4,y=8+i*1.1,d=[Math.cos(a),.45,Math.sin(a)];leaf(A([0,y,0]),d,[-Math.sin(a),0,Math.cos(a)],3.6-i*.2,1.7,k==='cay'?[44,120,52]:mixc([190,170,60],[44,120,52],i%3?.2:.6),{id})}
+    if(k==='caybenh'){for(let i=0;i<6;i++){const a=i*1.3;ell(A([Math.cos(a)*2.2,9+i,Math.sin(a)*2.2]),.35,.25,.35,[70,50,30],{id},5,3)}}}
+  else {box(A([0,1.5,0]),8,3,6,[180,180,180],{id})}}
+function itemsScene(){table();const its=APP.items,n=its.length,cols=Math.ceil(n/2),sp=Math.min(30,86/cols);
+  its.forEach((it,i)=>{const c=i%cols,r=Math.floor(i/cols);const o=[(c-(cols-1)/2)*sp,-1,r===0?-9:11],id='it_'+it.k;itemMesh(it.mesh||it.k,o,id);
+    const on=!!S.sel[it.k];if(on){const p=[];for(let k=0;k<24;k++){const a=-k/24*Math.PI*2;p.push(add(o,[Math.cos(a)*sp*.42,.05,Math.sin(a)*5.5]))}poly(p,[120,230,160],{n:[0,1,0],a:.55})}
+    text3(add(o,[0,it.lh||3.2,4.4]),(on?'✓ ':'')+it.ten,{bg:on?'#1f9d55':'rgba(255,255,255,.95)',col:on?'#fff':'#1f2a24',size:12,bd:on?null:'#cfe3d7',bold:on})})}
+
+/* ---------- trạng thái, phản hồi ---------- */
+const $=id=>document.getElementById(id);
+let APP=null,S=null,E={},SNAP=null,MODE='luyen',NHOM='',T0=0,BUSY=false,FAST=false,LASTFB=null,PLAY=false;
+const LAST=()=>APP.steps.length-1;
+function err(st,code,msg){E[st]=E[st]||{};E[st][code]=E[st][code]||{msg,n:0};E[st][code].n++}
+const sleep=ms=>FAST?Promise.resolve():new Promise(r=>setTimeout(r,ms));
+function fb(kind,html){LASTFB={kind,html};const el=$('fb');if(!el)return;el.className='fb '+kind;el.innerHTML=html}
+function toast(kind,s){const t=$('toast');t.className=kind;t.textContent=s;clearTimeout(toast._t);toast._t=setTimeout(()=>{t.className='';setTimeout(()=>{if(!t.className)t.textContent=''},350)},1800)}
+function ok(msg,p){beep(true);toast('ok','Đúng rồi!');fb('ok',msg);if(p)sparkle(p)}
+function bad(list){beep(false);toast('err','Chưa đúng – xem lỗi bên phải');fb('err','<b>Cần sửa:</b><ul>'+list.map(s=>'<li>'+s+'</li>').join('')+'</ul>')}
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function tlHTML(v,max,lab,band){const sh=band&&(S.hint>=2||MODE==='mau');return `<div class="timeline"><div class="fill" style="width:${v/max*100}%"></div>${sh?`<div class="band" style="left:${band[0]/max*100}%;width:${(band[1]-band[0])/max*100}%"></div>`:''}<div class="lab">${lab}</div></div>`}
+function ctl(id,lab,val,min,max,step,unit){return `<div class="ctl"><span>${lab}</span><b id="v_${id}">${fmt0(val)} ${unit}</b><input type="range" id="${id}" min="${min}" max="${max}" step="${step}" value="${val}" ${BUSY?'disabled':''}></div>`}
+function wireCtl(id,key,unit,cb){const e=$(id);if(!e)return;e.oninput=()=>{S[key]=+e.value;DIRTY=true;$('v_'+id).textContent=fmt0(S[key])+' '+unit;if(cb)cb()}}
+function pills(){$('pills').innerHTML=APP.steps.map((s,i)=>`<span class="pill ${i===S.step?'on':(i<S.step?'done':'')}">${s.pill}</span>`).join('')}
+function render(){DIRTY=true;pills();const st=S.step,s=APP.steps[st],L=LAST();$('pNo').textContent=st===0?'Chuẩn bị':(st<L?'Bước '+st:'Tổng kết');$('pTitle').textContent=s.name;$('pSgk').textContent=s.sgk;
+  const dis=BUSY?'disabled':'';let h=st<L?(st===0&&!S.prepItems?panel0(dis):APP.panel(st,dis)):resultHTML();h+='<div class="fb" id="fb"></div>';$('pBody').innerHTML=h;
+  if(LASTFB&&st<L){$('fb').className='fb '+LASTFB.kind;$('fb').innerHTML=LASTFB.html}if(APP.wire&&st<L)APP.wire(st);hud()}
+function hud(){let h=APP.hud?APP.hud(S.step):'';if(S.step===0&&!S.prepItems)h=`<div class="tag">Đã chọn <b>${Object.values(S.sel).filter(Boolean).length}</b> đồ vật</div>`;if(MODE==='mau')h+=`<div class="tag" style="background:#0b3d2c;color:#fff">▶ GV làm mẫu</div>`;if(NHOM)h+=`<div class="tag">${esc(NHOM)}</div>`;$('hud').innerHTML=h}
+function panel0(dis){return `<div class="guide">Bấm vào đồ vật trên bàn để chọn <b>những thứ cần</b> cho buổi ${APP.viec} (bấm lần nữa để bỏ chọn). Chọn xong bấm <b>Kiểm tra</b>.</div>
+  <div class="chips">${APP.items.filter(i=>S.sel[i.k]).map(i=>`<span class="chip">✓ ${i.ten}</span>`).join('')||'<span style="color:#888;font-size:13px">Chưa chọn đồ vật nào</span>'}</div>
+  <button class="btn main" data-act="check0" ${dis}>Kiểm tra</button>`}
+const ACT={},AUTO={};
+function goStep(n){S.step=n;S.hint=0;LASTFB=null;PLAY=false;SNAP=JSON.stringify(S);setView(APP.view(n));render();if(n===LAST())saveResult()}
+ACT.next=()=>goStep(S.step+1);
+ACT.redo=()=>{if(BUSY||S.step===LAST())return;PLAY=false;const st=S.step;S=JSON.parse(SNAP);S.step=st;setView(APP.view(st));render();fb('info','Đã đưa bước này về lúc bắt đầu. Lỗi đã mắc vẫn được ghi lại.')};
+ACT.hint=()=>{if(BUSY||S.step===LAST())return;S.hint++;const H=APP.hints[S.step];if(S.hint<=2){render();fb('info','💡 '+H[S.hint-1]+(S.hint===2?'<br><small>Bấm Gợi ý lần nữa để xem làm mẫu bước này.</small>':''))}else AUTO[S.step]()};
+ACT.check0=()=>{const L=[];APP.items.forEach(it=>{if(it.ok&&!S.sel[it.k]){L.push('Còn thiếu: <b>'+it.ten+'</b>.');err(0,'thieu_'+it.k,'Thiếu '+it.ten)}
+    if(!it.ok&&S.sel[it.k]){L.push('<b>'+it.ten+'</b>: '+it.ly);err(0,'thua_'+it.k,'Chọn '+it.ten+' – '+it.ly)}});
+  if(L.length)return bad(L);ok(APP.prepOk,[0,2,0]);if(APP.prep2){S.prepItems=true;setView(APP.view(0));render();return}setTimeout(()=>{if(S.step===0)goStep(1)},FAST?0:1100)};
+ACT.adv=b=>{APP.adv(+b.dataset.v);render()};
+ACT.play=async()=>{PLAY=!PLAY;render();const st=S.step;while(PLAY&&!S.ended&&S.step===st){APP.adv(1);render();await sleep(APP.playMs||380)}PLAY=false;if(S.step===st)render()};
+ACT.result=()=>goStep(LAST());
+async function auto0(){BUSY=true;render();for(const it of APP.items)S.sel[it.k]=false;for(const it of APP.items.filter(i=>i.ok)){S.sel[it.k]=true;render();await sleep(300)}BUSY=false;ACT.check0()}
+async function demoAll(){MODE='mau';S=APP.fresh();E={};T0=Date.now();goStep(0);await sleep(600);for(let i=0;i<LAST();i++){if(S.step!==i)goStep(i);await AUTO[i]();await sleep(1200);if(S.step===i)goStep(i+1)}if(S.step!==LAST())goStep(LAST())}
+
+/* ---------- kết quả, lưu, xuất ---------- */
+const KEY=()=>'app3d_'+APP.key;
+function loadH(){try{return JSON.parse(localStorage.getItem(KEY())||'[]')}catch(e){return []}}
+function saveH(a){try{localStorage.setItem(KEY(),JSON.stringify(a))}catch(e){}}
+function cnt(st){return Object.values(E[st]||{}).reduce((s,o)=>s+o.n,0)}
+const stepIdx=()=>APP.steps.slice(0,-1).map((_,i)=>i);
+function saveResult(){if(MODE!=='luyen'||saveResult._done)return;saveResult._done=true;const H=loadH(),luot=H.filter(r=>r.nhom===NHOM).length+1,d=new Date(),rec={tg:d.toLocaleString('vi-VN'),nhom:NHOM||'(chưa ghi mã)',luot};
+  stepIdx().forEach(i=>rec['b'+i]=cnt(i));rec.tong=stepIdx().reduce((s,i)=>s+cnt(i),0);rec.giay=Math.round((Date.now()-T0)/1000);rec.kq=APP.success()?APP.okShort:'Chưa đạt';rec.loi=stepIdx().flatMap(i=>Object.values(E[i]||{}).map(o=>o.msg)).join('; ');H.push(rec);saveH(H)}
+function resultHTML(){const okk=APP.success(),tong=stepIdx().reduce((s,i)=>s+cnt(i),0),sec=Math.round((Date.now()-T0)/1000);
+  let h=`<div class="fb ${okk?'ok':'err'}" style="display:block;font-size:16px">${okk?APP.okText:APP.badText()}</div><div class="meter">Tổng số lỗi: <b>${tong}</b> · Thời gian: <b>${Math.floor(sec/60)} phút ${sec%60} giây</b></div>`;
+  stepIdx().forEach(i=>{const L=Object.values(E[i]||{});h+=`<div style="font-size:14px"><b>${i===0?'Chuẩn bị':'Bước '+i+'. '+APP.steps[i].name}</b> – ${L.length?'<span class="res-bad">'+cnt(i)+' lỗi</span>':'<span class="res-ok">không lỗi</span>'}${L.length?'<ul style="margin:4px 0 0 18px;padding:0">'+L.map(o=>'<li>'+o.msg+(o.n>1?' (×'+o.n+')':'')+'</li>').join('')+'</ul>':''}</div>`});
+  h+=`<div class="guide" style="font-size:13px">${APP.resultNote}</div><div class="row"><button class="btn main" data-act="again">↻ Luyện lại từ đầu</button><button class="btn" data-act="hist">📋 Các lượt đã lưu</button></div>`;
+  if(MODE==='mau')h+='<div style="font-size:12px;color:#666">Lượt làm mẫu không được lưu.</div>';return h}
+ACT.again=()=>{MODE='luyen';S=APP.fresh();E={};T0=Date.now();saveResult._done=false;goStep(0)};
+ACT.hist=()=>showHist();
+function showHist(){const H=loadH(),ix=stepIdx();$('histCard').innerHTML=`<h2>📋 Các lượt đã lưu</h2><p>Dữ liệu nằm trong trình duyệt <b>máy này</b>. Cuối buổi bấm <b>Xuất CSV</b> để GV lưu; xoá lịch sử trình duyệt là mất.</p>
+  ${H.length?`<div style="overflow:auto"><table class="hist"><tr><th>Thời điểm</th><th>Mã nhóm</th><th>Lượt</th>${ix.map(i=>`<th>${i?'B'+i:'CB'}</th>`).join('')}<th>Tổng lỗi</th><th>Kết quả</th></tr>${H.slice(-30).reverse().map(r=>`<tr><td>${esc(r.tg)}</td><td>${esc(r.nhom)}</td><td>${r.luot}</td>${ix.map(i=>`<td>${r['b'+i]==null?'':r['b'+i]}</td>`).join('')}<td><b>${r.tong}</b></td><td class="${r.kq==='Chưa đạt'?'res-bad':'res-ok'}">${esc(r.kq)}</td></tr>`).join('')}</table></div>`:'<p><i>Chưa có lượt nào.</i></p>'}
+  <div class="row" style="margin-top:12px"><button class="btn main" id="hCsv">⬇ Xuất CSV</button><button class="btn" id="hClose">Đóng</button></div>`;
+  $('ovHist').style.display='flex';$('hClose').onclick=()=>$('ovHist').style.display='none';$('hCsv').onclick=exportCSV}
+function exportCSV(){const H=loadH(),ix=stepIdx(),cols=['tg','nhom','luot',...ix.map(i=>'b'+i),'tong','giay','kq','loi'],head=['Thời điểm','Mã nhóm','Lượt',...ix.map(i=>i?'Lỗi B'+i:'Lỗi chuẩn bị'),'Tổng lỗi','Số giây','Kết quả','Chi tiết lỗi'];
+  const q=v=>'"'+String(v==null?'':v).replace(/"/g,'""')+'"';const csv='﻿'+[head.map(q).join(',')].concat(H.map(r=>cols.map(c=>q(r[c])).join(','))).join('\r\n');
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));a.download=APP.key+'-3d-ket-qua.csv';document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500)}
+
+/* ---------- góc nhìn, chuột, chạm ---------- */
+function setView(v){Object.assign(camT,JSON.parse(JSON.stringify(v)))}
+let drag=null,last=null;
+function ptr(e){const r=cv.getBoundingClientRect();return [e.clientX-r.left,e.clientY-r.top]}
+function nearAxis(m,samples){let best=null;for(const s of samples){const p=proj(s.p);if(!p)continue;const d=Math.hypot(p[0]-m[0],p[1]-m[1]);if(!best||d<best.d)best={d,v:s.v}}return best}
+function lineSamples(a,b,v0,v1,step){const n=Math.max(2,Math.round(Math.abs(v1-v0)/step)),r=[];for(let i=0;i<=n;i++){const t=i/n;r.push({p:lerp3(a,b,t),v:lerp(v0,v1,t)})}return r}
+function toolDown(m){if(BUSY)return true;const id=pick(m[0],m[1]);
+  if(S.step===0&&!S.prepItems&&id&&id.startsWith('it_')){const k=id.slice(3);S.sel[k]=!S.sel[k];beep(true);render();return 'click'}
+  return APP.down?APP.down(m,id):false}
+cv.addEventListener('pointerdown',e=>{const m=ptr(e);const t=toolDown(m);try{cv.setPointerCapture(e.pointerId)}catch(x){}if(t===true||t==='click'){drag=null;return}if(t){drag=t;return}drag='cam';last=m;cv.style.cursor='grabbing'});
+cv.addEventListener('pointermove',e=>{const m=ptr(e);if(drag==='cam'){camT.yaw-=(m[0]-last[0])*.008;camT.pitch=clamp(camT.pitch+(m[1]-last[1])*.006,-.25,1.45);last=m;return}if(drag){if(APP.move)APP.move(m,drag);DIRTY=true;return}
+  const id=pick(m[0],m[1]);cv.style.cursor=id&&(APP.pickable||/^it_/).test(id)?'pointer':'grab'});
+cv.addEventListener('pointerup',()=>{if(drag&&drag!=='cam')render();drag=null;cv.style.cursor='grab'});
+cv.addEventListener('wheel',e=>{e.preventDefault();camT.dist=clamp(camT.dist*Math.exp(e.deltaY*.001),APP.zoom?APP.zoom[0]:10,APP.zoom?APP.zoom[1]:200)},{passive:false});
+document.querySelector('aside').addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(!b||b.disabled)return;if(BUSY&&b.dataset.act!=='play')return;const f=ACT[b.dataset.act];if(f)f(b)});
+$('btnView').onclick=()=>setView(APP.view(S.step));
+$('btnHist').onclick=showHist;
+$('btnNav').onclick=e=>{e.stopPropagation();const m=$('navMenu');m.style.display=m.style.display==='block'?'none':'block'};
+document.addEventListener('click',()=>{$('navMenu').style.display='none'});
+$('btnDemo').onclick=()=>{if(BUSY)return;$('ovStart').style.display='none';demoAll()};
+$('btnGo').onclick=()=>{NHOM=$('inNhom').value.trim().slice(0,30);MODE='luyen';T0=Date.now();saveResult._done=false;$('ovStart').style.display='none';beep(true);goStep(0)};
+$('btnGoDemo').onclick=()=>{$('ovStart').style.display='none';demoAll()};
+function resize(){const r=cv.getBoundingClientRect();DPR=Math.min(2,window.devicePixelRatio||1);if(W!==r.width||H!==r.height){W=r.width;H=r.height;cv.width=W*DPR;cv.height=H*DPR;DIRTY=true}}
+function loop(){resize();if(S.step===LAST()&&!NOROT)camT.yaw+=.003;
+  const mv=Math.abs(cam.yaw-camT.yaw)+Math.abs(cam.pitch-camT.pitch)+Math.abs(cam.dist-camT.dist)/50+Math.hypot(...sub(cam.tgt,camT.tgt))/50;
+  cam.yaw=lerp(cam.yaw,camT.yaw,.12);cam.pitch=lerp(cam.pitch,camT.pitch,.12);cam.dist=lerp(cam.dist,camT.dist,.12);cam.tgt=lerp3(cam.tgt,camT.tgt,.12);
+  if(mv>1e-4||DIRTY||PART.length||(APP.anim&&APP.anim())){DIRTY=false;F=[];OV=[];if(S.step===0&&!S.prepItems)itemsScene();else APP.scene();draw()}requestAnimationFrame(loop)}
+/* chế độ chụp: #start · #b0 · #bN&tham-so · #kq */
+async function snapMode(){const hs=location.hash.slice(1);if(!hs)return;const [scr,...ps]=hs.split('&');const P={};ps.forEach(p=>{const [k,v]=p.split('=');P[k]=v==null?true:v});
+  if(scr==='start')return;FAST=true;NOROT=true;$('ovStart').style.display='none';MODE='luyen';NHOM=APP.nhomMau||'Nhóm 3';T0=Date.now()-312000;saveResult._done=true;
+  const runTo=async n=>{for(let i=0;i<n;i++){if(S.step!==i)goStep(i);await AUTO[i]();if(S.step===i)goStep(i+1)}};
+  if(scr==='kq')await runTo(LAST());
+  else if(/^b\d$/.test(scr)){const n=+scr[1];await runTo(n);if(S.step!==n)goStep(n);if(APP.snap)await APP.snap(n,P)}
+  PART=[];render();FAST=false}
+function init(){S=APP.fresh();Object.assign(AUTO,APP.auto);if(!AUTO[0])AUTO[0]=auto0;pills();render();setView(APP.view(0));
+  snapMode().then(()=>{for(const k in camT)cam[k]=JSON.parse(JSON.stringify(camT[k]))});requestAnimationFrame(loop)}
+/* ===================== HẾT KHUNG CHUNG ===================== */
+/* ===================== THƯ VIỆN BƯỚC DÙNG CHUNG CN 6 – 8 =====================
+   APP.cfg[st] = {type:'parts'|'seq'|'quiz'|'hunt', ...} → khung tự vẽ bảng, bắt lỗi, làm mẫu.
+   parts: {parts:[{id,ten,cn,at}], cnSai:[...]}  – bấm bộ phận trên hình 3D → chọn tên → chọn chức năng
+   seq:   {acts:[{k,ten,ok,ly,need,why,msg,fx,fatal,at}]} – làm đúng việc, đúng trình tự (need = việc phải làm trước)
+   quiz:  {qs:[{q,o,a,giai,fx}]} – câu hỏi gắn với hình 3D
+   hunt:  {targets:[{id,ten,ly,at}], decoys:{id:'lí do'}} – tìm điểm mất an toàn trên hình */
+const G={
+ st(st){S.g=S.g||{};return S.g[st]=S.g[st]||{cur:null,ph:'ten',done:{},did:{},qi:0,found:{}}},
+ cfg(st){return APP.cfg&&APP.cfg[st]},
+ seed(s){let h=7;for(const ch of String(s))h=(h*31+ch.charCodeAt(0))%100003;return h},
+ shuf(a,s){const r=a.map((v,i)=>({v,k:G.seed(s+'|'+i+'|'+v)}));r.sort((x,y)=>x.k-y.k);return r.map(o=>o.v)},
+ isDone(st){const c=G.cfg(st),g=G.st(st);if(!c)return true;
+   if(c.type==='parts')return c.parts.every(p=>g.done[p.id]);
+   if(c.type==='seq')return c.acts.filter(a=>a.ok!==false).every(a=>g.did[a.k]);
+   if(c.type==='quiz')return g.qi>=c.qs.length;
+   if(c.type==='hunt')return c.targets.every(t=>g.found[t.id]);return true},
+ nextBtn(st,dis){const L=LAST();return `<button class="btn main" data-act="next" ${dis}>${st+1<L?'Sang Bước '+(st+1)+' →':'Xem kết quả →'}</button>`},
+ panel(st,dis){const c=G.cfg(st),g=G.st(st);let h=`<div class="guide">${typeof c.guide==='function'?c.guide():c.guide}</div>`;if(c.top)h+=c.top(dis);
+   if(c.type==='parts'){const n=c.parts.filter(p=>g.done[p.id]).length;h+=`<div class="meter">Đã nhận biết: <b>${n}/${c.parts.length}</b> bộ phận</div>`;
+     if(g.cur&&!g.done[g.cur]){const p=c.parts.find(x=>x.id===g.cur);
+       if(g.ph==='ten'){const names=G.shuf([...new Set(c.parts.map(x=>x.ten).concat(c.tenSai||[]))],'t'+st);h+=`<div style="font-size:14px"><b>Bộ phận đang viền vàng</b> có tên là gì?</div><div class="row">${names.map(t=>`<button class="btn small" data-act="gTen" data-v="${esc(t)}" ${dis}>${t}</button>`).join('')}</div>`}
+       else{const cns=G.shuf([...new Set(c.parts.filter(x=>x.cn).map(x=>x.cn).concat(c.cnSai||[]))],'c'+st);h+=`<div style="font-size:14px">${c.cnHoi||'Chức năng của'} <b>${p.ten}</b> là gì?</div><div style="display:flex;flex-direction:column;gap:6px">${cns.map(t=>`<button class="btn small" style="text-align:left" data-act="gCn" data-v="${esc(t)}" ${dis}>${t}</button>`).join('')}</div>`}}
+     else if(!G.isDone(st))h+=`<div style="font-size:13px;color:#5d6b63">👆 Bấm vào một bộ phận <b>chưa có nhãn xanh</b> trên hình 3D (kéo để xoay xem bên trong).</div>`;
+     if(n)h+=`<div class="chips">${c.parts.filter(p=>g.done[p.id]).map(p=>`<span class="chip">✓ ${p.ten}</span>`).join('')}</div>`}
+   if(c.type==='seq'){h+=`<div style="display:flex;flex-direction:column;gap:6px">${c.acts.map((a,i)=>`<button class="btn small ${g.did[a.k]?'done':''}" style="text-align:left" data-act="gAct" data-v="${i}" ${dis||(g.did[a.k]||G.isDone(st)?'disabled':'')}>${g.did[a.k]?'✓ ':''}${a.ten}</button>`).join('')}</div>`}
+   if(c.type==='quiz'){if(g.qi<c.qs.length){const q=c.qs[g.qi];h+=`<div class="meter" style="font-size:15px">Câu <b>${g.qi+1}/${c.qs.length}</b>. ${typeof q.q==='function'?q.q():q.q}</div><div style="display:flex;flex-direction:column;gap:6px">${q.o.map((t,i)=>`<button class="btn small" style="text-align:left" data-act="gQ" data-v="${i}" ${dis}>${String.fromCharCode(65+i)}. ${t}</button>`).join('')}</div>`}}
+   if(c.type==='hunt'){const n=c.targets.filter(t=>g.found[t.id]).length;h+=`<div class="meter">Đã tìm: <b>${n}/${c.targets.length}</b> điểm</div>`;if(n)h+=`<ul style="margin:0 0 0 18px;padding:0;font-size:13px">${c.targets.filter(t=>g.found[t.id]).map(t=>`<li>${t.ten}</li>`).join('')}</ul>`}
+   if(c.extra)h+=c.extra(dis);if(G.isDone(st)&&!c.noNext)h+=G.nextBtn(st,dis);return h},
+ down(m,id){const st=S.step,c=G.cfg(st);if(!c||!id||BUSY)return false;const g=G.st(st);
+   if(c.type==='parts'){const ids=G.pickAll(m[0],m[1]),p=c.parts.find(x=>!g.done[x.id]&&ids.has('p_'+x.id))||c.parts.find(x=>ids.has('p_'+x.id));if(!p)return false;if(g.done[p.id]){fb('info','<b>'+p.ten+'</b>'+(p.cn?': '+p.cn:'')+'.');DIRTY=true;return 'click'}g.cur=p.id;g.ph='ten';beep(true);render();return 'click'}
+   if(c.type==='hunt'){const t=c.targets.find(x=>x.id===id);if(t){if(!g.found[t.id]){g.found[t.id]=true;ok('Đúng: <b>'+t.ten+'</b>. '+t.ly,t.at);if(G.isDone(st))toast('ok','Đã tìm đủ!');render()}return 'click'}
+     if(c.decoys&&c.decoys[id]){err(st,'hunt_'+id,'Chọn nhầm chỗ an toàn');bad([c.decoys[id]]);return 'click'}return false}return false},
+ pickAll(x,y){const r=new Set();for(const f of DRAWN)if(f.id&&inPoly(x,y,f.q))r.add(f.id);return r},
+ pc(st,id,col){const g=S.g&&S.g[st];if(S.step===st&&g&&g.cur===id&&!g.done[id])return mixc(col,[245,196,0],.6);return col},
+ labels(st,o){o=o||{};const c=G.cfg(st),g=G.st(st);if(!c||S.step!==st)return;
+   if(c.type==='parts')c.parts.forEach(p=>{if(g.done[p.id])text3(p.at,p.ten,{bg:'#1f9d55',col:'#fff',size:12,bold:true});else if(g.cur===p.id)text3(p.at,'?',{bg:'#f5c400',col:'#3a2a00',size:15,bold:true})});
+   if(c.type==='hunt')c.targets.forEach(t=>{if(g.found[t.id])text3(t.at,'⚠ '+t.ten,{bg:'#d64545',col:'#fff',size:12,bold:true})})},
+ async auto(st){const c=G.cfg(st),g=G.st(st);
+   if(c.type==='parts'){for(const p of c.parts){if(g.done[p.id])continue;g.cur=p.id;g.ph='ten';render();await sleep(500);ACT.gTen({dataset:{v:p.ten}});await sleep(450);if(p.cn){ACT.gCn({dataset:{v:p.cn}});await sleep(450)}}}
+   if(c.type==='seq'){let guard=0;while(!G.isDone(st)&&guard++<40){const i=c.acts.findIndex(a=>a.ok!==false&&!g.did[a.k]&&(a.need||[]).every(k=>g.did[k]));if(i<0)break;await ACT.gAct({dataset:{v:i}});await sleep(650)}}
+   if(c.type==='quiz'){while(g.qi<c.qs.length){await sleep(500);ACT.gQ({dataset:{v:c.qs[g.qi].a}});await sleep(450)}}
+   if(c.type==='hunt'){for(const t of c.targets){if(g.found[t.id])continue;g.found[t.id]=true;ok('Đúng: <b>'+t.ten+'</b>. '+t.ly,t.at);render();await sleep(700)}}},
+ setup(){APP.auto=APP.auto||{};const p0=APP.panel,d0=APP.down;
+   for(const k in APP.cfg){if(!APP.auto[k])APP.auto[k]=()=>G.auto(+k)}
+   APP.panel=(st,dis)=>G.cfg(st)?G.panel(st,dis):(p0?p0(st,dis):'');
+   APP.down=(m,id)=>G.down(m,id)||(d0?d0(m,id):false);
+   if(!APP.success)APP.success=()=>!S.failed;
+   if(!APP.badText)APP.badText=()=>'⚠ <b>Chưa đạt</b>'+(S.failed?' – '+S.failed:'')}
+};
+ACT.gTen=b=>{const st=S.step,c=G.cfg(st),g=G.st(st),p=c.parts.find(x=>x.id===g.cur);if(!p)return;
+  if(b.dataset.v!==p.ten){err(st,'ten_'+p.id,'Gọi sai tên '+p.ten+' (chọn «'+b.dataset.v+'»)');return bad(['Bộ phận này <b>không phải</b> «'+b.dataset.v+'». Quan sát lại vị trí, hình dạng.'])}
+  if(p.cn){g.ph='cn';beep(true);fb('ok','Đúng, đây là <b>'+p.ten+'</b>. Giờ chọn chức năng.');render();return}
+  g.done[p.id]=true;g.cur=null;ok('Đúng: <b>'+p.ten+'</b>.',p.at);render()};
+ACT.gCn=b=>{const st=S.step,c=G.cfg(st),g=G.st(st),p=c.parts.find(x=>x.id===g.cur);if(!p)return;
+  if(b.dataset.v!==p.cn){err(st,'cn_'+p.id,'Nêu sai chức năng '+p.ten);return bad(['«'+b.dataset.v+'» không phải chức năng của <b>'+p.ten+'</b>.'])}
+  g.done[p.id]=true;g.cur=null;ok('<b>'+p.ten+'</b>: '+p.cn+'.',p.at);if(G.isDone(st))toast('ok','Đã nhận biết đủ!');render()};
+ACT.gAct=async b=>{const st=S.step,c=G.cfg(st),g=G.st(st),a=c.acts[+b.dataset.v];if(!a||g.did[a.k])return;
+  if(a.ok===false){err(st,'sai_'+a.k,a.loi||a.ten);if(a.fatal)S.failed=a.fatal;if(a.fx0)a.fx0();render();return bad([a.ly])}
+  const miss=(a.need||[]).filter(k=>!g.did[k]);if(miss.length){err(st,'thutu_'+a.k,'Làm «'+a.ten+'» sai trình tự');return bad([a.why||('Chưa đến lúc. Cần làm trước: <b>'+miss.map(k=>c.acts.find(x=>x.k===k).ten).join('</b>; <b>')+'</b>.')])}
+  g.did[a.k]=true;if(a.fx){BUSY=true;render();try{await a.fx()}finally{BUSY=false}}ok(a.msg||('Đúng trình tự: '+a.ten+'.'),a.at);if(G.isDone(st)){toast('ok','Hoàn thành bước!');if(c.onDone)c.onDone()}render()};
+ACT.gQ=b=>{const st=S.step,c=G.cfg(st),g=G.st(st),q=c.qs[g.qi];if(!q)return;const i=+b.dataset.v;
+  if(i!==q.a){err(st,'q'+g.qi,'Trả lời sai câu: '+String(typeof q.q==='function'?q.q():q.q).replace(/<[^>]+>/g,'').slice(0,70));return bad([q.sai&&q.sai[i]?q.sai[i]:'Chưa đúng. Xem lại hình bên trái và SGK.'])}
+  if(q.fx)q.fx();g.qi++;ok(q.giai||'Đúng.',q.at);render()};
+/* ---------- hình dùng chung ---------- */
+function cyl(c,r,h,col,o,seg){o=o||{};tube([c,add(c,[0,h,0])],r,seg||20,col,Object.assign({cap1:('top' in o)?o.top:col,cap0:o.bot===false?null:(o.bot||col)},o))}
+function hand(p,dir,col,o){o=o||{};const d=nrm(dir),[t,n1,n2]=basis(d);col=col||[236,190,150];ell(p,1.6,1.1,1.6,col,{id:o.id,rot:v=>add(add(mul(n1,v[0]),mul(t,v[1])),mul(n2,v[2]))},8,5);
+  for(let i=0;i<4;i++){const b=add(add(p,mul(d,1.3)),mul(n1,(i-1.5)*.7));tube([b,add(b,mul(d,1.6-.15*Math.abs(i-1.5)))],.3,6,col,{id:o.id,cap1:col})}
+  tube([add(p,mul(d,-1.4)),add(p,mul(d,-4))],1.1,10,o.ao||[70,110,170],{id:o.id})}
+function screw(c,col){cyl(add(c,[0,0,0]),.35,.5,col||[150,150,160],{gl:.8},10);box(add(c,[0,.6,0]),.9,.15,.25,[120,120,130],{gl:.8})}
+function innerWall(c,r,h,col,o,seg){o=o||{};seg=seg||20;for(let k=0;k<seg;k++){const a=k/seg*Math.PI*2,b=(k+1)/seg*Math.PI*2,P=(t,y)=>add(c,[Math.cos(t)*r,y,Math.sin(t)*r]);
+  poly([P(a,0),P(a,h),P(b,h),P(b,0)],col,{id:o.id,a:o.a,n:[-Math.cos((a+b)/2),0,-Math.sin((a+b)/2)]})}}
+function ring2(c,r1,r2,col,o,seg){o=o||{};seg=seg||20;for(let k=0;k<seg;k++){const a=-k/seg*Math.PI*2,b=-(k+1)/seg*Math.PI*2,P=(t,r)=>add(c,[Math.cos(t)*r,0,Math.sin(t)*r]);poly([P(a,r1),P(a,r2),P(b,r2),P(b,r1)],col,{id:o.id,n:[0,1,0],gl:o.gl})}}
+const rx=a=>v=>[v[0],v[1]*Math.cos(a)-v[2]*Math.sin(a),v[1]*Math.sin(a)+v[2]*Math.cos(a)],rz=a=>v=>[v[0]*Math.cos(a)-v[1]*Math.sin(a),v[0]*Math.sin(a)+v[1]*Math.cos(a),v[2]];
+function xform(F0,R,T){for(let i=F0;i<F.length;i++){const f=F[i];f.p=f.p.map(p=>add(R(p),T));if(f.n)f.n=R(f.n)}}
+function steam(p){if(PART.length<40)PART.push({p,t0:performance.now(),vx:(Math.random()-.5)*.5,vy:-1.4-Math.random(),c:'rgba(255,255,255,.9)'})}
+function dome(c,r,h,col,o,su,sv){o=o||{};su=su||14;sv=sv||5;const P=(u,v)=>{const th=u/su*Math.PI*2,ph=v/sv*Math.PI/2;return add(c,[Math.sin(ph)*Math.cos(th)*r,Math.cos(ph)*h,Math.sin(ph)*Math.sin(th)*r])};
+  for(let v=0;v<sv;v++)for(let u=0;u<su;u++){const q=[P(u,v),P(u,v+1),P(u+1,v+1),P(u+1,v)];const cen=mul(add(add(q[0],q[1]),add(q[2],q[3])),.25);poly(v===0?[q[0],q[1],q[2]]:q,col,{id:o.id,a:o.a,gl:o.gl,ds:o.ds,n:nrm(sub(cen,c))})}}
+
+/* ===================== APP ĐO NHIỆT ĐỘ, ĐỘ TRONG NƯỚC AO 3D · SGK Công nghệ 7 (KNTT) Bài 15 mục IV tr.77–78 ===================== */
+const XO={r:18,h:70,muc:64},TK={x:-9,z:-6,len:30}; /* xô cao 70 cm, nước sâu 64 cm; nhiệt kế dài 30 cm (thang 0 – 50 °C) */
+const NUOC=[70,140,130];
+function xo(o){o=o||[0,0,0];BGM=1;disk(add(o,[0,-.05,0]),XO.r+6,[170,190,150]);BGM=0;cyl(o,XO.r,XO.h,[60,110,190],{a:.28,gl:.9,top:null},28);ring2(add(o,[0,XO.h,0]),XO.r-.6,XO.r,[50,90,170],{},28);
+  innerWall(add(o,[0,.1,0]),XO.r-.5,XO.muc,[60,120,120],{a:.35},28);disk(add(o,[0,.1,0]),XO.r-.5,[90,110,90])}
+function matNuoc(o){disk(add(o||[0,0,0],[0,XO.muc,0]),XO.r-.5,NUOC,{a:.55,gl:1.2},28)}
+const tkV=t=>clamp(t,0,50)/50*(TK.len-4); /* chiều dài cột đỏ */
+function nhietKe(base,val){const top=add(base,[0,TK.len,0]);ell(base,.9,1.3,.9,[220,40,40],{gl:.8},8,5);tube([add(base,[0,.8,0]),top],.55,10,[235,240,245],{a:.5,gl:1,cap1:[235,240,245]});
+  tube([add(base,[0,.8,0]),add(base,[0,.8+tkV(val),0])],.26,6,[220,40,40],{gl:.6});
+  for(let t=0;t<=50;t++){const y=.8+tkV(t),L=t%5?.5:1;line3(add(base,[.6,y,0]),add(base,[.6+L,y,0]),'#334',t%5?1:1.6);if(t%10===0)text3(add(base,[2.8,y,0]),String(t),{size:12,bold:true,col:'#223'})}}
+function secchi(c,vis){const blk=mixc(NUOC,[20,20,24],vis),wht=mixc(NUOC,[250,250,250],vis);for(let q=0;q<4;q++){const p=[c];for(let k=0;k<=8;k++){const a=-(q+k/8)*Math.PI/2;p.push(add(c,[Math.cos(a)*12,0,Math.sin(a)*12]))}poly(p,q%2?blk:wht,{n:[0,1,0]})}
+  ell(add(c,[0,-1.2,0]),1.2,1,1.2,[80,80,90],{},6,3)}
+APP={key:'do-nuoc-ao-cn7',viec:'đo nhiệt độ, độ trong của nước ao',nhomMau:'Nhóm 3 – 7A1',prepOk:'Đủ nhiệt kế, xô cao 60 – 70 cm, nước ao hồ, đĩa Secchi 20 – 30 cm – đúng SGK tr.77.',
+ okText:'🐟 <b>Hoàn thành đo nhiệt độ và độ trong của nước ao!</b>',okShort:'Hoàn thành',
+ badText:()=>'⚠ <b>Chưa đạt</b>',
+ resultNote:'Đọc lại: SGK Công nghệ 7 Bài 15 tr.77 (đo nhiệt độ: 3 bước, Hình 15.7; nhiệt độ thích hợp 25 – 28 °C; độ trong thích hợp 20 – 30 cm), tr.78 (đĩa Secchi Hình 15.8; đo độ trong 2 lần, Hình 15.9). Ghi vào vở kết quả 2 lần đo, tính trung bình, đánh giá.',
+ pickable:/^it_/,zoom:[20,320],
+ items:[{k:'nk',ten:'Nhiệt kế',ok:true},{k:'xo',ten:'Xô nhựa cao 60 – 70 cm',ok:true},{k:'nuoc',ten:'Nước ao, hồ',ok:true},{k:'sec',ten:'Đĩa Secchi đường kính 25 cm',ok:true},
+   {k:'coc',ten:'Cốc nhựa cao 15 cm',ok:false,ly:'SGK tr.77: dụng cụ đựng nước có chiều cao tối thiểu từ 60 cm đến 70 cm.'},{k:'secnho',ten:'Đĩa nhỏ đường kính 8 cm',ok:false,ly:'SGK tr.77: đĩa Secchi có đường kính từ 20 cm đến 30 cm.'}],
+ itemMesh(k,o,id){const A=v=>add(o,v);
+   if(k==='nk'){tube([A([-5,.6,0]),A([5,.6,0])],.35,8,[235,240,245],{id,a:.7,gl:1});ell(A([-5.3,.6,0]),.6,.6,.6,[220,40,40],{id},6,4);tube([A([-5,.6,0]),A([0,.6,0])],.18,6,[220,40,40],{id});return true}
+   if(k==='xo'){cyl(A([0,0,0]),4,9,[60,110,190],{id,gl:.6,top:null},16);ring2(A([0,9,0]),3.6,4,[50,90,170],{id},16);innerWall(A([0,.1,0]),3.6,8.9,[50,90,170],{id},16);return true}
+   if(k==='nuoc'){cyl(A([0,0,0]),3.4,6,[200,215,225],{id,a:.6,top:null},14);disk(A([0,4.6,0]),3.3,NUOC,{id,gl:1});box(A([0,6.5,0]),2,1,2,[50,120,200],{id});return true}
+   if(k==='sec'){const s0=F.length;secchi([0,0,0],1);for(let i=s0;i<F.length;i++)F[i].id=id;xform(s0,v=>mul(v,.42),A([0,.6,0]));return true}
+   if(k==='secnho'){const s0=F.length;secchi([0,0,0],1);for(let i=s0;i<F.length;i++)F[i].id=id;xform(s0,v=>mul(v,.15),A([0,.6,0]));return true}
+   if(k==='coc'){cyl(A([0,0,0]),1.8,3,[230,230,235],{id,a:.7,top:null},12);innerWall(A([0,.1,0]),1.6,2.9,[200,200,210],{id},12);return true}},
+ steps:[{name:'Chuẩn bị',pill:'Chuẩn bị',sgk:'SGK tr.77 – 1a) và 2a) Vật liệu và dụng cụ'},
+   {name:'Đo nhiệt độ của nước',pill:'B1. Nhiệt độ',sgk:'SGK tr.77 – 1b) Các bước tiến hành, Hình 15.7'},
+   {name:'Đo độ trong của nước',pill:'B2. Độ trong',sgk:'SGK tr.78 – 2b) Các bước tiến hành, Hình 15.9'},
+   {name:'Ghi kết quả, đánh giá',pill:'B3. Đánh giá',sgk:'SGK tr.77 – 78: khoảng thích hợp; tính trung bình'},
+   {name:'Kết quả',pill:'Kết quả',sgk:'Học sinh tự đánh giá theo hướng dẫn của GV – SGK tr.77, 78'}],
+ fresh(){const T=24+Math.floor(Math.random()*16)/2,D=15+Math.floor(Math.random()*24);return{step:0,sel:{},g:{},T,Ta:T+(Math.random()<.5?-3:3),D,
+   sau:0,nhung:false,phut:0,doc:30,ghiT:null,dep:0,d1:null,d2:null,maxSau1:0,hint:0,failed:null}},
+ view(st){if(st===0)return {yaw:0,pitch:.62,dist:115,tgt:[0,0,2]};if(st===1)return {yaw:.1,pitch:.12,dist:62,tgt:[TK.x,XO.muc+9,TK.z]};if(st===2)return {yaw:.2,pitch:.8,dist:125,tgt:[0,XO.muc-14,0]};return {yaw:.3,pitch:.35,dist:210,tgt:[0,35,0]}},
+ hud(st){if(st===1)return `<div class="tag">⏱ Đã giữ nhiệt kế trong nước: <b>${S.phut}</b> phút</div>`;if(st===2)return `<div class="tag">Đĩa ở độ sâu <b>${S.dep} cm</b></div>${S.d1!=null?`<div class="tag">Lần 1: <b>${S.d1} cm</b>${S.d2!=null?' · Lần 2: <b>'+S.d2+' cm</b>':''}</div>`:''}`;return ''},
+ scene(){const st=S.step;xo();
+   if(st===1||st>=3){const y=XO.muc-(S.nhung?S.sau:-6),base=[TK.x,y,TK.z];const v=S.nhung?tkNow():S.Ta;nhietKe(base,v);hand(add(base,[0,TK.len+1.2,0]),[0,-1,0],null,{});
+     if(st===1){line3([TK.x-4,XO.muc,TK.z],[TK.x+6,XO.muc,TK.z],'rgba(255,255,255,.8)',2);text3([TK.x-10,XO.muc+2,TK.z],'mặt nước',{size:11,bg:'#fff',bd:'#cfe3d7'})}}
+   if(st>=2){const vis=clamp((S.D+1-S.dep)/4,0,1),c=[2,XO.muc-S.dep,4];secchi(c,st===2?vis:.3);line3(c,[2,XO.muc+56-S.dep,4],'#334',2);
+     for(let m=0;m<=50;m+=10){const p=[2,XO.muc-S.dep+m,4];line3(add(p,[-1,0,0]),add(p,[1,0,0]),'#d64545',3);if(st===2&&m+0>S.dep-1)text3(add(p,[-4,0,0]),String(m),{size:11,col:'#8b1f1f',bg:'rgba(255,255,255,.85)'})}
+     if(st===2){text3([24,XO.muc,4],'mặt nước ngang vạch '+S.dep+' cm',{bg:'#fff2a8',bd:'#e0a400',col:'#5a4300',size:13,bold:true});hand([2,XO.muc+57-S.dep,4],[0,-1,0],null,{});
+       text3([2,XO.muc-S.dep-8,4],vis>0?(vis>.6?'nhìn rõ vạch đen – trắng':'vạch mờ dần'):'không nhìn thấy vạch',{bg:vis>0?'#fff':'#0b3d2c',col:vis>0?'#1f2a24':'#fff',size:12,bold:true})}}
+   matNuoc()},
+ panel(st,dis){
+   if(st===1){if(S.ghiT!=null)return `<div class="guide">Đã ghi nhiệt độ nước: <b>${fmt(S.ghiT)} °C</b>.</div>${G.nextBtn(1,dis)}`;
+     if(!S.nhung)return `<div class="guide">Chọn độ sâu nhúng đầu nhiệt kế vào nước rồi bấm <b>Nhúng</b>.</div>${ctl('rgS','Độ sâu nhúng đầu nhiệt kế',S.sau,0,10,1,'cm')}<button class="btn main" data-act="nhung" ${dis}>⬇ Nhúng nhiệt kế</button>`;
+     return `<div class="guide">Giữ cố định nhiệt kế. Tua thời gian, rồi đọc vạch màu đỏ (kéo, cuộn để phóng to).</div>${tlHTML(S.phut,15,'Phút thứ '+S.phut,[5,10])}
+       <div class="row"><button class="btn small" data-act="phut" ${dis}>+1 phút</button></div>${ctl('rgD','Em đọc được',S.doc,0,50,.5,'°C')}<button class="btn main" data-act="ghiT" ${dis}>✍ Ghi kết quả vào vở</button>`}
+   if(st===2){const lan=S.d1==null?1:2;if(S.d2!=null)return `<div class="guide">Đã đo 2 lần: <b>${S.d1} cm</b> và <b>${S.d2} cm</b>.</div>${G.nextBtn(2,dis)}`;
+     return `<div class="guide">${lan===1?'<b>Lần 1:</b> cầm dây, <b>từ từ thả</b> đĩa xuống đến khi <b>không nhìn thấy</b> vạch đen – trắng, rồi ghi độ sâu.':'<b>Lần 2:</b> thả đĩa <b>sâu hơn</b>, rồi <b>kéo lên</b> đến khi <b>thấy</b> vạch đen – trắng, ghi độ sâu.'}</div>
+       ${ctl('rgP','Độ sâu của đĩa (vạch ở mặt nước)',S.dep,0,60,1,'cm')}<button class="btn main" data-act="ghiD" ${dis}>✍ Ghi độ sâu lần ${lan}</button>`}
+   return ''},
+ wire(st){if(st===1){wireCtl('rgS','sau','cm');wireCtl('rgD','doc','°C')}if(st===2)wireCtl('rgP','dep','cm',()=>{if(S.d1!=null)S.maxSau1=Math.max(S.maxSau1,S.dep);hud()})},
+ cfg:{3:{type:'quiz',guide:'Ghi kết quả vào vở, tính trung bình độ trong và so với khoảng thích hợp trong SGK.',top:()=>`<div class="meter" style="font-size:14px">Nhiệt độ: <b>${fmt(S.ghiT)} °C</b> · Độ trong lần 1: <b>${S.d1} cm</b>, lần 2: <b>${S.d2} cm</b></div>`,qs:[
+   {get q(){return 'Độ trong trung bình của nước là bao nhiêu?'},get o(){const m=(S.d1+S.d2)/2;return [fmt(m)+' cm',fmt(S.d1+S.d2)+' cm',fmt(Math.abs(S.d1-S.d2))+' cm']},a:0,get giai(){return 'Trung bình = ('+S.d1+' + '+S.d2+') : 2 = '+fmt((S.d1+S.d2)/2)+' cm.'}},
+   {get q(){return 'Độ trong '+fmt((S.d1+S.d2)/2)+' cm so với khoảng thích hợp cho ao nuôi (20 – 30 cm) là:'},o:['Thích hợp','Thấp hơn – nước quá đục','Cao hơn – nước quá trong'],get a(){const m=(S.d1+S.d2)/2;return m<20?1:(m>30?2:0)},giai:'SGK tr.77: độ trong thích hợp 20 – 30 cm; nước quá trong cũng không tốt, nước quá đục ảnh hưởng đến mang cá và khả năng bắt mồi.'},
+   {get q(){return 'Nhiệt độ '+fmt(S.ghiT)+' °C so với khoảng thích hợp cho cá (25 – 28 °C) là:'},o:['Thích hợp','Thấp hơn – cá ăn kém, sinh trưởng chậm','Cao hơn – cá ăn kém, sinh trưởng chậm'],get a(){return S.ghiT<25?1:(S.ghiT>28?2:0)},giai:'SGK tr.77: thích hợp 25 – 28 °C; ngoài khoảng này cá ăn kém, sinh trưởng chậm; quá lạnh cá chết rét, quá cao cá chết nóng.'},
+   {q:'Đo xong, nhóm cần làm gì?',o:['Để nguyên dụng cụ cho nhóm sau','Thu dọn dụng cụ thực hành và vệ sinh môi trường','Đổ nước ao ra sàn lớp'],a:1,giai:'SGK: Bước 3 – thu dọn dụng cụ thực hành và vệ sinh môi trường.'}]}},
+ hints:[['Xem vật liệu, dụng cụ của cả 2 phần đo.','SGK tr.77: nhiệt kế, dụng cụ đựng nước, nước (tốt nhất là nước ao, hồ); đĩa Secchi đường kính 20 – 30 cm, dụng cụ đựng nước cao tối thiểu 60 – 70 cm.'],
+   ['Đầu nhiệt kế phải ngập trong nước; chờ đủ thời gian.','SGK tr.77, Bước 1: nhúng <b>ngập đầu</b> nhiệt kế, giữ cố định <b>5 – 10 phút</b>; Bước 2: đọc kết quả tương ứng <b>vạch màu đỏ</b>, ghi vào vở.'],
+   ['Lần 1 thả xuống, lần 2 kéo lên.','SGK tr.78: Bước 1 – từ từ thả đĩa đến khi <b>không nhìn thấy</b> vạch, ghi độ sâu; Bước 2 – thả <b>sâu hơn</b> rồi <b>kéo lên</b> đến khi <b>thấy</b> vạch, ghi độ sâu.'],
+   ['Trung bình = tổng 2 lần đo chia 2.','SGK tr.77: nhiệt độ thích hợp 25 – 28 °C; độ trong thích hợp 20 – 30 cm.']],
+ auto:{1:async()=>{BUSY=true;for(let v=S.sau;v<=4;v++){S.sau=v;render();await sleep(120)}BUSY=false;ACT.nhung();for(let i=0;i<6;i++){await sleep(250);ACT.phut()}S.doc=Math.round(tkNow()*2)/2;render();await sleep(500);ACT.ghiT()},
+   2:async()=>{BUSY=true;for(let d=S.dep;d<=S.D+1;d++){S.dep=d;render();await sleep(70)}BUSY=false;ACT.ghiD();await sleep(500);BUSY=true;for(let d=S.dep;d<=S.D+6;d++){S.dep=d;S.maxSau1=Math.max(S.maxSau1,d);render();await sleep(60)}for(let d=S.dep;d>=S.D-1;d--){S.dep=d;render();await sleep(80)}BUSY=false;ACT.ghiD()}}
+};
+function tkNow(){return S.T+(S.Ta-S.T)*Math.exp(-S.phut/1.4)}
+ACT.nhung=()=>{if(S.sau<2){err(1,'khongngap','Đầu nhiệt kế chưa ngập trong nước');return bad(['Nhúng '+S.sau+' cm – <b>đầu nhiệt kế chưa ngập</b> trong nước. SGK: nhúng ngập đầu nhiệt kế vào nước.'])}S.nhung=true;S.phut=0;S.doc=Math.round(S.Ta);fb('info','Đã nhúng ngập đầu nhiệt kế. Giữ cố định, theo dõi thời gian.');render()};
+ACT.phut=()=>{S.phut=Math.min(20,S.phut+1);render()};
+ACT.ghiT=()=>{const L=[],real=tkNow();if(S.phut<5){L.push('Mới giữ '+S.phut+' phút – cột đỏ <b>chưa ổn định</b>. SGK: giữ cố định từ 5 đến 10 phút.');err(1,'som','Đọc nhiệt kế khi chưa đủ 5 phút')}
+  else if(S.phut>10){L.push('Đã giữ '+S.phut+' phút – SGK chỉ cần giữ 5 – 10 phút.');err(1,'lau','Giữ nhiệt kế quá 10 phút')}
+  if(!L.length&&Math.abs(S.doc-real)>.5){L.push('Đọc <b>'+fmt(S.doc)+' °C</b> chưa khớp vạch màu đỏ. Phóng to nhiệt kế, đọc lại (mỗi vạch nhỏ 1 °C).');err(1,'docsai','Đọc sai số chỉ nhiệt kế')}
+  if(L.length)return bad(L);S.ghiT=S.doc;ok('Nhiệt độ nước: <b>'+fmt(S.doc)+' °C</b> – đã ghi vào vở.',[TK.x,XO.muc,TK.z]);render()};
+ACT.ghiD=()=>{const vis=clamp((S.D+1-S.dep)/4,0,1),L=[];
+  if(S.d1==null){if(vis>0){L.push('Vẫn còn <b>nhìn thấy vạch</b> – thả tiếp từ từ cho đến khi không nhìn thấy.');err(2,'con1','Ghi lần 1 khi vẫn thấy vạch')}else if(S.dep>S.D+4){L.push('Đĩa đã xuống quá sâu so với lúc vừa mất vạch. Kéo lên, <b>thả lại từ từ</b>, dừng ngay khi vừa không thấy vạch.');err(2,'nhanh1','Thả đĩa quá nhanh, quá sâu ở lần 1')}
+    if(L.length)return bad(L);S.d1=S.dep;S.maxSau1=S.dep;ok('Lần 1: <b>'+S.d1+' cm</b>. Giờ thả đĩa sâu hơn rồi kéo lên.',[2,XO.muc-S.dep,4]);render();return}
+  if(S.maxSau1<=S.d1){L.push('Chưa <b>thả đĩa sâu hơn</b> lần 1. SGK: thả đĩa sâu hơn rồi kéo lên đến khi thấy vạch.');err(2,'chuasau','Lần 2 chưa thả sâu hơn')}
+  else if(vis<=0){L.push('Vẫn <b>chưa thấy vạch</b> – kéo đĩa lên thêm cho đến khi thấy.');err(2,'chuathay','Ghi lần 2 khi chưa thấy vạch')}else if(S.dep<S.D-4){L.push('Kéo lên quá nhiều – vạch đã rõ từ lâu. Thả xuống, kéo lên <b>từ từ</b>, dừng ngay khi vừa thấy vạch.');err(2,'nhanh2','Kéo đĩa quá nhanh ở lần 2')}
+  if(L.length)return bad(L);S.d2=S.dep;ok('Lần 2: <b>'+S.d2+' cm</b>. Đã đủ 2 lần đo.',[2,XO.muc-S.dep,4]);render()};
+G.setup();
+
+init();
+</script>
+</body>
+</html>
