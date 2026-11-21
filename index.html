@@ -89,7 +89,18 @@
       }
     ];
 
-    const INITIAL_MATERIALS = [];
+    
+    const INITIAL_MATERIALS = DATA_GAMES_PPT.map((g, idx) => ({
+      id: g.id || ('mat_game_' + idx),
+      title: 'Trò chơi PPT: ' + g.name,
+      category: 'SLIDE',
+      file_path: g.url,
+      file_size: g.size,
+      file_type: g.type,
+      created_at: '2026-11-21',
+      description: 'Trò chơi tương tác thiết kế bài dạy PowerPoint sinh động, có hiệu ứng âm thanh và câu hỏi'
+    }));
+
 
     const INITIAL_QUESTIONS = [
       {
@@ -763,6 +774,703 @@
     "category": "Trồng cây ăn quả"
   }
 ];
+
+    
+    // ==============================================================================
+    // DANH MỤC 76 TRÒ CHƠI POWERPOINT & VIDEO HƯỚNG DẪN DẠY HỌC TƯƠNG TÁC
+    // ==============================================================================
+    const DATA_GAMES_PPT = [
+  {
+    "id": "game_mtqc8p3",
+    "name": "AI LÀ TRIỆU PHÚ",
+    "filename": "AI LÀ TRIỆU PHÚ.pptx",
+    "size": "1.56 MB",
+    "type": "PPTX",
+    "url": "8.%20B%E1%BB%98%20TR%C3%92%20CH%C6%A0I%20PPT%20%2B%20VIDEO%20H%C6%AF%E1%BB%9ANG%20D%E1%BA%AAN/AI%20L%C3%80%20TRI%E1%BB%86U%20PH%C3%9A.pptx",
+    "rawPath": "8. BỘ TRÒ CHƠI PPT + VIDEO HƯỚNG DẪN/AI LÀ TRIỆU PHÚ.pptx"
+  },
+  {
+    "id": "game_8u4va0a",
+    "name": "AI LÀ TRIỆU PHÚ 2",
+    "filename": "AI LÀ TRIỆU PHÚ 2.pptx",
+    "size": "4.13 MB",
+    "type": "PPTX",
+    "url": "8.%20B%E1%BB%98%20TR%C3%92%20CH%C6%A0I%20PPT%20%2B%20VIDEO%20H%C6%AF%E1%BB%9ANG%20D%E1%BA%AAN/AI%20L%C3%80%20TRI%E1%BB%86U%20PH%C3%9A%202.pptx",
+    "rawPath": "8. BỘ TRÒ CHƠI PPT + VIDEO HƯỚNG DẪN/AI LÀ TRIỆU PHÚ 2.pptx"
+  },
+  {
+    "id": "game_0d9ybvu",
+    "name": "AI LÊN CAO HƠN",
+    "filename": "AI LÊN CAO HƠN.pptx",
+    "size": "5.53 MB",
+    "type": "PPTX",
+    "url": "8.%20B%E1%BB%98%20TR%C3%92%20CH%C6%A0I%20PPT%20%2B%20VIDEO%20H%C6%AF%E1%BB%9ANG%20D%E1%BA%AAN/AI%20L%C3%8AN%20CAO%20H%C6%A0N.pptx",
+    "rawPath": "8. BỘ TRÒ CHƠI PPT + VIDEO HƯỚNG DẪN/AI LÊN CAO HƠN.pptx"
+  },
+  {
+    "id": "game_4y7riid",
+    "name": "ĂN KHẾ TRẢ VÀNG",
+    "filename": "ĂN KHẾ TRẢ VÀNG.pptx",
+    "size": "8.41 MB",
+    "type": "PPTX",
+    "url": "8.%20B%E1%BB%98%20TR%C3%92%20CH%C6%A0I%20PPT%20%2B%20VIDEO%20H%C6%AF%E1%BB%9ANG%20D%E1%BA%AAN/%C4%82N%20KH%E1%BA%BE%20TR%E1%BA%A2%20V%C3%80NG.pptx",
+    "rawPath": "8. BỘ TRÒ CHƠI PPT + VIDEO HƯỚNG DẪN/ĂN KHẾ TRẢ VÀNG.pptx"
+  },
+  {
+    "id": "game_g6u1k40",
+    "name": "BẢO VỆ KHU PHỐ",
+    "filename": "BẢO VỆ KHU PHỐ.pptx",
+    "size": "7.32 MB",
+    "type": "PPTX",
+    "url": "8.%20B%E1%BB%98%20TR%C3%92%20CH%C6%A0I%20PPT%20%2B%20VIDEO%20H%C6%AF%E1%BB%9ANG%20D%E1%BA%AAN/B%E1%BA%A2O%20V%E1%BB%86%20KHU%20PH%E1%BB%90.pptx",
+    "rawPath": "8. BỘ TRÒ CHƠI PPT + VIDEO HƯỚNG DẪN/BẢO VỆ KHU PHỐ.pptx"
+  },
+  {
+    "id": "game_wtf40g1",
+    "name": "BẮN CUNG",
+    "filename": "BẮN CUNG.pptx",
+    "size": "16.83 MB",
+    "type": "PPTX",
+    "url": "8.%20B%E1%BB%98%20TR%C3%92%20CH%C6%A0I%20PPT%20%2B%20VIDEO%20H%C6%AF%E1%BB%9ANG%20D%E1%BA%AAN/B%E1%BA%AEN%20CUNG.pptx",
+    "rawPath": "8. BỘ TRÒ CHƠI PPT + VIDEO HƯỚNG DẪN/BẮN CUNG.pptx"
+  },
+  {
+    "id": "game_ktgv4pa",
+    "name": "BẮT BƯỚM",
+    "filename": "BẮT BƯỚM.pptx",
+    "size": "7.37 MB",
+    "type": "PPTX",
+    "url": "8.%20B%E1%BB%98%20TR%C3%92%20CH%C6%A0I%20PPT%20%2B%20VIDEO%20H%C6%AF%E1%BB%9ANG%20D%E1%BA%AAN/B%E1%BA%AET%20B%C6%AF%E1%BB%9AM.pptx",
+    "rawPath": "8. BỘ TRÒ CHƠI PPT + VIDEO HƯỚNG DẪN/BẮT BƯỚM.pptx"
+  },
+  {
+    "id": "game_itdxduc",
+    "name": "BÍ MẬT KHO BÁU CỔ",
+    "filename": "BÍ MẬT KHO BÁU CỔ.pptx",
+    "size": "10.70 MB",
+    "type": "PPTX",
+    "url": "8.%20B%E1%BB%98%20TR%C3%92%20CH%C6%A0I%20PPT%20%2B%20VIDEO%20H%C6%AF%E1%BB%9ANG%20D%E1%BA%AAN/B%C3%8D%20M%E1%BA%ACT%20KHO%20B%C3%81U%20C%E1%BB%94.pptx",
+    "rawPath": "8. BỘ TRÒ CHƠI PPT + VIDEO HƯỚNG DẪN/BÍ MẬT KHO BÁU CỔ.pptx"
+  },
+  {
+    "id": "game_wfenb3d",
+    "name": "BÓNG BAY",
+    "filename": "BÓNG BAY.pptx",
+    "size": "12.24 MB",
+    "type": "PPTX",
+    "url": "8.%20B%E1%BB%98%20TR%C3%92%20CH%C6%A0I%20PPT%20%2B%20VIDEO%20H%C6%AF%E1%BB%9ANG%20D%E1%BA%AAN/B%C3%93NG%20BAY.pptx",
+    "rawPath": "8. BỘ TRÒ CHƠI PPT + VIDEO HƯỚNG DẪN/BÓNG BAY.pptx"
+  },
+  {
+    "id": "game_ff7hz68",
+    "name": "BỘ ĐỒNG HỒ ĐẾM NGƯỢC",
+    "filename": "BỘ ĐỒNG HỒ ĐẾM NGƯỢC.ppt",
+    "size": "1.73 MB",
+    "type": "PPT",
+    "url": "8.%20B%E1%BB%98%20TR%C3%92%20CH%C6%A0I%20PPT%20%2B%20VIDEO%20H%C6%AF%E1%BB%9ANG%20D%E1%BA%AAN/B%E1%BB%98%20%C4%90%E1%BB%92NG%20H%E1%BB%92%20%C4%90%E1%BA%BEM%20NG%C6%AF%E1%BB%A2C.ppt",
+    "rawPath": "8. BỘ TRÒ CHƠI PPT + VIDEO HƯỚNG DẪN/BỘ ĐỒNG HỒ ĐẾM NGƯỢC.ppt"
+  },
+  {
+    "id": "game_q8097t5",
+    "name": "CÂU CÁ",
+    "filename": "CÂU CÁ.pptx",
+    "size": "1.29 MB",
+    "type": "PPTX",
+    "url": "8.%20B%E1%BB%98%20TR%C3%92%20CH%C6%A0I%20PPT%20%2B%20VIDEO%20H%C6%AF%E1%BB%9ANG%20D%E1%BA%AAN/C%C3%82U%20C%C3%81.pptx",
+    "rawPath": "8. BỘ TRÒ CHƠI PPT + VIDEO HƯỚNG DẪN/CÂU CÁ.pptx"
+  },
+  {
+    "id": "game_a1r7mge",
+    "name": "CÂU CÁ 1",
+    "filename": "CÂU CÁ 1.pptx",
+    "size": "2.54 MB",
+    "type": "PPTX",
+    "url": "8.%20B%E1%BB%98%20TR%C3%92%20CH%C6%A0I%20PPT%20%2B%20VIDEO%20H%C6%AF%E1%BB%9ANG%20D%E1%BA%AAN/C%C3%82U%20C%C3%81%201.pptx",
+    "rawPath": "8. BỘ TRÒ CHƠI PPT + VIDEO HƯỚNG DẪN/CÂU CÁ 1.pptx"
+  },
+  {
+    "id": "game_ti7kdj4",
+    "name": "CÂU CÁ 2",
+    "filename": "CÂU CÁ 2.pptx",
+    "size": "2.53 MB",
+    "type": "PPTX",
+    "url": "8.%20B%E1%BB%98%20TR%C3%92%20CH%C6%A0I%20PPT%20%2B%20VIDEO%20H%C6%AF%E1%BB%9ANG%20D%E1%BA%AAN/C%C3%82U%20C%C3%81%202.pptx",
+    "rawPath": "8. BỘ TRÒ CHƠI PPT + VIDEO HƯỚNG DẪN/CÂU CÁ 2.pptx"
+  },
+  {
+    "id": "game_nqpxm8p",
+    "name": "CÂU CÁ 3",
+    "filename": "CÂU CÁ 3.pptx",
+    "size": "2.70 MB",
+    "type": "PPTX",
+    "url": "8.%20B%E1%BB%98%20TR%C3%92%20CH%C6%A0I%20PPT%20%2B%20VIDEO%20H%C6%AF%E1%BB%9ANG%20D%E1%BA%AAN/C%C3%82U%20C%C3%81%203.pptx",
+    "rawPath": "8. BỘ TRÒ CHƠI PPT + VIDEO HƯỚNG DẪN/CÂU CÁ 3.pptx"
+  },
+  {
+    "id": "game_qqf3y9i",
+    "name": "CÂU CÁ 4",
+    "filename": "CÂU CÁ 4.pptx",
+    "size": "0.94 MB",
+    "type": "PPTX",
+    "url": "8.%20B%E1%BB%98%20TR%C3%92%20CH%C6%A0I%20PPT%20%2B%20VIDEO%20H%C6%AF%E1%BB%9ANG%20D%E1%BA%AAN/C%C3%82U%20C%C3%81%204.pptx",
+    "rawPath": "8. BỘ TRÒ CHƠI PPT + VIDEO HƯỚNG DẪN/CÂU CÁ 4.pptx"
+  },
+  {
+    "id": "game_0wivqpe",
+    "name": "CHUNG SỨC",
+    "filename": "CHUNG SỨC.pptx",
+    "size": "7.39 MB",
+    "type": "PPTX",
+    "url": "8.%20B%E1%BB%98%20TR%C3%92%20CH%C6%A0I%20PPT%20%2B%20VIDEO%20H%C6%AF%E1%BB%9ANG%20D%E1%BA%AAN/CHUNG%20S%E1%BB%A8C.pptx",
+    "rawPath": "8. BỘ TRÒ CHƠI PPT + VIDEO HƯỚNG DẪN/CHUNG SỨC.pptx"
+  },
+  {
+    "id": "game_zyn20c8",
+    "name": "CỌN BỌ 2",
+    "filename": "CỌN BỌ 2.pptx",
+    "size": "8.67 MB",
+    "type": "PPTX",
+    "url": "8.%20B%E1%BB%98%20TR%C3%92%20CH%C6%A0I%20PPT%20%2B%20VIDEO%20H%C6%AF%E1%BB%9ANG%20D%E1%BA%AAN/C%E1%BB%8CN%20B%E1%BB%8C%202.pptx",
+    "rawPath": "8. BỘ TRÒ CHƠI PPT + VIDEO HƯỚNG DẪN/CỌN BỌ 2.pptx"
+  },
+  {
+    "id": "game_zhdf47o",
+    "name": "CỜ CÁ NGỰA",
+    "filename": "CỜ CÁ NGỰA.pptx",
+    "size": "7.23 MB",
+    "type": "PPTX",
+    "url": "8.%20B%E1%BB%98%20TR%C3%92%20CH%C6%A0I%20PPT%20%2B%20VIDEO%20H%C6%AF%E1%BB%9ANG%20D%E1%BA%AAN/C%E1%BB%9C%20C%C3%81%20NG%E1%BB%B0A.pptx",
+    "rawPath": "8. BỘ TRÒ CHƠI PPT + VIDEO HƯỚNG DẪN/CỜ CÁ NGỰA.pptx"
+  },
+  {
+    "id": "game_ok8q22h",
+    "name": "CỨU HỘ NẠN LỤT",
+    "filename": "CỨU HỘ NẠN LỤT.pptx",
+    "size": "15.12 MB",
+    "type": "PPTX",
+    "url": "8.%20B%E1%BB%98%20TR%C3%92%20CH%C6%A0I%20PPT%20%2B%20VIDEO%20H%C6%AF%E1%BB%9ANG%20D%E1%BA%AAN/C%E1%BB%A8U%20H%E1%BB%98%20N%E1%BA%A0N%20L%E1%BB%A4T.pptx",
+    "rawPath": "8. BỘ TRÒ CHƠI PPT + VIDEO HƯỚNG DẪN/CỨU HỘ NẠN LỤT.pptx"
+  },
+  {
+    "id": "game_tw3mgzl",
+    "name": "CỨU LẤY CÁ VOI",
+    "filename": "CỨU LẤY CÁ VOI.pptx",
+    "size": "35.00 MB",
+    "type": "PPTX",
+    "url": "8.%20B%E1%BB%98%20TR%C3%92%20CH%C6%A0I%20PPT%20%2B%20VIDEO%20H%C6%AF%E1%BB%9ANG%20D%E1%BA%AAN/C%E1%BB%A8U%20L%E1%BA%A4Y%20C%C3%81%20VOI.pptx",
+    "rawPath": "8. BỘ TRÒ CHƠI PPT + VIDEO HƯỚNG DẪN/CỨU LẤY CÁ VOI.pptx"
+  },
+  {
+    "id": "game_ayq4tq3",
+    "name": "DU LỊCH CÙNG ĐOREMON",
+    "filename": "DU LỊCH CÙNG ĐOREMON.pptx",
+    "size": "37.65 MB",
+    "type": "PPTX",
+    "url": "8.%20B%E1%BB%98%20TR%C3%92%20CH%C6%A0I%20PPT%20%2B%20VIDEO%20H%C6%AF%E1%BB%9ANG%20D%E1%BA%AAN/DU%20L%E1%BB%8ACH%20C%C3%99NG%20%C4%90OREMON.pptx",
+    "rawPath": "8. BỘ TRÒ CHƠI PPT + VIDEO HƯỚNG DẪN/DU LỊCH CÙNG ĐOREMON.pptx"
+  },
+  {
+    "id": "game_mkpxsam",
+    "name": "ĐÁ BÓNG",
+    "filename": "ĐÁ BÓNG.pptx",
+    "size": "2.41 MB",
+    "type": "PPTX",
+    "url": "8.%20B%E1%BB%98%20TR%C3%92%20CH%C6%A0I%20PPT%20%2B%20VIDEO%20H%C6%AF%E1%BB%9ANG%20D%E1%BA%AAN/%C4%90%C3%81%20B%C3%93NG.pptx",
+    "rawPath": "8. BỘ TRÒ CHƠI PPT + VIDEO HƯỚNG DẪN/ĐÁ BÓNG.pptx"
+  },
+  {
+    "id": "game_fbom2zl",
+    "name": "ĐÁ BÓNG IOE",
+    "filename": "ĐÁ BÓNG IOE.pptx",
+    "size": "0.82 MB",
+    "type": "PPTX",
+    "url": "8.%20B%E1%BB%98%20TR%C3%92%20CH%C6%A0I%20PPT%20%2B%20VIDEO%20H%C6%AF%E1%BB%9ANG%20D%E1%BA%AAN/%C4%90%C3%81%20B%C3%93NG%20IOE.pptx",
+    "rawPath": "8. BỘ TRÒ CHƠI PPT + VIDEO HƯỚNG DẪN/ĐÁ BÓNG IOE.pptx"
+  },
+  {
+    "id": "game_s1zkw4j",
+    "name": "ĐÀO VÀNG",
+    "filename": "ĐÀO VÀNG.pptx",
+    "size": "13.40 MB",
+    "type": "PPTX",
+    "url": "8.%20B%E1%BB%98%20TR%C3%92%20CH%C6%A0I%20PPT%20%2B%20VIDEO%20H%C6%AF%E1%BB%9ANG%20D%E1%BA%AAN/%C4%90%C3%80O%20V%C3%80NG.pptx",
+    "rawPath": "8. BỘ TRÒ CHƠI PPT + VIDEO HƯỚNG DẪN/ĐÀO VÀNG.pptx"
+  },
+  {
+    "id": "game_wd4ho6i",
+    "name": "ĐIỀN KHUYẾT",
+    "filename": "ĐIỀN KHUYẾT.pptx",
+    "size": "1.85 MB",
+    "type": "PPTX",
+    "url": "8.%20B%E1%BB%98%20TR%C3%92%20CH%C6%A0I%20PPT%20%2B%20VIDEO%20H%C6%AF%E1%BB%9ANG%20D%E1%BA%AAN/%C4%90I%E1%BB%80N%20KHUY%E1%BA%BET.pptx",
+    "rawPath": "8. BỘ TRÒ CHƠI PPT + VIDEO HƯỚNG DẪN/ĐIỀN KHUYẾT.pptx"
+  },
+  {
+    "id": "game_xs4ooyu",
+    "name": "ĐOÁN BÓNG CON VẬT",
+    "filename": "ĐOÁN BÓNG CON VẬT.pptx",
+    "size": "45.97 MB",
+    "type": "PPTX",
+    "url": "8.%20B%E1%BB%98%20TR%C3%92%20CH%C6%A0I%20PPT%20%2B%20VIDEO%20H%C6%AF%E1%BB%9ANG%20D%E1%BA%AAN/%C4%90O%C3%81N%20B%C3%93NG%20CON%20V%E1%BA%ACT.pptx",
+    "rawPath": "8. BỘ TRÒ CHƠI PPT + VIDEO HƯỚNG DẪN/ĐOÁN BÓNG CON VẬT.pptx"
+  },
+  {
+    "id": "game_ssamcxi",
+    "name": "ĐỒNG HỒ BÁO THỨC",
+    "filename": "ĐỒNG HỒ BÁO THỨC.pptx",
+    "size": "1.41 MB",
+    "type": "PPTX",
+    "url": "8.%20B%E1%BB%98%20TR%C3%92%20CH%C6%A0I%20PPT%20%2B%20VIDEO%20H%C6%AF%E1%BB%9ANG%20D%E1%BA%AAN/%C4%90%E1%BB%92NG%20H%E1%BB%92%20B%C3%81O%20TH%E1%BB%A8C.pptx",
+    "rawPath": "8. BỘ TRÒ CHƠI PPT + VIDEO HƯỚNG DẪN/ĐỒNG HỒ BÁO THỨC.pptx"
+  },
+  {
+    "id": "game_8uqfstc",
+    "name": "ĐỒNG HỒ CÁT",
+    "filename": "ĐỒNG HỒ CÁT.pptx",
+    "size": "1.18 MB",
+    "type": "PPTX",
+    "url": "8.%20B%E1%BB%98%20TR%C3%92%20CH%C6%A0I%20PPT%20%2B%20VIDEO%20H%C6%AF%E1%BB%9ANG%20D%E1%BA%AAN/%C4%90%E1%BB%92NG%20H%E1%BB%92%20C%C3%81T.pptx",
+    "rawPath": "8. BỘ TRÒ CHƠI PPT + VIDEO HƯỚNG DẪN/ĐỒNG HỒ CÁT.pptx"
+  },
+  {
+    "id": "game_eedvfot",
+    "name": "ĐỒNG HỒ ĐẾM NGƯỢC",
+    "filename": "ĐỒNG HỒ ĐẾM NGƯỢC.pptx",
+    "size": "1.67 MB",
+    "type": "PPTX",
+    "url": "8.%20B%E1%BB%98%20TR%C3%92%20CH%C6%A0I%20PPT%20%2B%20VIDEO%20H%C6%AF%E1%BB%9ANG%20D%E1%BA%AAN/%C4%90%E1%BB%92NG%20H%E1%BB%92%20%C4%90%E1%BA%BEM%20NG%C6%AF%E1%BB%A2C.pptx",
+    "rawPath": "8. BỘ TRÒ CHƠI PPT + VIDEO HƯỚNG DẪN/ĐỒNG HỒ ĐẾM NGƯỢC.pptx"
+  },
+  {
+    "id": "game_57b75yq",
+    "name": "ĐỒNG HỒ XEM GIỜ",
+    "filename": "ĐỒNG HỒ XEM GIỜ.pptx",
+    "size": "1.21 MB",
+    "type": "PPTX",
+    "url": "8.%20B%E1%BB%98%20TR%C3%92%20CH%C6%A0I%20PPT%20%2B%20VIDEO%20H%C6%AF%E1%BB%9ANG%20D%E1%BA%AAN/%C4%90%E1%BB%92NG%20H%E1%BB%92%20XEM%20GI%E1%BB%9C.pptx",
+    "rawPath": "8. BỘ TRÒ CHƠI PPT + VIDEO HƯỚNG DẪN/ĐỒNG HỒ XEM GIỜ.pptx"
+  },
+  {
+    "id": "game_k2p78r9",
+    "name": "ĐƯỜNG LÊN ĐỈNH OLYMPIA",
+    "filename": "ĐƯỜNG LÊN ĐỈNH OLYMPIA.pptx",
+    "size": "5.10 MB",
+    "type": "PPTX",
+    "url": "8.%20B%E1%BB%98%20TR%C3%92%20CH%C6%A0I%20PPT%20%2B%20VIDEO%20H%C6%AF%E1%BB%9ANG%20D%E1%BA%AAN/%C4%90%C6%AF%E1%BB%9CNG%20L%C3%8AN%20%C4%90%E1%BB%88NH%20OLYMPIA.pptx",
+    "rawPath": "8. BỘ TRÒ CHƠI PPT + VIDEO HƯỚNG DẪN/ĐƯỜNG LÊN ĐỈNH OLYMPIA.pptx"
+  },
+  {
+    "id": "game_5pmci0y",
+    "name": "EM HIỂU LOÀI VẬT",
+    "filename": "EM HIỂU LOÀI VẬT.pptx",
+    "size": "6.19 MB",
+    "type": "PPTX",
+    "url": "8.%20B%E1%BB%98%20TR%C3%92%20CH%C6%A0I%20PPT%20%2B%20VIDEO%20H%C6%AF%E1%BB%9ANG%20D%E1%BA%AAN/EM%20HI%E1%BB%82U%20LO%C3%80I%20V%E1%BA%ACT.pptx",
+    "rawPath": "8. BỘ TRÒ CHƠI PPT + VIDEO HƯỚNG DẪN/EM HIỂU LOÀI VẬT.pptx"
+  },
+  {
+    "id": "game_ezhgmqz",
+    "name": "GIẢI CỨU BÃI BIẾN",
+    "filename": "GIẢI CỨU BÃI BIẾN.pptx",
+    "size": "1.95 MB",
+    "type": "PPTX",
+    "url": "8.%20B%E1%BB%98%20TR%C3%92%20CH%C6%A0I%20PPT%20%2B%20VIDEO%20H%C6%AF%E1%BB%9ANG%20D%E1%BA%AAN/GI%E1%BA%A2I%20C%E1%BB%A8U%20B%C3%83I%20BI%E1%BA%BEN.pptx",
+    "rawPath": "8. BỘ TRÒ CHƠI PPT + VIDEO HƯỚNG DẪN/GIẢI CỨU BÃI BIẾN.pptx"
+  },
+  {
+    "id": "game_p93ifaa",
+    "name": "GIẢI CỨU ĐẠI DƯƠNG",
+    "filename": "GIẢI CỨU ĐẠI DƯƠNG.ppt",
+    "size": "12.65 MB",
+    "type": "PPT",
+    "url": "8.%20B%E1%BB%98%20TR%C3%92%20CH%C6%A0I%20PPT%20%2B%20VIDEO%20H%C6%AF%E1%BB%9ANG%20D%E1%BA%AAN/GI%E1%BA%A2I%20C%E1%BB%A8U%20%C4%90%E1%BA%A0I%20D%C6%AF%C6%A0NG.ppt",
+    "rawPath": "8. BỘ TRÒ CHƠI PPT + VIDEO HƯỚNG DẪN/GIẢI CỨU ĐẠI DƯƠNG.ppt"
+  },
+  {
+    "id": "game_nyfzh3z",
+    "name": "GIẢI Ô CHỮ",
+    "filename": "GIẢI Ô CHỮ.pptx",
+    "size": "1.40 MB",
+    "type": "PPTX",
+    "url": "8.%20B%E1%BB%98%20TR%C3%92%20CH%C6%A0I%20PPT%20%2B%20VIDEO%20H%C6%AF%E1%BB%9ANG%20D%E1%BA%AAN/GI%E1%BA%A2I%20%C3%94%20CH%E1%BB%AE.pptx",
+    "rawPath": "8. BỘ TRÒ CHƠI PPT + VIDEO HƯỚNG DẪN/GIẢI Ô CHỮ.pptx"
+  },
+  {
+    "id": "game_x466o5e",
+    "name": "GIẢI Ô CHỮ 2",
+    "filename": "GIẢI Ô CHỮ 2.pptx",
+    "size": "1.32 MB",
+    "type": "PPTX",
+    "url": "8.%20B%E1%BB%98%20TR%C3%92%20CH%C6%A0I%20PPT%20%2B%20VIDEO%20H%C6%AF%E1%BB%9ANG%20D%E1%BA%AAN/GI%E1%BA%A2I%20%C3%94%20CH%E1%BB%AE%202.pptx",
+    "rawPath": "8. BỘ TRÒ CHƠI PPT + VIDEO HƯỚNG DẪN/GIẢI Ô CHỮ 2.pptx"
+  },
+  {
+    "id": "game_c2klfpy",
+    "name": "GIẢI Ô CHỮ 3",
+    "filename": "GIẢI Ô CHỮ 3.pptx",
+    "size": "1.66 MB",
+    "type": "PPTX",
+    "url": "8.%20B%E1%BB%98%20TR%C3%92%20CH%C6%A0I%20PPT%20%2B%20VIDEO%20H%C6%AF%E1%BB%9ANG%20D%E1%BA%AAN/GI%E1%BA%A2I%20%C3%94%20CH%E1%BB%AE%203.pptx",
+    "rawPath": "8. BỘ TRÒ CHƠI PPT + VIDEO HƯỚNG DẪN/GIẢI Ô CHỮ 3.pptx"
+  },
+  {
+    "id": "game_0ixl5l6",
+    "name": "GIÚP QUẠ UỐNG NƯỚC",
+    "filename": "GIÚP QUẠ UỐNG NƯỚC.pptx",
+    "size": "2.11 MB",
+    "type": "PPTX",
+    "url": "8.%20B%E1%BB%98%20TR%C3%92%20CH%C6%A0I%20PPT%20%2B%20VIDEO%20H%C6%AF%E1%BB%9ANG%20D%E1%BA%AAN/GI%C3%9AP%20QU%E1%BA%A0%20U%E1%BB%90NG%20N%C6%AF%E1%BB%9AC.pptx",
+    "rawPath": "8. BỘ TRÒ CHƠI PPT + VIDEO HƯỚNG DẪN/GIÚP QUẠ UỐNG NƯỚC.pptx"
+  },
+  {
+    "id": "game_umiwwo4",
+    "name": "HÁI DỪA",
+    "filename": "HÁI DỪA.pptx",
+    "size": "3.37 MB",
+    "type": "PPTX",
+    "url": "8.%20B%E1%BB%98%20TR%C3%92%20CH%C6%A0I%20PPT%20%2B%20VIDEO%20H%C6%AF%E1%BB%9ANG%20D%E1%BA%AAN/H%C3%81I%20D%E1%BB%AAA.pptx",
+    "rawPath": "8. BỘ TRÒ CHƠI PPT + VIDEO HƯỚNG DẪN/HÁI DỪA.pptx"
+  },
+  {
+    "id": "game_2rm3v1u",
+    "name": "HÁI HOA DÂN CHỦ",
+    "filename": "HÁI HOA DÂN CHỦ.pptx",
+    "size": "7.35 MB",
+    "type": "PPTX",
+    "url": "8.%20B%E1%BB%98%20TR%C3%92%20CH%C6%A0I%20PPT%20%2B%20VIDEO%20H%C6%AF%E1%BB%9ANG%20D%E1%BA%AAN/H%C3%81I%20HOA%20D%C3%82N%20CH%E1%BB%A6.pptx",
+    "rawPath": "8. BỘ TRÒ CHƠI PPT + VIDEO HƯỚNG DẪN/HÁI HOA DÂN CHỦ.pptx"
+  },
+  {
+    "id": "game_x0jacb6",
+    "name": "HÁI LỘC ĐẦU XUÂN",
+    "filename": "HÁI LỘC ĐẦU XUÂN.pptx",
+    "size": "11.77 MB",
+    "type": "PPTX",
+    "url": "8.%20B%E1%BB%98%20TR%C3%92%20CH%C6%A0I%20PPT%20%2B%20VIDEO%20H%C6%AF%E1%BB%9ANG%20D%E1%BA%AAN/H%C3%81I%20L%E1%BB%98C%20%C4%90%E1%BA%A6U%20XU%C3%82N.pptx",
+    "rawPath": "8. BỘ TRÒ CHƠI PPT + VIDEO HƯỚNG DẪN/HÁI LỘC ĐẦU XUÂN.pptx"
+  },
+  {
+    "id": "game_hdxgn2v",
+    "name": "HÁI TÁO",
+    "filename": "HÁI TÁO.pptx",
+    "size": "3.22 MB",
+    "type": "PPTX",
+    "url": "8.%20B%E1%BB%98%20TR%C3%92%20CH%C6%A0I%20PPT%20%2B%20VIDEO%20H%C6%AF%E1%BB%9ANG%20D%E1%BA%AAN/H%C3%81I%20T%C3%81O.pptx",
+    "rawPath": "8. BỘ TRÒ CHƠI PPT + VIDEO HƯỚNG DẪN/HÁI TÁO.pptx"
+  },
+  {
+    "id": "game_k2nye1t",
+    "name": "HÀNH TRÌNH TÌM MẬT",
+    "filename": "HÀNH TRÌNH TÌM MẬT.pptx",
+    "size": "34.52 MB",
+    "type": "PPTX",
+    "url": "8.%20B%E1%BB%98%20TR%C3%92%20CH%C6%A0I%20PPT%20%2B%20VIDEO%20H%C6%AF%E1%BB%9ANG%20D%E1%BA%AAN/H%C3%80NH%20TR%C3%8CNH%20T%C3%8CM%20M%E1%BA%ACT.pptx",
+    "rawPath": "8. BỘ TRÒ CHƠI PPT + VIDEO HƯỚNG DẪN/HÀNH TRÌNH TÌM MẬT.pptx"
+  },
+  {
+    "id": "game_ge7sufd",
+    "name": "HAPPY EASTER",
+    "filename": "HAPPY EASTER.pptx",
+    "size": "68.36 MB",
+    "type": "PPTX",
+    "url": "8.%20B%E1%BB%98%20TR%C3%92%20CH%C6%A0I%20PPT%20%2B%20VIDEO%20H%C6%AF%E1%BB%9ANG%20D%E1%BA%AAN/HAPPY%20EASTER.pptx",
+    "rawPath": "8. BỘ TRÒ CHƠI PPT + VIDEO HƯỚNG DẪN/HAPPY EASTER.pptx"
+  },
+  {
+    "id": "game_lle6y2a",
+    "name": "HỘP QUÀ BÍ MẬT",
+    "filename": "HỘP QUÀ BÍ MẬT.pptx",
+    "size": "16.09 MB",
+    "type": "PPTX",
+    "url": "8.%20B%E1%BB%98%20TR%C3%92%20CH%C6%A0I%20PPT%20%2B%20VIDEO%20H%C6%AF%E1%BB%9ANG%20D%E1%BA%AAN/H%E1%BB%98P%20QU%C3%80%20B%C3%8D%20M%E1%BA%ACT.pptx",
+    "rawPath": "8. BỘ TRÒ CHƠI PPT + VIDEO HƯỚNG DẪN/HỘP QUÀ BÍ MẬT.pptx"
+  },
+  {
+    "id": "game_rs3mwax",
+    "name": "HU GÔ",
+    "filename": "HU GÔ.pptx",
+    "size": "9.21 MB",
+    "type": "PPTX",
+    "url": "8.%20B%E1%BB%98%20TR%C3%92%20CH%C6%A0I%20PPT%20%2B%20VIDEO%20H%C6%AF%E1%BB%9ANG%20D%E1%BA%AAN/HU%20G%C3%94.pptx",
+    "rawPath": "8. BỘ TRÒ CHƠI PPT + VIDEO HƯỚNG DẪN/HU GÔ.pptx"
+  },
+  {
+    "id": "game_0hm1iqg",
+    "name": "LẬT HÌNH VƯỢT TRƯỚNG NGẠI VẬT",
+    "filename": "LẬT HÌNH VƯỢT TRƯỚNG NGẠI VẬT.pptx",
+    "size": "0.30 MB",
+    "type": "PPTX",
+    "url": "8.%20B%E1%BB%98%20TR%C3%92%20CH%C6%A0I%20PPT%20%2B%20VIDEO%20H%C6%AF%E1%BB%9ANG%20D%E1%BA%AAN/L%E1%BA%ACT%20H%C3%8CNH%20V%C6%AF%E1%BB%A2T%20TR%C6%AF%E1%BB%9ANG%20NG%E1%BA%A0I%20V%E1%BA%ACT.pptx",
+    "rawPath": "8. BỘ TRÒ CHƠI PPT + VIDEO HƯỚNG DẪN/LẬT HÌNH VƯỢT TRƯỚNG NGẠI VẬT.pptx"
+  },
+  {
+    "id": "game_7s1l30u",
+    "name": "LẬT MẢNH GHÉP",
+    "filename": "LẬT MẢNH GHÉP.pptx",
+    "size": "6.32 MB",
+    "type": "PPTX",
+    "url": "8.%20B%E1%BB%98%20TR%C3%92%20CH%C6%A0I%20PPT%20%2B%20VIDEO%20H%C6%AF%E1%BB%9ANG%20D%E1%BA%AAN/L%E1%BA%ACT%20M%E1%BA%A2NH%20GH%C3%89P.pptx",
+    "rawPath": "8. BỘ TRÒ CHƠI PPT + VIDEO HƯỚNG DẪN/LẬT MẢNH GHÉP.pptx"
+  },
+  {
+    "id": "game_l69aqp9",
+    "name": "mon qua noel youtube trogiang",
+    "filename": "mon qua noel youtube trogiang.pptx",
+    "size": "11.63 MB",
+    "type": "PPTX",
+    "url": "8.%20B%E1%BB%98%20TR%C3%92%20CH%C6%A0I%20PPT%20%2B%20VIDEO%20H%C6%AF%E1%BB%9ANG%20D%E1%BA%AAN/mon%20qua%20noel%20youtube%20trogiang.pptx",
+    "rawPath": "8. BỘ TRÒ CHƠI PPT + VIDEO HƯỚNG DẪN/mon qua noel youtube trogiang.pptx"
+  },
+  {
+    "id": "game_h65kcg9",
+    "name": "MÓN QUÀ NÔEL",
+    "filename": "MÓN QUÀ NÔEL.pptx",
+    "size": "11.73 MB",
+    "type": "PPTX",
+    "url": "8.%20B%E1%BB%98%20TR%C3%92%20CH%C6%A0I%20PPT%20%2B%20VIDEO%20H%C6%AF%E1%BB%9ANG%20D%E1%BA%AAN/M%C3%93N%20QU%C3%80%20N%C3%94EL.pptx",
+    "rawPath": "8. BỘ TRÒ CHƠI PPT + VIDEO HƯỚNG DẪN/MÓN QUÀ NÔEL.pptx"
+  },
+  {
+    "id": "game_spl2g05",
+    "name": "NGỘ KHÔNG THẬT- NGỘ KHÔNG GIẢ",
+    "filename": "NGỘ KHÔNG THẬT- NGỘ KHÔNG GIẢ.pptx",
+    "size": "7.67 MB",
+    "type": "PPTX",
+    "url": "8.%20B%E1%BB%98%20TR%C3%92%20CH%C6%A0I%20PPT%20%2B%20VIDEO%20H%C6%AF%E1%BB%9ANG%20D%E1%BA%AAN/NG%E1%BB%98%20KH%C3%94NG%20TH%E1%BA%ACT-%20NG%E1%BB%98%20KH%C3%94NG%20GI%E1%BA%A2.pptx",
+    "rawPath": "8. BỘ TRÒ CHƠI PPT + VIDEO HƯỚNG DẪN/NGỘ KHÔNG THẬT- NGỘ KHÔNG GIẢ.pptx"
+  },
+  {
+    "id": "game_noip7em",
+    "name": "NGÔI SAO MAY MẮN",
+    "filename": "NGÔI SAO MAY MẮN.pptx",
+    "size": "3.42 MB",
+    "type": "PPTX",
+    "url": "8.%20B%E1%BB%98%20TR%C3%92%20CH%C6%A0I%20PPT%20%2B%20VIDEO%20H%C6%AF%E1%BB%9ANG%20D%E1%BA%AAN/NG%C3%94I%20SAO%20MAY%20M%E1%BA%AEN.pptx",
+    "rawPath": "8. BỘ TRÒ CHƠI PPT + VIDEO HƯỚNG DẪN/NGÔI SAO MAY MẮN.pptx"
+  },
+  {
+    "id": "game_m8skhan",
+    "name": "NHANH NHƯ CHỚP",
+    "filename": "NHANH NHƯ CHỚP.pptx",
+    "size": "5.69 MB",
+    "type": "PPTX",
+    "url": "8.%20B%E1%BB%98%20TR%C3%92%20CH%C6%A0I%20PPT%20%2B%20VIDEO%20H%C6%AF%E1%BB%9ANG%20D%E1%BA%AAN/NHANH%20NH%C6%AF%20CH%E1%BB%9AP.pptx",
+    "rawPath": "8. BỘ TRÒ CHƠI PPT + VIDEO HƯỚNG DẪN/NHANH NHƯ CHỚP.pptx"
+  },
+  {
+    "id": "game_vtmtwsa",
+    "name": "NHANH NHƯ CHỚP NHÍ",
+    "filename": "NHANH NHƯ CHỚP NHÍ.pptx",
+    "size": "4.02 MB",
+    "type": "PPTX",
+    "url": "8.%20B%E1%BB%98%20TR%C3%92%20CH%C6%A0I%20PPT%20%2B%20VIDEO%20H%C6%AF%E1%BB%9ANG%20D%E1%BA%AAN/NHANH%20NH%C6%AF%20CH%E1%BB%9AP%20NH%C3%8D.pptx",
+    "rawPath": "8. BỘ TRÒ CHƠI PPT + VIDEO HƯỚNG DẪN/NHANH NHƯ CHỚP NHÍ.pptx"
+  },
+  {
+    "id": "game_azwvygs",
+    "name": "NHỔ CÀ RỐT",
+    "filename": "NHỔ CÀ RỐT.pptx",
+    "size": "6.08 MB",
+    "type": "PPTX",
+    "url": "8.%20B%E1%BB%98%20TR%C3%92%20CH%C6%A0I%20PPT%20%2B%20VIDEO%20H%C6%AF%E1%BB%9ANG%20D%E1%BA%AAN/NH%E1%BB%94%20C%C3%80%20R%E1%BB%90T.pptx",
+    "rawPath": "8. BỘ TRÒ CHƠI PPT + VIDEO HƯỚNG DẪN/NHỔ CÀ RỐT.pptx"
+  },
+  {
+    "id": "game_5c23k5b",
+    "name": "Ô CỬA BÍ MẬT",
+    "filename": "Ô CỬA BÍ MẬT.pptx",
+    "size": "2.13 MB",
+    "type": "PPTX",
+    "url": "8.%20B%E1%BB%98%20TR%C3%92%20CH%C6%A0I%20PPT%20%2B%20VIDEO%20H%C6%AF%E1%BB%9ANG%20D%E1%BA%AAN/%C3%94%20C%E1%BB%ACA%20B%C3%8D%20M%E1%BA%ACT.pptx",
+    "rawPath": "8. BỘ TRÒ CHƠI PPT + VIDEO HƯỚNG DẪN/Ô CỬA BÍ MẬT.pptx"
+  },
+  {
+    "id": "game_lgovtqu",
+    "name": "Ô CỬA BÍ MẬT 2",
+    "filename": "Ô CỬA BÍ MẬT 2.pptx",
+    "size": "6.91 MB",
+    "type": "PPTX",
+    "url": "8.%20B%E1%BB%98%20TR%C3%92%20CH%C6%A0I%20PPT%20%2B%20VIDEO%20H%C6%AF%E1%BB%9ANG%20D%E1%BA%AAN/%C3%94%20C%E1%BB%ACA%20B%C3%8D%20M%E1%BA%ACT%202.pptx",
+    "rawPath": "8. BỘ TRÒ CHƠI PPT + VIDEO HƯỚNG DẪN/Ô CỬA BÍ MẬT 2.pptx"
+  },
+  {
+    "id": "game_wdvbfe6",
+    "name": "PAC MAN",
+    "filename": "PAC MAN.pptx",
+    "size": "5.43 MB",
+    "type": "PPTX",
+    "url": "8.%20B%E1%BB%98%20TR%C3%92%20CH%C6%A0I%20PPT%20%2B%20VIDEO%20H%C6%AF%E1%BB%9ANG%20D%E1%BA%AAN/PAC%20MAN.pptx",
+    "rawPath": "8. BỘ TRÒ CHƠI PPT + VIDEO HƯỚNG DẪN/PAC MAN.pptx"
+  },
+  {
+    "id": "game_cs2folt",
+    "name": "QUẢ TÁO ĐỘC",
+    "filename": "QUẢ TÁO ĐỘC.pptx",
+    "size": "8.34 MB",
+    "type": "PPTX",
+    "url": "8.%20B%E1%BB%98%20TR%C3%92%20CH%C6%A0I%20PPT%20%2B%20VIDEO%20H%C6%AF%E1%BB%9ANG%20D%E1%BA%AAN/QU%E1%BA%A2%20T%C3%81O%20%C4%90%E1%BB%98C.pptx",
+    "rawPath": "8. BỘ TRÒ CHƠI PPT + VIDEO HƯỚNG DẪN/QUẢ TÁO ĐỘC.pptx"
+  },
+  {
+    "id": "game_8oglvs1",
+    "name": "TẢNG BĂNG TRÔI",
+    "filename": "TẢNG BĂNG TRÔI.pptx",
+    "size": "6.24 MB",
+    "type": "PPTX",
+    "url": "8.%20B%E1%BB%98%20TR%C3%92%20CH%C6%A0I%20PPT%20%2B%20VIDEO%20H%C6%AF%E1%BB%9ANG%20D%E1%BA%AAN/T%E1%BA%A2NG%20B%C4%82NG%20TR%C3%94I.pptx",
+    "rawPath": "8. BỘ TRÒ CHƠI PPT + VIDEO HƯỚNG DẪN/TẢNG BĂNG TRÔI.pptx"
+  },
+  {
+    "id": "game_imqmloi",
+    "name": "TÌM MẬT MÃ",
+    "filename": "TÌM MẬT MÃ.pptx",
+    "size": "15.41 MB",
+    "type": "PPTX",
+    "url": "8.%20B%E1%BB%98%20TR%C3%92%20CH%C6%A0I%20PPT%20%2B%20VIDEO%20H%C6%AF%E1%BB%9ANG%20D%E1%BA%AAN/T%C3%8CM%20M%E1%BA%ACT%20M%C3%83.pptx",
+    "rawPath": "8. BỘ TRÒ CHƠI PPT + VIDEO HƯỚNG DẪN/TÌM MẬT MÃ.pptx"
+  },
+  {
+    "id": "game_8eewcos",
+    "name": "TRICK OR TREAT",
+    "filename": "TRICK OR TREAT.pptx",
+    "size": "7.60 MB",
+    "type": "PPTX",
+    "url": "8.%20B%E1%BB%98%20TR%C3%92%20CH%C6%A0I%20PPT%20%2B%20VIDEO%20H%C6%AF%E1%BB%9ANG%20D%E1%BA%AAN/TRICK%20OR%20TREAT.pptx",
+    "rawPath": "8. BỘ TRÒ CHƠI PPT + VIDEO HƯỚNG DẪN/TRICK OR TREAT.pptx"
+  },
+  {
+    "id": "game_10d68sf",
+    "name": "TRÒ CHƠI Ô CHỮ",
+    "filename": "TRÒ CHƠI Ô CHỮ.pptx",
+    "size": "0.69 MB",
+    "type": "PPTX",
+    "url": "8.%20B%E1%BB%98%20TR%C3%92%20CH%C6%A0I%20PPT%20%2B%20VIDEO%20H%C6%AF%E1%BB%9ANG%20D%E1%BA%AAN/TR%C3%92%20CH%C6%A0I%20%C3%94%20CH%E1%BB%AE.pptx",
+    "rawPath": "8. BỘ TRÒ CHƠI PPT + VIDEO HƯỚNG DẪN/TRÒ CHƠI Ô CHỮ.pptx"
+  },
+  {
+    "id": "game_bt7rsfg",
+    "name": "TRÒ CHƠI TƯỚI HOA",
+    "filename": "TRÒ CHƠI TƯỚI HOA.pptx",
+    "size": "1.10 MB",
+    "type": "PPTX",
+    "url": "8.%20B%E1%BB%98%20TR%C3%92%20CH%C6%A0I%20PPT%20%2B%20VIDEO%20H%C6%AF%E1%BB%9ANG%20D%E1%BA%AAN/TR%C3%92%20CH%C6%A0I%20T%C6%AF%E1%BB%9AI%20HOA.pptx",
+    "rawPath": "8. BỘ TRÒ CHƠI PPT + VIDEO HƯỚNG DẪN/TRÒ CHƠI TƯỚI HOA.pptx"
+  },
+  {
+    "id": "game_nij09nt",
+    "name": "VÒNG QUAY KIỂM RA BÀI CŨ",
+    "filename": "VÒNG QUAY KIỂM RA BÀI CŨ.pptx",
+    "size": "6.46 MB",
+    "type": "PPTX",
+    "url": "8.%20B%E1%BB%98%20TR%C3%92%20CH%C6%A0I%20PPT%20%2B%20VIDEO%20H%C6%AF%E1%BB%9ANG%20D%E1%BA%AAN/V%C3%92NG%20QUAY%20KI%E1%BB%82M%20RA%20B%C3%80I%20C%C5%A8.pptx",
+    "rawPath": "8. BỘ TRÒ CHƠI PPT + VIDEO HƯỚNG DẪN/VÒNG QUAY KIỂM RA BÀI CŨ.pptx"
+  },
+  {
+    "id": "game_exqruba",
+    "name": "VÒNG QUAY KIỂM TRA BÀI CŨ",
+    "filename": "VÒNG QUAY KIỂM TRA BÀI CŨ.pptx",
+    "size": "6.59 MB",
+    "type": "PPTX",
+    "url": "8.%20B%E1%BB%98%20TR%C3%92%20CH%C6%A0I%20PPT%20%2B%20VIDEO%20H%C6%AF%E1%BB%9ANG%20D%E1%BA%AAN/V%C3%92NG%20QUAY%20KI%E1%BB%82M%20TRA%20B%C3%80I%20C%C5%A8.pptx",
+    "rawPath": "8. BỘ TRÒ CHƠI PPT + VIDEO HƯỚNG DẪN/VÒNG QUAY KIỂM TRA BÀI CŨ.pptx"
+  },
+  {
+    "id": "game_35sxud8",
+    "name": "VÒNG QUAY MAY MẮN",
+    "filename": "VÒNG QUAY MAY MẮN.pptx",
+    "size": "6.54 MB",
+    "type": "PPTX",
+    "url": "8.%20B%E1%BB%98%20TR%C3%92%20CH%C6%A0I%20PPT%20%2B%20VIDEO%20H%C6%AF%E1%BB%9ANG%20D%E1%BA%AAN/V%C3%92NG%20QUAY%20MAY%20M%E1%BA%AEN.pptx",
+    "rawPath": "8. BỘ TRÒ CHƠI PPT + VIDEO HƯỚNG DẪN/VÒNG QUAY MAY MẮN.pptx"
+  },
+  {
+    "id": "game_miaqbjv",
+    "name": "VÒNG QUAY MAY MẮN 2",
+    "filename": "VÒNG QUAY MAY MẮN 2.pptx",
+    "size": "7.12 MB",
+    "type": "PPTX",
+    "url": "8.%20B%E1%BB%98%20TR%C3%92%20CH%C6%A0I%20PPT%20%2B%20VIDEO%20H%C6%AF%E1%BB%9ANG%20D%E1%BA%AAN/V%C3%92NG%20QUAY%20MAY%20M%E1%BA%AEN%202.pptx",
+    "rawPath": "8. BỘ TRÒ CHƠI PPT + VIDEO HƯỚNG DẪN/VÒNG QUAY MAY MẮN 2.pptx"
+  },
+  {
+    "id": "game_vluyvjj",
+    "name": "VÒNG QUAY MAY MẮN 3",
+    "filename": "VÒNG QUAY MAY MẮN 3.pptx",
+    "size": "6.67 MB",
+    "type": "PPTX",
+    "url": "8.%20B%E1%BB%98%20TR%C3%92%20CH%C6%A0I%20PPT%20%2B%20VIDEO%20H%C6%AF%E1%BB%9ANG%20D%E1%BA%AAN/V%C3%92NG%20QUAY%20MAY%20M%E1%BA%AEN%203.pptx",
+    "rawPath": "8. BỘ TRÒ CHƠI PPT + VIDEO HƯỚNG DẪN/VÒNG QUAY MAY MẮN 3.pptx"
+  },
+  {
+    "id": "game_ydvvska",
+    "name": "VÒNG QUAY MAY MẮN 4",
+    "filename": "VÒNG QUAY MAY MẮN 4.pptx",
+    "size": "6.93 MB",
+    "type": "PPTX",
+    "url": "8.%20B%E1%BB%98%20TR%C3%92%20CH%C6%A0I%20PPT%20%2B%20VIDEO%20H%C6%AF%E1%BB%9ANG%20D%E1%BA%AAN/V%C3%92NG%20QUAY%20MAY%20M%E1%BA%AEN%204.pptx",
+    "rawPath": "8. BỘ TRÒ CHƠI PPT + VIDEO HƯỚNG DẪN/VÒNG QUAY MAY MẮN 4.pptx"
+  },
+  {
+    "id": "game_l22068a",
+    "name": "VÒNG QUAY MAY MẮN 5",
+    "filename": "VÒNG QUAY MAY MẮN 5.pptx",
+    "size": "6.93 MB",
+    "type": "PPTX",
+    "url": "8.%20B%E1%BB%98%20TR%C3%92%20CH%C6%A0I%20PPT%20%2B%20VIDEO%20H%C6%AF%E1%BB%9ANG%20D%E1%BA%AAN/V%C3%92NG%20QUAY%20MAY%20M%E1%BA%AEN%205.pptx",
+    "rawPath": "8. BỘ TRÒ CHƠI PPT + VIDEO HƯỚNG DẪN/VÒNG QUAY MAY MẮN 5.pptx"
+  },
+  {
+    "id": "game_rt083h3",
+    "name": "VUI ĐỂ HỌC",
+    "filename": "VUI ĐỂ HỌC.pptx",
+    "size": "60.57 MB",
+    "type": "PPTX",
+    "url": "8.%20B%E1%BB%98%20TR%C3%92%20CH%C6%A0I%20PPT%20%2B%20VIDEO%20H%C6%AF%E1%BB%9ANG%20D%E1%BA%AAN/VUI%20%C4%90%E1%BB%82%20H%E1%BB%8CC.pptx",
+    "rawPath": "8. BỘ TRÒ CHƠI PPT + VIDEO HƯỚNG DẪN/VUI ĐỂ HỌC.pptx"
+  },
+  {
+    "id": "game_xj3hru0",
+    "name": "VƯỢT CHƯỚNG NGẠI VẬT",
+    "filename": "VƯỢT CHƯỚNG NGẠI VẬT.pptx",
+    "size": "10.62 MB",
+    "type": "PPTX",
+    "url": "8.%20B%E1%BB%98%20TR%C3%92%20CH%C6%A0I%20PPT%20%2B%20VIDEO%20H%C6%AF%E1%BB%9ANG%20D%E1%BA%AAN/V%C6%AF%E1%BB%A2T%20CH%C6%AF%E1%BB%9ANG%20NG%E1%BA%A0I%20V%E1%BA%ACT.pptx",
+    "rawPath": "8. BỘ TRÒ CHƠI PPT + VIDEO HƯỚNG DẪN/VƯỢT CHƯỚNG NGẠI VẬT.pptx"
+  },
+  {
+    "id": "game_rxtmw7e",
+    "name": "VƯỢT CHƯỚNG NGẠI VẬT 2",
+    "filename": "VƯỢT CHƯỚNG NGẠI VẬT 2.pptx",
+    "size": "19.78 MB",
+    "type": "PPTX",
+    "url": "8.%20B%E1%BB%98%20TR%C3%92%20CH%C6%A0I%20PPT%20%2B%20VIDEO%20H%C6%AF%E1%BB%9ANG%20D%E1%BA%AAN/V%C6%AF%E1%BB%A2T%20CH%C6%AF%E1%BB%9ANG%20NG%E1%BA%A0I%20V%E1%BA%ACT%202.pptx",
+    "rawPath": "8. BỘ TRÒ CHƠI PPT + VIDEO HƯỚNG DẪN/VƯỢT CHƯỚNG NGẠI VẬT 2.pptx"
+  },
+  {
+    "id": "game_j9bwqab",
+    "name": "VƯỢT CHƯỚNG NGẠI VẬT 3",
+    "filename": "VƯỢT CHƯỚNG NGẠI VẬT 3.pptx",
+    "size": "10.62 MB",
+    "type": "PPTX",
+    "url": "8.%20B%E1%BB%98%20TR%C3%92%20CH%C6%A0I%20PPT%20%2B%20VIDEO%20H%C6%AF%E1%BB%9ANG%20D%E1%BA%AAN/V%C6%AF%E1%BB%A2T%20CH%C6%AF%E1%BB%9ANG%20NG%E1%BA%A0I%20V%E1%BA%ACT%203.pptx",
+    "rawPath": "8. BỘ TRÒ CHƠI PPT + VIDEO HƯỚNG DẪN/VƯỢT CHƯỚNG NGẠI VẬT 3.pptx"
+  },
+  {
+    "id": "game_pvikspa",
+    "name": "VƯỢT ĐẠI DƯƠNG",
+    "filename": "VƯỢT ĐẠI DƯƠNG.pptx",
+    "size": "53.09 MB",
+    "type": "PPTX",
+    "url": "8.%20B%E1%BB%98%20TR%C3%92%20CH%C6%A0I%20PPT%20%2B%20VIDEO%20H%C6%AF%E1%BB%9ANG%20D%E1%BA%AAN/V%C6%AF%E1%BB%A2T%20%C4%90%E1%BA%A0I%20D%C6%AF%C6%A0NG.pptx",
+    "rawPath": "8. BỘ TRÒ CHƠI PPT + VIDEO HƯỚNG DẪN/VƯỢT ĐẠI DƯƠNG.pptx"
+  }
+];
+    const DATA_GAMES_VIDEO = {
+  "name": "01. VIDEO HƯỚNG DẪN TỪNG TRÒ TẠI ĐÂY",
+  "filename": "01. VIDEO HƯỚNG DẪN TỪNG TRÒ TẠI ĐÂY.html",
+  "url": "8.%20B%E1%BB%98%20TR%C3%92%20CH%C6%A0I%20PPT%20%2B%20VIDEO%20H%C6%AF%E1%BB%9ANG%20D%E1%BA%AAN/01.%20VIDEO%20H%C6%AF%E1%BB%9ANG%20D%E1%BA%AAN%20T%E1%BB%AANG%20TR%C3%92%20T%E1%BA%A0I%20%C4%90%C3%82Y.html",
+  "rawPath": "8. BỘ TRÒ CHƠI PPT + VIDEO HƯỚNG DẪN/01. VIDEO HƯỚNG DẪN TỪNG TRÒ TẠI ĐÂY.html"
+};
 
     const DIGITAL_AI_STANDARDS = [
       {
@@ -1825,6 +2533,11 @@
       const [activeTab, setActiveTab] = useState('HDTN_TEMPLATE_GENERATOR');
 
       // STATE CHO APP THỰC HÀNH 3D & KHO E-LEARNING
+      
+      // STATE CHO BỘ TRÒ CHƠI POWERPOINT
+      const [gameSearch, setGameSearch] = useState('');
+      const [showVideoModal, setShowVideoModal] = useState(false);
+
       const [app3dGradeFilter, setApp3dGradeFilter] = useState('ALL');
       const [app3dSearch, setApp3dSearch] = useState('');
       const [elearningGradeFilter, setElearningGradeFilter] = useState('ALL');
@@ -3873,6 +4586,21 @@
                   <span className="bg-emerald-100 text-emerald-700 text-[10px] px-1.5 py-0.5 rounded-full font-bold">68</span>
                 </button>
 
+                
+                {/* TAB MỚI: BỘ TRÒ CHƠI PPT & VIDEO HƯỚNG DẪN */}
+                <button
+                  onClick={() => setActiveTab('GAMES_PPT')}
+                  className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                    activeTab === 'GAMES_PPT' ? 'bg-amber-50 text-amber-900 font-bold border-l-4 border-amber-500 shadow-sm' : 'text-slate-700 hover:bg-slate-50'
+                  }`}
+                >
+                  <div className="flex items-center space-x-2.5 truncate">
+                    <i data-lucide="gamepad-2" className="w-4 h-4 text-amber-500 shrink-0"></i>
+                    <span className="truncate">Trò Chơi PPT & Video</span>
+                  </div>
+                  <span className="bg-amber-100 text-amber-800 text-[10px] px-1.5 py-0.5 rounded-full font-bold">76</span>
+                </button>
+
                 {/* TAB MỚI: TỔ TRƯỞNG SỐ */}
                 <button
                   onClick={() => setActiveTab('TO_TRUONG')}
@@ -3989,6 +4717,16 @@
               >
                 📺 Kho E-Learning (68)
               </button>
+              
+              <button
+                onClick={() => setActiveTab('GAMES_PPT')}
+                className={`px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap ${
+                  activeTab === 'GAMES_PPT' ? 'bg-amber-500 text-slate-950 font-bold' : 'bg-white text-slate-700 border border-slate-200'
+                }`}
+              >
+                🎯 Trò Chơi PPT (76)
+              </button>
+
               <button
                 onClick={() => setActiveTab('TO_TRUONG')}
                 className={`px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap ${
@@ -5988,6 +6726,146 @@
               {/* ============================================================================== */}
               {/* TAB MỚI: APP THỰC HÀNH 3D CÔNG NGHỆ */}
               {/* ============================================================================== */}
+              
+              {/* ============================================================================== */}
+              {/* TAB MỚI: KHO 76 TRÒ CHƠI POWERPOINT & VIDEO HƯỚNG DẪN */}
+              {/* ============================================================================== */}
+              {activeTab === 'GAMES_PPT' && (
+                <div className="space-y-6 animate-in fade-in duration-200">
+                  <div className="bg-gradient-to-r from-amber-600 via-orange-600 to-rose-700 rounded-2xl p-6 text-white shadow-lg">
+                    <div className="flex flex-wrap items-center justify-between gap-4">
+                      <div>
+                        <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/20 text-white rounded-full text-xs font-semibold backdrop-blur-sm border border-white/30 mb-2">
+                          <i data-lucide="gamepad-2" className="w-3.5 h-3.5"></i>
+                          <span>Học Liệu Khởi Động & Củng Cố Tương Tác</span>
+                        </div>
+                        <h2 className="text-2xl font-black tracking-tight text-white flex items-center gap-3">
+                          <span>Bộ 76 Trò Chơi PowerPoint & Video Hướng Dẫn</span>
+                        </h2>
+                        <p className="text-xs text-amber-100 mt-1 max-w-2xl leading-relaxed">
+                          Kho trò chơi dạy học PowerPoint chất lượng cao: Vòng quay may mắn, Ai là triệu phú, Ô chữ, Vượt chướng ngại vật, Đào vàng, Bắn cung... Dễ dàng sửa câu hỏi để dạy mọi môn học!
+                        </p>
+                      </div>
+
+                      <div className="flex flex-wrap items-center gap-2.5">
+                        <button
+                          onClick={() => setShowVideoModal(true)}
+                          className="px-4 py-2.5 bg-white text-amber-900 hover:bg-amber-50 rounded-xl text-xs font-bold shadow-md flex items-center gap-2 transition-transform hover:scale-105"
+                        >
+                          <i data-lucide="video" className="w-4 h-4 text-red-600"></i>
+                          <span>Xem Video Hướng Dẫn Từng Trò</span>
+                        </button>
+                        <span className="px-3.5 py-2.5 bg-black/20 rounded-xl text-xs font-bold border border-white/20">
+                          {DATA_GAMES_PPT.length} Trò Chơi PPTX
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Thanh tìm kiếm trò chơi */}
+                    <div className="mt-6 flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-white/20">
+                      <div className="text-xs text-amber-100 font-medium flex items-center gap-2">
+                        <i data-lucide="sparkles" className="w-4 h-4 text-amber-300"></i>
+                        <span>Thầy/Cô bấm "Tải Slide PPTX" để tải về máy, mở bằng PowerPoint và thay câu hỏi của mình.</span>
+                      </div>
+
+                      <div className="relative min-w-[280px]">
+                        <input
+                          type="text"
+                          value={gameSearch}
+                          onChange={(e) => setGameSearch(e.target.value)}
+                          placeholder="Tìm trò chơi (VD: triệu phú, vòng quay, ô chữ...)"
+                          className="w-full pl-9 pr-3 py-2 bg-white/15 border border-white/30 rounded-xl text-xs text-white placeholder-amber-200/70 focus:outline-none focus:ring-2 focus:ring-white focus:bg-white/25"
+                        />
+                        <i data-lucide="search" className="w-4 h-4 text-amber-200 absolute left-2.5 top-2.5"></i>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Lưới 76 trò chơi */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {DATA_GAMES_PPT
+                      .filter(item => item.name.toLowerCase().includes(gameSearch.toLowerCase()))
+                      .map((item, idx) => (
+                        <div key={idx} className="bg-white rounded-xl border border-slate-200 hover:border-amber-400 p-4 shadow-sm hover:shadow-md transition-all flex flex-col justify-between group">
+                          <div>
+                            <div className="flex items-center justify-between mb-2">
+                              <span className="px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-amber-100 text-amber-800 border border-amber-200 flex items-center gap-1">
+                                <i data-lucide="file-presentation" className="w-3 h-3 text-amber-600"></i>
+                                {item.type}
+                              </span>
+                              <span className="text-[11px] font-semibold text-slate-400">
+                                {item.size}
+                              </span>
+                            </div>
+
+                            <h3 className="font-bold text-slate-800 text-sm group-hover:text-amber-700 transition-colors leading-snug mb-1">
+                              {item.name}
+                            </h3>
+                            <p className="text-[11px] text-slate-500 line-clamp-2 mb-3">
+                              Slide mẫu có hiệu ứng trigger, âm thanh sống động thích hợp hoạt động khởi động hoặc luyện tập.
+                            </p>
+                          </div>
+
+                          <div className="pt-2.5 border-t border-slate-100 flex items-center gap-2">
+                            <a
+                              href={item.url}
+                              download={item.filename}
+                              className="flex-1 bg-amber-500 hover:bg-amber-600 text-slate-950 text-xs font-bold py-2 px-3 rounded-lg flex items-center justify-center gap-1.5 shadow-sm transition-colors"
+                            >
+                              <i data-lucide="download" className="w-3.5 h-3.5"></i>
+                              <span>Tải Slide PPTX</span>
+                            </a>
+                          </div>
+                        </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* MODAL XEM VIDEO HƯỚNG DẪN */}
+              {showVideoModal && DATA_GAMES_VIDEO && (
+                <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex flex-col p-2 sm:p-4 animate-in fade-in duration-200">
+                  <div className="bg-slate-900 border border-slate-700 rounded-t-xl px-4 py-3 flex items-center justify-between text-white shadow-xl">
+                    <div className="flex items-center gap-3 truncate">
+                      <span className="px-2.5 py-1 bg-rose-500/20 text-rose-300 border border-rose-400/30 rounded text-xs font-bold uppercase flex items-center gap-1.5">
+                        <i data-lucide="video" className="w-3.5 h-3.5"></i>
+                        Video Hướng Dẫn
+                      </span>
+                      <h4 className="font-bold text-sm truncate">
+                        {DATA_GAMES_VIDEO.name}
+                      </h4>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <a
+                        href={DATA_GAMES_VIDEO.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-amber-300 rounded-lg text-xs font-semibold flex items-center gap-1.5 border border-slate-700 transition-colors"
+                      >
+                        <i data-lucide="external-link" className="w-3.5 h-3.5"></i>
+                        <span>Mở Tab Riêng</span>
+                      </a>
+                      <button
+                        onClick={() => setShowVideoModal(false)}
+                        className="p-1.5 hover:bg-rose-600/30 text-rose-300 rounded-lg border border-transparent hover:border-rose-500/50 transition-colors"
+                        title="Đóng cửa sổ"
+                      >
+                        <i data-lucide="x" className="w-5 h-5"></i>
+                      </button>
+                    </div>
+                  </div>
+                  <div className="flex-1 bg-white rounded-b-xl overflow-hidden shadow-2xl relative">
+                    <iframe
+                      src={DATA_GAMES_VIDEO.url}
+                      className="w-full h-full border-0"
+                      title={DATA_GAMES_VIDEO.name}
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    ></iframe>
+                  </div>
+                </div>
+              )}
+
               {activeTab === 'APPS_3D' && (
                 <div className="space-y-6 animate-in fade-in duration-200">
                   <div className="bg-gradient-to-r from-cyan-900 via-sky-800 to-indigo-900 rounded-2xl p-6 text-white shadow-lg">

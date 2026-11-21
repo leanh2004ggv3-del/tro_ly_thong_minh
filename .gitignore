@@ -33,3 +33,7 @@ Thumbs.db
 *.log
 tmp/
 temp/
+
+# File rar lon hon 100MB
+*.rar
+
