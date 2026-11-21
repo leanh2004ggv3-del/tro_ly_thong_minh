@@ -1869,6 +1869,24 @@
       const [elearningGradeFilter, setElearningGradeFilter] = useState('ALL');
       const [elearningSearch, setElearningSearch] = useState('');
       const [previewItem, setPreviewItem] = useState(null);
+      const [gameSearch, setGameSearch] = useState('');
+      const [previewPptx, setPreviewPptx] = useState(null);
+      const [previewEngine, setPreviewEngine] = useState('office'); // 'office' or 'google'
+
+      const getPptxPreviewUrl = (relativeUrl, engine = 'office') => {
+        let fullPublicUrl = '';
+        if (window.location.protocol === 'http:' || window.location.protocol === 'https:') {
+          const basePath = window.location.origin + window.location.pathname.replace(/\/[^/]*$/, '/');
+          fullPublicUrl = basePath + relativeUrl;
+        } else {
+          fullPublicUrl = 'https://leanh2004ggv3-del.github.io/tro_ly_thong_minh/' + relativeUrl;
+        }
+        
+        if (engine === 'google') {
+          return 'https://docs.google.com/viewer?url=' + encodeURIComponent(fullPublicUrl) + '&embedded=true';
+        }
+        return 'https://view.officeapps.live.com/op/embed.aspx?src=' + encodeURIComponent(fullPublicUrl);
+      };
 
       // ==========================================
       // USER AUTH & USAGE TRACKING SYSTEM
@@ -3568,7 +3586,7 @@
         if (window.lucide) {
           window.lucide.createIcons();
         }
-      }, [activeTab, lessons, isGenerating, generatedStreamText, showUploadModal, showAuthModal, currentUser, showProfileMenu, authTab, hdtnActiveSubTab, hdtnActivePeriodTab, currentHdtnPlan, isHdtnFullscreen, previewItem, app3dGradeFilter, elearningGradeFilter, registeredUsers, usageLogs, userSearchQuery, userRoleFilter]);
+      }, [activeTab, lessons, isGenerating, generatedStreamText, showUploadModal, showAuthModal, currentUser, showProfileMenu, authTab, hdtnActiveSubTab, hdtnActivePeriodTab, currentHdtnPlan, isHdtnFullscreen, previewItem, previewPptx, gameSearch, previewEngine, app3dGradeFilter, elearningGradeFilter, registeredUsers, usageLogs, userSearchQuery, userRoleFilter]);
 
       // AI Lesson Plan Streaming Generator Handler
       
@@ -6522,6 +6540,240 @@
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                       allowFullScreen
                     ></iframe>
+                  </div>
+                </div>
+              )}
+
+              {/* TAB BỘ TRÒ CHƠI PPT & VIDEO HƯỚNG DẪN */}
+              {activeTab === 'GAMES_PPT' && (
+                <div className="space-y-6">
+                  {/* Banner Header */}
+                  <div className="bg-gradient-to-r from-amber-600 via-orange-600 to-rose-600 rounded-2xl p-6 text-white shadow-lg relative overflow-hidden">
+                    <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                      <div>
+                        <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-md px-3 py-1 rounded-full text-xs font-semibold text-amber-100 mb-2">
+                          <i data-lucide="gamepad-2" className="w-3.5 h-3.5 text-amber-300"></i>
+                          <span>Học liệu tương tác tích cực</span>
+                        </div>
+                        <h2 className="text-xl md:text-2xl font-black tracking-tight flex items-center gap-2.5">
+                          <span>Kho 76 Trò Chơi PowerPoint Giảng Dạy & Video Hướng Dẫn</span>
+                        </h2>
+                        <p className="text-xs md:text-sm text-amber-100 max-w-2xl mt-1 leading-relaxed">
+                          Bộ sưu tập 76 trò chơi khởi động, ôn tập, củng cố bài học thiết kế chuyên nghiệp trên PowerPoint (.pptx). Hỗ trợ xem trước trực tuyến và tải về chỉnh sửa theo nội dung môn học.
+                        </p>
+                      </div>
+
+                      {/* Nút Video Hướng Dẫn */}
+                      <div className="flex flex-wrap items-center gap-2.5">
+                        {window.DATA_GAMES_VIDEO && (
+                          <a
+                            href={window.DATA_GAMES_VIDEO.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="bg-white text-orange-700 hover:bg-amber-50 font-bold text-xs px-4 py-2.5 rounded-xl shadow-md transition-all flex items-center gap-2"
+                          >
+                            <i data-lucide="video" className="w-4 h-4 text-rose-600"></i>
+                            <span>Bảng Tra Cứu Video Từng Trò</span>
+                          </a>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Filter & Search Bar */}
+                  <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-3">
+                    <div className="relative w-full sm:w-96">
+                      <i data-lucide="search" className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+                      <input
+                        type="text"
+                        value={gameSearch}
+                        onChange={(e) => setGameSearch(e.target.value)}
+                        placeholder="Tìm tên trò chơi (ví dụ: Triệu phú, Chiếc nón, Vòng quay...)"
+                        className="w-full pl-9 pr-8 py-2 text-xs border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 bg-slate-50/50"
+                      />
+                      {gameSearch && (
+                        <button
+                          onClick={() => setGameSearch('')}
+                          className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                        >
+                          <i data-lucide="x" className="w-3.5 h-3.5"></i>
+                        </button>
+                      )}
+                    </div>
+
+                    <div className="flex items-center gap-2 text-xs text-slate-500 self-end sm:self-center">
+                      <span>Hiển thị: </span>
+                      <strong className="text-amber-600 font-bold text-sm">
+                        {(window.DATA_GAMES_PPT || []).filter(g => !gameSearch || g.name.toLowerCase().includes(gameSearch.toLowerCase())).length}
+                      </strong>
+                      <span>/ {(window.DATA_GAMES_PPT || []).length} trò chơi PowerPoint</span>
+                    </div>
+                  </div>
+
+                  {/* Games Grid */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                    {(window.DATA_GAMES_PPT || [])
+                      .filter(g => !gameSearch || g.name.toLowerCase().includes(gameSearch.toLowerCase()))
+                      .map((game, idx) => (
+                        <div
+                          key={game.id || idx}
+                          className="bg-white rounded-xl border border-slate-200 hover:border-amber-400 p-4 shadow-sm hover:shadow-md transition-all flex flex-col justify-between group"
+                        >
+                          <div>
+                            {/* Card Header badge */}
+                            <div className="flex items-center justify-between mb-3">
+                              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-black bg-orange-100 text-orange-800 border border-orange-200">
+                                <i data-lucide="presentation" className="w-3.5 h-3.5 text-orange-600"></i>
+                                PPTX
+                              </span>
+                              <span className="text-[11px] font-medium text-slate-400 bg-slate-100 px-2 py-0.5 rounded">
+                                {game.size}
+                              </span>
+                            </div>
+
+                            {/* Game Title */}
+                            <h3 className="font-bold text-slate-800 text-sm line-clamp-2 min-h-[2.5rem] group-hover:text-amber-700 transition-colors">
+                              {game.name}
+                            </h3>
+                            <p className="text-[11px] text-slate-400 mt-1 truncate" title={game.filename}>
+                              {game.filename}
+                            </p>
+                          </div>
+
+                          {/* Action Buttons */}
+                          <div className="pt-3 mt-3 border-t border-slate-100 flex items-center gap-2">
+                            {/* Nút Xem Trước Slide */}
+                            <button
+                              onClick={() => {
+                                setPreviewPptx(game);
+                                setPreviewEngine('office');
+                              }}
+                              className="flex-1 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-bold text-xs py-2 px-2.5 rounded-lg flex items-center justify-center gap-1.5 shadow-sm transition-all"
+                              title="Xem trước slide PowerPoint trên trình duyệt"
+                            >
+                              <i data-lucide="eye" className="w-3.5 h-3.5"></i>
+                              <span>Xem trước</span>
+                            </button>
+
+                            {/* Nút Tải về máy */}
+                            <a
+                              href={game.url}
+                              download={game.filename}
+                              className="p-2 border border-slate-200 hover:border-emerald-400 hover:bg-emerald-50 text-slate-600 hover:text-emerald-700 rounded-lg text-xs font-semibold transition-colors"
+                              title="Tải file .pptx về máy tính"
+                            >
+                              <i data-lucide="download" className="w-4 h-4"></i>
+                            </a>
+                          </div>
+                        </div>
+                      ))}
+                  </div>
+
+                  {/* Empty search state */}
+                  {(window.DATA_GAMES_PPT || []).filter(g => !gameSearch || g.name.toLowerCase().includes(gameSearch.toLowerCase())).length === 0 && (
+                    <div className="bg-white rounded-xl border border-slate-200 p-12 text-center">
+                      <i data-lucide="search-x" className="w-12 h-12 text-slate-300 mx-auto mb-3"></i>
+                      <h4 className="font-bold text-slate-700 text-base">Không tìm thấy trò chơi phù hợp</h4>
+                      <p className="text-xs text-slate-500 mt-1">Thầy/Cô vui lòng thử với từ khóa khác (ví dụ: "Ai là triệu phú", "Hộp quà", "Đua xe"...)</p>
+                      <button
+                        onClick={() => setGameSearch('')}
+                        className="mt-4 px-4 py-1.5 bg-amber-500 hover:bg-amber-600 text-white rounded-lg text-xs font-semibold transition-colors"
+                      >
+                        Xem tất cả 76 trò chơi
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* MODAL XEM TRƯỚC SLIDE POWERPOINT (OFFICE WEB VIEWER / GOOGLE VIEWER) */}
+              {previewPptx && (
+                <div className="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-sm flex flex-col p-2 sm:p-4 animate-in fade-in duration-200">
+                  <div className="bg-slate-900 border border-slate-700 rounded-t-xl px-4 py-3 flex flex-wrap items-center justify-between text-white shadow-xl gap-2">
+                    <div className="flex items-center gap-2.5 truncate max-w-full sm:max-w-md">
+                      <span className="px-2 py-0.5 bg-orange-500/20 text-orange-300 border border-orange-400/30 rounded text-xs font-bold uppercase shrink-0">
+                        PPTX • {previewPptx.size}
+                      </span>
+                      <h4 className="font-bold text-sm truncate text-white" title={previewPptx.name}>
+                        {previewPptx.name}
+                      </h4>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      {/* Bộ chọn Viewer engine */}
+                      <div className="flex bg-slate-800 rounded-lg p-0.5 border border-slate-700 text-[11px]">
+                        <button
+                          onClick={() => setPreviewEngine('office')}
+                          className={'px-2.5 py-1 rounded font-semibold transition-colors ' + (previewEngine === 'office' ? 'bg-amber-500 text-white shadow-sm' : 'text-slate-400 hover:text-white')}
+                          title="Trình đọc Microsoft Office Web Viewer chính thức"
+                        >
+                          Office Viewer
+                        </button>
+                        <button
+                          onClick={() => setPreviewEngine('google')}
+                          className={'px-2.5 py-1 rounded font-semibold transition-colors ' + (previewEngine === 'google' ? 'bg-amber-500 text-white shadow-sm' : 'text-slate-400 hover:text-white')}
+                          title="Trình đọc Google Docs Viewer dự phòng"
+                        >
+                          Google Viewer
+                        </button>
+                      </div>
+
+                      {/* Tải về máy */}
+                      <a
+                        href={previewPptx.url}
+                        download={previewPptx.filename}
+                        className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors shadow-sm"
+                        title="Tải file .pptx về máy tính"
+                      >
+                        <i data-lucide="download" className="w-3.5 h-3.5"></i>
+                        <span className="hidden sm:inline">Tải Về (.pptx)</span>
+                      </a>
+
+                      {/* Mở tab riêng */}
+                      <a
+                        href={getPptxPreviewUrl(previewPptx.url, previewEngine)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-cyan-300 rounded-lg text-xs font-semibold flex items-center gap-1.5 border border-slate-700 transition-colors"
+                        title="Mở toàn màn hình trong tab mới"
+                      >
+                        <i data-lucide="maximize-2" className="w-3.5 h-3.5"></i>
+                        <span className="hidden sm:inline">Toàn Màn Hình</span>
+                      </a>
+
+                      {/* Nút Đóng */}
+                      <button
+                        onClick={() => setPreviewPptx(null)}
+                        className="p-1.5 hover:bg-rose-600/30 text-rose-300 rounded-lg border border-transparent hover:border-rose-500/50 transition-colors ml-1"
+                        title="Đóng cửa sổ xem trước"
+                      >
+                        <i data-lucide="x" className="w-5 h-5"></i>
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Body Iframe */}
+                  <div className="flex-1 bg-slate-900 rounded-b-xl overflow-hidden shadow-2xl relative flex flex-col">
+                    <iframe
+                      key={previewPptx.id + '_' + previewEngine}
+                      src={getPptxPreviewUrl(previewPptx.url, previewEngine)}
+                      className="w-full flex-1 border-0 bg-white"
+                      title={previewPptx.name}
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    ></iframe>
+                    <div className="bg-slate-950 px-4 py-2 text-[11px] text-slate-400 border-t border-slate-800 flex flex-wrap items-center justify-between gap-2">
+                      <div className="flex items-center gap-2">
+                        <i data-lucide="info" className="w-3.5 h-3.5 text-amber-400 shrink-0"></i>
+                        <span>
+                          {previewEngine === 'office'
+                            ? 'Đang phát trực tiếp từ máy chủ Microsoft Office Online Viewer.'
+                            : 'Đang phát từ Google Docs Viewer.'}
+                          {' Nếu nạp chậm do file dung lượng lớn, Thầy/Cô có thể đổi sang Google Viewer hoặc bấm nút "Tải Về (.pptx)" để mở bằng PowerPoint.'}
+                        </span>
+                      </div>
+                      <span className="text-slate-500 font-mono text-[10px]">THCS Tịnh Biên • Môn Công nghệ & HĐTN</span>
+                    </div>
                   </div>
                 </div>
               )}
