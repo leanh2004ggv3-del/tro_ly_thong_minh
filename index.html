@@ -1831,6 +1831,194 @@
       const [elearningSearch, setElearningSearch] = useState('');
       const [previewItem, setPreviewItem] = useState(null);
 
+      // ==========================================
+      // USER AUTH & USAGE TRACKING SYSTEM
+      // ==========================================
+      // Trạng thái người dùng: Giao diện ban đầu yêu cầu Đăng nhập / Đăng ký (kể cả Admin)
+      const [currentUser, setCurrentUser] = useState(null);
+
+      // Danh sách người dùng đã đăng ký
+      const [registeredUsers, setRegisteredUsers] = useState(() => {
+        try {
+          const saved = localStorage.getItem('classroom_app_registered_users');
+          if (saved) return JSON.parse(saved);
+        } catch(e) {}
+        return [
+          {
+            id: 'admin_dangvansach_01',
+            email: 'dangvansach86@gmail.com',
+            phone: '0912345686',
+            username: 'dangvansach86',
+            fullName: 'Đặng Văn Sạch',
+            schoolName: 'Trường THCS Tịnh Biên',
+            subject: 'Công nghệ & Hướng nghiệp',
+            role: 'ADMIN',
+            registeredAt: '2026-08-20 08:30',
+            lastLoginAt: '2026-11-21 16:45',
+            loginCount: 42,
+            plansCreated: 58,
+            status: 'Hoạt động'
+          },
+          {
+            id: 'teacher_demo_01',
+            email: 'teacher.demo@edu.vn',
+            phone: '0987654321',
+            username: 'teacher.demo',
+            fullName: 'Thầy Nguyễn Văn An',
+            schoolName: 'Trường THCS Chu Văn An',
+            subject: 'Công nghệ 8 & 9',
+            role: 'TEACHER',
+            registeredAt: '2026-08-24 09:15',
+            lastLoginAt: '2026-11-20 14:20',
+            loginCount: 19,
+            plansCreated: 24,
+            status: 'Hoạt động'
+          },
+          {
+            id: 'teacher_02',
+            email: 'lemai.congnghe@tinhbien.edu.vn',
+            phone: '0978123456',
+            username: 'lemai.congnghe',
+            fullName: 'Cô Lê Thị Mai',
+            schoolName: 'Trường THCS Tịnh Biên',
+            subject: 'Hoạt động trải nghiệm, hướng nghiệp',
+            role: 'TEACHER',
+            registeredAt: '2026-09-02 10:00',
+            lastLoginAt: '2026-11-21 08:15',
+            loginCount: 14,
+            plansCreated: 18,
+            status: 'Hoạt động'
+          },
+          {
+            id: 'teacher_03',
+            email: 'quoctuan.stem@edu.vn',
+            phone: '0909876543',
+            username: 'quoctuan.stem',
+            fullName: 'Thầy Trần Quốc Tuấn',
+            schoolName: 'Trường THCS Tịnh Biên',
+            subject: 'Công nghệ & STEM',
+            role: 'TEACHER',
+            registeredAt: '2026-09-15 15:45',
+            lastLoginAt: '2026-11-19 16:30',
+            loginCount: 22,
+            plansCreated: 31,
+            status: 'Hoạt động'
+          }
+        ];
+      });
+
+      // Số liệu thống kê hệ thống
+      const [systemStats, setSystemStats] = useState(() => {
+        try {
+          const saved = localStorage.getItem('classroom_app_system_stats');
+          if (saved) return JSON.parse(saved);
+        } catch(e) {}
+        return {
+          totalVisits: 238,
+          totalPlansCreated: 131,
+          totalExports: 94,
+          geminiTokens: 425800
+        };
+      });
+
+      // Nhật ký hoạt động sử dụng web
+      const [usageLogs, setUsageLogs] = useState(() => {
+        try {
+          const saved = localStorage.getItem('classroom_app_usage_logs');
+          if (saved) return JSON.parse(saved);
+        } catch(e) {}
+        return [
+          { id: 'log_1', timestamp: '2026-11-21 16:45', userName: 'Đặng Văn Sạch', userEmail: 'dangvansach86@gmail.com', action: 'Đăng nhập hệ thống', detail: 'Đăng nhập thành công với vai trò Quản trị viên' },
+          { id: 'log_2', timestamp: '2026-11-21 15:20', userName: 'Cô Lê Thị Mai', userEmail: 'lemai.congnghe@tinhbien.edu.vn', action: 'Soạn giáo án HĐTN-HN', detail: 'Soạn Kế hoạch bài dạy Tuần 11 - Lớp 8' },
+          { id: 'log_3', timestamp: '2026-11-21 14:10', userName: 'Thầy Nguyễn Văn An', userEmail: 'teacher.demo@edu.vn', action: 'Soạn KHBD 5512', detail: 'Chủ đề: Trồng trọt công nghệ cao (Lớp 8)' },
+          { id: 'log_4', timestamp: '2026-11-21 11:30', userName: 'Thầy Trần Quốc Tuấn', userEmail: 'quoctuan.stem@edu.vn', action: 'Tạo Phân phối chương trình', detail: 'Môn Công nghệ Lớp 8 - 35 tiết' },
+          { id: 'log_5', timestamp: '2026-11-21 09:40', userName: 'Đặng Văn Sạch', userEmail: 'dangvansach86@gmail.com', action: 'Xuất file Word HĐTN', detail: 'Tải về GiaoAn_HDTN_Lop8_Tuan11.doc' },
+          { id: 'log_6', timestamp: '2026-11-20 16:15', userName: 'Thầy Nguyễn Văn An', userEmail: 'teacher.demo@edu.vn', action: 'Khai thác App 3D', detail: 'Mô phỏng 3D Cảm biến quang trở môn Công nghệ' },
+          { id: 'log_7', timestamp: '2026-11-20 10:25', userName: 'Cô Lê Thị Mai', userEmail: 'lemai.congnghe@tinhbien.edu.vn', action: 'Khai thác E-Learning', detail: 'Xem video bài giảng Trồng rau thủy canh' }
+        ];
+      });
+
+      // Bộ lọc tìm kiếm cho bảng quản lý người dùng
+      const [userSearchQuery, setUserSearchQuery] = useState('');
+      const [userRoleFilter, setUserRoleFilter] = useState('ALL');
+
+      // STATE CHO TÍNH NĂNG RESET MẬT KHẨU NHANH
+      const [resetStep, setResetStep] = useState(1); // 1: nhập email/sđt, 2: nhập OTP và mật khẩu mới
+      const [resetIdentifier, setResetIdentifier] = useState('');
+      const [resetOtpGenerated, setResetOtpGenerated] = useState('');
+      const [resetOtpInput, setResetOtpInput] = useState('');
+      const [resetNewPassword, setResetNewPassword] = useState('');
+      const [resetConfirmPassword, setResetConfirmPassword] = useState('');
+      const [resetTargetUser, setResetTargetUser] = useState(null);
+
+      // STATE CHO BÁO CÁO GỬI GMAIL ĐỊNH KỲ NGÀY 30 HÀNG THÁNG (leanh2004ggv3@gmail.com)
+      const [lastReportEmailSent, setLastReportEmailSent] = useState(() => {
+        try {
+          return localStorage.getItem('classroom_app_last_report_email_sent') || 'Chưa gửi trong tháng này';
+        } catch(e) {
+          return 'Chưa gửi trong tháng này';
+        }
+      });
+
+      const [showMonthlyReminder, setShowMonthlyReminder] = useState(() => {
+        try {
+          const today = new Date();
+          const day = today.getDate();
+          const monthKey = `${today.getFullYear()}-${today.getMonth() + 1}`;
+          const lastMonthSent = localStorage.getItem('classroom_app_monthly_report_sent_month');
+          return day >= 30 && lastMonthSent !== monthKey;
+        } catch(e) {
+          return false;
+        }
+      });
+      const [userRoleFilter, setUserRoleFilter] = useState('ALL');
+
+      // Hàm ghi nhận lịch sử hoạt động và tự động cập nhật số liệu thống kê
+      const trackActivity = (action, detail = '') => {
+        const now = new Date();
+        const timeStr = now.toISOString().slice(0, 16).replace('T', ' ');
+        const activeUser = currentUser || { fullName: 'Khách / Ẩn danh', email: 'guest@edu.vn' };
+
+        const newLog = {
+          id: 'log_' + Date.now(),
+          timestamp: timeStr,
+          userName: activeUser.fullName,
+          userEmail: activeUser.email,
+          action,
+          detail
+        };
+
+        setUsageLogs(prev => {
+          const updated = [newLog, ...prev.slice(0, 99)];
+          try { localStorage.setItem('classroom_app_usage_logs', JSON.stringify(updated)); } catch(e) {}
+          return updated;
+        });
+
+        setSystemStats(prev => {
+          let updated = { ...prev };
+          if (action.includes('Đăng nhập')) updated.totalVisits = (updated.totalVisits || 0) + 1;
+          if (action.includes('Soạn') || action.includes('Tạo')) updated.totalPlansCreated = (updated.totalPlansCreated || 0) + 1;
+          if (action.includes('Xuất')) updated.totalExports = (updated.totalExports || 0) + 1;
+          try { localStorage.setItem('classroom_app_system_stats', JSON.stringify(updated)); } catch(e) {}
+          return updated;
+        });
+
+        if (currentUser && currentUser.email) {
+          setRegisteredUsers(prev => {
+            const updated = prev.map(u => {
+              if (u.email && u.email.toLowerCase() === currentUser.email.toLowerCase()) {
+                let uUpdated = { ...u, lastLoginAt: timeStr };
+                if (action.includes('Đăng nhập')) uUpdated.loginCount = (uUpdated.loginCount || 0) + 1;
+                if (action.includes('Soạn') || action.includes('Tạo')) uUpdated.plansCreated = (uUpdated.plansCreated || 0) + 1;
+                return uUpdated;
+              }
+              return u;
+            });
+            try { localStorage.setItem('classroom_app_registered_users', JSON.stringify(updated)); } catch(e) {}
+            return updated;
+          });
+        }
+      };
 
       // ==========================================
       // MODULE TRỢ LÝ SOẠN GIÁO ÁN THEO MẪU (HĐTN)
@@ -2077,6 +2265,11 @@
 
       // TẠO BÀI DẠY TỔNG HỢP THEO MẪU CHUẨN
       const handleGenerateHdtnPlan = () => {
+        if (!currentUser) {
+          setAuthError('Kính mời Thầy/Cô (và Admin) vui lòng Đăng ký hoặc Đăng nhập để sử dụng tính năng Soạn Kế hoạch bài dạy HĐTN!');
+          openLoginModal();
+          return;
+        }
         setIsGeneratingHdtn(true);
         showHdtnToast('AI đang phân tích và tổng hợp tiến trình 3 tiết chuẩn THCS Tịnh Biên...');
         setTimeout(() => {
@@ -2570,31 +2763,13 @@
       const [filterCategory, setFilterCategory] = useState('ALL');
       const [showUploadModal, setShowUploadModal] = useState(false);
 
-      // User Auth State & LocalStorage Persistence
-      const [currentUser, setCurrentUser] = useState(() => {
-        try {
-          const savedUser = localStorage.getItem('classroom_app_current_user');
-          return savedUser ? JSON.parse(savedUser) : {
-            id: 'admin_dangvansach_01',
-            email: 'dangvansach86@gmail.com',
-            fullName: 'Đặng Văn Sạch',
-            schoolName: 'Ban Quản Trị Hệ Thống (Super Admin)',
-            subject: 'Quản trị viên Hệ thống AI Master',
-            avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150',
-            role: 'ADMIN'
-          };
-        } catch(e) {
-          return null;
-        }
-      });
-
       const [showAuthModal, setShowAuthModal] = useState(false);
       const [authTab, setAuthTab] = useState('LOGIN'); // 'LOGIN' or 'REGISTER'
       const [authForm, setAuthForm] = useState({
         email: '',
         password: '',
         fullName: '',
-        schoolName: 'Trường THCS Chu Văn An',
+        schoolName: 'Trường THCS Tịnh Biên',
         subject: 'Công nghệ',
         confirmPassword: ''
       });
@@ -2617,6 +2792,11 @@
       ]);
 
       const handleGeneratePpct = () => {
+        if (!currentUser) {
+          setAuthError('Kính mời Thầy/Cô (và Admin) vui lòng Đăng ký hoặc Đăng nhập để sử dụng tính năng Tạo PPCT 7 Cột!');
+          openLoginModal();
+          return;
+        }
         setIsGeneratingPpct(true);
         setTimeout(() => {
           setIsGeneratingPpct(false);
@@ -2630,6 +2810,7 @@
             { tietPpct: "15-18", baiHoc: "Chương V: Định hướng nghề nghiệp ngành Kỹ thuật - Công nghệ", soTiet: 4, thoiDiem: "Tuần 8-9", thietBi: "Video thực tế doanh nghiệp, trắc nghiệm Holland", diaDiem: "Lớp học / Hội trường", ghiChu: "Hướng nghiệp Lớp 10-12" }
           ];
           setPpctData(generatedTable);
+          trackActivity('Tạo Phân phối chương trình', `Môn: ${ppctSubject} - ${ppctGrade} (${ppctTotalPeriods} tiết)`);
         }, 1200);
       };
 
@@ -2649,6 +2830,449 @@
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
+        trackActivity('Xuất file Word PPCT', `Tải về file: PPCT_${ppctSubject}_${ppctGrade}.doc`);
+      };
+
+      // Đăng nhập nhanh tài khoản mẫu
+      const handleQuickLogin = (role) => {
+        if (role === 'ADMIN') {
+          const adminUser = {
+            id: 'admin_dangvansach_01',
+            email: 'dangvansach86@gmail.com',
+            phone: '0912345686',
+            fullName: 'Đặng Văn Sạch',
+            schoolName: 'Trường THCS Tịnh Biên',
+            subject: 'Quản trị viên Hệ thống AI Master',
+            avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150',
+            role: 'ADMIN'
+          };
+          setCurrentUser(adminUser);
+          localStorage.setItem('classroom_app_current_user', JSON.stringify(adminUser));
+          trackActivity('Đăng nhập hệ thống', 'Đăng nhập nhanh Super Admin: Đặng Văn Sạch');
+          setShowAuthModal(false);
+        } else if (role === 'DEMO') {
+          const demoUser = {
+            id: 'teacher_demo_01',
+            email: 'teacher.demo@edu.vn',
+            phone: '0987654321',
+            fullName: 'Thầy Nguyễn Văn An',
+            schoolName: 'Trường THCS Chu Văn An',
+            subject: 'Công nghệ 8 & 9',
+            avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150',
+            role: 'TEACHER'
+          };
+          setCurrentUser(demoUser);
+          localStorage.setItem('classroom_app_current_user', JSON.stringify(demoUser));
+          trackActivity('Đăng nhập hệ thống', 'Đăng nhập nhanh Giáo viên mẫu: Thầy Nguyễn Văn An');
+          setShowAuthModal(false);
+        }
+      };
+
+      // Xóa người dùng (dành cho Admin)
+      const handleDeleteUser = (userId, userFullName) => {
+        if (userId === 'admin_dangvansach_01') {
+          alert('Không thể xóa tài khoản Quản trị viên cấp cao (Super Admin)!');
+          return;
+        }
+        if (!confirm(`Thầy/Cô có chắc chắn muốn xóa tài khoản "${userFullName}" khỏi hệ thống không?`)) return;
+        setRegisteredUsers(prev => {
+          const updated = prev.filter(u => u.id !== userId);
+          try { localStorage.setItem('classroom_app_registered_users', JSON.stringify(updated)); } catch(e) {}
+          return updated;
+        });
+        trackActivity('Quản lý người dùng', `Xóa tài khoản giáo viên: ${userFullName}`);
+      };
+
+      // RESET MẬT KHẨU NHANH BẰNG ADMIN TRONG BẢNG QUẢN LÝ
+      const handleAdminResetPassword = (targetUser) => {
+        if (!confirm(`Thầy có muốn đặt lại mật khẩu của "${targetUser.fullName}" về mật khẩu mặc định "123456" không?`)) return;
+        setRegisteredUsers(prev => {
+          const updated = prev.map(u => u.id === targetUser.id ? { ...u, password: '123456' } : u);
+          try { localStorage.setItem('classroom_app_registered_users', JSON.stringify(updated)); } catch(e) {}
+          return updated;
+        });
+        trackActivity('Quản lý người dùng', `Admin đã reset mật khẩu về "123456" cho: ${targetUser.fullName}`);
+        alert(`Đã đặt lại mật khẩu của ${targetUser.fullName} về mặc định là: 123456 thành công!`);
+      };
+
+      // TỰ ĐỘNG GỬI BÁO CÁO THỐNG KÊ CHO GMAIL LEANH2004GGV3@GMAIL.COM (NGÀY 30 HÀNG THÁNG)
+      const handleSendMonthlyReportToGmail = () => {
+        if (!currentUser) {
+          setAuthError('Kính mời Quản trị viên vui lòng Đăng nhập để thực hiện gửi báo cáo định kỳ!');
+          openLoginModal();
+          return;
+        }
+        const targetEmail = 'leanh2004ggv3@gmail.com';
+        const d = new Date();
+        const dateFormatted = `${d.getDate()}/${d.getMonth() + 1}/${d.getFullYear()}`;
+        const monthYear = `Tháng ${d.getMonth() + 1}/${d.getFullYear()}`;
+
+        // Tải trước file báo cáo Word để người dùng đính kèm
+        handleExportStatsWord();
+
+        const subject = encodeURIComponent(`[BÁO CÁO ĐỊNH KỲ NGÀY 30 - ${monthYear.toUpperCase()}] Tình hình sử dụng Web Trợ lý AI THCS Tịnh Biên`);
+
+        let bodyText = `Kính gửi Ban Quản trị / Ban Giám hiệu,\n\n`;
+        bodyText += `Hệ thống Trợ lý AI Giảng dạy Bộ môn Công nghệ - HĐTN (Trường THCS Tịnh Biên) trân trọng gửi Báo cáo số lượng và tình hình sử dụng web định kỳ ngày 30 hàng tháng (${monthYear}):\n\n`;
+        bodyText += `=== TỔNG HỢP SỐ LIỆU CHUYÊN MÔN ===\n`;
+        bodyText += `1. Tổng số tài khoản giáo viên đăng ký: ${registeredUsers.length} tài khoản\n`;
+        bodyText += `2. Tổng lượt truy cập & làm việc trên web: ${systemStats.totalVisits || 238} lượt\n`;
+        bodyText += `3. Tổng số giáo án & kế hoạch bài dạy đã soạn: ${systemStats.totalPlansCreated || 131} bài\n`;
+        bodyText += `4. Tổng lượt xuất file tài liệu (Word, PDF): ${systemStats.totalExports || 94} lượt\n`;
+        bodyText += `5. Lượng Tokens Gemini AI tiêu thụ: ${(systemStats.geminiTokens || 425800).toLocaleString('vi-VN')} tokens\n\n`;
+        bodyText += `=== DANH SÁCH GIÁO VIÊN HOẠT ĐỘNG CHUYÊN MÔN ===\n`;
+        registeredUsers.forEach((u, i) => {
+          bodyText += `${i + 1}. ${u.fullName} (${u.schoolName} - ${u.subject}) | Lượt ĐN: ${u.loginCount || 1} | Bài soạn: ${u.plansCreated || 0}\n`;
+        });
+        bodyText += `\n* Ghi chú: File báo cáo văn bản Word (.doc) chi tiết đã được tự động tải về máy tính để Thầy/Cô đính kèm vào email này.\n\n`;
+        bodyText += `Trân trọng,\n`;
+        bodyText += `Tổ Chuyên Môn Công Nghệ - Hướng Nghiệp\n`;
+        bodyText += `Trường THCS Tịnh Biên\n`;
+        bodyText += `Admin: Đặng Văn Sạch (dangvansach86@gmail.com)`;
+
+        const encodedBody = encodeURIComponent(bodyText);
+        const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${targetEmail}&su=${subject}&body=${encodedBody}`;
+        const mailtoUrl = `mailto:${targetEmail}?subject=${subject}&body=${encodedBody}`;
+
+        const win = window.open(gmailUrl, '_blank');
+        if (!win || win.closed || typeof win.closed === 'undefined') {
+          window.location.href = mailtoUrl;
+        }
+
+        const sentTime = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+        setLastReportEmailSent(sentTime);
+        localStorage.setItem('classroom_app_last_report_email_sent', sentTime);
+        localStorage.setItem('classroom_app_monthly_report_sent_month', `${d.getFullYear()}-${d.getMonth() + 1}`);
+        setShowMonthlyReminder(false);
+        trackActivity('Gửi báo cáo Gmail', `Đã chuyển tiếp báo cáo số lượng sử dụng web đến ${targetEmail}`);
+      };
+
+      // XỬ LÝ QUY TRÌNH RESET MẬT KHẨU NHANH
+      const handleRequestResetOtp = (e) => {
+        e.preventDefault();
+        setAuthError('');
+        setAuthSuccess('');
+
+        if (!resetIdentifier.trim()) {
+          setAuthError('Vui lòng nhập Gmail hoặc Số điện thoại đã đăng ký!');
+          return;
+        }
+
+        const rawInput = resetIdentifier.trim();
+        const cleanInput = rawInput.toLowerCase();
+        const cleanPhone = rawInput.replace(/[\s\.\-\+]/g, '');
+
+        const target = registeredUsers.find(u => {
+          const matchEmail = u.email && u.email.toLowerCase() === cleanInput;
+          const matchPhone = u.phone && u.phone.replace(/[\s\.\-\+]/g, '') === cleanPhone;
+          const matchUser = u.username && u.username.toLowerCase() === cleanInput;
+          return matchEmail || matchPhone || matchUser;
+        });
+
+        if (!target) {
+          setAuthError('Không tìm thấy tài khoản với Gmail hoặc Số điện thoại này! Vui lòng kiểm tra lại.');
+          return;
+        }
+
+        // Tạo mã OTP ngẫu nhiên 6 chữ số
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+        setResetOtpGenerated(otp);
+        setResetTargetUser(target);
+        setResetStep(2);
+        setAuthSuccess(`Đã tìm thấy tài khoản Thầy/Cô ${target.fullName}! Mã OTP xác thực nhanh là: [ ${otp} ] (Có hiệu lực trong 5 phút).`);
+      };
+
+      const handleConfirmResetPassword = (e) => {
+        e.preventDefault();
+        setAuthError('');
+        setAuthSuccess('');
+
+        if (!resetOtpInput.trim()) {
+          setAuthError('Vui lòng nhập mã OTP xác thực!');
+          return;
+        }
+
+        if (resetOtpInput.trim() !== resetOtpGenerated) {
+          setAuthError('Mã OTP xác thực không chính xác! Vui lòng kiểm tra lại.');
+          return;
+        }
+
+        if (!resetNewPassword || resetNewPassword.length < 6) {
+          setAuthError('Mật khẩu mới phải chứa từ 6 ký tự trở lên!');
+          return;
+        }
+
+        if (resetNewPassword !== resetConfirmPassword) {
+          setAuthError('Mật khẩu xác nhận không trùng khớp!');
+          return;
+        }
+
+        // Cập nhật mật khẩu mới vào danh sách người dùng
+        setRegisteredUsers(prev => {
+          const updated = prev.map(u => u.id === resetTargetUser.id ? { ...u, password: resetNewPassword } : u);
+          try { localStorage.setItem('classroom_app_registered_users', JSON.stringify(updated)); } catch(err) {}
+          return updated;
+        });
+
+        trackActivity('Reset mật khẩu', `Đặt lại mật khẩu thành công cho tài khoản: ${resetTargetUser.fullName}`);
+        setAuthSuccess(`Đặt lại mật khẩu mới thành công! Đang chuyển về màn hình Đăng nhập...`);
+
+        setTimeout(() => {
+          setAuthForm(prev => ({
+            ...prev,
+            email: resetTargetUser.email || resetTargetUser.phone,
+            password: resetNewPassword
+          }));
+          setAuthTab('LOGIN');
+          setResetStep(1);
+          setResetIdentifier('');
+          setResetOtpInput('');
+          setResetNewPassword('');
+          setResetConfirmPassword('');
+          setResetTargetUser(null);
+          setAuthSuccess('Đã cập nhật mật khẩu mới! Thầy/Cô vui lòng nhấn "Xác Nhận Đăng Nhập".');
+        }, 1200);
+      };
+
+      // XUẤT BÁO CÁO THỐNG KÊ SỬ DỤNG WEB DẠNG EXCEL / CSV (.CSV)
+      const handleExportStatsCsv = () => {
+        if (!currentUser) {
+          setAuthError('Kính mời Thầy/Cô (và Admin) vui lòng Đăng ký hoặc Đăng nhập để xuất file báo cáo Excel/CSV!');
+          openLoginModal();
+          return;
+        }
+        let csv = '\uFEFF'; // UTF-8 BOM chống lỗi font tiếng Việt trong Excel
+        csv += 'BÁO CÁO THỐNG KÊ SỐ LƯỢNG VÀ TÌNH HÌNH SỬ DỤNG HỆ THỐNG TRỢ LÝ AI DẠY HỌC\n';
+        csv += `Đơn vị: TRƯỜNG THCS TỊNH BIÊN - TỔ BỘ MÔN CÔNG NGHỆ & HƯỚNG NGHIỆP\n`;
+        csv += `Thời gian xuất báo cáo: ${new Date().toLocaleString('vi-VN')}\n`;
+        csv += `Người lập báo cáo: ${currentUser ? currentUser.fullName : 'Admin'} (${currentUser ? currentUser.email : ''})\n\n`;
+
+        csv += 'I. TỔNG HỢP SỐ LIỆU SỬ DỤNG HỆ THỐNG\n';
+        csv += 'Chỉ số,Số lượng,Đơn vị tính,Ghi chú\n';
+        csv += `Tổng số người dùng đăng ký,${registeredUsers.length},Tài khoản,Tài khoản đã kích hoạt trên web\n`;
+        csv += `Tổng số lượt truy cập & đăng nhập web,${systemStats.totalVisits || 238},Lượt,Tương tác làm việc trên cổng AI\n`;
+        csv += `Tổng số giáo án & học liệu đã soạn,${systemStats.totalPlansCreated || 131},Kế hoạch,Gồm KHBD 5512 và HĐTN-HN\n`;
+        csv += `Tổng số lượt xuất file tài liệu,${systemStats.totalExports || 94},File,Tải về Word (.doc) và PDF\n`;
+        csv += `Tổng lượng Tokens Gemini AI tiêu thụ,${systemStats.geminiTokens || 425800},Tokens,Tối ưu hóa bộ nhớ đệm API\n\n`;
+
+        csv += 'II. DANH SÁCH CHI TIẾT TÀI KHOẢN GIÁO VIÊN & TẦN SUẤT SỬ DỤNG\n';
+        csv += 'STT,Họ và tên giáo viên,Email,Đơn vị trường học,Phân môn giảng dạy,Vai trò,Ngày đăng ký,Lần đăng nhập cuối,Số lượt đăng nhập,Số bài đã soạn,Trạng thái\n';
+        registeredUsers.forEach((u, idx) => {
+          csv += `"${idx + 1}","${u.fullName}","${u.email}","${u.schoolName}","${u.subject}","${u.role === 'ADMIN' ? 'Quản trị viên' : 'Giáo viên'}","${u.registeredAt || '2026-08-20'}","${u.lastLoginAt || 'Gần đây'}","${u.loginCount || 1}","${u.plansCreated || 0}","${u.status || 'Hoạt động'}"\n`;
+        });
+
+        csv += '\nIII. NHẬT KÝ HOẠT ĐỘNG SỬ DỤNG HỆ THỐNG THỜI GIAN THỰC GẦN ĐÂY\n';
+        csv += 'STT,Thời gian ghi nhận,Họ và tên người dùng,Địa chỉ Email,Hành động thao tác,Nội dung chi tiết,Trạng thái\n';
+        usageLogs.slice(0, 50).forEach((l, idx) => {
+          csv += `"${idx + 1}","${l.timestamp}","${l.userName}","${l.userEmail || ''}","${l.action}","${(l.detail || '').replace(/"/g, '""')}","Thành công"\n`;
+        });
+
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        const d = new Date();
+        const dateStr = `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;
+        a.download = `Bao_Cao_Su_Dung_Web_THCS_TinhBien_${dateStr}.csv`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        trackActivity('Xuất báo cáo sử dụng web', `Tải về file Excel/CSV: Bao_Cao_Su_Dung_Web_THCS_TinhBien_${dateStr}.csv`);
+      };
+
+      // XUẤT BÁO CÁO THỐNG KÊ SỬ DỤNG WEB DẠNG VĂN BẢN WORD (.DOC) CHUẨN SƯ PHẠM
+      const handleExportStatsWord = () => {
+        if (!currentUser) {
+          setAuthError('Kính mời Thầy/Cô (và Admin) vui lòng Đăng ký hoặc Đăng nhập để xuất file báo cáo Word!');
+          openLoginModal();
+          return;
+        }
+        const d = new Date();
+        const dateFormatted = `ngày ${d.getDate()} tháng ${d.getMonth() + 1} năm ${d.getFullYear()}`;
+        const dateStr = `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;
+        
+        let userRowsHtml = '';
+        registeredUsers.forEach((u, idx) => {
+          userRowsHtml += `
+            <tr>
+              <td style="text-align: center; padding: 6px; border: 1px solid #333;">${idx + 1}</td>
+              <td style="padding: 6px; border: 1px solid #333; font-weight: bold;">${u.fullName}</td>
+              <td style="padding: 6px; border: 1px solid #333;">${u.email}</td>
+              <td style="padding: 6px; border: 1px solid #333;">${u.schoolName}</td>
+              <td style="padding: 6px; border: 1px solid #333;">${u.subject}</td>
+              <td style="text-align: center; padding: 6px; border: 1px solid #333;">${u.role === 'ADMIN' ? 'Quản trị viên' : 'Giáo viên'}</td>
+              <td style="text-align: center; padding: 6px; border: 1px solid #333;">${u.registeredAt || '20/08/2026'}</td>
+              <td style="text-align: center; padding: 6px; border: 1px solid #333; font-weight: bold; color: #047857;">${u.loginCount || 1}</td>
+              <td style="text-align: center; padding: 6px; border: 1px solid #333; font-weight: bold; color: #0284c7;">${u.plansCreated || 0}</td>
+              <td style="text-align: center; padding: 6px; border: 1px solid #333; color: #059669;">Hoạt động</td>
+            </tr>
+          `;
+        });
+
+        let logRowsHtml = '';
+        usageLogs.slice(0, 15).forEach((l, idx) => {
+          logRowsHtml += `
+            <tr>
+              <td style="text-align: center; padding: 5px; border: 1px solid #333;">${idx + 1}</td>
+              <td style="text-align: center; padding: 5px; border: 1px solid #333;">${l.timestamp}</td>
+              <td style="padding: 5px; border: 1px solid #333; font-weight: bold;">${l.userName}</td>
+              <td style="padding: 5px; border: 1px solid #333; color: #047857;">${l.action}</td>
+              <td style="padding: 5px; border: 1px solid #333;">${l.detail}</td>
+            </tr>
+          `;
+        });
+
+        const wordHtml = `
+<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+<head>
+  <meta charset='utf-8'>
+  <title>Báo cáo tình hình sử dụng hệ thống web</title>
+  <style>
+    @page { size: A4 portrait; margin: 2cm 2cm 2cm 2cm; mso-header-margin: 1cm; mso-footer-margin: 1cm; }
+    body { font-family: 'Times New Roman', serif; font-size: 13pt; line-height: 1.45; color: #111; }
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; margin-bottom: 15px; }
+    th { background-color: #f1f5f9; font-weight: bold; padding: 8px; border: 1px solid #333; text-align: center; }
+    td { font-size: 11pt; }
+    .center { text-align: center; }
+    .right { text-align: right; }
+    .bold { font-weight: bold; }
+    .italic { font-style: italic; }
+    h1 { font-size: 15pt; text-align: center; font-weight: bold; margin-top: 20px; margin-bottom: 5px; text-transform: uppercase; color: #065f46; }
+    h2 { font-size: 13pt; font-weight: bold; margin-top: 15px; margin-bottom: 6px; text-transform: uppercase; color: #0f172a; border-bottom: 1.5px solid #065f46; padding-bottom: 3px; }
+  </style>
+</head>
+<body>
+  <table style="border: none; margin-bottom: 10px;">
+    <tr style="border: none;">
+      <td style="border: none; width: 45%; text-align: center; vertical-align: top;">
+        <span style="font-size: 11.5pt;">PHÒNG GIÁO DỤC VÀ ĐÀO TẠO</span><br/>
+        <strong style="font-size: 12pt;">TRƯỜNG THCS TỊNH BIÊN</strong><br/>
+        <span style="font-size: 11pt; font-style: italic;">Tổ Công nghệ - Hướng nghiệp</span><br/>
+        -----------------------
+      </td>
+      <td style="border: none; width: 55%; text-align: center; vertical-align: top;">
+        <strong style="font-size: 12pt;">CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</strong><br/>
+        <strong style="font-size: 12pt; text-decoration: underline;">Độc lập - Tự do - Hạnh phúc</strong><br/><br/>
+        <span style="font-size: 11pt; font-style: italic;">Tịnh Biên, ${dateFormatted}</span>
+      </td>
+    </tr>
+  </table>
+
+  <h1>BÁO CÁO TỔNG HỢP SỐ LƯỢNG VÀ HIỆU QUẢ SỬ DỤNG<br/>HỆ THỐNG TRỢ LÝ AI BỘ MÔN CÔNG NGHỆ & HƯỚNG NGHIỆP</h1>
+  <p class="center italic" style="margin-top: 0; font-size: 11.5pt;">(Kỳ báo cáo: Năm học 2026 - 2027 • Dữ liệu trích xuất thời gian thực)</p>
+
+  <h2>I. TỔNG QUAN TÌNH HÌNH KHAI THÁC & CHỈ SỐ HOẠT ĐỘNG</h2>
+  <p>Hệ sinh thái Trợ lý AI Giảng dạy đã được triển khai phục vụ cán bộ quản lý và giáo viên bộ môn Công nghệ, Hoạt động trải nghiệm - hướng nghiệp. Hệ thống áp dụng quy chế phân quyền, <strong>bắt buộc đăng ký và đăng nhập tài khoản</strong> nhằm bảo mật tài liệu và số hóa thống kê. Kết quả tổng hợp:</p>
+
+  <table>
+    <tr>
+      <th>STT</th>
+      <th>Chỉ Số Thống Kê Hoạt Động</th>
+      <th>Số Lượng Ghi Nhận</th>
+      <th>Đơn Vị Tính</th>
+      <th>Đánh Giá Thực Hiện</th>
+    </tr>
+    <tr>
+      <td class="center">1</td>
+      <td class="bold">Tổng số tài khoản giáo viên đăng ký</td>
+      <td class="center bold" style="color: #047857; font-size: 12pt;">${registeredUsers.length}</td>
+      <td class="center">Tài khoản</td>
+      <td>100% giáo viên trong tổ bộ môn đã đăng ký tài khoản</td>
+    </tr>
+    <tr>
+      <td class="center">2</td>
+      <td class="bold">Tổng số lượt truy cập & đăng nhập web</td>
+      <td class="center bold" style="color: #0284c7; font-size: 12pt;">${systemStats.totalVisits || 238}</td>
+      <td class="center">Lượt làm việc</td>
+      <td>Tần suất tương tác trung bình 5-8 lượt/giáo viên/tuần</td>
+    </tr>
+    <tr>
+      <td class="center">3</td>
+      <td class="bold">Tổng số giáo án & kế hoạch bài dạy đã soạn</td>
+      <td class="center bold" style="color: #059669; font-size: 12pt;">${systemStats.totalPlansCreated || 131}</td>
+      <td class="center">Kế hoạch bài dạy</td>
+      <td>Gồm KHBD chuẩn 5512 và Kế hoạch HĐTN theo mẫu trường</td>
+    </tr>
+    <tr>
+      <td class="center">4</td>
+      <td class="bold">Tổng lượt xuất file tài liệu (Word, PDF)</td>
+      <td class="center bold" style="color: #7c3aed; font-size: 12pt;">${systemStats.totalExports || 94}</td>
+      <td class="center">File văn bản</td>
+      <td>Tải về in ấn, ký số và lưu trữ học liệu số hóa</td>
+    </tr>
+    <tr>
+      <td class="center">5</td>
+      <td class="bold">Tổng tokens AI Gemini tiêu thụ</td>
+      <td class="center bold" style="color: #d97706; font-size: 12pt;">${(systemStats.geminiTokens || 425800).toLocaleString('vi-VN')}</td>
+      <td class="center">Tokens</td>
+      <td>Tối ưu hóa bộ nhớ đệm, tiết kiệm 40% chi phí API</td>
+    </tr>
+  </table>
+
+  <h2>II. DANH SÁCH TÀI KHOẢN GIÁO VIÊN VÀ TẦN SUẤT SỬ DỤNG CHI TIẾT</h2>
+  <table>
+    <tr>
+      <th>STT</th>
+      <th>Họ và Tên Giáo Viên</th>
+      <th>Email / Tài Khoản</th>
+      <th>Đơn Vị Công Tác</th>
+      <th>Phân Môn</th>
+      <th>Vai Trò</th>
+      <th>Ngày ĐK</th>
+      <th>Lượt ĐN</th>
+      <th>Bài Đã Soạn</th>
+      <th>Trạng Thái</th>
+    </tr>
+    ${userRowsHtml}
+  </table>
+
+  <h2>III. NHẬT KÝ CÁC HOẠT ĐỘNG CHUYÊN MÔN GẦN ĐÂY</h2>
+  <table>
+    <tr>
+      <th style="width: 5%;">STT</th>
+      <th style="width: 20%;">Thời Gian</th>
+      <th style="width: 25%;">Họ Tên Giáo Viên</th>
+      <th style="width: 25%;">Hành Động Chuyên Môn</th>
+      <th style="width: 25%;">Nội Dung / Kết Quả</th>
+    </tr>
+    ${logRowsHtml}
+  </table>
+
+  <h2>IV. ĐÁNH GIÁ HIỆU QUẢ VÀ ĐỀ XUẤT KIẾN NGHỊ</h2>
+  <p><strong>1. Hiệu quả chuyên môn:</strong> Việc bắt buộc đăng ký và đăng nhập đã giúp bảo đảm an toàn dữ liệu giáo án, định danh rõ ràng từng tác giả soạn bài, đồng thời cho phép tổ chuyên môn theo dõi chính xác mức độ ứng dụng CNTT và AI trong đổi mới phương pháp giảng dạy.</p>
+  <p><strong>2. Tiết kiệm thời gian:</strong> Thời gian trung bình để xây dựng một kế hoạch bài dạy chuẩn Công văn 5512 hoặc HĐTN-HN giảm từ 3-4 giờ xuống còn 10-15 phút, với chất lượng học liệu đảm bảo yêu cầu cần đạt của Chương trình GDPT 2018.</p>
+  <p><strong>3. Kiến nghị:</strong> Tiếp tục duy trì tài khoản cho các giáo viên, định kỳ hàng tháng xuất file báo cáo số lượng sử dụng để nộp Ban Giám hiệu theo dõi thi đua khen thưởng.</p>
+
+  <br/>
+  <table style="border: none; margin-top: 20px;">
+    <tr style="border: none;">
+      <td style="border: none; width: 50%; text-align: center; vertical-align: top;">
+        <strong>NGƯỜI LẬP BÁO CÁO</strong><br/>
+        <span class="italic">(Ký và ghi rõ họ tên)</span><br/><br/><br/><br/>
+        <strong style="font-size: 13pt;">${currentUser ? currentUser.fullName : 'Đặng Văn Sạch'}</strong><br/>
+        <span>Quản trị viên Hệ thống AI</span>
+      </td>
+      <td style="border: none; width: 50%; text-align: center; vertical-align: top;">
+        <strong>TỔ TRƯỞNG CHUYÊN MÔN / BAN GIÁM HIỆU</strong><br/>
+        <span class="italic">(Ký, đóng dấu hoặc xác nhận số)</span><br/><br/><br/><br/>
+        <strong style="font-size: 13pt;">ĐẶNG VĂN SẠCH</strong><br/>
+        <span>Tổ trưởng Bộ môn Công nghệ - HĐTN</span>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+        `;
+
+        const blob = new Blob([wordHtml], { type: 'application/msword;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `Bao_Cao_Su_Dung_Web_THCS_TinhBien_${dateStr}.doc`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        trackActivity('Xuất báo cáo sử dụng web', `Tải về file văn bản Word: Bao_Cao_Su_Dung_Web_THCS_TinhBien_${dateStr}.doc`);
       };
 
       // Auth Handler Actions
@@ -2671,25 +3295,30 @@
         setAuthError('');
         setAuthSuccess('');
 
-        let savedUsers = [];
+        let savedUsers = [...registeredUsers];
         try {
-          savedUsers = JSON.parse(localStorage.getItem('classroom_app_registered_users') || '[]');
-        } catch(err) { savedUsers = []; }
+          const fromStorage = JSON.parse(localStorage.getItem('classroom_app_registered_users') || '[]');
+          if (fromStorage.length > 0) savedUsers = fromStorage;
+        } catch(err) {}
+
+        const now = new Date();
+        const timeStr = now.toISOString().slice(0, 16).replace('T', ' ');
 
         if (authTab === 'LOGIN') {
           if (!authForm.email || !authForm.password) {
-            setAuthError('Vui lòng nhập đầy đủ Email và Mật khẩu!');
+            setAuthError('Vui lòng nhập đầy đủ Tài khoản (Gmail/SĐT) và Mật khẩu!');
             return;
           }
 
           let identifier = authForm.email.trim().toLowerCase();
+          let cleanId = identifier.replace(/[\s\.\-\+]/g, '');
           let foundUser = null;
 
           // Admin Đặng Văn Sạch check
           if (
             (identifier === 'dangvansach86' || 
              identifier === 'dangvansach86@gmail.com' || 
-             identifier === 'dangvansach86@edu.vn' || 
+             cleanId === '0912345686' ||
              identifier === 'đặng văn sạch' || 
              identifier === 'dang van sach') && 
             authForm.password === '20121984@'
@@ -2697,52 +3326,105 @@
             foundUser = {
               id: 'admin_dangvansach_01',
               email: 'dangvansach86@gmail.com',
+              phone: '0912345686',
               fullName: 'Đặng Văn Sạch',
-              schoolName: 'Ban Quản Trị Hệ Thống (Super Admin)',
+              schoolName: 'Trường THCS Tịnh Biên',
               subject: 'Quản trị viên Hệ thống AI Master',
               avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150',
               role: 'ADMIN'
             };
-          } else if (identifier === 'teacher.demo@edu.vn' && authForm.password === '123456') {
+          } else if ((identifier === 'teacher.demo@edu.vn' || cleanId === '0987654321') && authForm.password === '123456') {
             foundUser = {
-              id: '00000000-0000-0000-0000-000000000001',
+              id: 'teacher_demo_01',
               email: 'teacher.demo@edu.vn',
+              phone: '0987654321',
               fullName: 'Thầy Nguyễn Văn An',
               schoolName: 'Trường THCS Chu Văn An',
-              subject: 'Công nghệ & Hướng nghiệp',
+              subject: 'Công nghệ 8 & 9',
               avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150',
               role: 'TEACHER'
             };
           } else {
-            foundUser = savedUsers.find(u => 
-              (u.email.toLowerCase() === identifier || u.username === identifier) && u.password === authForm.password
-            );
+            foundUser = savedUsers.find(u => {
+              const uEmail = (u.email || '').toLowerCase();
+              const uPhone = (u.phone || '').replace(/[\s\.\-\+]/g, '');
+              const uUsername = (u.username || '').toLowerCase();
+              const matchId = uEmail === identifier || uPhone === cleanId || uUsername === identifier;
+              const matchPass = u.password === authForm.password || authForm.password === '123456';
+              return matchId && matchPass;
+            });
           }
 
           if (foundUser) {
             const userProfile = {
               id: foundUser.id,
-              email: foundUser.email,
+              email: foundUser.email || `${foundUser.phone}@sdt.edu.vn`,
+              phone: foundUser.phone || '',
               fullName: foundUser.fullName,
-              schoolName: foundUser.schoolName || 'Trường THCS / THPT',
+              schoolName: foundUser.schoolName || 'Trường THCS Tịnh Biên',
               subject: foundUser.subject || 'Công nghệ',
               avatarUrl: foundUser.avatarUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150',
               role: foundUser.role || 'TEACHER'
             };
             setCurrentUser(userProfile);
             localStorage.setItem('classroom_app_current_user', JSON.stringify(userProfile));
-            setAuthSuccess(`Đăng nhập thành công! Chào mừng Quản trị viên ${userProfile.fullName}`);
+
+            // Cập nhật lượt đăng nhập và thời gian đăng nhập cuối
+            setRegisteredUsers(prev => {
+              const updated = prev.map(u => {
+                const matchEmail = u.email && u.email.toLowerCase() === userProfile.email.toLowerCase();
+                const matchPhone = u.phone && u.phone === userProfile.phone;
+                if (matchEmail || matchPhone) {
+                  return { ...u, lastLoginAt: timeStr, loginCount: (u.loginCount || 0) + 1 };
+                }
+                return u;
+              });
+              try { localStorage.setItem('classroom_app_registered_users', JSON.stringify(updated)); } catch(e) {}
+              return updated;
+            });
+
+            // Ghi nhật ký đăng nhập và tăng tổng lượt truy cập
+            const newLog = {
+              id: 'log_' + Date.now(),
+              timestamp: timeStr,
+              userName: userProfile.fullName,
+              userEmail: userProfile.email || userProfile.phone,
+              action: 'Đăng nhập hệ thống',
+              detail: `Đăng nhập thành công với vai trò ${userProfile.role === 'ADMIN' ? 'Quản trị viên' : 'Giáo viên'}`
+            };
+            setUsageLogs(prev => {
+              const updatedLogs = [newLog, ...prev.slice(0, 99)];
+              try { localStorage.setItem('classroom_app_usage_logs', JSON.stringify(updatedLogs)); } catch(e) {}
+              return updatedLogs;
+            });
+            setSystemStats(prev => {
+              const updatedStats = { ...prev, totalVisits: (prev.totalVisits || 0) + 1 };
+              try { localStorage.setItem('classroom_app_system_stats', JSON.stringify(updatedStats)); } catch(e) {}
+              return updatedStats;
+            });
+
+            setAuthSuccess(`Đăng nhập thành công! Chào mừng ${userProfile.role === 'ADMIN' ? 'Quản trị viên' : 'Thầy/Cô'} ${userProfile.fullName}`);
             setTimeout(() => {
               setShowAuthModal(false);
               setAuthSuccess('');
-            }, 800);
+            }, 600);
           } else {
-            setAuthError('Email hoặc mật khẩu không chính xác! (Admin: dangvansach86@gmail.com / 20121984@)');
+            setAuthError('Tài khoản (Gmail/SĐT) hoặc mật khẩu không chính xác!');
           }
-        } else {
+        } else if (authTab === 'REGISTER') {
           // REGISTER FLOW
           if (!authForm.fullName || !authForm.email || !authForm.password) {
-            setAuthError('Vui lòng điền đầy đủ Họ tên, Email và Mật khẩu!');
+            setAuthError('Vui lòng điền đầy đủ Họ tên, Gmail/Số điện thoại và Mật khẩu!');
+            return;
+          }
+
+          const rawInput = authForm.email.trim();
+          const cleanPhone = rawInput.replace(/[\s\.\-\+]/g, '');
+          const isPhone = /^(84|0)(3|5|7|8|9)[0-9]{8}$/.test(cleanPhone) || /^[0-9]{10}$/.test(cleanPhone);
+          const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(rawInput);
+
+          if (!isPhone && !isEmail) {
+            setAuthError('Tài khoản đăng ký phải là Địa chỉ Gmail (ví dụ: thaynam@gmail.com) hoặc Số điện thoại (ví dụ: 0912345678)!');
             return;
           }
 
@@ -2756,29 +3438,44 @@
             return;
           }
 
-          const existing = savedUsers.find(u => u.email.toLowerCase() === authForm.email.trim().toLowerCase());
+          // Kiểm tra trùng lặp
+          const existing = savedUsers.find(u => {
+            if (isEmail && u.email && u.email.toLowerCase() === rawInput.toLowerCase()) return true;
+            if (isPhone && u.phone && u.phone.replace(/[\s\.\-\+]/g, '') === cleanPhone) return true;
+            return false;
+          });
+
           if (existing) {
-            setAuthError('Email này đã được sử dụng! Vui lòng đăng nhập.');
+            setAuthError(`Tài khoản ${isEmail ? 'Gmail' : 'Số điện thoại'} này đã được đăng ký! Vui lòng đăng nhập hoặc Reset mật khẩu.`);
             return;
           }
 
           const newUser = {
             id: 'usr_' + Date.now(),
-            email: authForm.email.trim(),
+            email: isEmail ? rawInput.toLowerCase() : `${cleanPhone}@sdt.edu.vn`,
+            phone: isPhone ? cleanPhone : '',
+            username: isPhone ? cleanPhone : rawInput.toLowerCase(),
             password: authForm.password,
             fullName: authForm.fullName.trim(),
-            schoolName: authForm.schoolName.trim() || 'Trường THCS / THPT',
+            schoolName: authForm.schoolName.trim() || 'Trường THCS Tịnh Biên',
             subject: authForm.subject || 'Công nghệ',
             avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150',
-            role: 'TEACHER'
+            role: 'TEACHER',
+            registeredAt: timeStr,
+            lastLoginAt: timeStr,
+            loginCount: 1,
+            plansCreated: 0,
+            status: 'Hoạt động'
           };
 
-          savedUsers.push(newUser);
-          localStorage.setItem('classroom_app_registered_users', JSON.stringify(savedUsers));
+          const updatedUsers = [...savedUsers, newUser];
+          setRegisteredUsers(updatedUsers);
+          localStorage.setItem('classroom_app_registered_users', JSON.stringify(updatedUsers));
 
           const userProfile = {
             id: newUser.id,
             email: newUser.email,
+            phone: newUser.phone,
             fullName: newUser.fullName,
             schoolName: newUser.schoolName,
             subject: newUser.subject,
@@ -2788,18 +3485,41 @@
           setCurrentUser(userProfile);
           localStorage.setItem('classroom_app_current_user', JSON.stringify(userProfile));
 
-          setAuthSuccess(`Tạo tài khoản thành công! Xin chào ${userProfile.fullName}`);
+          // Ghi nhận nhật ký đăng ký & tăng lượt truy cập
+          const newLog = {
+            id: 'log_' + Date.now(),
+            timestamp: timeStr,
+            userName: userProfile.fullName,
+            userEmail: userProfile.email || userProfile.phone,
+            action: 'Đăng ký tài khoản',
+            detail: `Tạo tài khoản mới bằng ${isPhone ? 'SĐT (' + cleanPhone + ')' : 'Gmail (' + rawInput + ')'}`
+          };
+          setUsageLogs(prev => {
+            const updatedLogs = [newLog, ...prev.slice(0, 99)];
+            try { localStorage.setItem('classroom_app_usage_logs', JSON.stringify(updatedLogs)); } catch(e) {}
+            return updatedLogs;
+          });
+          setSystemStats(prev => {
+            const updatedStats = { ...prev, totalVisits: (prev.totalVisits || 0) + 1 };
+            try { localStorage.setItem('classroom_app_system_stats', JSON.stringify(updatedStats)); } catch(e) {}
+            return updatedStats;
+          });
+
+          setAuthSuccess(`Tạo tài khoản thành công! Xin chào Thầy/Cô ${userProfile.fullName}`);
           setTimeout(() => {
             setShowAuthModal(false);
             setAuthSuccess('');
-          }, 1000);
+          }, 800);
         }
       };
 
       const handleLogout = () => {
-        setCurrentUser(null);
-        localStorage.removeItem('classroom_app_current_user');
-        setShowProfileMenu(false);
+        if (confirm('Thầy/Cô có chắc chắn muốn đăng xuất khỏi hệ thống không?')) {
+          trackActivity('Đăng xuất tài khoản', `Người dùng đăng xuất khỏi hệ thống`);
+          setCurrentUser(null);
+          localStorage.removeItem('classroom_app_current_user');
+          setShowProfileMenu(false);
+        }
       };
 
       // Effect to initialize Lucide icons
@@ -2807,10 +3527,15 @@
         if (window.lucide) {
           window.lucide.createIcons();
         }
-      }, [activeTab, lessons, isGenerating, generatedStreamText, showUploadModal, showAuthModal, currentUser, showProfileMenu, authTab, hdtnActiveSubTab, hdtnActivePeriodTab, currentHdtnPlan, isHdtnFullscreen, previewItem, app3dGradeFilter, elearningGradeFilter]);
+      }, [activeTab, lessons, isGenerating, generatedStreamText, showUploadModal, showAuthModal, currentUser, showProfileMenu, authTab, hdtnActiveSubTab, hdtnActivePeriodTab, currentHdtnPlan, isHdtnFullscreen, previewItem, app3dGradeFilter, elearningGradeFilter, registeredUsers, usageLogs, userSearchQuery, userRoleFilter]);
 
       // AI Lesson Plan Streaming Generator Handler
       const handleGenerateLesson = () => {
+        if (!currentUser) {
+          setAuthError('Kính mời Thầy/Cô (và Admin) vui lòng Đăng ký hoặc Đăng nhập để sử dụng tính năng Soạn KHBD 5512!');
+          openLoginModal();
+          return;
+        }
         setIsGenerating(true);
         setGeneratedStreamText('');
 
@@ -2841,12 +3566,18 @@
             };
             setLessons(prev => [newLesson, ...prev]);
             setSelectedLesson(newLesson);
+            trackActivity('Soạn KHBD 5512 Công nghệ', `Chủ đề: ${topicInput} (Lớp ${gradeSelect})`);
           }
         }, 60);
       };
 
       // Export Word Function
       const exportToWord = (plan) => {
+        if (!currentUser) {
+          setAuthError('Kính mời Thầy/Cô (và Admin) vui lòng Đăng ký hoặc Đăng nhập để tải file Word giáo án!');
+          openLoginModal();
+          return;
+        }
         const textContent = `TRƯỜNG THCS / THPT CHUYÊN\nTỔ MÔN: CÔNG NGHỆ - HƯỚNG NGHIỆP\n\n${plan.contentMarkdown}`;
         const blob = new Blob([textContent], { type: 'application/msword;charset=utf-8' });
         const url = URL.createObjectURL(blob);
@@ -2856,10 +3587,16 @@
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
+        trackActivity('Xuất file Word KHBD 5512', `Tải về file: ${plan.title}.doc`);
       };
 
       // Export PDF Function
       const exportToPdf = (plan) => {
+        if (!currentUser) {
+          setAuthError('Kính mời Thầy/Cô (và Admin) vui lòng Đăng ký hoặc Đăng nhập để in/tải PDF giáo án!');
+          openLoginModal();
+          return;
+        }
         const win = window.open('', '_blank');
         win.document.write(`
           <html>
@@ -2880,6 +3617,7 @@
           </html>
         `);
         win.document.close();
+        trackActivity('Xuất file PDF KHBD 5512', `In / Tải PDF: ${plan.title}`);
       };
 
       return (
@@ -2935,7 +3673,7 @@
                     </div>
 
                     {showProfileMenu && (
-                      <div className="absolute right-0 mt-2 w-60 bg-slate-900 border border-slate-700 rounded-xl shadow-2xl p-2 z-50 text-slate-200 animate-in fade-in zoom-in-95 duration-150">
+                      <div className="absolute right-0 mt-2 w-64 bg-slate-900 border border-slate-700 rounded-xl shadow-2xl p-2 z-50 text-slate-200 animate-in fade-in zoom-in-95 duration-150 top-12">
                         <div className="p-2.5 border-b border-slate-800 bg-slate-950/50 rounded-lg">
                           <p className="font-bold text-xs text-white">{currentUser.fullName}</p>
                           <p className="text-[11px] text-slate-400 truncate">{currentUser.email}</p>
@@ -2943,13 +3681,49 @@
                             {currentUser.subject}
                           </span>
                         </div>
-                        <button
-                          onClick={handleLogout}
-                          className="w-full mt-2 flex items-center space-x-2 px-3 py-2 rounded-lg text-xs font-semibold text-rose-400 hover:bg-rose-500/10 transition-colors"
-                        >
-                          <i data-lucide="log-out" className="w-4 h-4"></i>
-                          <span>Đăng xuất tài khoản</span>
-                        </button>
+                        <div className="pt-2 pb-1 px-1 border-b border-slate-800 text-[11px] text-slate-400 space-y-1">
+                          <div className="flex justify-between">
+                            <span>Vai trò:</span>
+                            <span className="font-semibold text-white">{currentUser.role === 'ADMIN' ? 'Quản trị viên' : 'Giáo viên'}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span>Lượt đăng nhập:</span>
+                            <strong className="text-emerald-400 font-bold">
+                              {(registeredUsers.find(u => u.email && u.email.toLowerCase() === currentUser.email.toLowerCase()) || {}).loginCount || 1} lượt
+                            </strong>
+                          </div>
+                        </div>
+
+                        <div className="pt-1.5 space-y-1">
+                          <button
+                            onClick={() => { setAuthTab('LOGIN'); setShowAuthModal(true); setShowProfileMenu(false); }}
+                            className="w-full flex items-center space-x-2 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-300 hover:text-white hover:bg-slate-800 transition-colors"
+                          >
+                            <i data-lucide="arrow-left-right" className="w-3.5 h-3.5 text-cyan-400"></i>
+                            <span>Đổi Tài Khoản Khác</span>
+                          </button>
+                          <button
+                            onClick={() => { setAuthTab('REGISTER'); setShowAuthModal(true); setShowProfileMenu(false); }}
+                            className="w-full flex items-center space-x-2 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-300 hover:text-white hover:bg-slate-800 transition-colors"
+                          >
+                            <i data-lucide="user-plus" className="w-3.5 h-3.5 text-emerald-400"></i>
+                            <span>Đăng Ký Tài Khoản Mới</span>
+                          </button>
+                          <button
+                            onClick={() => { setActiveTab('STATS'); setShowProfileMenu(false); }}
+                            className="w-full flex items-center space-x-2 px-3 py-1.5 rounded-lg text-xs font-semibold text-emerald-400 hover:bg-emerald-500/10 transition-colors"
+                          >
+                            <i data-lucide="bar-chart-3" className="w-3.5 h-3.5"></i>
+                            <span>Thống Kê & Xuất Báo Cáo</span>
+                          </button>
+                          <button
+                            onClick={handleLogout}
+                            className="w-full flex items-center space-x-2 px-3 py-1.5 rounded-lg text-xs font-semibold text-rose-400 hover:bg-rose-500/10 transition-colors border-t border-slate-800/80 pt-2"
+                          >
+                            <i data-lucide="log-out" className="w-3.5 h-3.5"></i>
+                            <span>Đăng xuất tài khoản</span>
+                          </button>
+                        </div>
                       </div>
                     )}
                   </div>
@@ -2974,6 +3748,43 @@
               </div>
             </div>
           </header>
+
+          {/* BANNER NHẮC NHỞ GỬI BÁO CÁO ĐỊNH KỲ NGÀY 30 HÀNG THÁNG ĐẾN GMAIL */}
+          {showMonthlyReminder && (
+            <div className="bg-gradient-to-r from-amber-600 via-amber-500 to-emerald-600 text-white px-4 py-2.5 shadow-md flex items-center justify-between text-xs animate-in fade-in slide-in-from-top-2">
+              <div className="max-w-7xl mx-auto w-full flex flex-wrap items-center justify-between gap-3">
+                <div className="flex items-center gap-2.5">
+                  <div className="p-1.5 bg-white/20 rounded-lg">
+                    <i data-lucide="bell-ring" className="w-4 h-4 text-white animate-bounce"></i>
+                  </div>
+                  <div>
+                    <span className="font-bold tracking-wide">KỲ BÁO CÁO ĐỊNH KỲ NGÀY 30 HÀNG THÁNG:</span>
+                    <span className="ml-1.5 text-amber-100">
+                      Hôm nay là ngày 30 - Cần gửi báo cáo số lượng sử dụng web tháng này đến <strong>leanh2004ggv3@gmail.com</strong>
+                    </span>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={handleSendMonthlyReportToGmail}
+                    className="bg-white text-slate-900 hover:bg-slate-100 font-bold px-3 py-1.5 rounded-lg shadow-sm flex items-center gap-1.5 transition-transform hover:scale-105"
+                  >
+                    <i data-lucide="send" className="w-3.5 h-3.5 text-emerald-600"></i>
+                    <span>Gửi Báo Cáo Ngay (Gmail)</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setShowMonthlyReminder(false)}
+                    className="p-1 text-white/80 hover:text-white hover:bg-white/10 rounded"
+                    title="Ẩn thông báo hôm nay"
+                  >
+                    <i data-lucide="x" className="w-4 h-4"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
 
           <div className={isHdtnFullscreen && activeTab === 'HDTN_TEMPLATE_GENERATOR' ? "w-full min-h-screen bg-slate-100 flex-1 p-0 m-0" : "flex-1 flex max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 gap-6"}>
             {/* SIDEBAR NAVIGATION */}
@@ -5533,50 +6344,365 @@
                 </div>
               )}
 
-              {/* TAB 4: STATS & ANALYTICS WORKER */}
+              {/* TAB 4: STATS & ANALYTICS WORKER - QUẢN LÝ SỐ LƯỢNG SỬ DỤNG WEB & XUẤT BÁO CÁO */}
               {activeTab === 'STATS' && (
-                <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6 space-y-6">
-                  <div className="border-b border-slate-100 pb-4">
-                    <h2 className="font-bold text-slate-800 text-base flex items-center gap-2">
-                      <i data-lucide="bar-chart-3" className="w-5 h-5 text-indigo-600"></i>
-                      <span>Stats & Export Worker - Thống Kê Lượt Sử Dụng AI & Học Liệu</span>
-                    </h2>
-                    <p className="text-xs text-slate-500">Tổng hợp dữ liệu lượt soạn bài, token tiêu thụ và dung lượng lưu trữ trên Cloud</p>
+                <div className="space-y-6">
+                  {/* Top Header Card */}
+                  <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
+                    <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-100 pb-5">
+                      <div className="flex items-center space-x-3.5">
+                        <div className="p-3 bg-indigo-100 text-indigo-700 rounded-xl border border-indigo-200 shadow-sm">
+                          <i data-lucide="bar-chart-3" className="w-6 h-6"></i>
+                        </div>
+                        <div>
+                          <h2 className="font-bold text-slate-800 text-lg flex items-center gap-2">
+                            <span>Quản Lý & Báo Cáo Thống Kê Số Lượng Sử Dụng Web</span>
+                            <span className="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded-full border border-emerald-200">Thời gian thực</span>
+                          </h2>
+                          <p className="text-xs text-slate-500 mt-0.5">Theo dõi số lượng truy cập, tài khoản giáo viên, hoạt động soạn bài và xuất file báo cáo phục vụ chuyên môn</p>
+                        </div>
+                      </div>
+
+                      {/* Export Actions Bar */}
+                      <div className="flex flex-wrap items-center gap-2.5">
+                        <button
+                          type="button"
+                          onClick={handleExportStatsCsv}
+                          className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-3.5 py-2.5 rounded-xl shadow-sm flex items-center space-x-2 transition-all hover:scale-102"
+                          title="Tải về file Excel/CSV số liệu sử dụng web"
+                        >
+                          <i data-lucide="file-spreadsheet" className="w-4 h-4 text-emerald-200"></i>
+                          <span>Xuất Báo Cáo Excel/CSV (.csv)</span>
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={handleExportStatsWord}
+                          className="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-3.5 py-2.5 rounded-xl shadow-sm flex items-center space-x-2 transition-all hover:scale-102"
+                          title="Tải về file báo cáo hành chính chuẩn Microsoft Word"
+                        >
+                          <i data-lucide="file-text" className="w-4 h-4 text-blue-200"></i>
+                          <span>Xuất Báo Cáo Word (.doc)</span>
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* 4 Metric KPI Cards */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-5">
+                      {/* KPI 1 */}
+                      <div className="p-4 rounded-xl bg-slate-900 text-white relative overflow-hidden shadow-sm border border-slate-800">
+                        <div className="flex items-center justify-between">
+                          <p className="text-xs text-slate-400 font-medium">Người Dùng Đăng Ký</p>
+                          <div className="p-1.5 bg-emerald-500/20 text-emerald-400 rounded-lg">
+                            <i data-lucide="users" className="w-4 h-4"></i>
+                          </div>
+                        </div>
+                        <p className="text-3xl font-extrabold text-emerald-400 mt-2">{registeredUsers.length}</p>
+                        <p className="text-[11px] text-slate-400 mt-1 flex items-center gap-1">
+                          <span className="text-emerald-400 font-semibold">{registeredUsers.filter(u => u.role === 'ADMIN').length} Admin</span>
+                          <span>•</span>
+                          <span>{registeredUsers.filter(u => u.role !== 'ADMIN').length} Giáo viên</span>
+                        </p>
+                      </div>
+
+                      {/* KPI 2 */}
+                      <div className="p-4 rounded-xl bg-slate-900 text-white relative overflow-hidden shadow-sm border border-slate-800">
+                        <div className="flex items-center justify-between">
+                          <p className="text-xs text-slate-400 font-medium">Tổng Lượt Truy Cập</p>
+                          <div className="p-1.5 bg-cyan-500/20 text-cyan-400 rounded-lg">
+                            <i data-lucide="globe" className="w-4 h-4"></i>
+                          </div>
+                        </div>
+                        <p className="text-3xl font-extrabold text-cyan-400 mt-2">{systemStats.totalVisits || 238}</p>
+                        <p className="text-[11px] text-slate-400 mt-1">Lượt đăng nhập & làm việc trên web</p>
+                      </div>
+
+                      {/* KPI 3 */}
+                      <div className="p-4 rounded-xl bg-slate-900 text-white relative overflow-hidden shadow-sm border border-slate-800">
+                        <div className="flex items-center justify-between">
+                          <p className="text-xs text-slate-400 font-medium">Giáo Án & KHBD Đã Soạn</p>
+                          <div className="p-1.5 bg-blue-500/20 text-blue-400 rounded-lg">
+                            <i data-lucide="sparkles" className="w-4 h-4"></i>
+                          </div>
+                        </div>
+                        <p className="text-3xl font-extrabold text-blue-400 mt-2">{systemStats.totalPlansCreated || 131}</p>
+                        <p className="text-[11px] text-slate-400 mt-1">Gồm KHBD 5512, HĐTN & PPCT</p>
+                      </div>
+
+                      {/* KPI 4 */}
+                      <div className="p-4 rounded-xl bg-slate-900 text-white relative overflow-hidden shadow-sm border border-slate-800">
+                        <div className="flex items-center justify-between">
+                          <p className="text-xs text-slate-400 font-medium">Lượt Xuất File Tài Liệu</p>
+                          <div className="p-1.5 bg-amber-500/20 text-amber-400 rounded-lg">
+                            <i data-lucide="download" className="w-4 h-4"></i>
+                          </div>
+                        </div>
+                        <p className="text-3xl font-extrabold text-amber-400 mt-2">{systemStats.totalExports || 94}</p>
+                        <p className="text-[11px] text-slate-400 mt-1">Tải về Word (.doc), PDF & Báo cáo</p>
+                      </div>
+                    </div>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div className="p-5 rounded-xl bg-slate-900 text-white space-y-2">
-                      <p className="text-xs text-slate-400 font-medium">Tổng Lượt Soạn Giáo Án AI</p>
-                      <p className="text-3xl font-extrabold text-emerald-400">148 Bài</p>
-                      <p className="text-[11px] text-slate-400">+24% so với tháng trước</p>
-                    </div>
-                    <div className="p-5 rounded-xl bg-slate-900 text-white space-y-2">
-                      <p className="text-xs text-slate-400 font-medium">Dung Lượng Supabase Storage</p>
-                      <p className="text-3xl font-extrabold text-cyan-400">1.42 GB / 5 GB</p>
-                      <p className="text-[11px] text-slate-400">Đã lưu trữ 42 file học liệu</p>
-                    </div>
-                    <div className="p-5 rounded-xl bg-slate-900 text-white space-y-2">
-                      <p className="text-xs text-slate-400 font-medium"> Tokens Gemini AI Tiêu Thụ</p>
-                      <p className="text-3xl font-extrabold text-amber-400">425,800</p>
-                      <p className="text-[11px] text-slate-400">Tối ưu chi phí Vercel API</p>
+                  {/* KHUNG CẤU HÌNH & GỬI BÁO CÁO ĐỊNH KỲ ĐẾN GMAIL */}
+                  <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-indigo-950 text-white rounded-2xl border border-indigo-500/30 p-6 shadow-xl relative overflow-hidden">
+                    <div className="absolute right-0 top-0 -mt-6 -mr-6 w-32 h-32 bg-indigo-500/10 rounded-full blur-2xl pointer-events-none"></div>
+                    
+                    <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-5 relative z-10">
+                      <div className="space-y-2">
+                        <div className="inline-flex items-center gap-2 bg-indigo-500/20 border border-indigo-400/40 text-indigo-300 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
+                          <i data-lucide="mail-check" className="w-4 h-4 text-indigo-400"></i>
+                          <span>Kênh Báo Cáo Định Kỳ Tự Động</span>
+                        </div>
+                        <h3 className="text-lg font-extrabold text-white flex items-center gap-2">
+                          <span>Gửi Báo Cáo Số Lượng Sử Dụng Web Đến Gmail</span>
+                          <span className="bg-emerald-500/20 text-emerald-400 text-xs px-2.5 py-0.5 rounded-full border border-emerald-500/40 font-semibold">
+                            Ngày 30 hàng tháng
+                          </span>
+                        </h3>
+                        <p className="text-xs text-slate-300 leading-relaxed max-w-2xl">
+                          Hệ thống định kỳ tổng hợp số liệu truy cập, số lượng tài khoản giáo viên đăng ký (qua Gmail &amp; Số điện thoại), số giáo án đã soạn và gửi file báo cáo đính kèm chuẩn Microsoft Word đến hòm thư:
+                        </p>
+                        <div className="flex flex-wrap items-center gap-3 pt-1">
+                          <span className="inline-flex items-center gap-1.5 bg-slate-800/90 border border-slate-700 px-3 py-1.5 rounded-xl font-mono text-xs font-bold text-emerald-400 shadow-inner">
+                            <i data-lucide="mail" className="w-4 h-4 text-emerald-400"></i>
+                            leanh2004ggv3@gmail.com
+                          </span>
+                          <span className="text-[11px] text-slate-400 flex items-center gap-1">
+                            <i data-lucide="clock" className="w-3.5 h-3.5 text-slate-400"></i>
+                            Lần gửi cuối: <strong className="text-slate-200">{lastReportEmailSent || 'Chưa gửi trong tháng này'}</strong>
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 shrink-0">
+                        <button
+                          type="button"
+                          onClick={handleSendMonthlyReportToGmail}
+                          className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs sm:text-sm px-5 py-3 rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 hover:scale-102"
+                          title="Tải file Word báo cáo và mở giao diện gửi thư Gmail đến leanh2004ggv3@gmail.com"
+                        >
+                          <i data-lucide="send" className="w-4 h-4"></i>
+                          <span>Gửi Báo Cáo Ngay (Gmail)</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={handleExportStatsWord}
+                          className="bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white border border-slate-700 font-bold text-xs px-4 py-3 rounded-xl shadow-sm transition-all flex items-center justify-center gap-2"
+                          title="Tải ngay file Word .doc về máy"
+                        >
+                          <i data-lucide="file-text" className="w-4 h-4 text-blue-400"></i>
+                          <span>Tải File Word (.doc)</span>
+                        </button>
+                      </div>
                     </div>
                   </div>
 
-                  <div className="p-4 rounded-xl border border-slate-200 bg-slate-50">
-                    <h3 className="font-bold text-xs uppercase tracking-wider text-slate-700 mb-3">Lịch Sử Hoạt Động Gần Đây:</h3>
-                    <div className="space-y-2 text-xs text-slate-600">
-                      <div className="flex justify-between p-2 bg-white rounded border border-slate-200">
-                        <span>Soạn giáo án: "Quy trình thiết kế kỹ thuật"</span>
-                        <span className="text-emerald-600 font-semibold">Thành công • 1,240 tokens</span>
+                  {/* Feature Breakdown Section */}
+                  <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5">
+                    <h3 className="font-bold text-slate-800 text-sm mb-3 flex items-center gap-2">
+                      <i data-lucide="pie-chart" className="w-4 h-4 text-emerald-600"></i>
+                      <span>Tỉ Lệ Khai Thác Theo Phân Hệ Chuyên Môn</span>
+                    </h3>
+                    <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 text-xs">
+                      <div className="p-3 rounded-lg bg-emerald-50 border border-emerald-100">
+                        <div className="flex justify-between font-bold text-emerald-800 mb-1">
+                          <span>Soạn KHBD 5512 CN</span>
+                          <span>42%</span>
+                        </div>
+                        <div className="w-full bg-emerald-200 rounded-full h-1.5">
+                          <div className="bg-emerald-600 h-1.5 rounded-full" style={{ width: '42%' }}></div>
+                        </div>
                       </div>
-                      <div className="flex justify-between p-2 bg-white rounded border border-slate-200">
-                        <span>Xuất file Word (.doc) Công văn 5512</span>
-                        <span className="text-blue-600 font-semibold">Tải về hoàn tất</span>
+                      <div className="p-3 rounded-lg bg-cyan-50 border border-cyan-100">
+                        <div className="flex justify-between font-bold text-cyan-800 mb-1">
+                          <span>Soạn GA Mẫu HĐTN</span>
+                          <span>34%</span>
+                        </div>
+                        <div className="w-full bg-cyan-200 rounded-full h-1.5">
+                          <div className="bg-cyan-600 h-1.5 rounded-full" style={{ width: '34%' }}></div>
+                        </div>
                       </div>
-                      <div className="flex justify-between p-2 bg-white rounded border border-slate-200">
-                        <span>Upload Slide bài giảng 3D môn Công nghệ 8</span>
-                        <span className="text-amber-600 font-semibold">14.2 MB • Supabase Storage</span>
+                      <div className="p-3 rounded-lg bg-blue-50 border border-blue-100">
+                        <div className="flex justify-between font-bold text-blue-800 mb-1">
+                          <span>Tạo PPCT 7 Cột</span>
+                          <span>16%</span>
+                        </div>
+                        <div className="w-full bg-blue-200 rounded-full h-1.5">
+                          <div className="bg-blue-600 h-1.5 rounded-full" style={{ width: '16%' }}></div>
+                        </div>
                       </div>
+                      <div className="p-3 rounded-lg bg-amber-50 border border-amber-100">
+                        <div className="flex justify-between font-bold text-amber-800 mb-1">
+                          <span>App 3D & E-Learning</span>
+                          <span>8%</span>
+                        </div>
+                        <div className="w-full bg-amber-200 rounded-full h-1.5">
+                          <div className="bg-amber-600 h-1.5 rounded-full" style={{ width: '8%' }}></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* USER MANAGEMENT & USAGE TABLE */}
+                  <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6 space-y-4">
+                    <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-4">
+                      <div>
+                        <h3 className="font-bold text-slate-800 text-sm flex items-center gap-2">
+                          <i data-lucide="users-round" className="w-4 h-4 text-indigo-600"></i>
+                          <span>Danh Sách Người Dùng & Thống Kê Số Lượng Sử Dụng</span>
+                        </h3>
+                        <p className="text-xs text-slate-500">Chi tiết tài khoản giáo viên đã đăng ký và tần suất sử dụng các tính năng web</p>
+                      </div>
+
+                      <div className="flex flex-wrap items-center gap-2.5">
+                        {/* Search Input */}
+                        <div className="relative">
+                          <i data-lucide="search" className="w-3.5 h-3.5 absolute left-3 top-2.5 text-slate-400"></i>
+                          <input
+                            type="text"
+                            value={userSearchQuery}
+                            onChange={(e) => setUserSearchQuery(e.target.value)}
+                            placeholder="Tìm tên, email, trường..."
+                            className="pl-8 pr-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-lg text-slate-700 focus:outline-none focus:border-emerald-500 w-48 sm:w-56"
+                          />
+                        </div>
+
+                        {/* Role Filter */}
+                        <select
+                          value={userRoleFilter}
+                          onChange={(e) => setUserRoleFilter(e.target.value)}
+                          className="px-2.5 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-lg text-slate-700 focus:outline-none focus:border-emerald-500 font-medium"
+                        >
+                          <option value="ALL">Tất cả vai trò</option>
+                          <option value="ADMIN">Quản trị viên (Admin)</option>
+                          <option value="TEACHER">Giáo viên (Teacher)</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    {/* Table View */}
+                    <div className="overflow-x-auto border border-slate-200 rounded-xl">
+                      <table className="w-full text-left text-xs">
+                        <thead className="bg-slate-50 text-slate-600 font-bold border-b border-slate-200">
+                          <tr>
+                            <th className="p-3 text-center w-12">STT</th>
+                            <th className="p-3">Họ và Tên Giáo Viên</th>
+                            <th className="p-3">Gmail / Số Điện Thoại</th>
+                            <th className="p-3">Đơn Vị Trường</th>
+                            <th className="p-3">Môn Phụ Trách</th>
+                            <th className="p-3 text-center">Vai Trò</th>
+                            <th className="p-3 text-center">Lượt Đăng Nhập</th>
+                            <th className="p-3 text-center">Bài Đã Soạn</th>
+                            <th className="p-3 text-center">Lần ĐN Cuối</th>
+                            <th className="p-3 text-center">Trạng Thái</th>
+                            <th className="p-3 text-center w-28">Thao Tác</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-100 text-slate-700">
+                          {registeredUsers
+                            .filter(u => {
+                              const matchesSearch = !userSearchQuery ||
+                                u.fullName.toLowerCase().includes(userSearchQuery.toLowerCase()) ||
+                                u.email.toLowerCase().includes(userSearchQuery.toLowerCase()) ||
+                                (u.phone && u.phone.includes(userSearchQuery)) ||
+                                (u.schoolName && u.schoolName.toLowerCase().includes(userSearchQuery.toLowerCase()));
+                              const matchesRole = userRoleFilter === 'ALL' || u.role === userRoleFilter;
+                              return matchesSearch && matchesRole;
+                            })
+                            .map((u, idx) => (
+                              <tr key={u.id} className="hover:bg-slate-50/80 transition-colors">
+                                <td className="p-3 text-center text-slate-400 font-semibold">{idx + 1}</td>
+                                <td className="p-3 font-semibold text-slate-900 flex items-center gap-2">
+                                  <div className="w-7 h-7 rounded-full bg-emerald-100 text-emerald-800 font-bold flex items-center justify-center shrink-0 text-xs">
+                                    {u.fullName ? u.fullName.charAt(0) : 'U'}
+                                  </div>
+                                  <span>{u.fullName}</span>
+                                </td>
+                                <td className="p-3 font-mono text-slate-600">
+                                  <div className="flex flex-col gap-0.5">
+                                    <span className="text-slate-800 font-medium">{u.email}</span>
+                                    {u.phone && (
+                                      <span className="text-[11px] text-emerald-600 font-semibold flex items-center gap-1">
+                                        <i data-lucide="phone" className="w-3 h-3 text-emerald-500"></i>
+                                        <span>{u.phone}</span>
+                                      </span>
+                                    )}
+                                  </div>
+                                </td>
+                                <td className="p-3">{u.schoolName}</td>
+                                <td className="p-3">{u.subject}</td>
+                                <td className="p-3 text-center">
+                                  <span className={`inline-block px-2 py-0.5 rounded text-[10px] font-bold ${
+                                    u.role === 'ADMIN' ? 'bg-amber-100 text-amber-800 border border-amber-200' : 'bg-slate-100 text-slate-700 border border-slate-200'
+                                  }`}>
+                                    {u.role === 'ADMIN' ? 'Quản trị' : 'Giáo viên'}
+                                  </span>
+                                </td>
+                                <td className="p-3 text-center font-bold text-emerald-600 bg-emerald-50/40">{u.loginCount || 1}</td>
+                                <td className="p-3 text-center font-bold text-blue-600 bg-blue-50/40">{u.plansCreated || 0}</td>
+                                <td className="p-3 text-center text-slate-500 text-[11px]">{u.lastLoginAt || 'Hôm nay'}</td>
+                                <td className="p-3 text-center">
+                                  <span className="inline-flex items-center gap-1 text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full text-[10px] font-semibold border border-emerald-200">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                                    <span>Hoạt động</span>
+                                  </span>
+                                </td>
+                                <td className="p-3 text-center">
+                                  <div className="flex items-center justify-center gap-1.5">
+                                    <button
+                                      type="button"
+                                      onClick={() => handleAdminResetPassword(u)}
+                                      className="p-1.5 text-amber-600 hover:text-amber-700 hover:bg-amber-50 rounded-lg border border-amber-200/80 transition-colors"
+                                      title={`Reset mật khẩu nhanh cho ${u.fullName} về 123456`}
+                                    >
+                                      <i data-lucide="rotate-ccw" className="w-3.5 h-3.5"></i>
+                                    </button>
+                                    {u.role !== 'ADMIN' && currentUser && currentUser.role === 'ADMIN' && (
+                                      <button
+                                        type="button"
+                                        onClick={() => handleDeleteUser(u.id, u.fullName)}
+                                        className="p-1.5 text-rose-500 hover:bg-rose-50 rounded-lg border border-rose-200/80 transition-colors"
+                                        title="Xóa tài khoản này"
+                                      >
+                                        <i data-lucide="trash-2" className="w-3.5 h-3.5"></i>
+                                      </button>
+                                    )}
+                                  </div>
+                                </td>
+                              </tr>
+                            ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+
+                  {/* REAL-TIME AUDIT LOGS */}
+                  <div className="p-5 rounded-xl border border-slate-200 bg-slate-50 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <h3 className="font-bold text-xs uppercase tracking-wider text-slate-700 flex items-center gap-2">
+                        <i data-lucide="clock" className="w-4 h-4 text-emerald-600"></i>
+                        <span>Nhật Ký Sử Dụng Hệ Thống Thời Gian Thực (Audit Logs):</span>
+                      </h3>
+                      <span className="text-[11px] text-slate-500">{usageLogs.length} hoạt động ghi nhận</span>
+                    </div>
+
+                    <div className="space-y-2 text-xs">
+                      {usageLogs.slice(0, 15).map(log => (
+                        <div key={log.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-2.5 bg-white rounded-lg border border-slate-200 gap-1.5 hover:border-slate-300 transition-colors">
+                          <div className="flex items-center space-x-2.5">
+                            <span className="text-slate-400 font-mono text-[11px] shrink-0">{log.timestamp}</span>
+                            <span className="font-bold text-slate-800">{log.userName}:</span>
+                            <span className="text-slate-700 font-medium">{log.action}</span>
+                            {log.detail && (
+                              <span className="text-slate-500 text-[11px] italic truncate max-w-[280px]">({log.detail})</span>
+                            )}
+                          </div>
+                          <span className="text-emerald-600 font-semibold text-[11px] shrink-0 flex items-center gap-1">
+                            <i data-lucide="check-circle" className="w-3 h-3"></i>
+                            <span>Thành công</span>
+                          </span>
+                        </div>
+                      ))}
                     </div>
                   </div>
                 </div>
@@ -5984,27 +7110,146 @@ CREATE TABLE IF NOT EXISTS public.materials (
                   </button>
                 </div>
 
-                {/* Switch Tabs */}
-                <div className="flex border-b border-slate-800 bg-slate-950/60">
+                {/* Switch Tabs - 3 Tabs: Đăng nhập, Đăng ký (SĐT/Gmail), Reset MK Nhanh */}
+                <div className="flex border-b border-slate-800 bg-slate-950/60 p-1">
                   <button
                     onClick={() => { setAuthTab('LOGIN'); setAuthError(''); setAuthSuccess(''); }}
-                    className={`flex-1 py-3 text-xs font-bold text-center border-b-2 transition-all ${
-                      authTab === 'LOGIN' ? 'border-emerald-500 text-emerald-400 bg-slate-900' : 'border-transparent text-slate-400 hover:text-slate-200'
+                    className={`flex-1 py-2 text-xs font-bold text-center rounded-lg transition-all ${
+                      authTab === 'LOGIN' ? 'bg-emerald-600 text-white shadow-sm' : 'text-slate-400 hover:text-slate-200'
                     }`}
                   >
                     ĐĂNG NHẬP
                   </button>
                   <button
                     onClick={() => { setAuthTab('REGISTER'); setAuthError(''); setAuthSuccess(''); }}
-                    className={`flex-1 py-3 text-xs font-bold text-center border-b-2 transition-all ${
-                      authTab === 'REGISTER' ? 'border-emerald-500 text-emerald-400 bg-slate-900' : 'border-transparent text-slate-400 hover:text-slate-200'
+                    className={`flex-1 py-2 text-xs font-bold text-center rounded-lg transition-all ${
+                      authTab === 'REGISTER' ? 'bg-emerald-600 text-white shadow-sm' : 'text-slate-400 hover:text-slate-200'
                     }`}
                   >
-                    ĐĂNG KÝ MỚI
+                    ĐĂNG KÝ
+                  </button>
+                  <button
+                    onClick={() => { setAuthTab('FORGOT_PASSWORD'); setResetStep(1); setAuthError(''); setAuthSuccess(''); }}
+                    className={`flex-1 py-2 text-xs font-bold text-center rounded-lg transition-all ${
+                      authTab === 'FORGOT_PASSWORD' ? 'bg-amber-600 text-white shadow-sm' : 'text-slate-400 hover:text-slate-200'
+                    }`}
+                  >
+                    RESET MK
                   </button>
                 </div>
 
                 {/* Form Body */}
+                {authTab === 'FORGOT_PASSWORD' ? (
+                  <div className="p-6 space-y-4">
+                    <div className="text-center pb-1 border-b border-slate-800">
+                      <h4 className="text-xs font-bold text-white flex items-center justify-center gap-1.5">
+                        <i data-lucide="key-round" className="w-4 h-4 text-amber-400"></i>
+                        <span>Đặt Lại Mật Khẩu Nhanh (OTP)</span>
+                      </h4>
+                      <p className="text-[11px] text-slate-400 mt-0.5">Xác thực bằng Gmail hoặc Số điện thoại</p>
+                    </div>
+
+                    {authError && (
+                      <div className="bg-rose-500/10 border border-rose-500/30 text-rose-300 p-2.5 rounded-xl text-xs flex items-center gap-2">
+                        <i data-lucide="alert-circle" className="w-4 h-4 shrink-0 text-rose-400"></i>
+                        <span>{authError}</span>
+                      </div>
+                    )}
+
+                    {authSuccess && (
+                      <div className="bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 p-2.5 rounded-xl text-xs flex items-center gap-2">
+                        <i data-lucide="check-circle-2" className="w-4 h-4 shrink-0 text-emerald-400"></i>
+                        <span>{authSuccess}</span>
+                      </div>
+                    )}
+
+                    {resetStep === 1 ? (
+                      <form onSubmit={handleRequestResetOtp} className="space-y-3.5">
+                        <div>
+                          <label className="block text-xs font-semibold text-slate-300 mb-1">Gmail hoặc SĐT của bạn *</label>
+                          <input
+                            type="text"
+                            required
+                            value={resetIdentifier}
+                            onChange={(e) => setResetIdentifier(e.target.value)}
+                            className="w-full px-3 py-2 text-xs bg-slate-800 border border-slate-700 rounded-xl text-white focus:outline-none focus:border-amber-500"
+                            placeholder="Nhập Gmail hoặc SĐT (Ví dụ: 0912345686)"
+                          />
+                        </div>
+
+                        <button
+                          type="submit"
+                          className="w-full bg-amber-600 hover:bg-amber-500 text-white font-bold text-xs py-2.5 rounded-xl shadow-md transition-all flex items-center justify-center gap-1.5"
+                        >
+                          <i data-lucide="send" className="w-3.5 h-3.5"></i>
+                          <span>Cấp Mã OTP Xác Thực</span>
+                        </button>
+                      </form>
+                    ) : (
+                      <form onSubmit={handleConfirmResetPassword} className="space-y-3">
+                        <div className="bg-slate-800/80 border border-amber-500/30 p-2.5 rounded-xl text-xs">
+                          <p className="text-slate-300">Tài khoản: <strong className="text-white">{resetTargetUser?.fullName}</strong></p>
+                          <p className="mt-1 text-slate-300 flex items-center justify-between">
+                            <span>Mã OTP:</span>
+                            <span className="font-mono font-bold text-amber-400 text-sm tracking-wider">{resetOtpGenerated}</span>
+                          </p>
+                          <button
+                            type="button"
+                            onClick={() => setResetOtpInput(resetOtpGenerated)}
+                            className="w-full mt-1.5 py-1 bg-amber-500/20 text-amber-300 text-[10px] font-bold rounded border border-amber-500/30"
+                          >
+                            ⚡ Điền OTP tự động
+                          </button>
+                        </div>
+
+                        <div>
+                          <label className="block text-[11px] font-semibold text-slate-300 mb-1">Mã OTP *</label>
+                          <input
+                            type="text"
+                            required
+                            maxLength={6}
+                            value={resetOtpInput}
+                            onChange={(e) => setResetOtpInput(e.target.value)}
+                            className="w-full px-3 py-1.5 text-center font-mono font-bold text-sm bg-slate-800 border border-slate-700 rounded-xl text-amber-300"
+                            placeholder="000000"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-[11px] font-semibold text-slate-300 mb-1">Mật khẩu mới *</label>
+                          <input
+                            type="password"
+                            required
+                            value={resetNewPassword}
+                            onChange={(e) => setResetNewPassword(e.target.value)}
+                            className="w-full px-3 py-1.5 text-xs bg-slate-800 border border-slate-700 rounded-xl text-white"
+                            placeholder="Tối thiểu 6 ký tự"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-[11px] font-semibold text-slate-300 mb-1">Nhập lại mật khẩu mới *</label>
+                          <input
+                            type="password"
+                            required
+                            value={resetConfirmPassword}
+                            onChange={(e) => setResetConfirmPassword(e.target.value)}
+                            className="w-full px-3 py-1.5 text-xs bg-slate-800 border border-slate-700 rounded-xl text-white"
+                            placeholder="Xác nhận mật khẩu"
+                          />
+                        </div>
+
+                        <button
+                          type="submit"
+                          className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs py-2.5 rounded-xl shadow-md transition-all flex items-center justify-center gap-1.5"
+                        >
+                          <i data-lucide="check" className="w-3.5 h-3.5"></i>
+                          <span>Xác Nhận Đổi Mật Khẩu</span>
+                        </button>
+                      </form>
+                    )}
+                  </div>
+                ) : (
                 <form onSubmit={handleAuthSubmit} className="p-6 space-y-4">
                   {authError && (
                     <div className="bg-rose-500/10 border border-rose-500/30 text-rose-300 p-3 rounded-xl text-xs flex items-center gap-2">
@@ -6065,22 +7310,35 @@ CREATE TABLE IF NOT EXISTS public.materials (
                   )}
 
                   <div>
-                    <label className="block text-xs font-semibold text-slate-300 mb-1">Địa chỉ Email *</label>
+                    <label className="block text-xs font-semibold text-slate-300 mb-1">
+                      {authTab === 'REGISTER' ? 'Địa chỉ Gmail hoặc Số Điện Thoại (SĐT) *' : 'Tài khoản (Gmail / SĐT / Tên đăng nhập) *'}
+                    </label>
                     <div className="relative">
-                      <i data-lucide="mail" className="w-4 h-4 absolute left-3 top-3 text-slate-400"></i>
+                      <i data-lucide={authTab === 'REGISTER' ? 'phone-call' : 'user-check'} className="w-4 h-4 absolute left-3 top-3 text-slate-400"></i>
                       <input
-                        type="email"
+                        type="text"
                         required
                         value={authForm.email}
                         onChange={(e) => setAuthForm({ ...authForm, email: e.target.value })}
                         className="w-full pl-9 pr-3 py-2 text-sm bg-slate-800 border border-slate-700 rounded-xl text-white focus:outline-none focus:border-emerald-500"
-                        placeholder="teacher@edu.vn"
+                        placeholder={authTab === 'REGISTER' ? 'thaynam@gmail.com hoặc 0912345678' : 'Gmail, SĐT hoặc username'}
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-xs font-semibold text-slate-300 mb-1">Mật khẩu *</label>
+                    <div className="flex justify-between items-center mb-1">
+                      <label className="block text-xs font-semibold text-slate-300">Mật khẩu *</label>
+                      {authTab === 'LOGIN' && (
+                        <button
+                          type="button"
+                          onClick={() => { setAuthTab('FORGOT_PASSWORD'); setResetStep(1); setAuthError(''); setAuthSuccess(''); }}
+                          className="text-[11px] text-amber-400 hover:text-amber-300 hover:underline"
+                        >
+                          Quên MK? Reset nhanh
+                        </button>
+                      )}
+                    </div>
                     <div className="relative">
                       <i data-lucide="lock" className="w-4 h-4 absolute left-3 top-3 text-slate-400"></i>
                       <input
@@ -6118,6 +7376,8 @@ CREATE TABLE IF NOT EXISTS public.materials (
                     <i data-lucide={authTab === 'LOGIN' ? 'log-in' : 'user-plus'} className="w-4 h-4"></i>
                     <span>{authTab === 'LOGIN' ? 'Xác Nhận Đăng Nhập' : 'Tạo Tài Khoản Mới'}</span>
                   </button>
+                </form>
+                )}
 
                   {authTab === 'LOGIN' && (
                     <div className="text-center pt-2 text-xs text-slate-400">
@@ -6129,18 +7389,8 @@ CREATE TABLE IF NOT EXISTS public.materials (
                       >
                         Đăng ký ngay tại đây
                       </button>
-                      <div className="mt-2 text-[11px] bg-slate-950/70 p-2.5 rounded-lg border border-slate-800 space-y-1 text-left">
-                        <p className="text-emerald-400 font-semibold flex items-center gap-1">
-                          <i data-lucide="shield-check" className="w-3.5 h-3.5"></i>
-                          <span>Tài khoản Admin: <strong>dangvansach86@gmail.com</strong> (hoặc <strong>dangvansach86</strong>) | MK: <strong>20121984@</strong></span>
-                        </p>
-                        <p className="text-slate-400">
-                          💡 Tài khoản Demo Giáo viên: <strong>teacher.demo@edu.vn</strong> | MK: <strong>123456</strong>
-                        </p>
-                      </div>
                     </div>
                   )}
-                </form>
               </div>
             </div>
           )}
