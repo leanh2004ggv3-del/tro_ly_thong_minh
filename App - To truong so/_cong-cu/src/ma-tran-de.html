@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Kiểm ma trận đề — Tổ trưởng số</title>
+<!--CSS-->
+<style>
+:root{--B:#0ea5e9;--H:#8b5cf6;--V:#f59e0b}
+.mB{color:var(--B)}.mH{color:var(--H)}.mV{color:var(--V)}
+table.nhiet{border-collapse:separate;border-spacing:4px;width:100%;font-size:14px}
+table.nhiet th{font-size:13px;color:var(--chu2);text-align:center;padding:4px}
+table.nhiet th:first-child{text-align:left}
+table.nhiet td{border-radius:10px;text-align:center;padding:8px 4px;font-weight:700;min-width:70px}
+table.nhiet td:first-child{text-align:left;background:#f8fafc;font-weight:600;color:var(--chu)}
+.kiem{display:flex;gap:10px;align-items:flex-start;padding:9px 12px;border-radius:12px;margin-bottom:6px;font-size:14.5px}
+.kiem.ok{background:#f0fdf4;color:#166534}.kiem.loi{background:#fef2f2;color:#991b1b}.kiem.canh{background:#fffbeb;color:#92400e}
+.kiem .i{font-size:18px;line-height:1.2}
+.cau{display:grid;grid-template-columns:42px 1.6fr 1.1fr 1fr 80px 38px;gap:6px;margin-bottom:6px;align-items:center}
+.cau .stt{font-weight:800;color:var(--chinh);text-align:center}
+.cau button{border:0;background:#fee2e2;border-radius:10px;cursor:pointer;height:36px}
+.cau select,.cau input{min-height:36px;padding:5px 8px}
+.muctieu{display:flex;gap:8px}
+.muctieu label{flex:1}
+@media (max-width:640px){.cau{grid-template-columns:34px 1fr 1fr;}.cau .stt{grid-row:span 2}}
+</style>
+</head>
+<body>
+<div class="khung">
+<header class="dau">
+  <svg class="logo noi" viewBox="0 0 64 64"><rect x="4" y="4" width="56" height="56" rx="14" fill="#1e1b4b"/>
+    <rect x="11" y="11" width="12" height="12" rx="3" fill="#0ea5e9"/><rect x="26" y="11" width="12" height="12" rx="3" fill="#8b5cf6" opacity=".6"/><rect x="41" y="11" width="12" height="12" rx="3" fill="#f59e0b" opacity=".35"/>
+    <rect x="11" y="26" width="12" height="12" rx="3" fill="#0ea5e9" opacity=".5"/><rect x="26" y="26" width="12" height="12" rx="3" fill="#8b5cf6"/><rect x="41" y="26" width="12" height="12" rx="3" fill="#f59e0b" opacity=".7"/>
+    <rect x="11" y="41" width="12" height="12" rx="3" fill="#0ea5e9" opacity=".3"/><rect x="26" y="41" width="12" height="12" rx="3" fill="#8b5cf6" opacity=".5"/><rect x="41" y="41" width="12" height="12" rx="3" fill="#f59e0b"/></svg>
+  <div><h1>KIỂM MA TRẬN ĐỀ</h1><p>Nhập từng câu (chủ đề · dạng · mức · điểm) → so với tỉ lệ tổ thống nhất, tổng điểm, độ phủ chủ đề</p></div>
+  <div class="phai">
+    <button class="nut xanh" id="bCsv">📄 Xuất ma trận</button>
+    <button class="nut phu" id="bLuu">💾 Sao lưu</button>
+    <button class="nut phu" id="bNhap">📂 Nhập lại</button>
+  </div>
+</header>
+
+<div class="luoi l2" style="margin-bottom:16px">
+  <div class="the">
+    <h2>🎯 Mục tiêu tổ thống nhất</h2>
+    <div class="hang"><label class="o" style="flex:2 1 220px">Tên đề<input id="tenDe" placeholder="VD: Đề KT giữa kỳ I – Công nghệ 8"></label><label class="o" style="flex:0 1 120px">Thang điểm<input id="thangDiem" type="number" min="1" value="10"></label></div>
+    <div class="muctieu" style="margin-top:8px">
+      <label class="o"><span class="mB">Biết (%)</span><input id="tB" type="number" min="0" max="100"></label>
+      <label class="o"><span class="mH">Hiểu (%)</span><input id="tH" type="number" min="0" max="100"></label>
+      <label class="o"><span class="mV">Vận dụng (%)</span><input id="tV" type="number" min="0" max="100"></label>
+      <label class="o">Cho lệch (±%)<input id="tLech" type="number" min="0" max="20"></label>
+    </div>
+    <div class="goiy" style="margin-top:10px"><svg width="30" height="30" viewBox="0 0 40 40"><circle cx="20" cy="20" r="18" fill="#8b5cf6"/><text x="20" y="27" text-anchor="middle" font-size="20" font-weight="800" fill="#fff">?</text></svg>
+      <div>CV 7991/BGDĐT-GDTrH: đề có 4 dạng câu, 3 mức Biết – Hiểu – Vận dụng; <b>THCS theo hướng dẫn của Sở</b> (phụ lục chỉ để tham khảo). Tỉ lệ ở đây là <b>tổ thống nhất</b>, không phải quy định Bộ.</div></div>
+    <div class="hang" style="margin-top:10px"><button class="nut cam nho" id="bKhuon">⚡ Dựng khung: 12 TN + 4 Đ-S + 2 TL (40-30-30)</button></div>
+  </div>
+  <div class="the">
+    <h2>✅ Kết quả kiểm</h2>
+    <div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap">
+      <div id="vanhMuc"></div>
+      <div style="font-size:14px;line-height:1.9"><div>vòng ngoài: <b>đề đang có</b> · vòng trong: <b>mục tiêu</b></div><div id="chuMuc"></div></div>
+    </div>
+    <div id="dsKiem" style="margin-top:10px"></div>
+  </div>
+</div>
+
+<div class="the" style="margin-bottom:16px">
+  <h2>🔥 Bản đồ điểm: chủ đề × mức</h2>
+  <div class="cuon"><table class="nhiet" id="bangNhiet"></table></div>
+  <canvas id="cvDang" style="width:100%;height:200px;display:block;margin-top:10px"></canvas>
+</div>
+
+<div class="the">
+  <h2>📝 Các câu trong đề <span id="tongCau" style="margin-left:auto;font-size:14px;font-weight:600;color:var(--chu2)"></span></h2>
+  <div class="cau" style="font-size:13px;color:var(--chu2);font-weight:600"><span>Câu</span><span>Chủ đề / bài</span><span>Dạng</span><span>Mức</span><span>Điểm</span><span></span></div>
+  <div id="dsCau"></div>
+  <div class="hang" style="margin-top:10px;align-items:flex-end">
+    <label class="o" style="flex:2 1 180px">Thêm nhanh — chủ đề<input id="nChuDe" placeholder="VD: Bài 3 – Bản vẽ kĩ thuật"></label>
+    <label class="o" style="flex:1 1 130px">Dạng<select id="nDang"></select></label>
+    <label class="o" style="flex:1 1 110px">Mức<select id="nMuc"></select></label>
+    <label class="o" style="flex:0 1 90px">Số câu<input id="nSo" type="number" min="1" value="1"></label>
+    <label class="o" style="flex:0 1 100px">Điểm/câu<input id="nDiem" type="number" min="0" step="0.25" value="0.25"></label>
+    <button class="nut" id="bThem">➕ Thêm</button>
+  </div>
+</div>
+<!--CHAN-->
+</div>
+<!--JS-->
+<script>
+const DANG = { TN: "Nhiều lựa chọn", DS: "Đúng – Sai", TLN: "Trả lời ngắn", TL: "Tự luận" };
+const MUC = { B: "Biết", H: "Hiểu", V: "Vận dụng" }, MAU = { B: "#0ea5e9", H: "#8b5cf6", V: "#f59e0b" };
+let S = TT.load("matran", null) || { ten: "", thang: 10, muc: { B: 40, H: 30, V: 30 }, lech: 5, cau: [] };
+function khuonTo(cd) {
+  const c = [], them = (n, dang, muc, diem, chuDe) => { for (let i = 0; i < n; i++) c.push({ id: TT.uid(), chuDe, dang, muc, diem }); };
+  cd = cd || ["Chủ đề 1", "Chủ đề 2", "Chủ đề 3"];
+  them(4, "TN", "B", .25, cd[0]); them(4, "TN", "B", .25, cd[1]); them(4, "TN", "B", .25, cd[2]);
+  them(1, "DS", "B", 1, cd[0]); them(1, "DS", "H", 1, cd[0]); them(1, "DS", "H", 1, cd[1]); them(1, "DS", "H", 1, cd[2]);
+  them(1, "TL", "V", 2, cd[1]); them(1, "TL", "V", 1, cd[2]);
+  return c;
+}
+if (TT.MAU) S = { ten: "Đề KT giữa kỳ I – Công nghệ 8 (DỮ LIỆU THỬ)", thang: 10, muc: { B: 40, H: 30, V: 30 }, lech: 5, cau: (() => { const c = khuonTo(["Bản vẽ kĩ thuật", "Cơ khí", "Kĩ thuật điện"]); c[11].muc = "H"; c[13].muc = "B"; c[16].diem = 1.5; return c; })() };
+function luu() { TT.save("matran", S); }
+const tron = x => Math.round(x * 100) / 100;
+function tinh() {
+  const tong = S.cau.reduce((a, c) => a + (+c.diem || 0), 0), theoMuc = { B: 0, H: 0, V: 0 }, theoDang = { TN: 0, DS: 0, TLN: 0, TL: 0 }, soDang = { TN: 0, DS: 0, TLN: 0, TL: 0 }, chuDe = {};
+  S.cau.forEach(c => { const d = +c.diem || 0; theoMuc[c.muc] += d; theoDang[c.dang] += d; soDang[c.dang]++; const k = (c.chuDe || "(chưa ghi chủ đề)").trim(); chuDe[k] = chuDe[k] || { B: 0, H: 0, V: 0, so: 0 }; chuDe[k][c.muc] += d; chuDe[k].so++; });
+  return { tong: tron(tong), theoMuc, theoDang, soDang, chuDe };
+}
+function veKiem() {
+  const t = tinh(), th = +S.thang || 10, kq = [];
+  kq.push(Math.abs(t.tong - th) < 1e-9 ? ["ok", "✓", `Tổng điểm ${t.tong}/${th}`] : ["loi", "✗", `Tổng điểm đang là ${t.tong}, cần đúng ${th} — ${t.tong > th ? "thừa " + tron(t.tong - th) : "thiếu " + tron(th - t.tong)} điểm`]);
+  const tongMT = S.muc.B + S.muc.H + S.muc.V;
+  if (tongMT !== 100) kq.push(["canh", "!", `Tỉ lệ mục tiêu cộng lại là ${tongMT}%, chưa đủ 100%`]);
+  Object.keys(MUC).forEach(m => {
+    const pt = t.tong ? t.theoMuc[m] / t.tong * 100 : 0, lech = pt - S.muc[m];
+    kq.push(Math.abs(lech) <= S.lech + 1e-9 ? ["ok", "✓", `${MUC[m]}: ${tron(pt)}% (mục tiêu ${S.muc[m]}%)`] : ["loi", "✗", `${MUC[m]}: ${tron(pt)}% — ${lech > 0 ? "nhiều hơn" : "ít hơn"} mục tiêu ${S.muc[m]}% là ${tron(Math.abs(lech))}% (≈ ${tron(Math.abs(lech) / 100 * t.tong)} điểm)`]);
+  });
+  const thieuCD = Object.entries(t.chuDe).filter(([k, v]) => v.so === 0);
+  const cdKhongMuc = Object.keys(t.chuDe).filter(k => k === "(chưa ghi chủ đề)");
+  if (cdKhongMuc.length) kq.push(["canh", "!", "Có câu chưa ghi chủ đề"]);
+  const khongDiem = S.cau.filter(c => !(+c.diem > 0)).length; if (khongDiem) kq.push(["canh", "!", `${khongDiem} câu chưa có điểm`]);
+  const cd = Object.keys(t.chuDe).length; if (cd) kq.push(["ok", "•", `Đề phủ ${cd} chủ đề · ${S.cau.length} câu`]);
+  dsKiem.innerHTML = kq.map(([l, i, s]) => `<div class="kiem ${l}"><span class="i">${i}</span><span>${s}</span></div>`).join("");
+  const dat = kq.every(k => k[0] !== "loi") && S.cau.length;
+  return dat;
+}
+function veVanh() {
+  const t = tinh(), W = 170, c = W / 2;
+  const cung = (r, ds, day) => { const cv = 2 * Math.PI * r, tg = ds.reduce((a, x) => a + x.gt, 0) || 1; let bd = 0, s = `<circle cx="${c}" cy="${c}" r="${r}" fill="none" stroke="#e2e8f0" stroke-width="${day}"/>`; ds.forEach(x => { const l = x.gt / tg * cv; if (l > 0) s += `<circle cx="${c}" cy="${c}" r="${r}" fill="none" stroke="${x.mau}" stroke-width="${day}" stroke-dasharray="${l} ${cv - l}" stroke-dashoffset="${-bd}" transform="rotate(-90 ${c} ${c})"/>`; bd += l; }); return s; };
+  vanhMuc.innerHTML = `<svg width="${W}" height="${W}" viewBox="0 0 ${W} ${W}">${cung(72, Object.keys(MUC).map(m => ({ gt: t.theoMuc[m], mau: MAU[m] })), 18)}${cung(50, Object.keys(MUC).map(m => ({ gt: S.muc[m], mau: MAU[m] + "88" })), 12)}
+    <text x="${c}" y="${c - 2}" text-anchor="middle" font-size="24" font-weight="800" fill="#1e1b4b">${t.tong}</text><text x="${c}" y="${c + 16}" text-anchor="middle" font-size="11" fill="#64748b">/ ${S.thang} điểm</text></svg>`;
+  chuMuc.innerHTML = Object.keys(MUC).map(m => `<div><span style="display:inline-block;width:12px;height:12px;border-radius:3px;background:${MAU[m]}"></span> ${MUC[m]}: <b>${tron(t.theoMuc[m])}đ</b> (${t.tong ? tron(t.theoMuc[m] / t.tong * 100) : 0}%)</div>`).join("");
+}
+function veNhiet() {
+  const t = tinh(), cd = Object.entries(t.chuDe), max = Math.max(.01, ...cd.flatMap(([, v]) => [v.B, v.H, v.V]));
+  const o = (m, v) => `<td style="background:${v ? MAU[m] + Math.round(40 + v / max * 215).toString(16).padStart(2, "0") : "#f1f5f9"};color:${v / max > .5 ? "#fff" : "#1e1b4b"}">${v ? tron(v) + "đ" : "–"}</td>`;
+  bangNhiet.innerHTML = `<tr><th>Chủ đề</th>${Object.keys(MUC).map(m => `<th class="m${m}">${MUC[m]}</th>`).join("")}<th>Số câu</th><th>Cộng</th></tr>` +
+    (cd.length ? cd.map(([k, v]) => `<tr><td>${TT.esc(k)}</td>${o("B", v.B)}${o("H", v.H)}${o("V", v.V)}<td style="background:#f8fafc">${v.so}</td><td style="background:#eef2ff">${tron(v.B + v.H + v.V)}đ</td></tr>`).join("") : `<tr><td colspan="6" style="text-align:center;color:#64748b">Chưa có câu nào — bấm «Dựng khung» hoặc «Thêm»</td></tr>`);
+  TT.bieuDoCot(cvDang, Object.keys(DANG).map(d => DANG[d] + " (" + t.soDang[d] + " câu)"), [{ ten: "Điểm", mau: "#6366f1", mau2: "#14b8a6", gt: Object.keys(DANG).map(d => tron(t.theoDang[d])) }], { dinhDang: v => v + "đ" });
+}
+function veCau() {
+  const opt = (o, v) => Object.entries(o).map(([k, t]) => `<option value="${k}"${k === v ? " selected" : ""}>${t}</option>`).join("");
+  dsCau.innerHTML = S.cau.map((c, i) => `<div class="cau" data-i="${i}"><span class="stt">${i + 1}</span><input data-k="chuDe" value="${TT.esc(c.chuDe)}" placeholder="Chủ đề"><select data-k="dang">${opt(DANG, c.dang)}</select>
+    <select data-k="muc" style="border-color:${MAU[c.muc]};color:${MAU[c.muc]};font-weight:700">${opt(MUC, c.muc)}</select><input data-k="diem" type="number" step="0.25" min="0" value="${c.diem}"><button title="Xoá">✕</button></div>`).join("");
+  dsCau.querySelectorAll("[data-i]").forEach(r => { const c = S.cau[+r.dataset.i];
+    r.querySelectorAll("input,select").forEach(e => e.onchange = () => { c[e.dataset.k] = e.dataset.k === "diem" ? +e.value : e.value; luu(); veTat(e.tagName === "SELECT"); });
+    r.querySelector("button").onclick = () => { S.cau.splice(+r.dataset.i, 1); luu(); veTat(true); }; });
+  tongCau.textContent = S.cau.length + " câu";
+}
+let datTruoc = null;
+function veTat(veLaiCau) { if (veLaiCau !== false) veCau(); const dat = veKiem(); veVanh(); veNhiet(); if (datTruoc === false && dat) { TT.ting(); TT.phaoGiay(); TT.toast("Đề đã khớp mục tiêu 🎉", "ok"); } datTruoc = !!dat; }
+nDang.innerHTML = Object.entries(DANG).map(([k, t]) => `<option value="${k}">${t}</option>`).join("");
+nMuc.innerHTML = Object.entries(MUC).map(([k, t]) => `<option value="${k}">${t}</option>`).join("");
+tenDe.value = S.ten; thangDiem.value = S.thang; tB.value = S.muc.B; tH.value = S.muc.H; tV.value = S.muc.V; tLech.value = S.lech;
+tenDe.oninput = () => { S.ten = tenDe.value; luu(); };
+thangDiem.oninput = () => { S.thang = +thangDiem.value || 10; luu(); veTat(false); };
+[["B", tB], ["H", tH], ["V", tV]].forEach(([m, e]) => e.oninput = () => { S.muc[m] = +e.value || 0; luu(); veTat(false); });
+tLech.oninput = () => { S.lech = +tLech.value || 0; luu(); veTat(false); };
+bKhuon.onclick = () => { if (S.cau.length && !confirm("Thay các câu hiện có bằng khung 12 TN + 4 Đ-S + 2 TL?")) return; S.cau = khuonTo(); S.muc = { B: 40, H: 30, V: 30 }; tB.value = 40; tH.value = 30; tV.value = 30; luu(); veTat(); TT.toast("Đã dựng khung — sếp sửa chủ đề, mức cho đúng đề của tổ", "ok"); };
+bThem.onclick = () => { const n = Math.max(1, Math.min(40, +nSo.value || 1)); for (let i = 0; i < n; i++) S.cau.push({ id: TT.uid(), chuDe: nChuDe.value.trim(), dang: nDang.value, muc: nMuc.value, diem: +nDiem.value || 0 }); luu(); TT.ting(); veTat(); };
+nDang.onchange = () => { nDiem.value = { TN: .25, DS: 1, TLN: .25, TL: 1 }[nDang.value]; };
+bCsv.onclick = () => {
+  const t = tinh(), h = [["MA TRẬN ĐỀ: " + (S.ten || "") + " (bản nháp — tổ thống nhất)"], ["Chủ đề", ...Object.keys(DANG).flatMap(d => Object.keys(MUC).map(m => DANG[d] + " – " + MUC[m])), "Tổng điểm"]];
+  Object.keys(t.chuDe).forEach(k => { const hang = [k]; Object.keys(DANG).forEach(d => Object.keys(MUC).forEach(m => { const ds = S.cau.filter(c => (c.chuDe || "(chưa ghi chủ đề)").trim() === k && c.dang === d && c.muc === m); hang.push(ds.length ? ds.length + " câu (" + tron(ds.reduce((a, c) => a + (+c.diem || 0), 0)) + "đ)" : ""); })); hang.push(tron(t.chuDe[k].B + t.chuDe[k].H + t.chuDe[k].V)); h.push(hang); });
+  h.push(["Tỉ lệ theo mức", ...Object.keys(MUC).map(m => MUC[m] + ": " + (t.tong ? tron(t.theoMuc[m] / t.tong * 100) : 0) + "%")]);
+  h.push([]); h.push(["Câu", "Chủ đề", "Dạng", "Mức", "Điểm"]); S.cau.forEach((c, i) => h.push([i + 1, c.chuDe, DANG[c.dang], MUC[c.muc], c.diem]));
+  TT.taiVe("ma-tran-de-" + TT.homNay() + ".csv", TT.csv(h), "text/csv;charset=utf-8"); TT.ting(); TT.toast("Đã xuất file mở bằng Excel", "ok");
+};
+bLuu.onclick = () => TT.saoLuu(["matran"], "ma-tran-de");
+bNhap.onclick = () => TT.nhapLai(["matran"], () => { S = TT.load("matran", S); tenDe.value = S.ten; thangDiem.value = S.thang; tB.value = S.muc.B; tH.value = S.muc.H; tV.value = S.muc.V; tLech.value = S.lech; veTat(); });
+addEventListener("resize", () => veNhiet());
+veTat();
+</script>
+</body>
+</html>

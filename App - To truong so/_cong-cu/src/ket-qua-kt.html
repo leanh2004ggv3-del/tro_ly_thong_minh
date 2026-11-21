@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Kết quả kiểm tra — Tổ trưởng số</title>
+<!--CSS-->
+<style>
+canvas.bd{width:100%;height:280px;display:block}
+.nhietcau{display:grid;gap:5px;grid-template-columns:repeat(auto-fill,minmax(64px,1fr))}
+.nhietcau div{border-radius:12px;padding:8px 4px;text-align:center;color:#fff;font-weight:700;font-size:13px;box-shadow:0 4px 10px -6px rgba(0,0,0,.4)}
+.nhietcau div b{display:block;font-size:17px}
+.canhbao{background:#fef2f2;border:1.5px solid #fecaca;color:#991b1b;border-radius:12px;padding:10px 12px;font-size:14.5px;margin-top:8px}
+</style>
+</head>
+<body>
+<div class="khung">
+<header class="dau">
+  <svg class="logo noi" viewBox="0 0 64 64"><defs><linearGradient id="lk" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ec4899"/><stop offset="1" stop-color="#6366f1"/></linearGradient></defs>
+    <rect x="4" y="4" width="56" height="56" rx="14" fill="url(#lk)"/><rect x="13" y="34" width="8" height="16" rx="3" fill="#fff"/><rect x="25" y="22" width="8" height="28" rx="3" fill="#fff"/><rect x="37" y="28" width="8" height="22" rx="3" fill="#fff" opacity=".85"/><rect x="49" y="14" width="4" height="36" rx="2" fill="#fde68a"/></svg>
+  <div><h1>KẾT QUẢ KIỂM TRA</h1><p>Dán bảng điểm (chỉ mã học sinh) → phổ điểm, so các lớp, câu nhiều em sai · làm nội dung họp tổ</p></div>
+  <div class="phai">
+    <button class="nut xanh" id="bCsv">📄 Xuất tổng hợp</button>
+    <button class="nut phu" id="bLuu">💾 Sao lưu</button>
+    <button class="nut phu" id="bNhap">📂 Nhập lại</button>
+  </div>
+</header>
+
+<div class="the" style="margin-bottom:16px">
+  <h2>📋 Dán bảng điểm</h2>
+  <div class="hang">
+    <label class="o" style="flex:2 1 260px">Tên bài kiểm tra<input id="tenBai" placeholder="VD: Giữa kỳ I – Công nghệ 8"></label>
+    <label class="o" style="flex:0 1 140px">Thang điểm<input id="thang" type="number" value="10" min="1"></label>
+  </div>
+  <textarea id="oDan" style="margin-top:8px;min-height:130px;font-family:Consolas,monospace;font-size:13.5px" placeholder="Cột 1: Mã HS · Cột 2: Lớp · Cột 3: Điểm · (tuỳ chọn) các cột sau: điểm từng câu C1, C2, … (1 = đúng, 0 = sai, hoặc điểm đạt được)
+HS01, 8A1, 7.5, 1, 0, 1
+HS02, 8A1, 6, 1, 1, 0"></textarea>
+  <div class="hang" style="margin-top:8px">
+    <button class="nut" id="bPhanTich">🔍 Phân tích</button>
+    <button class="nut phu" id="bXoaDan">Xoá ô dán</button>
+  </div>
+  <div id="canhBao"></div>
+  <div class="goiy" style="margin-top:10px"><svg width="30" height="30" viewBox="0 0 40 40"><circle cx="20" cy="20" r="18" fill="#ec4899"/><path d="M13 20l5 5 9-10" stroke="#fff" stroke-width="3.5" fill="none" stroke-linecap="round"/></svg>
+    <div>Dán thẳng từ Excel được (tự nhận dấu Tab, phẩy, chấm phẩy; dòng tiêu đề tự bỏ qua). <b>Chỉ dùng mã HS</b> — thấy cột giống họ tên, app sẽ nhắc. Đây là <b>thống kê một bài kiểm tra</b> để tổ bàn cách dạy; điểm trung bình môn, mức đánh giá theo TT 22 không tính ở đây.</div></div>
+</div>
+
+<div id="ketQua" class="an">
+  <div class="luoi l4" style="margin-bottom:16px">
+    <div class="kpi k1"><b id="kSo">0</b><span>bài đã chấm</span></div>
+    <div class="kpi k2"><b id="kTb">0</b><span>điểm bình quân bài này</span></div>
+    <div class="kpi k4"><b id="kTren">0%</b><span>đạt từ nửa thang điểm</span></div>
+    <div class="kpi k5"><b id="kDuoi">0%</b><span>dưới nửa thang điểm</span></div>
+  </div>
+  <div class="luoi l2">
+    <div class="the"><h2>📊 Phổ điểm</h2><canvas class="bd" id="cvPho"></canvas></div>
+    <div class="the"><h2>🏫 So các lớp <span style="font-size:13px;font-weight:500;color:var(--chu2);margin-left:auto"><span class="nhan n-tt">■ bình quân (quy ra % thang điểm)</span> <span class="nhan n-dung">■ % từ nửa thang</span></span></h2><canvas class="bd" id="cvLop"></canvas></div>
+  </div>
+  <div class="the" style="margin-top:16px">
+    <h2>🎯 Tỉ lệ làm đúng từng câu <span style="font-size:13px;font-weight:500;color:var(--chu2);margin-left:auto">đỏ = ít em đúng → nên chữa, bàn trong tổ</span></h2>
+    <div id="nhietCau" class="nhietcau"></div>
+    <div id="goiYCau" style="margin-top:12px"></div>
+  </div>
+  <div class="the" style="margin-top:16px">
+    <h2>📑 Bảng theo lớp</h2>
+    <div class="cuon"><table class="bang"><thead><tr><th>Lớp</th><th>Số bài</th><th>Bình quân</th><th>Thấp nhất</th><th>Cao nhất</th><th>% dưới nửa thang</th><th>% từ nửa thang</th><th>% từ 8/10 thang</th></tr></thead><tbody id="tbLop"></tbody></table></div>
+  </div>
+</div>
+<!--CHAN-->
+</div>
+<!--JS-->
+<script>
+let S = TT.load("ketqua", null) || { ten: "", thang: 10, dan: "" };
+if (TT.MAU) {
+  const lop = ["8A1", "8A2", "8A3", "8A4"], hang = []; let n = 1, seed = 7;
+  const r = () => (seed = (seed * 9301 + 49297) % 233280) / 233280;
+  lop.forEach((l, li) => { for (let i = 0; i < 34; i++) { const cau = Array.from({ length: 14 }, (_, c) => r() < [.9, .85, .8, .75, .45, .8, .7, .65, .35, .7, .6, .55, .5, .3][c] + li * .02 - .03 ? 1 : 0);
+    const d = Math.min(10, Math.round((cau.reduce((a, b) => a + b, 0) / 14 * 10 + (r() - .5)) * 4) / 4); hang.push(["HS" + String(n++).padStart(3, "0"), l, Math.max(0, d), ...cau].join(", ")); } });
+  S = { ten: "Giữa kỳ I – Công nghệ 8 (DỮ LIỆU THỬ)", thang: 10, dan: "Mã HS, Lớp, Điểm, " + Array.from({ length: 14 }, (_, i) => "C" + (i + 1)).join(", ") + "\n" + hang.join("\n") };
+}
+let KQ = null;
+tenBai.value = S.ten; thang.value = S.thang; oDan.value = S.dan;
+function luu() { S.ten = tenBai.value; S.thang = +thang.value || 10; S.dan = oDan.value; TT.save("ketqua", S); }
+[tenBai, thang, oDan].forEach(e => e.addEventListener("change", luu));
+const so = x => parseFloat(String(x).replace(",", "."));
+const tron = (x, k) => Math.round(x * Math.pow(10, k || 1)) / Math.pow(10, k || 1);
+function giongTen(s) { return /^[A-ZÀ-Ỹa-zà-ỹĐđ]+(\s+[A-ZÀ-Ỹa-zà-ỹĐđ]+){1,4}$/.test(s.trim()) && /[a-zà-ỹđ]/.test(s) && !/^HS/i.test(s.trim()); }
+function phanTich() {
+  luu();
+  const hang = TT.docCSV(oDan.value), max = +thang.value || 10, cb = [];
+  let tieuDe = null; const du = [];
+  hang.forEach(r => { if (r.length >= 3 && !isNaN(so(r[2]))) du.push(r); else if (!tieuDe && !du.length) tieuDe = r; });
+  if (!du.length) { TT.buzz(); canhBao.innerHTML = '<div class="canhbao">Không thấy dòng nào có cột thứ 3 là điểm. Sếp kiểm lại thứ tự cột: Mã HS · Lớp · Điểm.</div>'; ketQua.classList.add("an"); return; }
+  const ten = du.filter(r => giongTen(r[0])).length;
+  if (ten) cb.push(`⚠ Có ${ten} dòng cột 1 trông giống họ tên. Để giữ riêng tư cho học sinh, sếp nên đổi sang mã (HS01…) trước khi dán.`);
+  const ngoai = du.filter(r => so(r[2]) < 0 || so(r[2]) > max).length;
+  if (ngoai) cb.push(`⚠ ${ngoai} điểm nằm ngoài thang 0–${max} — đã bỏ qua các dòng đó.`);
+  const bai = du.filter(r => so(r[2]) >= 0 && so(r[2]) <= max).map(r => ({ ma: r[0], lop: r[1] || "(không ghi lớp)", d: so(r[2]), cau: r.slice(3).map(so) }));
+  const soCau = Math.max(0, ...bai.map(b => b.cau.filter(x => !isNaN(x)).length));
+  const tenCau = Array.from({ length: soCau }, (_, i) => (tieuDe && tieuDe[i + 3]) || "C" + (i + 1));
+  const caoCau = tenCau.map((_, i) => Math.max(1, ...bai.map(b => b.cau[i] || 0)));
+  const tk = ds => { const d = ds.map(b => b.d); const n = d.length; return { n, tb: n ? d.reduce((a, b) => a + b, 0) / n : 0, min: Math.min(...d), max: Math.max(...d), duoi: n ? d.filter(x => x < max / 2).length / n * 100 : 0, tren: n ? d.filter(x => x >= max / 2).length / n * 100 : 0, gioi: n ? d.filter(x => x >= max * .8).length / n * 100 : 0 }; };
+  const lop = [...new Set(bai.map(b => b.lop))].sort();
+  KQ = { max, bai, lop, tk: tk(bai), tkLop: lop.map(l => tk(bai.filter(b => b.lop === l))), tenCau,
+    cau: tenCau.map((t, i) => { const co = bai.filter(b => !isNaN(b.cau[i])); return co.length ? co.reduce((a, b) => a + b.cau[i] / caoCau[i], 0) / co.length * 100 : 0; }) };
+  canhBao.innerHTML = cb.map(c => `<div class="canhbao">${c}</div>`).join("");
+  ketQua.classList.remove("an"); ketQua.classList.add("hien"); ve(); TT.ting();
+}
+function ve() {
+  const { max, tk } = KQ;
+  kSo.textContent = tk.n; kTb.textContent = tron(tk.tb, 2); kTren.textContent = tron(tk.tren) + "%"; kDuoi.textContent = tron(tk.duoi) + "%";
+  const so10 = Array.from({ length: 10 }, () => 0);
+  KQ.bai.forEach(b => so10[Math.min(9, Math.floor(b.d / max * 10))]++);
+  const nhan = Array.from({ length: 10 }, (_, i) => tron(i * max / 10) + (i === 9 ? "–" + max : "–<" + tron((i + 1) * max / 10)));
+  TT.bieuDoCot(cvPho, nhan.map(n => n.replace("–<", "–")), [{ ten: "Số bài", mau: "#8b5cf6", mau2: "#6366f1", gt: so10 }]);
+  const ctx = cvPho.getContext("2d");
+  TT.bieuDoCot(cvLop, KQ.lop, [{ ten: "Bình quân", mau: "#6366f1", gt: KQ.tkLop.map(t => tron(t.tb / max * 100)) }, { ten: "% từ nửa thang", mau: "#22c55e", mau2: "#0d9488", gt: KQ.tkLop.map(t => tron(t.tren)) }], { max: 100, donVi: "", dinhDang: v => v });
+  tbLop.innerHTML = KQ.lop.map((l, i) => { const t = KQ.tkLop[i]; return `<tr><td><b>${TT.esc(l)}</b></td><td>${t.n}</td><td>${tron(t.tb, 2)}</td><td>${t.min}</td><td>${t.max}</td><td><span class="nhan ${t.duoi > 30 ? "n-sai" : "n-canh"}">${tron(t.duoi)}%</span></td><td>${tron(t.tren)}%</td><td>${tron(t.gioi)}%</td></tr>`; }).join("")
+    + `<tr style="font-weight:700"><td>Cả khối</td><td>${tk.n}</td><td>${tron(tk.tb, 2)}</td><td>${tk.min}</td><td>${tk.max}</td><td>${tron(tk.duoi)}%</td><td>${tron(tk.tren)}%</td><td>${tron(tk.gioi)}%</td></tr>`;
+  if (!KQ.tenCau.length) { nhietCau.innerHTML = '<p style="color:var(--chu2)">Chưa có cột điểm từng câu. Dán thêm cột C1, C2… (1 đúng, 0 sai) để thấy câu nào nhiều em sai.</p>'; goiYCau.innerHTML = ""; return; }
+  const mau = p => p < 40 ? "linear-gradient(135deg,#ef4444,#be123c)" : p < 60 ? "linear-gradient(135deg,#f59e0b,#ea580c)" : p < 80 ? "linear-gradient(135deg,#14b8a6,#0ea5e9)" : "linear-gradient(135deg,#22c55e,#15803d)";
+  nhietCau.innerHTML = KQ.tenCau.map((t, i) => `<div style="background:${mau(KQ.cau[i])}" title="${TT.esc(t)}: ${tron(KQ.cau[i])}% đúng">${TT.esc(t)}<b>${Math.round(KQ.cau[i])}%</b></div>`).join("");
+  const kho = KQ.tenCau.map((t, i) => [t, KQ.cau[i]]).sort((a, b) => a[1] - b[1]).slice(0, 3).filter(x => x[1] < 60);
+  goiYCau.innerHTML = kho.length ? `<div class="goiy"><svg width="30" height="30" viewBox="0 0 40 40"><circle cx="20" cy="20" r="18" fill="#ef4444"/><text x="20" y="27" text-anchor="middle" font-size="20" font-weight="800" fill="#fff">!</text></svg><div><b>Gợi ý nội dung họp tổ:</b> các câu ${kho.map(k => `<b>${TT.esc(k[0])}</b> (${Math.round(k[1])}% đúng)`).join(", ")} ít em làm đúng nhất. Tổ xem lại yêu cầu cần đạt của các câu này, cách dạy phần đó và lỗi học sinh hay mắc — tổ bàn, không quy lỗi cho người dạy.</div></div>` : '<div class="goiy"><div>✓ Không câu nào dưới 60% làm đúng.</div></div>';
+}
+bPhanTich.onclick = phanTich;
+bXoaDan.onclick = () => { oDan.value = ""; luu(); ketQua.classList.add("an"); canhBao.innerHTML = ""; };
+bCsv.onclick = () => {
+  if (!KQ) { TT.buzz(); TT.toast("Bấm «Phân tích» trước ạ", "loi"); return; }
+  const h = [["TỔNG HỢP KẾT QUẢ: " + (tenBai.value || "bài kiểm tra") + " (bản nháp)"], ["Lớp", "Số bài", "Bình quân", "Thấp nhất", "Cao nhất", "% dưới nửa thang", "% từ nửa thang", "% từ 8/10 thang"]];
+  KQ.lop.forEach((l, i) => { const t = KQ.tkLop[i]; h.push([l, t.n, tron(t.tb, 2), t.min, t.max, tron(t.duoi), tron(t.tren), tron(t.gioi)]); });
+  const t = KQ.tk; h.push(["Cả khối", t.n, tron(t.tb, 2), t.min, t.max, tron(t.duoi), tron(t.tren), tron(t.gioi)]);
+  if (KQ.tenCau.length) { h.push([]); h.push(["Câu", "% làm đúng"]); KQ.tenCau.forEach((c, i) => h.push([c, tron(KQ.cau[i])])); }
+  TT.taiVe("ket-qua-" + TT.homNay() + ".csv", TT.csv(h), "text/csv;charset=utf-8"); TT.ting(); TT.toast("Đã xuất file mở bằng Excel", "ok");
+};
+bLuu.onclick = () => { luu(); TT.saoLuu(["ketqua"], "ket-qua-kiem-tra"); };
+bNhap.onclick = () => TT.nhapLai(["ketqua"], () => { S = TT.load("ketqua", S); tenBai.value = S.ten; thang.value = S.thang; oDan.value = S.dan; phanTich(); });
+addEventListener("resize", () => KQ && ve());
+if (oDan.value.trim()) phanTich();
+</script>
+</body>
+</html>

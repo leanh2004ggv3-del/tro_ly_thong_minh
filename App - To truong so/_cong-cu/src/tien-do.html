@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Tiến độ chương trình — Tổ trưởng số</title>
+<!--CSS-->
+<style>
+#duong{width:100%;height:auto}
+.tdthanh{position:relative;height:16px;border-radius:9px;background:#e2e8f0;min-width:140px}
+.tdthanh i{position:absolute;left:0;top:0;bottom:0;border-radius:9px;transition:width .4s}
+.tdthanh .moc{position:absolute;top:-5px;bottom:-5px;width:3px;background:#1e1b4b;border-radius:2px}
+.cong{display:inline-flex;gap:4px}
+.cong button{width:32px;height:32px;border-radius:9px;border:0;cursor:pointer;font-weight:800;font-size:16px}
+.cong .c{background:#dcfce7;color:#166534}.cong .t{background:#fee2e2;color:#991b1b}
+table.bang td input{min-width:60px}
+.loc{display:flex;gap:6px;flex-wrap:wrap}
+.loc button{border:1.5px solid #c7d2fe;background:#fff;border-radius:999px;padding:5px 12px;font:600 13px var(--font);cursor:pointer;color:#3730a3}
+.loc button.chon{background:var(--chinh);color:#fff;border-color:transparent}
+</style>
+</head>
+<body>
+<div class="khung">
+<header class="dau">
+  <svg class="logo noi" viewBox="0 0 64 64"><defs><linearGradient id="lt" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0ea5e9"/><stop offset="1" stop-color="#22c55e"/></linearGradient></defs>
+    <rect x="4" y="4" width="56" height="56" rx="14" fill="url(#lt)"/><path d="M12 46l12-12 9 8 18-20" stroke="#fff" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M44 20h8v8" stroke="#fff" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  <div><h1>TIẾN ĐỘ CHƯƠNG TRÌNH</h1><p>So số tiết đã dạy với số tiết lẽ ra phải tới theo tuần · thấy ngay lớp nào chậm</p></div>
+  <div class="phai">
+    <button class="nut xanh" id="bCsv">📄 Xuất báo cáo</button>
+    <button class="nut phu" id="bLuu">💾 Sao lưu</button>
+    <button class="nut phu" id="bNhap">📂 Nhập lại</button>
+  </div>
+</header>
+
+<div class="the" style="margin-bottom:16px">
+  <div class="hang">
+    <label class="o">Ngày bắt đầu tuần 1<input id="bd" type="date"></label>
+    <label class="o">Số tuần thực học cả năm<input id="soTuan" type="number" min="1" max="52"></label>
+    <label class="o">Tuần hiện tại (để trống = tự tính)<input id="tuanTay" type="number" min="0" max="52" placeholder="tự tính"></label>
+  </div>
+  <div class="goiy" style="margin-top:10px"><svg width="30" height="30" viewBox="0 0 40 40"><circle cx="20" cy="20" r="18" fill="#0ea5e9"/><text x="20" y="27" text-anchor="middle" font-size="20" font-weight="800" fill="#fff">i</text></svg>
+    <div>Lấy ngày bắt đầu, số tuần theo <b>kế hoạch thời gian năm học</b> của Sở/trường. Tuần nghỉ Tết, nghỉ giữa kỳ làm lệch cách tự tính → sếp gõ thẳng tuần hiện tại. «Lẽ ra phải tới» = tổng tiết × tuần hiện tại ÷ số tuần (ước lượng đều; PPCT có tuần dồn tiết thì xem cột ghi chú).</div></div>
+  <svg id="duong" viewBox="0 0 1000 90" style="margin-top:12px"></svg>
+</div>
+
+<div class="luoi l4" style="margin-bottom:16px">
+  <div class="kpi k1"><b id="kTuan">0</b><span>tuần hiện tại</span></div>
+  <div class="kpi k4"><b id="kKip">0</b><span>lớp – môn kịp tiến độ</span></div>
+  <div class="kpi k3"><b id="kHoi">0</b><span>hơi chậm (1 tiết)</span></div>
+  <div class="kpi k5"><b id="kCham">0</b><span>chậm từ 2 tiết</span></div>
+</div>
+
+<div class="the">
+  <h2>📚 Lớp – môn <span class="loc" id="loc" style="margin-left:auto"></span></h2>
+  <div class="cuon"><table class="bang"><thead><tr><th>GV</th><th>Lớp</th><th>Môn</th><th>Tổng tiết năm</th><th>Đã dạy</th><th style="min-width:220px">Tiến độ <span style="font-weight:500">(| = lẽ ra tới)</span></th><th>Tình trạng</th><th>Ghi chú</th><th></th></tr></thead><tbody id="tb"></tbody></table></div>
+  <div class="hang" style="margin-top:12px">
+    <button class="nut" id="bThem">➕ Thêm lớp – môn</button>
+    <button class="nut phu" id="bDan">📋 Dán từ Excel</button>
+  </div>
+  <div id="khungDan" class="an" style="margin-top:10px">
+    <textarea id="oDan" placeholder="Dán các cột: GV | Lớp | Môn | Tổng tiết năm | Đã dạy (mỗi dòng một lớp; dòng tiêu đề tự bỏ qua)"></textarea>
+    <button class="nut xanh nho" id="bDanOk" style="margin-top:6px">Thêm các dòng đã dán</button>
+  </div>
+</div>
+<!--CHAN-->
+</div>
+<!--JS-->
+<script>
+const homnay = new Date();
+const namHoc = homnay.getMonth() + 1 >= 8 ? homnay.getFullYear() : homnay.getFullYear() - 1;
+let S = TT.load("tiendo", null) || { bd: "", soTuan: 35, tuanTay: "", ds: [] };
+if (TT.MAU) S = { bd: "2026-09-07", soTuan: 35, tuanTay: 11, ds: [
+  ["GV01", "9A1", "Công nghệ", 35, 11, ""], ["GV01", "9A2", "Công nghệ", 35, 10, ""], ["GV02", "8A3", "Công nghệ", 52, 16, ""], ["GV02", "8A4", "Công nghệ", 52, 14, "lớp đi thực tế 1 buổi"],
+  ["GV05", "7A5", "Công nghệ", 35, 11, ""], ["GV05", "6A5", "Công nghệ", 35, 12, ""], ["GV04", "6A1", "HĐTN-HN", 105, 31, ""], ["GV03", "8A1", "GDCD", 35, 9, "trùng lịch thi đấu"]
+].map(r => ({ id: TT.uid(), gv: r[0], lop: r[1], mon: r[2], tong: r[3], day: r[4], gc: r[5] })) };
+let loc = "tat";
+function luu() { TT.save("tiendo", S); }
+function tuan() {
+  if (S.tuanTay !== "" && S.tuanTay != null) return Math.max(0, Math.min(+S.soTuan || 35, +S.tuanTay));
+  if (!S.bd) return 0;
+  const d = (homnay - new Date(S.bd + "T00:00:00")) / 864e5; return Math.max(0, Math.min(+S.soTuan || 35, Math.floor(d / 7) + 1));
+}
+function tinh(r) {
+  const w = tuan(), n = +S.soTuan || 35, phai = Math.round((+r.tong || 0) * w / n * 10) / 10, chenh = Math.round(((+r.day || 0) - phai) * 10) / 10;
+  return { phai, chenh, tt: chenh <= -2 ? "cham" : chenh < 0 ? "hoi" : chenh > 2 ? "nhanh" : "kip" };
+}
+const TEN = { kip: ["n-dung", "✓ kịp"], hoi: ["n-canh", "hơi chậm"], cham: ["n-sai", "chậm"], nhanh: ["n-tt", "nhanh hơn"] };
+function veDuong() {
+  const n = +S.soTuan || 35, w = tuan(), svg = document.getElementById("duong"), x0 = 30, x1 = 970, kx = i => x0 + (x1 - x0) * i / n;
+  let s = `<defs><linearGradient id="gdu" x1="0" x2="1"><stop offset="0" stop-color="#22c55e"/><stop offset="1" stop-color="#0ea5e9"/></linearGradient></defs>
+    <rect x="${x0}" y="38" width="${x1 - x0}" height="14" rx="7" fill="#e2e8f0"/><rect x="${x0}" y="38" width="${kx(w) - x0}" height="14" rx="7" fill="url(#gdu)"/>`;
+  for (let i = 0; i <= n; i++) if (i % 5 === 0 || i === n) s += `<text x="${kx(i)}" y="72" font-size="13" text-anchor="middle" fill="#64748b">${i}</text><line x1="${kx(i)}" y1="54" x2="${kx(i)}" y2="60" stroke="#94a3b8"/>`;
+  const hk = Math.round(n / 2); s += `<line x1="${kx(hk)}" y1="30" x2="${kx(hk)}" y2="58" stroke="#8b5cf6" stroke-dasharray="4 3"/><text x="${kx(hk)}" y="24" font-size="12" text-anchor="middle" fill="#8b5cf6">giữa năm</text>`;
+  s += `<g transform="translate(${kx(w)},45)"><circle r="15" fill="#fff" stroke="#4f46e5" stroke-width="3"/><text y="5" text-anchor="middle" font-size="14" font-weight="800" fill="#4f46e5">${w}</text></g>
+    <text x="${x1}" y="24" text-anchor="end" font-size="13" fill="#1e1b4b" font-weight="700">Tuần ${w}/${n}</text>`;
+  svg.innerHTML = s;
+}
+function veBang() {
+  const max = Math.max(1, ...S.ds.map(r => +r.tong || 0));
+  const ds = S.ds.filter(r => loc === "tat" || tinh(r).tt === loc);
+  tb.innerHTML = ds.map(r => {
+    const t = tinh(r), tl = Math.min(100, (+r.day || 0) / (+r.tong || 1) * 100), moc = Math.min(100, t.phai / (+r.tong || 1) * 100);
+    const mau = t.tt === "cham" ? "linear-gradient(90deg,#f87171,#dc2626)" : t.tt === "hoi" ? "linear-gradient(90deg,#fbbf24,#d97706)" : "linear-gradient(90deg,#4ade80,#0d9488)";
+    return `<tr data-id="${r.id}"><td><input data-k="gv" value="${TT.esc(r.gv)}" style="width:70px"></td><td><input data-k="lop" value="${TT.esc(r.lop)}" style="width:70px"></td><td><input data-k="mon" value="${TT.esc(r.mon)}" style="width:110px"></td>
+      <td><input data-k="tong" type="number" min="0" value="${r.tong ?? ""}" style="width:76px"></td>
+      <td><span class="cong"><button class="t" title="Bớt 1 tiết">−</button><input data-k="day" type="number" min="0" value="${r.day ?? ""}" style="width:64px"><button class="c" title="Thêm 1 tiết">+</button></span></td>
+      <td><div class="tdthanh"><i style="width:${tl}%;background:${mau}"></i><span class="moc" style="left:${moc}%"></span></div><div style="font-size:12px;color:#64748b;margin-top:3px">${r.day || 0}/${r.tong || 0} · lẽ ra ≈ ${t.phai}</div></td>
+      <td><span class="nhan ${TEN[t.tt][0]}">${TEN[t.tt][1]}${t.chenh < 0 ? " " + (-t.chenh) + " tiết" : t.tt === "nhanh" ? " " + t.chenh : ""}</span></td>
+      <td><input data-k="gc" value="${TT.esc(r.gc || "")}" placeholder="…" style="width:150px"></td><td><button class="nut do nho" title="Xoá">✕</button></td></tr>`;
+  }).join("") || `<tr><td colspan="9" style="text-align:center;color:#64748b;padding:20px">Chưa có dòng nào${loc !== "tat" ? " ở mục này" : ""}.</td></tr>`;
+  tb.querySelectorAll("tr[data-id]").forEach(tr => {
+    const r = S.ds.find(x => x.id === tr.dataset.id);
+    tr.querySelectorAll("input").forEach(i => i.onchange = () => { r[i.dataset.k] = i.type === "number" ? (i.value === "" ? "" : +i.value) : i.value; luu(); veTat(); });
+    tr.querySelector(".c").onclick = () => { r.day = (+r.day || 0) + 1; luu(); TT.ting(); veTat(); };
+    tr.querySelector(".t").onclick = () => { r.day = Math.max(0, (+r.day || 0) - 1); luu(); veTat(); };
+    tr.querySelector(".do").onclick = () => { if (confirm("Xoá dòng " + r.lop + " – " + r.mon + "?")) { S.ds = S.ds.filter(x => x !== r); luu(); veTat(); } };
+  });
+}
+function veLoc() {
+  const dem = k => S.ds.filter(r => tinh(r).tt === k).length;
+  const nut = [["tat", "Tất cả " + S.ds.length], ["cham", "Chậm " + dem("cham")], ["hoi", "Hơi chậm " + dem("hoi")], ["kip", "Kịp " + dem("kip")], ["nhanh", "Nhanh " + dem("nhanh")]];
+  document.getElementById("loc").innerHTML = nut.map(([k, t]) => `<button data-k="${k}" class="${k === loc ? "chon" : ""}">${t}</button>`).join("");
+  document.querySelectorAll("#loc button").forEach(b => b.onclick = () => { loc = b.dataset.k; veTat(); });
+}
+function veKpi() {
+  kTuan.textContent = tuan(); const d = k => S.ds.filter(r => tinh(r).tt === k).length;
+  kKip.textContent = d("kip") + d("nhanh"); kHoi.textContent = d("hoi"); kCham.textContent = d("cham");
+}
+function veTat() { veDuong(); veLoc(); veBang(); veKpi(); }
+bd.value = S.bd || ""; soTuan.value = S.soTuan; tuanTay.value = S.tuanTay ?? "";
+bd.onchange = () => { S.bd = bd.value; luu(); veTat(); };
+soTuan.onchange = () => { S.soTuan = +soTuan.value || 35; luu(); veTat(); };
+tuanTay.oninput = () => { S.tuanTay = tuanTay.value === "" ? "" : +tuanTay.value; luu(); veTat(); };
+bThem.onclick = () => { S.ds.push({ id: TT.uid(), gv: "", lop: "", mon: "", tong: "", day: 0, gc: "" }); luu(); loc = "tat"; veTat(); const o = tb.querySelector("tr:last-child input"); o && o.focus(); };
+bDan.onclick = () => khungDan.classList.toggle("an");
+bDanOk.onclick = () => {
+  const hang = TT.docCSV(oDan.value).filter(r => r.length >= 4 && !isNaN(parseFloat(r[3])));
+  if (!hang.length) { TT.buzz(); TT.toast("Không thấy dòng nào có cột «Tổng tiết» là số", "loi"); return; }
+  hang.forEach(r => S.ds.push({ id: TT.uid(), gv: r[0], lop: r[1], mon: r[2], tong: parseFloat(r[3]), day: parseFloat(r[4]) || 0, gc: r[5] || "" }));
+  luu(); oDan.value = ""; khungDan.classList.add("an"); TT.ting(); TT.toast("Đã thêm " + hang.length + " dòng", "ok"); veTat();
+};
+bCsv.onclick = () => {
+  const h = [["BÁO CÁO TIẾN ĐỘ CHƯƠNG TRÌNH — tuần " + tuan() + "/" + S.soTuan + " (bản nháp)"], ["GV", "Lớp", "Môn", "Tổng tiết năm", "Đã dạy", "Lẽ ra tới (ước)", "Chênh", "Tình trạng", "Ghi chú"]];
+  S.ds.forEach(r => { const t = tinh(r); h.push([r.gv, r.lop, r.mon, r.tong, r.day, t.phai, t.chenh, TEN[t.tt][1], r.gc]); });
+  TT.taiVe("tien-do-tuan-" + tuan() + ".csv", TT.csv(h), "text/csv;charset=utf-8"); TT.ting(); TT.toast("Đã xuất file mở bằng Excel", "ok");
+};
+bLuu.onclick = () => TT.saoLuu(["tiendo"], "tien-do");
+bNhap.onclick = () => TT.nhapLai(["tiendo"], () => { S = TT.load("tiendo", S); bd.value = S.bd || ""; soTuan.value = S.soTuan; tuanTay.value = S.tuanTay ?? ""; veTat(); });
+veTat();
+</script>
+</body>
+</html>

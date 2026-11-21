@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Lịch việc tổ — Tổ trưởng số</title>
+<!--CSS-->
+<style>
+.vongwrap{display:flex;justify-content:center;align-items:center}
+#vong{width:100%;max-width:380px;height:auto}
+#vong .o{cursor:pointer;transition:transform .15s;transform-origin:180px 180px}
+#vong .o:hover{transform:scale(1.03)}
+#vong .o.chon path.mat{stroke:#1e1b4b;stroke-width:3}
+.viec{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:14px;background:#fff;border:1.5px solid #e0e7ff;margin-bottom:8px;transition:background .2s}
+.viec.xong{background:linear-gradient(135deg,#f0fdf4,#ecfeff);border-color:#bbf7d0}
+.viec.xong .ten{text-decoration:line-through;color:#64748b}
+.viec .tick{width:30px;height:30px;flex:none;border-radius:9px;border:2px solid #a5b4fc;background:#fff;cursor:pointer;display:grid;place-items:center;font-size:18px;color:#fff;transition:.15s}
+.viec.xong .tick{background:linear-gradient(135deg,#22c55e,#0d9488);border-color:#16a34a}
+.viec .ten{flex:1;font-weight:600}
+.viec .ngay{font-size:13px;color:#64748b;white-space:nowrap}
+.viec .xoa{border:0;background:none;cursor:pointer;font-size:17px;opacity:.55}
+.viec .xoa:hover{opacity:1}
+.viec.qua .ngay{color:var(--sai);font-weight:700}
+.thangtieu{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.thangtieu .so{width:54px;height:54px;border-radius:16px;display:grid;place-items:center;color:#fff;font-size:24px;font-weight:800;background:linear-gradient(135deg,var(--chinh),var(--chinh2))}
+.chamthang{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.chamthang button{border:0;border-radius:10px;min-width:42px;min-height:36px;font-weight:700;cursor:pointer;background:#e0e7ff;color:#3730a3}
+.chamthang button.chon{background:linear-gradient(135deg,var(--chinh),var(--chinh2));color:#fff}
+</style>
+</head>
+<body>
+<div class="khung">
+<header class="dau">
+  <svg class="logo noi" viewBox="0 0 64 64"><defs><linearGradient id="lg1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6366f1"/><stop offset="1" stop-color="#14b8a6"/></linearGradient></defs>
+    <rect x="6" y="10" width="52" height="46" rx="10" fill="url(#lg1)"/><rect x="6" y="10" width="52" height="13" rx="6" fill="#1e1b4b" opacity=".25"/>
+    <rect x="17" y="5" width="6" height="12" rx="3" fill="#fff"/><rect x="41" y="5" width="6" height="12" rx="3" fill="#fff"/>
+    <circle cx="32" cy="39" r="11" fill="#fff"/><path d="M26 39l4 4 8-8" stroke="#16a34a" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  <div><h1>LỊCH VIỆC TỔ</h1><p>Việc của tổ trưởng theo tháng, từ tháng 8 đến tháng 7 · tick khi xong · xuất vào Google Calendar</p></div>
+  <div class="phai">
+    <button class="nut xanh" id="bIcs">📅 Xuất lịch (.ics)</button>
+    <button class="nut phu" id="bLuu">💾 Sao lưu</button>
+    <button class="nut phu" id="bNhap">📂 Nhập lại</button>
+  </div>
+</header>
+
+<div class="luoi l4" style="margin-bottom:16px">
+  <div class="kpi k1"><b id="kTong">0</b><span>việc cả năm</span></div>
+  <div class="kpi k4"><b id="kXong">0</b><span>việc đã xong</span></div>
+  <div class="kpi k3"><b id="kThang">0</b><span>việc tháng này còn lại</span></div>
+  <div class="kpi k5"><b id="kQua">0</b><span>việc đã quá ngày</span></div>
+</div>
+
+<div class="luoi l2">
+  <div class="the">
+    <h2>🧭 Vòng năm học <select id="namHoc" style="width:auto;margin-left:auto"></select></h2>
+    <div class="vongwrap"><svg id="vong" viewBox="0 0 360 360" role="img" aria-label="Vòng 12 tháng năm học"></svg></div>
+    <div class="goiy" style="margin-top:10px">
+      <svg width="34" height="34" viewBox="0 0 40 40"><circle cx="20" cy="20" r="18" fill="#6366f1"/><circle cx="14" cy="17" r="3" fill="#fff"/><circle cx="26" cy="17" r="3" fill="#fff"/><path d="M13 26q7 6 14 0" stroke="#fff" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg>
+      <div>Ô càng đậm là tháng càng xong nhiều việc; ô <b style="color:#16a34a">xanh lá</b> là xong hết. Bấm vào một tháng để xem việc. Mốc thật theo <b>kế hoạch giáo dục nhà trường</b> — sếp sửa ngày cho khớp.</div>
+    </div>
+  </div>
+  <div class="the">
+    <div class="thangtieu"><div class="so" id="tSo">11</div><div><h2 style="margin:0" id="tTen">Tháng 11</h2><div style="color:var(--chu2);font-size:14px" id="tTom"></div></div></div>
+    <div id="dsViec"></div>
+    <h3>➕ Thêm việc riêng của tổ</h3>
+    <div class="hang">
+      <label class="o" style="flex:3 1 220px">Tên việc<input id="vTen" placeholder="VD: Chuyên đề ứng dụng AI trong soạn bài"></label>
+      <label class="o" style="flex:0 1 110px">Ngày<input id="vNgay" type="number" min="1" max="31" value="15"></label>
+      <button class="nut" id="bThem">Thêm</button>
+    </div>
+    <div class="chamthang" id="chamThang"></div>
+  </div>
+</div>
+<div class="the khongin" style="margin-top:16px">
+  <h2>⚙️ Khác</h2>
+  <div class="hang">
+    <button class="nut phu" id="bMacDinh">↺ Khôi phục danh sách gợi ý (giữ việc riêng)</button>
+    <button class="nut phu" id="bIn">🖨️ In cả năm</button>
+  </div>
+  <p style="color:var(--chu2);font-size:14px;margin:10px 0 0">File <b>.ics</b> mở được bằng Google Calendar (Cài đặt → Nhập), Outlook, lịch điện thoại; mỗi việc có nhắc trước 1 ngày. Mỗi tháng có sẵn việc «Sinh hoạt tổ + ghi sổ» theo nhịp tối thiểu của Điều lệ (TT 15/2026 Điều 13 khoản 3) — ngày họp cụ thể theo lịch trường.</p>
+</div>
+<!--CHAN-->
+</div>
+<!--JS-->
+<script>
+const THANG = [8, 9, 10, 11, 12, 1, 2, 3, 4, 5, 6, 7];
+const GOI_Y = {
+  8: [["Nhận quyết định thành lập tổ, kế hoạch giáo dục nhà trường", 10], ["Tổ ghép nhiều môn/cấp: lập bảng việc chung – riêng", 15], ["Đề xuất phân công chuyên môn trình hiệu trưởng", 20]],
+  9: [["Trình duyệt kế hoạch hoạt động của tổ năm học", 10], ["Thống nhất lịch sinh hoạt tổ, nhóm chuyên môn", 12], ["Chọn bài nghiên cứu bài học học kỳ I", 20], ["Nhắc thành viên lập kế hoạch bồi dưỡng thường xuyên", 25]],
+  10: [["Chu kỳ nghiên cứu bài học lần 1", 10], ["Rà ma trận, đặc tả đề giữa học kỳ I", 15], ["Dự giờ theo kế hoạch của trường", 22]],
+  11: [["Hội giảng, chuyên đề theo kế hoạch trường", 15], ["Ra đề, duyệt đề trong tổ (giữ bảo mật đề)", 25]],
+  12: [["Ra đề, duyệt đề cuối học kỳ I", 5], ["Kiểm tra cuối học kỳ I", 20]],
+  1: [["Phân tích kết quả cuối học kỳ I theo nhóm, lớp", 8], ["Sơ kết học kỳ I của tổ, báo cáo ban giám hiệu", 15]],
+  2: [["Chu kỳ nghiên cứu bài học lần 2", 20], ["Điều chỉnh kế hoạch dạy học học kỳ II (nếu cần)", 25]],
+  3: [["Rà tiến độ chương trình học kỳ II", 10], ["Rà ma trận, đặc tả đề giữa học kỳ II", 15]],
+  4: [["Ra đề, duyệt đề cuối năm", 15], ["Nhắc thành viên tự đánh giá chuẩn nghề nghiệp có minh chứng", 25]],
+  5: [["Tổ họp góp ý đánh giá giáo viên theo chuẩn (hiệu trưởng quyết)", 10], ["Kiểm tra cuối năm", 15], ["Tổng kết hoạt động tổ năm học", 28]],
+  6: [["Báo cáo tổng kết năm học gửi ban giám hiệu", 5], ["Rà ngân hàng đề của tổ", 20]],
+  7: [["Đề xuất phân công năm học sau", 10], ["Tổ đề xuất chọn sách giáo khoa, học liệu", 20]]
+};
+function taoGoiY() {
+  const v = [];
+  THANG.forEach(t => {
+    v.push({ id: "g" + t + "_0", thang: t, ten: "Sinh hoạt tổ chuyên môn + ghi biên bản vào sổ", ngay: 1, xong: false });
+    GOI_Y[t].forEach(([ten, ngay], i) => v.push({ id: "g" + t + "_" + (i + 1), thang: t, ten, ngay, xong: false }));
+  });
+  return v;
+}
+const homnay = new Date();
+const namMacDinh = homnay.getMonth() + 1 >= 8 ? homnay.getFullYear() : homnay.getFullYear() - 1;
+let S = TT.load("lich", null) || { nam: namMacDinh, viec: taoGoiY() };
+if (TT.MAU) S.viec.forEach(v => { if ([8, 9, 10].includes(v.thang) || (v.thang === 11 && v.ngay < 10)) v.xong = true; });
+let chon = homnay.getMonth() + 1;
+const m = location.hash.match(/thang=(\d+)/); if (m) chon = +m[1];
+function luu() { TT.save("lich", S); }
+function namCua(t) { return t >= 8 ? S.nam : S.nam + 1; }
+function ngayThat(v) { const nam = namCua(v.thang), cuoi = new Date(nam, v.thang, 0).getDate(); return new Date(nam, v.thang - 1, Math.min(v.ngay, cuoi)); }
+function quaHan(v) { return !v.xong && ngayThat(v) < new Date(homnay.getFullYear(), homnay.getMonth(), homnay.getDate()); }
+
+const selNam = document.getElementById("namHoc");
+for (let y = namMacDinh - 1; y <= namMacDinh + 2; y++) selNam.add(new Option(y + "–" + (y + 1), y));
+selNam.value = S.nam;
+selNam.onchange = () => { S.nam = +selNam.value; luu(); veTat(); };
+
+function cungTron(cx, cy, r1, r2, a1, a2) {
+  const p = (r, a) => [cx + r * Math.cos(a), cy + r * Math.sin(a)];
+  const [x1, y1] = p(r2, a1), [x2, y2] = p(r2, a2), [x3, y3] = p(r1, a2), [x4, y4] = p(r1, a1);
+  return `M${x1},${y1} A${r2},${r2} 0 0 1 ${x2},${y2} L${x3},${y3} A${r1},${r1} 0 0 0 ${x4},${y4}Z`;
+}
+function veVong() {
+  const cx = 180, cy = 180, svg = document.getElementById("vong");
+  let s = `<defs><linearGradient id="gx" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#22c55e"/><stop offset="1" stop-color="#0d9488"/></linearGradient>
+  <radialGradient id="gg"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#eef2ff"/></radialGradient></defs>`;
+  const thangNay = homnay.getMonth() + 1;
+  THANG.forEach((t, i) => {
+    const a1 = -Math.PI / 2 + i * Math.PI / 6 + .015, a2 = a1 + Math.PI / 6 - .03, ds = S.viec.filter(v => v.thang === t);
+    const xong = ds.filter(v => v.xong).length, tl = ds.length ? xong / ds.length : 0;
+    const mau = tl === 1 ? "url(#gx)" : `rgba(99,102,241,${.12 + tl * .7})`;
+    const qua = ds.some(quaHan);
+    const am = (a1 + a2) / 2, lx = cx + 118 * Math.cos(am), ly = cy + 118 * Math.sin(am);
+    s += `<g class="o${t === chon ? " chon" : ""}" data-t="${t}"><path class="mat" d="${cungTron(cx, cy, 72, 165, a1, a2)}" fill="${mau}" stroke="#fff" stroke-width="2"/>
+      <path d="${cungTron(cx, cy, 160, 166, a1, a1 + (a2 - a1) * tl)}" fill="#16a34a" opacity=".9"/>
+      <text x="${lx}" y="${ly - 4}" text-anchor="middle" font-size="22" font-weight="800" fill="${tl > .55 ? "#fff" : "#312e81"}">${t}</text>
+      <text x="${lx}" y="${ly + 15}" text-anchor="middle" font-size="12" fill="${tl > .55 ? "#fff" : "#475569"}">${xong}/${ds.length}</text>
+      ${qua ? `<circle cx="${cx + 150 * Math.cos(am)}" cy="${cy + 150 * Math.sin(am)}" r="6" fill="#dc2626"/>` : ""}
+      ${t === thangNay ? `<circle cx="${cx + 88 * Math.cos(am)}" cy="${cy + 88 * Math.sin(am)}" r="4" fill="#f59e0b"/>` : ""}</g>`;
+  });
+  const tong = S.viec.length, xong = S.viec.filter(v => v.xong).length, pt = tong ? Math.round(xong / tong * 100) : 0;
+  s += `<circle cx="${cx}" cy="${cy}" r="66" fill="url(#gg)"/><text x="${cx}" y="${cy - 6}" text-anchor="middle" font-size="34" font-weight="800" fill="#4f46e5">${pt}%</text>
+    <text x="${cx}" y="${cy + 18}" text-anchor="middle" font-size="13" fill="#475569">năm học ${S.nam}–${S.nam + 1}</text>`;
+  svg.innerHTML = s;
+  svg.querySelectorAll(".o").forEach(g => g.onclick = () => { chon = +g.dataset.t; veTat(); });
+}
+function veThang() {
+  const ds = S.viec.filter(v => v.thang === chon).sort((a, b) => a.ngay - b.ngay);
+  document.getElementById("tSo").textContent = chon;
+  document.getElementById("tTen").textContent = "Tháng " + chon + "/" + namCua(chon);
+  const xong = ds.filter(v => v.xong).length;
+  document.getElementById("tTom").textContent = `${xong}/${ds.length} việc đã xong` + (xong === ds.length && ds.length ? " · 🎉 hoàn thành tháng" : "");
+  document.getElementById("dsViec").innerHTML = ds.map(v => `<div class="viec${v.xong ? " xong" : ""}${quaHan(v) ? " qua" : ""}" data-id="${v.id}">
+     <button class="tick" title="Đánh dấu xong">${v.xong ? "✓" : ""}</button><span class="ten">${TT.esc(v.ten)}</span>
+     <span class="ngay">${quaHan(v) ? "⚠ " : ""}${ngayThat(v).toLocaleDateString("vi-VN")}</span>
+     ${v.rieng ? '<button class="xoa" title="Xoá việc riêng">🗑️</button>' : ""}</div>`).join("") || '<p style="color:var(--chu2)">Chưa có việc nào.</p>';
+  document.querySelectorAll("#dsViec .viec").forEach(d => {
+    const v = S.viec.find(x => x.id === d.dataset.id);
+    d.querySelector(".tick").onclick = e => {
+      v.xong = !v.xong; luu();
+      if (v.xong) { TT.ting(); const r = e.target.getBoundingClientRect(); const conLai = S.viec.filter(x => x.thang === chon && !x.xong).length; if (!conLai) TT.phaoGiay(r.left, r.top); }
+      veTat();
+    };
+    const x = d.querySelector(".xoa"); if (x) x.onclick = () => { if (confirm("Xoá việc «" + v.ten + "»?")) { S.viec = S.viec.filter(y => y !== v); luu(); veTat(); } };
+  });
+  document.getElementById("chamThang").innerHTML = THANG.map(t => `<button class="${t === chon ? "chon" : ""}" data-t="${t}">T${t}</button>`).join("");
+  document.querySelectorAll("#chamThang button").forEach(b => b.onclick = () => { chon = +b.dataset.t; veTat(); });
+}
+function veKPI() {
+  const thangNay = homnay.getMonth() + 1;
+  kTong.textContent = S.viec.length; kXong.textContent = S.viec.filter(v => v.xong).length;
+  kThang.textContent = S.viec.filter(v => v.thang === thangNay && !v.xong).length; kQua.textContent = S.viec.filter(quaHan).length;
+}
+function veTat() { veVong(); veThang(); veKPI(); }
+document.getElementById("bThem").onclick = () => {
+  const ten = vTen.value.trim(), ngay = Math.max(1, Math.min(31, +vNgay.value || 15));
+  if (!ten) { vTen.classList.add("rung"); setTimeout(() => vTen.classList.remove("rung"), 400); TT.buzz(); TT.toast("Sếp gõ tên việc trước ạ", "loi"); return; }
+  S.viec.push({ id: TT.uid(), thang: chon, ten, ngay, xong: false, rieng: true }); vTen.value = ""; luu(); TT.ting(); TT.toast("Đã thêm vào tháng " + chon, "ok"); veTat();
+};
+vTen.addEventListener("keydown", e => { if (e.key === "Enter") bThem.click(); });
+document.getElementById("bMacDinh").onclick = () => {
+  if (!confirm("Khôi phục các việc gợi ý? Việc riêng sếp đã thêm vẫn giữ.")) return;
+  const rieng = S.viec.filter(v => v.rieng); S.viec = taoGoiY().concat(rieng); luu(); veTat(); TT.toast("Đã khôi phục", "ok");
+};
+function icsChu(s) { return String(s).replace(/\\/g, "\\\\").replace(/;/g, "\\;").replace(/,/g, "\\,").replace(/\n/g, "\\n"); }
+function d8(d) { return d.getFullYear() + String(d.getMonth() + 1).padStart(2, "0") + String(d.getDate()).padStart(2, "0"); }
+document.getElementById("bIcs").onclick = () => {
+  const dong = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//To truong so//Lich viec to//VI", "CALSCALE:GREGORIAN", "X-WR-CALNAME:Việc tổ chuyên môn " + S.nam + "-" + (S.nam + 1)];
+  const st = d8(new Date()) + "T000000Z";
+  S.viec.filter(v => !v.xong).forEach(v => {
+    const d = ngayThat(v), sau = new Date(d); sau.setDate(sau.getDate() + 1);
+    dong.push("BEGIN:VEVENT", "UID:" + v.id + "-" + S.nam + "@to-truong-so", "DTSTAMP:" + st, "DTSTART;VALUE=DATE:" + d8(d), "DTEND;VALUE=DATE:" + d8(sau),
+      "SUMMARY:" + icsChu("[Tổ] " + v.ten), "DESCRIPTION:" + icsChu("Việc tổ trưởng chuyên môn – mốc thật theo kế hoạch nhà trường"),
+      "BEGIN:VALARM", "TRIGGER:-P1D", "ACTION:DISPLAY", "DESCRIPTION:" + icsChu(v.ten), "END:VALARM", "END:VEVENT");
+  });
+  dong.push("END:VCALENDAR");
+  TT.taiVe("lich-viec-to-" + S.nam + "-" + (S.nam + 1) + ".ics", dong.join("\r\n"), "text/calendar;charset=utf-8");
+  TT.ting(); TT.toast("Đã xuất " + S.viec.filter(v => !v.xong).length + " việc chưa xong ra file lịch", "ok");
+};
+document.getElementById("bLuu").onclick = () => TT.saoLuu(["lich"], "lich-viec-to");
+document.getElementById("bNhap").onclick = () => TT.nhapLai(["lich"], () => { S = TT.load("lich", S); selNam.value = S.nam; veTat(); });
+document.getElementById("bIn").onclick = () => {
+  const w = window.open("", "_blank");
+  if (!w) { TT.toast("Trình duyệt chặn cửa sổ mới — cho phép cửa sổ bật lên giúp em ạ", "loi"); return; }
+  const hang = THANG.map(t => `<tr><td style="font-weight:700;padding:6px;border:1px solid #999">${t}/${namCua(t)}</td><td style="padding:6px;border:1px solid #999">${S.viec.filter(v => v.thang === t).sort((a, b) => a.ngay - b.ngay).map(v => (v.xong ? "☑ " : "☐ ") + TT.esc(v.ten) + " (" + ngayThat(v).toLocaleDateString("vi-VN") + ")").join("<br>")}</td></tr>`).join("");
+  w.document.write(`<html><head><meta charset="utf-8"><title>Lịch việc tổ</title></head><body style="font-family:'Times New Roman';font-size:14pt"><h3 style="text-align:center">LỊCH VIỆC TỔ CHUYÊN MÔN NĂM HỌC ${S.nam}–${S.nam + 1}</h3><p style="text-align:center;font-style:italic">Bản nháp — tổ thống nhất, hiệu trưởng duyệt; mốc theo kế hoạch giáo dục nhà trường</p><table style="border-collapse:collapse;width:100%"><tr><th style="border:1px solid #999">Tháng</th><th style="border:1px solid #999">Việc</th></tr>${hang}</table></body></html>`);
+  w.document.close(); w.focus(); w.print();
+};
+veTat();
+</script>
+</body>
+</html>

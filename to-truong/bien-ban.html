@@ -1,0 +1,410 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Biên bản họp tổ — Tổ trưởng số</title>
+<style>
+:root{
+  --nen1:#eef2ff; --nen2:#ecfeff; --nen3:#fff7ed;
+  --kinh:rgba(255,255,255,.78); --vien:rgba(99,102,241,.16);
+  --chu:#1e1b4b; --chu2:#475569; --mo:#94a3b8;
+  --chinh:#4f46e5; --chinh2:#7c3aed; --nhan1:#0d9488; --nhan2:#f59e0b;
+  --dung:#16a34a; --sai:#dc2626; --canh:#d97706;
+  --r:18px; --bong:0 10px 30px -12px rgba(30,27,75,.25);
+  --font:"Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{font-family:var(--font);color:var(--chu);font-size:16px;line-height:1.5;min-height:100vh;
+  background:radial-gradient(1200px 600px at 0% 0%,var(--nen1),transparent 60%),
+             radial-gradient(900px 500px at 100% 10%,var(--nen2),transparent 60%),
+             radial-gradient(900px 700px at 50% 100%,var(--nen3),transparent 60%),#f8fafc;}
+.khung{max-width:1180px;margin:0 auto;padding:16px 16px 40px}
+header.dau{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin:6px 0 18px}
+header.dau .logo{width:56px;height:56px;flex:none;filter:drop-shadow(0 6px 10px rgba(79,70,229,.3))}
+header.dau h1{margin:0;font-size:clamp(22px,3.2vw,32px);line-height:1.15;
+  background:linear-gradient(90deg,var(--chinh),var(--chinh2) 50%,var(--nhan1));-webkit-background-clip:text;background-clip:text;color:transparent}
+header.dau p{margin:2px 0 0;color:var(--chu2);font-size:15px}
+header.dau .phai{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
+.the{background:var(--kinh);border:1px solid var(--vien);border-radius:var(--r);box-shadow:var(--bong);padding:18px;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.the h2{margin:0 0 10px;font-size:19px;display:flex;align-items:center;gap:8px}
+.the h3{margin:12px 0 6px;font-size:16px}
+.luoi{display:grid;gap:16px}
+.l2{grid-template-columns:repeat(auto-fit,minmax(320px,1fr))}
+.l3{grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+.l4{grid-template-columns:repeat(auto-fit,minmax(170px,1fr))}
+.nut{appearance:none;border:0;cursor:pointer;font:600 15px var(--font);min-height:44px;padding:10px 16px;border-radius:12px;color:#fff;
+  background:linear-gradient(135deg,var(--chinh),var(--chinh2));box-shadow:0 6px 14px -6px rgba(79,70,229,.6);transition:transform .12s,box-shadow .12s;display:inline-flex;align-items:center;gap:6px;text-decoration:none}
+.nut:hover{transform:translateY(-2px);box-shadow:0 10px 18px -8px rgba(79,70,229,.7)}
+.nut:active{transform:translateY(1px) scale(.98)}
+.nut.phu{background:rgba(255,255,255,.7);color:var(--chinh);border:1.5px solid rgba(79,70,229,.35);box-shadow:none}
+.nut.xanh{background:linear-gradient(135deg,#0d9488,#16a34a)}
+.nut.cam{background:linear-gradient(135deg,#f59e0b,#ea580c)}
+.nut.do{background:linear-gradient(135deg,#ef4444,#be123c)}
+.nut.nho{min-height:34px;padding:5px 10px;font-size:13.5px;border-radius:10px}
+label.o{display:flex;flex-direction:column;gap:4px;font-size:13.5px;font-weight:600;color:var(--chu2)}
+input,select,textarea{font:15px var(--font);color:var(--chu);padding:9px 11px;border-radius:11px;border:1.5px solid #c7d2fe;background:#fff;min-height:42px;width:100%}
+textarea{min-height:80px;resize:vertical}
+input:focus,select:focus,textarea:focus{outline:3px solid rgba(79,70,229,.25);border-color:var(--chinh)}
+table.bang{width:100%;border-collapse:separate;border-spacing:0;font-size:14.5px}
+table.bang th{background:linear-gradient(135deg,#eef2ff,#f5f3ff);color:var(--chinh);text-align:left;padding:9px 8px;font-size:13.5px;position:sticky;top:0}
+table.bang td{padding:7px 8px;border-top:1px solid #e2e8f0;vertical-align:middle}
+table.bang tr:hover td{background:rgba(238,242,255,.6)}
+table.bang input,table.bang select{min-height:36px;padding:6px 8px}
+.cuon{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.kpi{border-radius:16px;padding:14px 16px;color:#fff;box-shadow:var(--bong);position:relative;overflow:hidden}
+.kpi b{display:block;font-size:30px;line-height:1.1}
+.kpi span{font-size:13.5px;opacity:.92}
+.kpi::after{content:"";position:absolute;right:-20px;top:-20px;width:90px;height:90px;border-radius:50%;background:rgba(255,255,255,.15)}
+.k1{background:linear-gradient(135deg,#6366f1,#8b5cf6)} .k2{background:linear-gradient(135deg,#14b8a6,#0ea5e9)}
+.k3{background:linear-gradient(135deg,#f59e0b,#f97316)} .k4{background:linear-gradient(135deg,#22c55e,#16a34a)}
+.k5{background:linear-gradient(135deg,#ef4444,#e11d48)}
+.nhan{display:inline-block;padding:2px 9px;border-radius:999px;font-size:12.5px;font-weight:700}
+.n-dung{background:#dcfce7;color:#166534}.n-sai{background:#fee2e2;color:#991b1b}.n-canh{background:#fef3c7;color:#92400e}.n-tt{background:#e0e7ff;color:#3730a3}
+.nhapnhay{animation:nn .6s}
+@keyframes nn{0%{box-shadow:0 0 0 0 rgba(22,163,74,.6)}100%{box-shadow:0 0 0 14px rgba(22,163,74,0)}}
+.rung{animation:rung .35s}
+@keyframes rung{20%{transform:translateX(-5px)}40%{transform:translateX(5px)}60%{transform:translateX(-3px)}80%{transform:translateX(3px)}}
+.noi{animation:noi 4s ease-in-out infinite}
+@keyframes noi{50%{transform:translateY(-6px)}}
+.hien{animation:hien .3s ease}
+@keyframes hien{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+#tts-toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:99;display:flex;flex-direction:column;gap:8px;align-items:center;pointer-events:none}
+#tts-toast div{background:#1e1b4b;color:#fff;padding:10px 16px;border-radius:12px;box-shadow:var(--bong);font-size:14.5px;animation:hien .25s}
+#tts-toast div.ok{background:linear-gradient(135deg,#15803d,#0d9488)}
+#tts-toast div.loi{background:linear-gradient(135deg,#b91c1c,#be123c)}
+canvas.phao{position:fixed;inset:0;pointer-events:none;z-index:98}
+footer.cuoi{margin-top:26px;text-align:center;color:var(--chu2);font-size:13.5px}
+footer.cuoi .nhap{display:inline-block;background:#fef9c3;color:#713f12;border:1px dashed #ca8a04;padding:6px 12px;border-radius:10px;font-weight:600;margin-bottom:6px}
+.mau-ribbon{position:fixed;top:12px;right:-44px;transform:rotate(35deg);background:#f59e0b;color:#fff;font-weight:800;padding:6px 52px;z-index:97;box-shadow:var(--bong);font-size:13px;letter-spacing:.5px}
+.goiy{display:flex;gap:12px;align-items:flex-start;background:linear-gradient(135deg,#eef2ff,#ecfeff);border-radius:14px;padding:12px 14px;font-size:14.5px;color:var(--chu2)}
+.goiy svg{flex:none}
+.hang{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end}
+.hang>*{flex:1 1 150px}
+.hang>.nut{flex:0 0 auto}
+.an{display:none!important}
+@media (max-width:640px){header.dau .phai{margin-left:0;width:100%} .the{padding:14px} .kpi b{font-size:24px}}
+@media print{body{background:#fff} .khongin,header.dau .phai,footer.cuoi .nut{display:none!important} .the{box-shadow:none;border:0}}
+
+</style>
+<style>
+.buoc{display:flex;gap:10px;align-items:center;margin:16px 0 8px}
+.buoc .so{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:800;flex:none;background:linear-gradient(135deg,var(--chinh),var(--chinh2))}
+.buoc.xong .so{background:linear-gradient(135deg,#22c55e,#0d9488)}
+.buoc b{font-size:16px}
+.ykien{display:grid;grid-template-columns:150px 1fr 38px;gap:6px;margin-bottom:6px}
+.pcong{display:grid;grid-template-columns:1.6fr 1fr 130px 38px;gap:6px;margin-bottom:6px}
+.vang{display:grid;grid-template-columns:1fr 1fr 38px;gap:6px;margin-bottom:6px}
+.ykien button,.pcong button,.vang button{border:0;background:#fee2e2;border-radius:10px;cursor:pointer}
+.a4{background:#fff;color:#000;font-family:"Times New Roman",serif;font-size:14px;line-height:1.45;padding:28px 30px;border-radius:6px;box-shadow:0 12px 30px -12px rgba(0,0,0,.35);max-height:900px;overflow:auto;border:1px solid #e5e7eb}
+.a4 h4{text-align:center;margin:10px 0 2px;font-size:15px}
+.a4 table.dau{width:100%;font-size:13px;text-align:center}
+.a4 p{margin:4px 0;text-align:justify}
+.dsbb{display:flex;gap:8px;flex-wrap:wrap}
+.dsbb button{border:1.5px solid #c7d2fe;background:#fff;border-radius:12px;padding:6px 12px;cursor:pointer;font:600 13.5px var(--font);color:#3730a3}
+.dsbb button.chon{background:linear-gradient(135deg,var(--chinh),var(--chinh2));color:#fff;border-color:transparent}
+@media (max-width:640px){.ykien{grid-template-columns:1fr 38px}.ykien input:first-child{grid-column:1/3}.pcong{grid-template-columns:1fr 1fr}.vang{grid-template-columns:1fr 1fr 38px}}
+</style>
+</head>
+<body>
+<div class="khung">
+<header class="dau">
+  <svg class="logo noi" viewBox="0 0 64 64"><defs><linearGradient id="lb" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#14b8a6"/><stop offset="1" stop-color="#6366f1"/></linearGradient></defs>
+    <rect x="10" y="4" width="44" height="56" rx="8" fill="url(#lb)"/><rect x="18" y="16" width="28" height="4" rx="2" fill="#fff"/><rect x="18" y="26" width="28" height="4" rx="2" fill="#fff" opacity=".8"/><rect x="18" y="36" width="18" height="4" rx="2" fill="#fff" opacity=".7"/>
+    <path d="M40 54l14-14 5 5-14 14h-5z" fill="#f59e0b"/></svg>
+  <div><h1>BIÊN BẢN HỌP TỔ</h1><p>Điền theo khung sổ ghi chép của tổ · xem trước khổ A4 · xuất Word</p></div>
+  <div class="phai">
+    <button class="nut xanh" id="bWord">📝 Xuất Word</button>
+    <button class="nut phu" id="bLuu">💾 Sao lưu</button>
+    <button class="nut phu" id="bNhap">📂 Nhập lại</button>
+  </div>
+</header>
+
+<div class="the" style="margin-bottom:16px">
+  <h2>🗂️ Các lần họp đã ghi <button class="nut nho" id="bMoi" style="margin-left:auto">➕ Biên bản mới</button></h2>
+  <div class="dsbb" id="dsBb"></div>
+</div>
+
+<div class="luoi l2">
+<div class="the">
+  <div class="luoi" style="grid-template-columns:auto 1fr;align-items:center;gap:14px">
+    <div id="vanhDu"></div>
+    <div><b style="font-size:17px">Độ đầy đủ của biên bản</b><div id="thieuGi" style="font-size:14px;color:var(--chu2)"></div></div>
+  </div>
+
+  <div class="buoc" data-b="1"><span class="so">1</span><b>Thông tin buổi họp</b></div>
+  <div class="hang">
+    <label class="o">Trường<input data-f="truong" placeholder="TRƯỜNG THCS …"></label>
+    <label class="o">Tổ<input data-f="to" placeholder="Tổ Công nghệ – Hướng nghiệp"></label>
+  </div>
+  <div class="hang" style="margin-top:8px">
+    <label class="o">Lần / tháng<input data-f="lan" placeholder="Lần 2 – tháng 11/2026"></label>
+    <label class="o">Ngày họp<input data-f="ngay" type="date"></label>
+    <label class="o" style="flex:0 1 110px">Bắt đầu<input data-f="gioBd" type="time"></label>
+    <label class="o" style="flex:0 1 110px">Kết thúc<input data-f="gioKt" type="time"></label>
+  </div>
+  <div class="hang" style="margin-top:8px">
+    <label class="o">Địa điểm<input data-f="diaDiem" placeholder="Phòng họp tổ"></label>
+    <label class="o">Hình thức<select data-f="hinhThuc"><option>Trực tiếp</option><option>Trực tuyến</option><option>Kết hợp trực tiếp – trực tuyến</option></select></label>
+  </div>
+  <div class="hang" style="margin-top:8px">
+    <label class="o">Chủ trì<input data-f="chuTri" placeholder="Tổ trưởng …"></label>
+    <label class="o">Thư ký<input data-f="thuKy" placeholder="…"></label>
+    <label class="o" style="flex:0 1 110px">Tổng số<input data-f="tong" type="number" min="1"></label>
+    <label class="o" style="flex:0 1 110px">Có mặt<input data-f="coMat" type="number" min="0"></label>
+  </div>
+  <h3>Vắng (tên, lý do)</h3><div id="dsVang"></div><button class="nut phu nho" data-them="vang">➕ Thêm người vắng</button>
+
+  <div class="buoc" data-b="2"><span class="so">2</span><b>Điểm lại việc lần trước</b></div>
+  <textarea data-f="lanTruoc" placeholder="Đã vận dụng gì vào lớp sau lần họp trước, kết quả ra sao…"></textarea>
+
+  <div class="buoc" data-b="3"><span class="so">3</span><b>Nội dung chuyên môn chính</b></div>
+  <input data-f="noiDung" placeholder="VD: Phân tích kết quả kiểm tra giữa kỳ I môn Công nghệ 8">
+  <textarea data-f="trinhBay" style="margin-top:6px" placeholder="Người trình bày, tóm tắt nội dung…"></textarea>
+  <h3>Ý kiến (ghi đúng lời người nói)</h3><div id="dsYk"></div><button class="nut phu nho" data-them="yk">➕ Thêm ý kiến</button>
+
+  <div class="buoc" data-b="4"><span class="so">4</span><b>Phần nhóm (tổ ghép, nếu có)</b></div>
+  <textarea data-f="nhom" placeholder="Nhóm Công nghệ: … · Nhóm GDCD: …"></textarea>
+
+  <div class="buoc" data-b="5"><span class="so">5</span><b>Kết luận, phân công</b></div>
+  <textarea data-f="ketLuan" placeholder="Kết luận của tổ trưởng chủ trì…"></textarea>
+  <h3>Phân công</h3><div id="dsPc"></div><button class="nut phu nho" data-them="pc">➕ Thêm việc</button>
+  <h3>Việc khác (hành chính, gọn)</h3><textarea data-f="viecKhac" placeholder="Triển khai công văn… (ngắn)"></textarea>
+  <div class="hang" style="margin-top:14px"><button class="nut do nho" id="bXoa">🗑️ Xoá biên bản này</button></div>
+</div>
+
+<div>
+  <div class="the" style="position:sticky;top:12px">
+    <h2>👁️ Xem trước <button class="nut phu nho" id="bIn" style="margin-left:auto">🖨️ In</button></h2>
+    <div class="a4" id="a4"></div>
+  </div>
+</div>
+</div>
+<footer class="cuoi">
+  <div class="nhap">✅ BẢN NHÁP — thầy/cô duyệt trước khi dùng</div>
+  <div>Dữ liệu chỉ nằm trong trình duyệt máy này, không gửi đi đâu. Cuối tuần bấm <b>Sao lưu</b> để giữ một bản trên máy.</div>
+  <div style="margin-top:8px"><a class="nut phu nho" href="index.html">⬅ Về trang chủ Tổ trưởng số</a></div>
+</footer>
+</div>
+<script>
+/* Bộ chung «Tổ trưởng số» — không gọi mạng, dữ liệu chỉ nằm trong trình duyệt máy này. */
+const TT = (() => {
+  const TIEN_TO = "tts_";
+  const MAU = /(^|[#&])mau\b/.test(location.hash);
+  function load(k, def) {
+    if (MAU) return def;
+    try { const v = localStorage.getItem(TIEN_TO + k); return v ? JSON.parse(v) : def; } catch (e) { return def; }
+  }
+  function save(k, v) {
+    if (MAU) return false;
+    try { localStorage.setItem(TIEN_TO + k, JSON.stringify(v)); return true; } catch (e) { return false; }
+  }
+  function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])); }
+  function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
+  function toast(msg, loai) {
+    let h = document.getElementById("tts-toast");
+    if (!h) { h = document.createElement("div"); h.id = "tts-toast"; document.body.appendChild(h); }
+    const d = document.createElement("div"); d.className = loai || ""; d.textContent = msg; h.appendChild(d);
+    setTimeout(() => d.remove(), 2600);
+  }
+  let ac = null;
+  function am(tan, dai, kieu, to) {
+    try {
+      ac = ac || new (window.AudioContext || window.webkitAudioContext)();
+      const o = ac.createOscillator(), g = ac.createGain();
+      o.type = kieu || "sine"; o.frequency.value = tan; g.gain.value = to || 0.08;
+      o.connect(g); g.connect(ac.destination); const t = ac.currentTime;
+      g.gain.setValueAtTime(to || 0.08, t); g.gain.exponentialRampToValueAtTime(0.0001, t + dai);
+      o.start(t); o.stop(t + dai);
+    } catch (e) {}
+  }
+  function ting() { am(880, .18); setTimeout(() => am(1320, .25), 90); }
+  function buzz() { am(180, .25, "sawtooth", .05); }
+  function phaoGiay(x, y) {
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const c = document.createElement("canvas"); c.className = "phao"; c.width = innerWidth; c.height = innerHeight; document.body.appendChild(c);
+    const g = c.getContext("2d"), mau = ["#6366f1", "#14b8a6", "#f59e0b", "#ec4899", "#22c55e", "#8b5cf6"];
+    x = x == null ? innerWidth / 2 : x; y = y == null ? innerHeight / 3 : y;
+    const ht = Array.from({ length: 90 }, () => ({ x, y, vx: (Math.random() - .5) * 11, vy: -Math.random() * 10 - 3, r: Math.random() * 6 + 3, m: mau[Math.random() * 6 | 0], q: Math.random() * 6 }));
+    let n = 0;
+    (function ve() {
+      g.clearRect(0, 0, c.width, c.height);
+      ht.forEach(p => { p.x += p.vx; p.y += p.vy; p.vy += .35; p.q += .2; g.save(); g.translate(p.x, p.y); g.rotate(p.q); g.fillStyle = p.m; g.fillRect(-p.r / 2, -p.r / 4, p.r, p.r / 2); g.restore(); });
+      if (++n < 90) requestAnimationFrame(ve); else c.remove();
+    })();
+  }
+  function taiVe(ten, noiDung, kieu) {
+    const b = new Blob([noiDung], { type: kieu || "text/plain;charset=utf-8" });
+    const a = document.createElement("a"); a.href = URL.createObjectURL(b); a.download = ten;
+    document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500);
+  }
+  function homNay() { const d = new Date(); return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); }
+  function saoLuu(khoa, tenFile) {
+    const goi = { ung_dung: "to-truong-so", ngay: homNay(), du_lieu: {} };
+    khoa.forEach(k => goi.du_lieu[k] = load(k, null));
+    taiVe((tenFile || "sao-luu") + "-" + homNay() + ".json", JSON.stringify(goi, null, 2), "application/json");
+    toast("Đã tải file sao lưu về máy", "ok");
+  }
+  function nhapLai(khoa, xong) {
+    const i = document.createElement("input"); i.type = "file"; i.accept = ".json,application/json";
+    i.onchange = () => {
+      const f = i.files[0]; if (!f) return;
+      const r = new FileReader();
+      r.onload = () => {
+        try {
+          const goi = JSON.parse(r.result);
+          if (!goi || goi.ung_dung !== "to-truong-so") throw 0;
+          let n = 0; Object.keys(goi.du_lieu || {}).forEach(k => { if ((!khoa || khoa.includes(k)) && goi.du_lieu[k] != null) { save(k, goi.du_lieu[k]); n++; } });
+          toast("Đã nhập lại " + n + " phần dữ liệu", "ok"); ting(); xong && xong();
+        } catch (e) { toast("File này không phải file sao lưu của Tổ trưởng số", "loi"); buzz(); }
+      };
+      r.readAsText(f);
+    };
+    i.click();
+  }
+  function csv(hang) { return "﻿" + hang.map(r => r.map(o => { o = String(o == null ? "" : o); return /[",\n;]/.test(o) ? '"' + o.replace(/"/g, '""') + '"' : o; }).join(",")).join("\r\n"); }
+  function docCSV(text) {
+    const dong = text.replace(/\r/g, "").split("\n").filter(d => d.trim());
+    if (!dong.length) return [];
+    const tach = dong[0].includes("\t") ? "\t" : (dong[0].split(";").length > dong[0].split(",").length ? ";" : ",");
+    return dong.map(d => {
+      const out = []; let o = "", q = false;
+      for (let i = 0; i < d.length; i++) {
+        const c = d[i];
+        if (q) { if (c === '"' && d[i + 1] === '"') { o += '"'; i++; } else if (c === '"') q = false; else o += c; }
+        else if (c === '"') q = true; else if (c === tach) { out.push(o.trim()); o = ""; } else o += c;
+      }
+      out.push(o.trim()); return out;
+    });
+  }
+  /* Biểu đồ cột (canvas, không thư viện). nhom: [{ten, mau, gt:[...]}] */
+  function bieuDoCot(cv, nhan, nhom, tuyChon) {
+    tuyChon = tuyChon || {};
+    const dpr = window.devicePixelRatio || 1, W = cv.clientWidth || 600, H = cv.clientHeight || 260;
+    cv.width = W * dpr; cv.height = H * dpr; const g = cv.getContext("2d"); g.scale(dpr, dpr); g.clearRect(0, 0, W, H);
+    const tren = 18, duoi = 34, trai = 34, phai = 8, cao = H - tren - duoi, rong = W - trai - phai;
+    let max = tuyChon.max || Math.max(1, ...nhom.flatMap(n => n.gt));
+    const buoc = max <= 5 ? 1 : max <= 12 ? 2 : Math.ceil(max / 5);
+    max = Math.ceil(max / buoc) * buoc;
+    g.font = "12px Segoe UI, Arial"; g.fillStyle = "#64748b"; g.strokeStyle = "#e2e8f0"; g.textAlign = "right";
+    for (let v = 0; v <= max; v += buoc) { const y = tren + cao - v / max * cao; g.beginPath(); g.moveTo(trai, y); g.lineTo(W - phai, y); g.stroke(); g.fillText(v + (tuyChon.donVi || ""), trai - 5, y + 4); }
+    const o = rong / nhan.length, cot = Math.min(46, (o * .74) / nhom.length);
+    nhan.forEach((t, i) => {
+      nhom.forEach((n, j) => {
+        const v = n.gt[i] || 0, h = v / max * cao, x = trai + i * o + (o - cot * nhom.length) / 2 + j * cot, y = tren + cao - h;
+        const gr = g.createLinearGradient(0, y, 0, y + h); gr.addColorStop(0, n.mau); gr.addColorStop(1, n.mau2 || n.mau + "99");
+        g.fillStyle = gr; const r = Math.min(6, cot / 2, h);
+        g.beginPath(); g.moveTo(x, y + h); g.lineTo(x, y + r); g.quadraticCurveTo(x, y, x + r, y); g.lineTo(x + cot - 2 - r, y); g.quadraticCurveTo(x + cot - 2, y, x + cot - 2, y + r); g.lineTo(x + cot - 2, y + h); g.fill();
+        if (v && tuyChon.soTren !== false) { g.fillStyle = "#1e1b4b"; g.textAlign = "center"; g.font = "bold 12px Segoe UI, Arial"; g.fillText(tuyChon.dinhDang ? tuyChon.dinhDang(v) : v, x + cot / 2 - 1, y - 4); g.font = "12px Segoe UI, Arial"; }
+      });
+      g.fillStyle = "#475569"; g.textAlign = "center"; g.fillText(t, trai + i * o + o / 2, H - duoi + 18);
+    });
+  }
+  /* Vành tròn SVG: phan [{gt, mau}] */
+  function vanh(phan, kich, day, giua) {
+    kich = kich || 140; day = day || 18; const r = (kich - day) / 2, cv = 2 * Math.PI * r, tong = phan.reduce((a, p) => a + p.gt, 0) || 1;
+    let bd = 0, s = `<svg viewBox="0 0 ${kich} ${kich}" width="${kich}" height="${kich}" role="img"><circle cx="${kich / 2}" cy="${kich / 2}" r="${r}" fill="none" stroke="#e2e8f0" stroke-width="${day}"/>`;
+    phan.forEach(p => { const l = p.gt / tong * cv; if (l > 0) s += `<circle cx="${kich / 2}" cy="${kich / 2}" r="${r}" fill="none" stroke="${p.mau}" stroke-width="${day}" stroke-dasharray="${l} ${cv - l}" stroke-dashoffset="${-bd}" transform="rotate(-90 ${kich / 2} ${kich / 2})" stroke-linecap="butt"/>`; bd += l; });
+    if (giua) s += `<text x="50%" y="50%" text-anchor="middle" dominant-baseline="central" font-size="${kich / 5.2}" font-weight="800" fill="#1e1b4b">${giua}</text>`;
+    return s + "</svg>";
+  }
+  function moDau() {
+    if (MAU) { const r = document.createElement("div"); r.className = "mau-ribbon"; r.textContent = "DỮ LIỆU THỬ"; document.body.appendChild(r); }
+  }
+  document.addEventListener("DOMContentLoaded", moDau);
+  return { MAU, load, save, esc, uid, toast, ting, buzz, phaoGiay, taiVe, homNay, saoLuu, nhapLai, csv, docCSV, bieuDoCot, vanh };
+})();
+
+</script>
+<script>
+function bbMoi(cu) {
+  return { id: TT.uid(), truong: cu ? cu.truong : "", to: cu ? cu.to : "", lan: "", ngay: TT.homNay(), gioBd: "14:00", gioKt: "", diaDiem: cu ? cu.diaDiem : "", hinhThuc: "Trực tiếp",
+    chuTri: cu ? cu.chuTri : "", thuKy: cu ? cu.thuKy : "", tong: cu ? cu.tong : "", coMat: cu ? cu.tong : "", vang: [], lanTruoc: "", noiDung: "", trinhBay: "", yk: [], nhom: "", ketLuan: "", pc: [], viecKhac: "" };
+}
+let S = TT.load("bienban", null) || { ds: [], dang: null };
+if (TT.MAU) { const b = bbMoi(); Object.assign(b, { truong: "TRƯỜNG THCS (DỮ LIỆU THỬ)", to: "Tổ Công nghệ – Hướng nghiệp", lan: "Lần 2 – tháng 11/2026", ngay: "2026-11-14", gioBd: "14:00", gioKt: "15:30", diaDiem: "Phòng họp tổ", chuTri: "Tổ trưởng GV01", thuKy: "GV06", tong: 12, coMat: 11,
+  vang: [{ ten: "GV09", ly: "Đi tập huấn" }], lanTruoc: "Các lớp 8 đã áp dụng phiếu quan sát nhóm khi thực hành lắp mạch; HS ghi nhật ký thực hành đầy đủ hơn.", noiDung: "Phân tích kết quả kiểm tra giữa học kỳ I môn Công nghệ 8",
+  trinhBay: "GV02 trình bày phổ điểm 4 lớp và 3 câu học sinh sai nhiều (câu 5, 9, 14).", yk: [{ ai: "GV03", noi: "Câu 9 hỏi ký hiệu bản vẽ, nhiều em nhầm vì chưa thực hành đủ trên bản vẽ thật." }, { ai: "GV05", noi: "Đề xuất thêm 10 phút luyện đọc bản vẽ ở đầu tiết trong 2 tuần tới." }],
+  ketLuan: "Tổ thống nhất ôn lại phần đọc bản vẽ lắp trong 2 tuần; nhóm khối 8 soạn chung phiếu luyện tập.", pc: [{ viec: "Soạn phiếu luyện đọc bản vẽ", ai: "GV02, GV05", han: "2026-11-21" }, { viec: "Tổng hợp kết quả sau 2 tuần", ai: "GV02", han: "2026-11-28" }], viecKhac: "Nhắc nộp KHBD tuần 12 lên thư mục tổ." });
+  S = { ds: [b], dang: b.id }; }
+if (!S.ds.length) { const b = bbMoi(); S.ds.push(b); S.dang = b.id; }
+let B = S.ds.find(b => b.id === S.dang) || S.ds[0];
+function luu() { TT.save("bienban", S); }
+function dNgay(s) { if (!s) return "…"; const [y, m, d] = s.split("-"); return `${d}/${m}/${y}`; }
+const MUC = [
+  ["Trường, tổ", b => b.truong && b.to], ["Ngày, giờ bắt đầu", b => b.ngay && b.gioBd], ["Chủ trì, thư ký", b => b.chuTri && b.thuKy], ["Sĩ số", b => b.tong !== "" && b.coMat !== ""],
+  ["Điểm lại lần trước", b => b.lanTruoc.trim()], ["Nội dung chuyên môn chính", b => b.noiDung.trim()], ["Ít nhất 1 ý kiến", b => b.yk.some(y => y.noi.trim())],
+  ["Kết luận", b => b.ketLuan.trim()], ["Phân công có người, có hạn", b => b.pc.length && b.pc.every(p => p.ai && p.han)], ["Giờ kết thúc", b => b.gioKt]
+];
+function veDu() {
+  const dat = MUC.filter(([, f]) => f(B)), pt = Math.round(dat.length / MUC.length * 100);
+  vanhDu.innerHTML = TT.vanh([{ gt: dat.length, mau: pt === 100 ? "#16a34a" : "#6366f1" }, { gt: MUC.length - dat.length, mau: "#e2e8f0" }], 96, 14, pt + "%");
+  const thieu = MUC.filter(([, f]) => !f(B)).map(([t]) => t);
+  thieuGi.innerHTML = thieu.length ? "Còn thiếu: " + thieu.map(t => `<span class="nhan n-canh">${t}</span>`).join(" ") : '<span class="nhan n-dung">✓ Đủ các mục — sẵn sàng xuất</span>';
+  const buoc = { 1: [0, 1, 2, 3], 2: [4], 3: [5, 6], 4: [], 5: [7, 8] };
+  document.querySelectorAll(".buoc").forEach(b => { const ds = buoc[b.dataset.b]; b.classList.toggle("xong", ds.length ? ds.every(i => MUC[i][1](B)) : !!B.nhom.trim()); });
+}
+function noiDungBB(choWord) {
+  const e = TT.esc, br = s => e(s || "…").replace(/\n/g, "<br>");
+  const vang = B.vang.filter(v => v.ten).map(v => `${e(v.ten)} (${e(v.ly || "không rõ lý do")})`).join("; ");
+  const pc = B.pc.filter(p => p.viec).map(p => `<tr><td style="border:1px solid #000;padding:3px 6px">${e(p.viec)}</td><td style="border:1px solid #000;padding:3px 6px">${e(p.ai)}</td><td style="border:1px solid #000;padding:3px 6px;text-align:center">${dNgay(p.han)}</td></tr>`).join("");
+  const nn = B.ngay ? B.ngay.split("-") : ["…", "…", "…"];
+  return `<table class="dau" style="width:100%;border-collapse:collapse;font-size:13pt"><tr><td style="text-align:center;vertical-align:top;width:45%">${e((B.truong || "TRƯỜNG …").toUpperCase())}<br><b>${e((B.to || "TỔ …").toUpperCase())}</b></td>
+    <td style="text-align:center;vertical-align:top"><b>CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</b><br><b><u>Độc lập - Tự do - Hạnh phúc</u></b><br><i>…, ngày ${nn[2]} tháng ${nn[1]} năm ${nn[0]}</i></td></tr></table>
+  <h4 style="text-align:center;margin-top:14pt">BIÊN BẢN SINH HOẠT TỔ CHUYÊN MÔN</h4><p style="text-align:center;margin-top:0">${e(B.lan || "")}</p>
+  <p>Thời gian: ${e(B.gioBd || "…")}, ngày ${dNgay(B.ngay)}. Địa điểm: ${e(B.diaDiem || "…")} (${e(B.hinhThuc)}).</p>
+  <p>Chủ trì: ${e(B.chuTri || "…")}. Thư ký: ${e(B.thuKy || "…")}.</p>
+  <p>Thành phần: có mặt ${B.coMat === "" ? "…" : e(B.coMat)}/${B.tong === "" ? "…" : e(B.tong)} thành viên${vang ? "; vắng: " + vang : ""}.</p>
+  <p><b>1. Điểm lại việc lần trước</b><br>${br(B.lanTruoc)}</p>
+  <p><b>2. Nội dung chuyên môn chính: ${e(B.noiDung || "…")}</b><br>${br(B.trinhBay)}</p>
+  ${B.yk.filter(y => y.noi).length ? "<p><i>Ý kiến:</i><br>" + B.yk.filter(y => y.noi).map(y => `+ Đ/c ${e(y.ai || "…")}: ${e(y.noi)}`).join("<br>") + "</p>" : ""}
+  ${B.nhom.trim() ? `<p><b>3. Phần nhóm chuyên môn</b><br>${br(B.nhom)}</p>` : ""}
+  <p><b>${B.nhom.trim() ? 4 : 3}. Kết luận của chủ trì</b><br>${br(B.ketLuan)}</p>
+  ${pc ? `<table style="border-collapse:collapse;width:100%;font-size:13pt;margin:4pt 0"><tr><th style="border:1px solid #000;padding:3px 6px">Việc</th><th style="border:1px solid #000;padding:3px 6px">Người thực hiện</th><th style="border:1px solid #000;padding:3px 6px">Hạn</th></tr>${pc}</table>` : ""}
+  ${B.viecKhac.trim() ? `<p><b>${B.nhom.trim() ? 5 : 4}. Việc khác</b><br>${br(B.viecKhac)}</p>` : ""}
+  <p>Buổi sinh hoạt kết thúc lúc ${e(B.gioKt || "…")} cùng ngày.</p>
+  <table style="width:100%;margin-top:12pt;font-size:13pt"><tr><td style="text-align:center;width:50%"><b>THƯ KÝ</b><br><br><br><br>${e(B.thuKy || "")}</td><td style="text-align:center"><b>CHỦ TRÌ</b><br><br><br><br>${e(B.chuTri || "")}</td></tr></table>
+  <p style="font-size:10pt;color:#666;margin-top:10pt"><i>Bản nháp — tổ thống nhất, chủ trì duyệt trước khi ghi vào sổ ghi chép hoạt động của tổ.</i></p>`;
+}
+function veA4() { a4.innerHTML = noiDungBB(); }
+function veDs() {
+  dsBb.innerHTML = S.ds.map(b => `<button data-id="${b.id}" class="${b.id === B.id ? "chon" : ""}">${TT.esc(b.lan || "(chưa đặt tên)")} · ${dNgay(b.ngay)}</button>`).join("");
+  dsBb.querySelectorAll("button").forEach(x => x.onclick = () => { B = S.ds.find(b => b.id === x.dataset.id); S.dang = B.id; luu(); dien(); });
+}
+const DS = { vang: ["dsVang", "vang", [["ten", "Tên / mã"], ["ly", "Lý do"]], () => ({ ten: "", ly: "" })],
+  yk: ["dsYk", "ykien", [["ai", "Đ/c …"], ["noi", "Nội dung ý kiến"]], () => ({ ai: "", noi: "" })],
+  pc: ["dsPc", "pcong", [["viec", "Việc"], ["ai", "Người làm"], ["han", "", "date"]], () => ({ viec: "", ai: "", han: "" })] };
+function veDong(k) {
+  const [hop, lop, cot] = DS[k], el = document.getElementById(hop);
+  el.innerHTML = B[k].map((r, i) => `<div class="${lop}" data-i="${i}">${cot.map(([f, ph, kieu]) => `<input data-c="${f}" ${kieu ? `type="${kieu}"` : ""} placeholder="${ph}" value="${TT.esc(r[f])}">`).join("")}<button title="Xoá">✕</button></div>`).join("");
+  el.querySelectorAll("[data-i]").forEach(d => {
+    const i = +d.dataset.i;
+    d.querySelectorAll("input").forEach(inp => inp.oninput = () => { B[k][i][inp.dataset.c] = inp.value; luu(); veA4(); veDu(); });
+    d.querySelector("button").onclick = () => { B[k].splice(i, 1); luu(); veDong(k); veA4(); veDu(); };
+  });
+}
+function dien() {
+  document.querySelectorAll("[data-f]").forEach(el => { el.value = B[el.dataset.f] ?? ""; });
+  Object.keys(DS).forEach(veDong); veDs(); veA4(); veDu();
+}
+document.querySelectorAll("[data-f]").forEach(el => el.addEventListener("input", () => {
+  B[el.dataset.f] = el.type === "number" ? (el.value === "" ? "" : +el.value) : el.value;
+  if (el.dataset.f === "coMat" || el.dataset.f === "tong") { if (+B.coMat > +B.tong && B.tong !== "") { el.classList.add("rung"); setTimeout(() => el.classList.remove("rung"), 400); TT.toast("Số có mặt lớn hơn tổng số thành viên", "loi"); } }
+  luu(); veA4(); veDu(); if (el.dataset.f === "lan" || el.dataset.f === "ngay") veDs();
+}));
+document.querySelectorAll("[data-them]").forEach(b => b.onclick = () => { const k = b.dataset.them; B[k].push(DS[k][3]()); luu(); veDong(k); veDu(); const o = document.getElementById(DS[k][0]).lastElementChild; o && o.querySelector("input").focus(); });
+bMoi.onclick = () => { const b = bbMoi(B); S.ds.unshift(b); B = b; S.dang = b.id; luu(); dien(); TT.ting(); TT.toast("Đã tạo biên bản mới (giữ trường, tổ, chủ trì, thư ký)", "ok"); };
+bXoa.onclick = () => { if (!confirm("Xoá biên bản «" + (B.lan || "chưa đặt tên") + "»?")) return; S.ds = S.ds.filter(b => b !== B); if (!S.ds.length) S.ds.push(bbMoi()); B = S.ds[0]; S.dang = B.id; luu(); dien(); };
+bWord.onclick = () => {
+  const html = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word"><head><meta charset="utf-8"><title>Biên bản</title>
+  <style>@page{size:21cm 29.7cm;margin:2cm 2cm 2cm 3cm}body{font-family:"Times New Roman";font-size:14pt;line-height:1.3}p{margin:3pt 0;text-align:justify}h4{font-size:14pt;margin:0}</style></head><body>${noiDungBB(true)}</body></html>`;
+  TT.taiVe("Bien-ban-hop-to-" + (B.ngay || TT.homNay()) + ".doc", "﻿" + html, "application/msword");
+  TT.ting(); const pt = MUC.filter(([, f]) => f(B)).length; if (pt === MUC.length) TT.phaoGiay(); TT.toast("Đã xuất file Word (.doc)", "ok");
+};
+bIn.onclick = () => { const w = window.open("", "_blank"); if (!w) { TT.toast("Trình duyệt chặn cửa sổ mới", "loi"); return; } w.document.write(`<html><head><meta charset="utf-8"><title>Biên bản</title><style>body{font-family:'Times New Roman';font-size:14pt;margin:2cm 2cm 2cm 3cm}p{margin:3pt 0;text-align:justify}</style></head><body>${noiDungBB(true)}</body></html>`); w.document.close(); w.focus(); w.print(); };
+bLuu.onclick = () => TT.saoLuu(["bienban"], "bien-ban-to");
+bNhap.onclick = () => TT.nhapLai(["bienban"], () => { S = TT.load("bienban", S); B = S.ds.find(b => b.id === S.dang) || S.ds[0]; dien(); });
+dien();
+</script>
+</body>
+</html>

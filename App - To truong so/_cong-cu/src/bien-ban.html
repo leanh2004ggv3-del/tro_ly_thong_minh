@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Biên bản họp tổ — Tổ trưởng số</title>
+<!--CSS-->
+<style>
+.buoc{display:flex;gap:10px;align-items:center;margin:16px 0 8px}
+.buoc .so{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:800;flex:none;background:linear-gradient(135deg,var(--chinh),var(--chinh2))}
+.buoc.xong .so{background:linear-gradient(135deg,#22c55e,#0d9488)}
+.buoc b{font-size:16px}
+.ykien{display:grid;grid-template-columns:150px 1fr 38px;gap:6px;margin-bottom:6px}
+.pcong{display:grid;grid-template-columns:1.6fr 1fr 130px 38px;gap:6px;margin-bottom:6px}
+.vang{display:grid;grid-template-columns:1fr 1fr 38px;gap:6px;margin-bottom:6px}
+.ykien button,.pcong button,.vang button{border:0;background:#fee2e2;border-radius:10px;cursor:pointer}
+.a4{background:#fff;color:#000;font-family:"Times New Roman",serif;font-size:14px;line-height:1.45;padding:28px 30px;border-radius:6px;box-shadow:0 12px 30px -12px rgba(0,0,0,.35);max-height:900px;overflow:auto;border:1px solid #e5e7eb}
+.a4 h4{text-align:center;margin:10px 0 2px;font-size:15px}
+.a4 table.dau{width:100%;font-size:13px;text-align:center}
+.a4 p{margin:4px 0;text-align:justify}
+.dsbb{display:flex;gap:8px;flex-wrap:wrap}
+.dsbb button{border:1.5px solid #c7d2fe;background:#fff;border-radius:12px;padding:6px 12px;cursor:pointer;font:600 13.5px var(--font);color:#3730a3}
+.dsbb button.chon{background:linear-gradient(135deg,var(--chinh),var(--chinh2));color:#fff;border-color:transparent}
+@media (max-width:640px){.ykien{grid-template-columns:1fr 38px}.ykien input:first-child{grid-column:1/3}.pcong{grid-template-columns:1fr 1fr}.vang{grid-template-columns:1fr 1fr 38px}}
+</style>
+</head>
+<body>
+<div class="khung">
+<header class="dau">
+  <svg class="logo noi" viewBox="0 0 64 64"><defs><linearGradient id="lb" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#14b8a6"/><stop offset="1" stop-color="#6366f1"/></linearGradient></defs>
+    <rect x="10" y="4" width="44" height="56" rx="8" fill="url(#lb)"/><rect x="18" y="16" width="28" height="4" rx="2" fill="#fff"/><rect x="18" y="26" width="28" height="4" rx="2" fill="#fff" opacity=".8"/><rect x="18" y="36" width="18" height="4" rx="2" fill="#fff" opacity=".7"/>
+    <path d="M40 54l14-14 5 5-14 14h-5z" fill="#f59e0b"/></svg>
+  <div><h1>BIÊN BẢN HỌP TỔ</h1><p>Điền theo khung sổ ghi chép của tổ · xem trước khổ A4 · xuất Word</p></div>
+  <div class="phai">
+    <button class="nut xanh" id="bWord">📝 Xuất Word</button>
+    <button class="nut phu" id="bLuu">💾 Sao lưu</button>
+    <button class="nut phu" id="bNhap">📂 Nhập lại</button>
+  </div>
+</header>
+
+<div class="the" style="margin-bottom:16px">
+  <h2>🗂️ Các lần họp đã ghi <button class="nut nho" id="bMoi" style="margin-left:auto">➕ Biên bản mới</button></h2>
+  <div class="dsbb" id="dsBb"></div>
+</div>
+
+<div class="luoi l2">
+<div class="the">
+  <div class="luoi" style="grid-template-columns:auto 1fr;align-items:center;gap:14px">
+    <div id="vanhDu"></div>
+    <div><b style="font-size:17px">Độ đầy đủ của biên bản</b><div id="thieuGi" style="font-size:14px;color:var(--chu2)"></div></div>
+  </div>
+
+  <div class="buoc" data-b="1"><span class="so">1</span><b>Thông tin buổi họp</b></div>
+  <div class="hang">
+    <label class="o">Trường<input data-f="truong" placeholder="TRƯỜNG THCS …"></label>
+    <label class="o">Tổ<input data-f="to" placeholder="Tổ Công nghệ – Hướng nghiệp"></label>
+  </div>
+  <div class="hang" style="margin-top:8px">
+    <label class="o">Lần / tháng<input data-f="lan" placeholder="Lần 2 – tháng 11/2026"></label>
+    <label class="o">Ngày họp<input data-f="ngay" type="date"></label>
+    <label class="o" style="flex:0 1 110px">Bắt đầu<input data-f="gioBd" type="time"></label>
+    <label class="o" style="flex:0 1 110px">Kết thúc<input data-f="gioKt" type="time"></label>
+  </div>
+  <div class="hang" style="margin-top:8px">
+    <label class="o">Địa điểm<input data-f="diaDiem" placeholder="Phòng họp tổ"></label>
+    <label class="o">Hình thức<select data-f="hinhThuc"><option>Trực tiếp</option><option>Trực tuyến</option><option>Kết hợp trực tiếp – trực tuyến</option></select></label>
+  </div>
+  <div class="hang" style="margin-top:8px">
+    <label class="o">Chủ trì<input data-f="chuTri" placeholder="Tổ trưởng …"></label>
+    <label class="o">Thư ký<input data-f="thuKy" placeholder="…"></label>
+    <label class="o" style="flex:0 1 110px">Tổng số<input data-f="tong" type="number" min="1"></label>
+    <label class="o" style="flex:0 1 110px">Có mặt<input data-f="coMat" type="number" min="0"></label>
+  </div>
+  <h3>Vắng (tên, lý do)</h3><div id="dsVang"></div><button class="nut phu nho" data-them="vang">➕ Thêm người vắng</button>
+
+  <div class="buoc" data-b="2"><span class="so">2</span><b>Điểm lại việc lần trước</b></div>
+  <textarea data-f="lanTruoc" placeholder="Đã vận dụng gì vào lớp sau lần họp trước, kết quả ra sao…"></textarea>
+
+  <div class="buoc" data-b="3"><span class="so">3</span><b>Nội dung chuyên môn chính</b></div>
+  <input data-f="noiDung" placeholder="VD: Phân tích kết quả kiểm tra giữa kỳ I môn Công nghệ 8">
+  <textarea data-f="trinhBay" style="margin-top:6px" placeholder="Người trình bày, tóm tắt nội dung…"></textarea>
+  <h3>Ý kiến (ghi đúng lời người nói)</h3><div id="dsYk"></div><button class="nut phu nho" data-them="yk">➕ Thêm ý kiến</button>
+
+  <div class="buoc" data-b="4"><span class="so">4</span><b>Phần nhóm (tổ ghép, nếu có)</b></div>
+  <textarea data-f="nhom" placeholder="Nhóm Công nghệ: … · Nhóm GDCD: …"></textarea>
+
+  <div class="buoc" data-b="5"><span class="so">5</span><b>Kết luận, phân công</b></div>
+  <textarea data-f="ketLuan" placeholder="Kết luận của tổ trưởng chủ trì…"></textarea>
+  <h3>Phân công</h3><div id="dsPc"></div><button class="nut phu nho" data-them="pc">➕ Thêm việc</button>
+  <h3>Việc khác (hành chính, gọn)</h3><textarea data-f="viecKhac" placeholder="Triển khai công văn… (ngắn)"></textarea>
+  <div class="hang" style="margin-top:14px"><button class="nut do nho" id="bXoa">🗑️ Xoá biên bản này</button></div>
+</div>
+
+<div>
+  <div class="the" style="position:sticky;top:12px">
+    <h2>👁️ Xem trước <button class="nut phu nho" id="bIn" style="margin-left:auto">🖨️ In</button></h2>
+    <div class="a4" id="a4"></div>
+  </div>
+</div>
+</div>
+<!--CHAN-->
+</div>
+<!--JS-->
+<script>
+function bbMoi(cu) {
+  return { id: TT.uid(), truong: cu ? cu.truong : "", to: cu ? cu.to : "", lan: "", ngay: TT.homNay(), gioBd: "14:00", gioKt: "", diaDiem: cu ? cu.diaDiem : "", hinhThuc: "Trực tiếp",
+    chuTri: cu ? cu.chuTri : "", thuKy: cu ? cu.thuKy : "", tong: cu ? cu.tong : "", coMat: cu ? cu.tong : "", vang: [], lanTruoc: "", noiDung: "", trinhBay: "", yk: [], nhom: "", ketLuan: "", pc: [], viecKhac: "" };
+}
+let S = TT.load("bienban", null) || { ds: [], dang: null };
+if (TT.MAU) { const b = bbMoi(); Object.assign(b, { truong: "TRƯỜNG THCS (DỮ LIỆU THỬ)", to: "Tổ Công nghệ – Hướng nghiệp", lan: "Lần 2 – tháng 11/2026", ngay: "2026-11-14", gioBd: "14:00", gioKt: "15:30", diaDiem: "Phòng họp tổ", chuTri: "Tổ trưởng GV01", thuKy: "GV06", tong: 12, coMat: 11,
+  vang: [{ ten: "GV09", ly: "Đi tập huấn" }], lanTruoc: "Các lớp 8 đã áp dụng phiếu quan sát nhóm khi thực hành lắp mạch; HS ghi nhật ký thực hành đầy đủ hơn.", noiDung: "Phân tích kết quả kiểm tra giữa học kỳ I môn Công nghệ 8",
+  trinhBay: "GV02 trình bày phổ điểm 4 lớp và 3 câu học sinh sai nhiều (câu 5, 9, 14).", yk: [{ ai: "GV03", noi: "Câu 9 hỏi ký hiệu bản vẽ, nhiều em nhầm vì chưa thực hành đủ trên bản vẽ thật." }, { ai: "GV05", noi: "Đề xuất thêm 10 phút luyện đọc bản vẽ ở đầu tiết trong 2 tuần tới." }],
+  ketLuan: "Tổ thống nhất ôn lại phần đọc bản vẽ lắp trong 2 tuần; nhóm khối 8 soạn chung phiếu luyện tập.", pc: [{ viec: "Soạn phiếu luyện đọc bản vẽ", ai: "GV02, GV05", han: "2026-11-21" }, { viec: "Tổng hợp kết quả sau 2 tuần", ai: "GV02", han: "2026-11-28" }], viecKhac: "Nhắc nộp KHBD tuần 12 lên thư mục tổ." });
+  S = { ds: [b], dang: b.id }; }
+if (!S.ds.length) { const b = bbMoi(); S.ds.push(b); S.dang = b.id; }
+let B = S.ds.find(b => b.id === S.dang) || S.ds[0];
+function luu() { TT.save("bienban", S); }
+function dNgay(s) { if (!s) return "…"; const [y, m, d] = s.split("-"); return `${d}/${m}/${y}`; }
+const MUC = [
+  ["Trường, tổ", b => b.truong && b.to], ["Ngày, giờ bắt đầu", b => b.ngay && b.gioBd], ["Chủ trì, thư ký", b => b.chuTri && b.thuKy], ["Sĩ số", b => b.tong !== "" && b.coMat !== ""],
+  ["Điểm lại lần trước", b => b.lanTruoc.trim()], ["Nội dung chuyên môn chính", b => b.noiDung.trim()], ["Ít nhất 1 ý kiến", b => b.yk.some(y => y.noi.trim())],
+  ["Kết luận", b => b.ketLuan.trim()], ["Phân công có người, có hạn", b => b.pc.length && b.pc.every(p => p.ai && p.han)], ["Giờ kết thúc", b => b.gioKt]
+];
+function veDu() {
+  const dat = MUC.filter(([, f]) => f(B)), pt = Math.round(dat.length / MUC.length * 100);
+  vanhDu.innerHTML = TT.vanh([{ gt: dat.length, mau: pt === 100 ? "#16a34a" : "#6366f1" }, { gt: MUC.length - dat.length, mau: "#e2e8f0" }], 96, 14, pt + "%");
+  const thieu = MUC.filter(([, f]) => !f(B)).map(([t]) => t);
+  thieuGi.innerHTML = thieu.length ? "Còn thiếu: " + thieu.map(t => `<span class="nhan n-canh">${t}</span>`).join(" ") : '<span class="nhan n-dung">✓ Đủ các mục — sẵn sàng xuất</span>';
+  const buoc = { 1: [0, 1, 2, 3], 2: [4], 3: [5, 6], 4: [], 5: [7, 8] };
+  document.querySelectorAll(".buoc").forEach(b => { const ds = buoc[b.dataset.b]; b.classList.toggle("xong", ds.length ? ds.every(i => MUC[i][1](B)) : !!B.nhom.trim()); });
+}
+function noiDungBB(choWord) {
+  const e = TT.esc, br = s => e(s || "…").replace(/\n/g, "<br>");
+  const vang = B.vang.filter(v => v.ten).map(v => `${e(v.ten)} (${e(v.ly || "không rõ lý do")})`).join("; ");
+  const pc = B.pc.filter(p => p.viec).map(p => `<tr><td style="border:1px solid #000;padding:3px 6px">${e(p.viec)}</td><td style="border:1px solid #000;padding:3px 6px">${e(p.ai)}</td><td style="border:1px solid #000;padding:3px 6px;text-align:center">${dNgay(p.han)}</td></tr>`).join("");
+  const nn = B.ngay ? B.ngay.split("-") : ["…", "…", "…"];
+  return `<table class="dau" style="width:100%;border-collapse:collapse;font-size:13pt"><tr><td style="text-align:center;vertical-align:top;width:45%">${e((B.truong || "TRƯỜNG …").toUpperCase())}<br><b>${e((B.to || "TỔ …").toUpperCase())}</b></td>
+    <td style="text-align:center;vertical-align:top"><b>CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</b><br><b><u>Độc lập - Tự do - Hạnh phúc</u></b><br><i>…, ngày ${nn[2]} tháng ${nn[1]} năm ${nn[0]}</i></td></tr></table>
+  <h4 style="text-align:center;margin-top:14pt">BIÊN BẢN SINH HOẠT TỔ CHUYÊN MÔN</h4><p style="text-align:center;margin-top:0">${e(B.lan || "")}</p>
+  <p>Thời gian: ${e(B.gioBd || "…")}, ngày ${dNgay(B.ngay)}. Địa điểm: ${e(B.diaDiem || "…")} (${e(B.hinhThuc)}).</p>
+  <p>Chủ trì: ${e(B.chuTri || "…")}. Thư ký: ${e(B.thuKy || "…")}.</p>
+  <p>Thành phần: có mặt ${B.coMat === "" ? "…" : e(B.coMat)}/${B.tong === "" ? "…" : e(B.tong)} thành viên${vang ? "; vắng: " + vang : ""}.</p>
+  <p><b>1. Điểm lại việc lần trước</b><br>${br(B.lanTruoc)}</p>
+  <p><b>2. Nội dung chuyên môn chính: ${e(B.noiDung || "…")}</b><br>${br(B.trinhBay)}</p>
+  ${B.yk.filter(y => y.noi).length ? "<p><i>Ý kiến:</i><br>" + B.yk.filter(y => y.noi).map(y => `+ Đ/c ${e(y.ai || "…")}: ${e(y.noi)}`).join("<br>") + "</p>" : ""}
+  ${B.nhom.trim() ? `<p><b>3. Phần nhóm chuyên môn</b><br>${br(B.nhom)}</p>` : ""}
+  <p><b>${B.nhom.trim() ? 4 : 3}. Kết luận của chủ trì</b><br>${br(B.ketLuan)}</p>
+  ${pc ? `<table style="border-collapse:collapse;width:100%;font-size:13pt;margin:4pt 0"><tr><th style="border:1px solid #000;padding:3px 6px">Việc</th><th style="border:1px solid #000;padding:3px 6px">Người thực hiện</th><th style="border:1px solid #000;padding:3px 6px">Hạn</th></tr>${pc}</table>` : ""}
+  ${B.viecKhac.trim() ? `<p><b>${B.nhom.trim() ? 5 : 4}. Việc khác</b><br>${br(B.viecKhac)}</p>` : ""}
+  <p>Buổi sinh hoạt kết thúc lúc ${e(B.gioKt || "…")} cùng ngày.</p>
+  <table style="width:100%;margin-top:12pt;font-size:13pt"><tr><td style="text-align:center;width:50%"><b>THƯ KÝ</b><br><br><br><br>${e(B.thuKy || "")}</td><td style="text-align:center"><b>CHỦ TRÌ</b><br><br><br><br>${e(B.chuTri || "")}</td></tr></table>
+  <p style="font-size:10pt;color:#666;margin-top:10pt"><i>Bản nháp — tổ thống nhất, chủ trì duyệt trước khi ghi vào sổ ghi chép hoạt động của tổ.</i></p>`;
+}
+function veA4() { a4.innerHTML = noiDungBB(); }
+function veDs() {
+  dsBb.innerHTML = S.ds.map(b => `<button data-id="${b.id}" class="${b.id === B.id ? "chon" : ""}">${TT.esc(b.lan || "(chưa đặt tên)")} · ${dNgay(b.ngay)}</button>`).join("");
+  dsBb.querySelectorAll("button").forEach(x => x.onclick = () => { B = S.ds.find(b => b.id === x.dataset.id); S.dang = B.id; luu(); dien(); });
+}
+const DS = { vang: ["dsVang", "vang", [["ten", "Tên / mã"], ["ly", "Lý do"]], () => ({ ten: "", ly: "" })],
+  yk: ["dsYk", "ykien", [["ai", "Đ/c …"], ["noi", "Nội dung ý kiến"]], () => ({ ai: "", noi: "" })],
+  pc: ["dsPc", "pcong", [["viec", "Việc"], ["ai", "Người làm"], ["han", "", "date"]], () => ({ viec: "", ai: "", han: "" })] };
+function veDong(k) {
+  const [hop, lop, cot] = DS[k], el = document.getElementById(hop);
+  el.innerHTML = B[k].map((r, i) => `<div class="${lop}" data-i="${i}">${cot.map(([f, ph, kieu]) => `<input data-c="${f}" ${kieu ? `type="${kieu}"` : ""} placeholder="${ph}" value="${TT.esc(r[f])}">`).join("")}<button title="Xoá">✕</button></div>`).join("");
+  el.querySelectorAll("[data-i]").forEach(d => {
+    const i = +d.dataset.i;
+    d.querySelectorAll("input").forEach(inp => inp.oninput = () => { B[k][i][inp.dataset.c] = inp.value; luu(); veA4(); veDu(); });
+    d.querySelector("button").onclick = () => { B[k].splice(i, 1); luu(); veDong(k); veA4(); veDu(); };
+  });
+}
+function dien() {
+  document.querySelectorAll("[data-f]").forEach(el => { el.value = B[el.dataset.f] ?? ""; });
+  Object.keys(DS).forEach(veDong); veDs(); veA4(); veDu();
+}
+document.querySelectorAll("[data-f]").forEach(el => el.addEventListener("input", () => {
+  B[el.dataset.f] = el.type === "number" ? (el.value === "" ? "" : +el.value) : el.value;
+  if (el.dataset.f === "coMat" || el.dataset.f === "tong") { if (+B.coMat > +B.tong && B.tong !== "") { el.classList.add("rung"); setTimeout(() => el.classList.remove("rung"), 400); TT.toast("Số có mặt lớn hơn tổng số thành viên", "loi"); } }
+  luu(); veA4(); veDu(); if (el.dataset.f === "lan" || el.dataset.f === "ngay") veDs();
+}));
+document.querySelectorAll("[data-them]").forEach(b => b.onclick = () => { const k = b.dataset.them; B[k].push(DS[k][3]()); luu(); veDong(k); veDu(); const o = document.getElementById(DS[k][0]).lastElementChild; o && o.querySelector("input").focus(); });
+bMoi.onclick = () => { const b = bbMoi(B); S.ds.unshift(b); B = b; S.dang = b.id; luu(); dien(); TT.ting(); TT.toast("Đã tạo biên bản mới (giữ trường, tổ, chủ trì, thư ký)", "ok"); };
+bXoa.onclick = () => { if (!confirm("Xoá biên bản «" + (B.lan || "chưa đặt tên") + "»?")) return; S.ds = S.ds.filter(b => b !== B); if (!S.ds.length) S.ds.push(bbMoi()); B = S.ds[0]; S.dang = B.id; luu(); dien(); };
+bWord.onclick = () => {
+  const html = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word"><head><meta charset="utf-8"><title>Biên bản</title>
+  <style>@page{size:21cm 29.7cm;margin:2cm 2cm 2cm 3cm}body{font-family:"Times New Roman";font-size:14pt;line-height:1.3}p{margin:3pt 0;text-align:justify}h4{font-size:14pt;margin:0}</style></head><body>${noiDungBB(true)}</body></html>`;
+  TT.taiVe("Bien-ban-hop-to-" + (B.ngay || TT.homNay()) + ".doc", "﻿" + html, "application/msword");
+  TT.ting(); const pt = MUC.filter(([, f]) => f(B)).length; if (pt === MUC.length) TT.phaoGiay(); TT.toast("Đã xuất file Word (.doc)", "ok");
+};
+bIn.onclick = () => { const w = window.open("", "_blank"); if (!w) { TT.toast("Trình duyệt chặn cửa sổ mới", "loi"); return; } w.document.write(`<html><head><meta charset="utf-8"><title>Biên bản</title><style>body{font-family:'Times New Roman';font-size:14pt;margin:2cm 2cm 2cm 3cm}p{margin:3pt 0;text-align:justify}</style></head><body>${noiDungBB(true)}</body></html>`); w.document.close(); w.focus(); w.print(); };
+bLuu.onclick = () => TT.saoLuu(["bienban"], "bien-ban-to");
+bNhap.onclick = () => TT.nhapLai(["bienban"], () => { S = TT.load("bienban", S); B = S.ds.find(b => b.id === S.dang) || S.ds[0]; dien(); });
+dien();
+</script>
+</body>
+</html>

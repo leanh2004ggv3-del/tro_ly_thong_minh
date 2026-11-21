@@ -1,0 +1,390 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Kiểm ma trận đề — Tổ trưởng số</title>
+<style>
+:root{
+  --nen1:#eef2ff; --nen2:#ecfeff; --nen3:#fff7ed;
+  --kinh:rgba(255,255,255,.78); --vien:rgba(99,102,241,.16);
+  --chu:#1e1b4b; --chu2:#475569; --mo:#94a3b8;
+  --chinh:#4f46e5; --chinh2:#7c3aed; --nhan1:#0d9488; --nhan2:#f59e0b;
+  --dung:#16a34a; --sai:#dc2626; --canh:#d97706;
+  --r:18px; --bong:0 10px 30px -12px rgba(30,27,75,.25);
+  --font:"Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{font-family:var(--font);color:var(--chu);font-size:16px;line-height:1.5;min-height:100vh;
+  background:radial-gradient(1200px 600px at 0% 0%,var(--nen1),transparent 60%),
+             radial-gradient(900px 500px at 100% 10%,var(--nen2),transparent 60%),
+             radial-gradient(900px 700px at 50% 100%,var(--nen3),transparent 60%),#f8fafc;}
+.khung{max-width:1180px;margin:0 auto;padding:16px 16px 40px}
+header.dau{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin:6px 0 18px}
+header.dau .logo{width:56px;height:56px;flex:none;filter:drop-shadow(0 6px 10px rgba(79,70,229,.3))}
+header.dau h1{margin:0;font-size:clamp(22px,3.2vw,32px);line-height:1.15;
+  background:linear-gradient(90deg,var(--chinh),var(--chinh2) 50%,var(--nhan1));-webkit-background-clip:text;background-clip:text;color:transparent}
+header.dau p{margin:2px 0 0;color:var(--chu2);font-size:15px}
+header.dau .phai{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
+.the{background:var(--kinh);border:1px solid var(--vien);border-radius:var(--r);box-shadow:var(--bong);padding:18px;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.the h2{margin:0 0 10px;font-size:19px;display:flex;align-items:center;gap:8px}
+.the h3{margin:12px 0 6px;font-size:16px}
+.luoi{display:grid;gap:16px}
+.l2{grid-template-columns:repeat(auto-fit,minmax(320px,1fr))}
+.l3{grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+.l4{grid-template-columns:repeat(auto-fit,minmax(170px,1fr))}
+.nut{appearance:none;border:0;cursor:pointer;font:600 15px var(--font);min-height:44px;padding:10px 16px;border-radius:12px;color:#fff;
+  background:linear-gradient(135deg,var(--chinh),var(--chinh2));box-shadow:0 6px 14px -6px rgba(79,70,229,.6);transition:transform .12s,box-shadow .12s;display:inline-flex;align-items:center;gap:6px;text-decoration:none}
+.nut:hover{transform:translateY(-2px);box-shadow:0 10px 18px -8px rgba(79,70,229,.7)}
+.nut:active{transform:translateY(1px) scale(.98)}
+.nut.phu{background:rgba(255,255,255,.7);color:var(--chinh);border:1.5px solid rgba(79,70,229,.35);box-shadow:none}
+.nut.xanh{background:linear-gradient(135deg,#0d9488,#16a34a)}
+.nut.cam{background:linear-gradient(135deg,#f59e0b,#ea580c)}
+.nut.do{background:linear-gradient(135deg,#ef4444,#be123c)}
+.nut.nho{min-height:34px;padding:5px 10px;font-size:13.5px;border-radius:10px}
+label.o{display:flex;flex-direction:column;gap:4px;font-size:13.5px;font-weight:600;color:var(--chu2)}
+input,select,textarea{font:15px var(--font);color:var(--chu);padding:9px 11px;border-radius:11px;border:1.5px solid #c7d2fe;background:#fff;min-height:42px;width:100%}
+textarea{min-height:80px;resize:vertical}
+input:focus,select:focus,textarea:focus{outline:3px solid rgba(79,70,229,.25);border-color:var(--chinh)}
+table.bang{width:100%;border-collapse:separate;border-spacing:0;font-size:14.5px}
+table.bang th{background:linear-gradient(135deg,#eef2ff,#f5f3ff);color:var(--chinh);text-align:left;padding:9px 8px;font-size:13.5px;position:sticky;top:0}
+table.bang td{padding:7px 8px;border-top:1px solid #e2e8f0;vertical-align:middle}
+table.bang tr:hover td{background:rgba(238,242,255,.6)}
+table.bang input,table.bang select{min-height:36px;padding:6px 8px}
+.cuon{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.kpi{border-radius:16px;padding:14px 16px;color:#fff;box-shadow:var(--bong);position:relative;overflow:hidden}
+.kpi b{display:block;font-size:30px;line-height:1.1}
+.kpi span{font-size:13.5px;opacity:.92}
+.kpi::after{content:"";position:absolute;right:-20px;top:-20px;width:90px;height:90px;border-radius:50%;background:rgba(255,255,255,.15)}
+.k1{background:linear-gradient(135deg,#6366f1,#8b5cf6)} .k2{background:linear-gradient(135deg,#14b8a6,#0ea5e9)}
+.k3{background:linear-gradient(135deg,#f59e0b,#f97316)} .k4{background:linear-gradient(135deg,#22c55e,#16a34a)}
+.k5{background:linear-gradient(135deg,#ef4444,#e11d48)}
+.nhan{display:inline-block;padding:2px 9px;border-radius:999px;font-size:12.5px;font-weight:700}
+.n-dung{background:#dcfce7;color:#166534}.n-sai{background:#fee2e2;color:#991b1b}.n-canh{background:#fef3c7;color:#92400e}.n-tt{background:#e0e7ff;color:#3730a3}
+.nhapnhay{animation:nn .6s}
+@keyframes nn{0%{box-shadow:0 0 0 0 rgba(22,163,74,.6)}100%{box-shadow:0 0 0 14px rgba(22,163,74,0)}}
+.rung{animation:rung .35s}
+@keyframes rung{20%{transform:translateX(-5px)}40%{transform:translateX(5px)}60%{transform:translateX(-3px)}80%{transform:translateX(3px)}}
+.noi{animation:noi 4s ease-in-out infinite}
+@keyframes noi{50%{transform:translateY(-6px)}}
+.hien{animation:hien .3s ease}
+@keyframes hien{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+#tts-toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:99;display:flex;flex-direction:column;gap:8px;align-items:center;pointer-events:none}
+#tts-toast div{background:#1e1b4b;color:#fff;padding:10px 16px;border-radius:12px;box-shadow:var(--bong);font-size:14.5px;animation:hien .25s}
+#tts-toast div.ok{background:linear-gradient(135deg,#15803d,#0d9488)}
+#tts-toast div.loi{background:linear-gradient(135deg,#b91c1c,#be123c)}
+canvas.phao{position:fixed;inset:0;pointer-events:none;z-index:98}
+footer.cuoi{margin-top:26px;text-align:center;color:var(--chu2);font-size:13.5px}
+footer.cuoi .nhap{display:inline-block;background:#fef9c3;color:#713f12;border:1px dashed #ca8a04;padding:6px 12px;border-radius:10px;font-weight:600;margin-bottom:6px}
+.mau-ribbon{position:fixed;top:12px;right:-44px;transform:rotate(35deg);background:#f59e0b;color:#fff;font-weight:800;padding:6px 52px;z-index:97;box-shadow:var(--bong);font-size:13px;letter-spacing:.5px}
+.goiy{display:flex;gap:12px;align-items:flex-start;background:linear-gradient(135deg,#eef2ff,#ecfeff);border-radius:14px;padding:12px 14px;font-size:14.5px;color:var(--chu2)}
+.goiy svg{flex:none}
+.hang{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end}
+.hang>*{flex:1 1 150px}
+.hang>.nut{flex:0 0 auto}
+.an{display:none!important}
+@media (max-width:640px){header.dau .phai{margin-left:0;width:100%} .the{padding:14px} .kpi b{font-size:24px}}
+@media print{body{background:#fff} .khongin,header.dau .phai,footer.cuoi .nut{display:none!important} .the{box-shadow:none;border:0}}
+
+</style>
+<style>
+:root{--B:#0ea5e9;--H:#8b5cf6;--V:#f59e0b}
+.mB{color:var(--B)}.mH{color:var(--H)}.mV{color:var(--V)}
+table.nhiet{border-collapse:separate;border-spacing:4px;width:100%;font-size:14px}
+table.nhiet th{font-size:13px;color:var(--chu2);text-align:center;padding:4px}
+table.nhiet th:first-child{text-align:left}
+table.nhiet td{border-radius:10px;text-align:center;padding:8px 4px;font-weight:700;min-width:70px}
+table.nhiet td:first-child{text-align:left;background:#f8fafc;font-weight:600;color:var(--chu)}
+.kiem{display:flex;gap:10px;align-items:flex-start;padding:9px 12px;border-radius:12px;margin-bottom:6px;font-size:14.5px}
+.kiem.ok{background:#f0fdf4;color:#166534}.kiem.loi{background:#fef2f2;color:#991b1b}.kiem.canh{background:#fffbeb;color:#92400e}
+.kiem .i{font-size:18px;line-height:1.2}
+.cau{display:grid;grid-template-columns:42px 1.6fr 1.1fr 1fr 80px 38px;gap:6px;margin-bottom:6px;align-items:center}
+.cau .stt{font-weight:800;color:var(--chinh);text-align:center}
+.cau button{border:0;background:#fee2e2;border-radius:10px;cursor:pointer;height:36px}
+.cau select,.cau input{min-height:36px;padding:5px 8px}
+.muctieu{display:flex;gap:8px}
+.muctieu label{flex:1}
+@media (max-width:640px){.cau{grid-template-columns:34px 1fr 1fr;}.cau .stt{grid-row:span 2}}
+</style>
+</head>
+<body>
+<div class="khung">
+<header class="dau">
+  <svg class="logo noi" viewBox="0 0 64 64"><rect x="4" y="4" width="56" height="56" rx="14" fill="#1e1b4b"/>
+    <rect x="11" y="11" width="12" height="12" rx="3" fill="#0ea5e9"/><rect x="26" y="11" width="12" height="12" rx="3" fill="#8b5cf6" opacity=".6"/><rect x="41" y="11" width="12" height="12" rx="3" fill="#f59e0b" opacity=".35"/>
+    <rect x="11" y="26" width="12" height="12" rx="3" fill="#0ea5e9" opacity=".5"/><rect x="26" y="26" width="12" height="12" rx="3" fill="#8b5cf6"/><rect x="41" y="26" width="12" height="12" rx="3" fill="#f59e0b" opacity=".7"/>
+    <rect x="11" y="41" width="12" height="12" rx="3" fill="#0ea5e9" opacity=".3"/><rect x="26" y="41" width="12" height="12" rx="3" fill="#8b5cf6" opacity=".5"/><rect x="41" y="41" width="12" height="12" rx="3" fill="#f59e0b"/></svg>
+  <div><h1>KIỂM MA TRẬN ĐỀ</h1><p>Nhập từng câu (chủ đề · dạng · mức · điểm) → so với tỉ lệ tổ thống nhất, tổng điểm, độ phủ chủ đề</p></div>
+  <div class="phai">
+    <button class="nut xanh" id="bCsv">📄 Xuất ma trận</button>
+    <button class="nut phu" id="bLuu">💾 Sao lưu</button>
+    <button class="nut phu" id="bNhap">📂 Nhập lại</button>
+  </div>
+</header>
+
+<div class="luoi l2" style="margin-bottom:16px">
+  <div class="the">
+    <h2>🎯 Mục tiêu tổ thống nhất</h2>
+    <div class="hang"><label class="o" style="flex:2 1 220px">Tên đề<input id="tenDe" placeholder="VD: Đề KT giữa kỳ I – Công nghệ 8"></label><label class="o" style="flex:0 1 120px">Thang điểm<input id="thangDiem" type="number" min="1" value="10"></label></div>
+    <div class="muctieu" style="margin-top:8px">
+      <label class="o"><span class="mB">Biết (%)</span><input id="tB" type="number" min="0" max="100"></label>
+      <label class="o"><span class="mH">Hiểu (%)</span><input id="tH" type="number" min="0" max="100"></label>
+      <label class="o"><span class="mV">Vận dụng (%)</span><input id="tV" type="number" min="0" max="100"></label>
+      <label class="o">Cho lệch (±%)<input id="tLech" type="number" min="0" max="20"></label>
+    </div>
+    <div class="goiy" style="margin-top:10px"><svg width="30" height="30" viewBox="0 0 40 40"><circle cx="20" cy="20" r="18" fill="#8b5cf6"/><text x="20" y="27" text-anchor="middle" font-size="20" font-weight="800" fill="#fff">?</text></svg>
+      <div>CV 7991/BGDĐT-GDTrH: đề có 4 dạng câu, 3 mức Biết – Hiểu – Vận dụng; <b>THCS theo hướng dẫn của Sở</b> (phụ lục chỉ để tham khảo). Tỉ lệ ở đây là <b>tổ thống nhất</b>, không phải quy định Bộ.</div></div>
+    <div class="hang" style="margin-top:10px"><button class="nut cam nho" id="bKhuon">⚡ Dựng khung: 12 TN + 4 Đ-S + 2 TL (40-30-30)</button></div>
+  </div>
+  <div class="the">
+    <h2>✅ Kết quả kiểm</h2>
+    <div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap">
+      <div id="vanhMuc"></div>
+      <div style="font-size:14px;line-height:1.9"><div>vòng ngoài: <b>đề đang có</b> · vòng trong: <b>mục tiêu</b></div><div id="chuMuc"></div></div>
+    </div>
+    <div id="dsKiem" style="margin-top:10px"></div>
+  </div>
+</div>
+
+<div class="the" style="margin-bottom:16px">
+  <h2>🔥 Bản đồ điểm: chủ đề × mức</h2>
+  <div class="cuon"><table class="nhiet" id="bangNhiet"></table></div>
+  <canvas id="cvDang" style="width:100%;height:200px;display:block;margin-top:10px"></canvas>
+</div>
+
+<div class="the">
+  <h2>📝 Các câu trong đề <span id="tongCau" style="margin-left:auto;font-size:14px;font-weight:600;color:var(--chu2)"></span></h2>
+  <div class="cau" style="font-size:13px;color:var(--chu2);font-weight:600"><span>Câu</span><span>Chủ đề / bài</span><span>Dạng</span><span>Mức</span><span>Điểm</span><span></span></div>
+  <div id="dsCau"></div>
+  <div class="hang" style="margin-top:10px;align-items:flex-end">
+    <label class="o" style="flex:2 1 180px">Thêm nhanh — chủ đề<input id="nChuDe" placeholder="VD: Bài 3 – Bản vẽ kĩ thuật"></label>
+    <label class="o" style="flex:1 1 130px">Dạng<select id="nDang"></select></label>
+    <label class="o" style="flex:1 1 110px">Mức<select id="nMuc"></select></label>
+    <label class="o" style="flex:0 1 90px">Số câu<input id="nSo" type="number" min="1" value="1"></label>
+    <label class="o" style="flex:0 1 100px">Điểm/câu<input id="nDiem" type="number" min="0" step="0.25" value="0.25"></label>
+    <button class="nut" id="bThem">➕ Thêm</button>
+  </div>
+</div>
+<footer class="cuoi">
+  <div class="nhap">✅ BẢN NHÁP — thầy/cô duyệt trước khi dùng</div>
+  <div>Dữ liệu chỉ nằm trong trình duyệt máy này, không gửi đi đâu. Cuối tuần bấm <b>Sao lưu</b> để giữ một bản trên máy.</div>
+  <div style="margin-top:8px"><a class="nut phu nho" href="index.html">⬅ Về trang chủ Tổ trưởng số</a></div>
+</footer>
+</div>
+<script>
+/* Bộ chung «Tổ trưởng số» — không gọi mạng, dữ liệu chỉ nằm trong trình duyệt máy này. */
+const TT = (() => {
+  const TIEN_TO = "tts_";
+  const MAU = /(^|[#&])mau\b/.test(location.hash);
+  function load(k, def) {
+    if (MAU) return def;
+    try { const v = localStorage.getItem(TIEN_TO + k); return v ? JSON.parse(v) : def; } catch (e) { return def; }
+  }
+  function save(k, v) {
+    if (MAU) return false;
+    try { localStorage.setItem(TIEN_TO + k, JSON.stringify(v)); return true; } catch (e) { return false; }
+  }
+  function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])); }
+  function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
+  function toast(msg, loai) {
+    let h = document.getElementById("tts-toast");
+    if (!h) { h = document.createElement("div"); h.id = "tts-toast"; document.body.appendChild(h); }
+    const d = document.createElement("div"); d.className = loai || ""; d.textContent = msg; h.appendChild(d);
+    setTimeout(() => d.remove(), 2600);
+  }
+  let ac = null;
+  function am(tan, dai, kieu, to) {
+    try {
+      ac = ac || new (window.AudioContext || window.webkitAudioContext)();
+      const o = ac.createOscillator(), g = ac.createGain();
+      o.type = kieu || "sine"; o.frequency.value = tan; g.gain.value = to || 0.08;
+      o.connect(g); g.connect(ac.destination); const t = ac.currentTime;
+      g.gain.setValueAtTime(to || 0.08, t); g.gain.exponentialRampToValueAtTime(0.0001, t + dai);
+      o.start(t); o.stop(t + dai);
+    } catch (e) {}
+  }
+  function ting() { am(880, .18); setTimeout(() => am(1320, .25), 90); }
+  function buzz() { am(180, .25, "sawtooth", .05); }
+  function phaoGiay(x, y) {
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const c = document.createElement("canvas"); c.className = "phao"; c.width = innerWidth; c.height = innerHeight; document.body.appendChild(c);
+    const g = c.getContext("2d"), mau = ["#6366f1", "#14b8a6", "#f59e0b", "#ec4899", "#22c55e", "#8b5cf6"];
+    x = x == null ? innerWidth / 2 : x; y = y == null ? innerHeight / 3 : y;
+    const ht = Array.from({ length: 90 }, () => ({ x, y, vx: (Math.random() - .5) * 11, vy: -Math.random() * 10 - 3, r: Math.random() * 6 + 3, m: mau[Math.random() * 6 | 0], q: Math.random() * 6 }));
+    let n = 0;
+    (function ve() {
+      g.clearRect(0, 0, c.width, c.height);
+      ht.forEach(p => { p.x += p.vx; p.y += p.vy; p.vy += .35; p.q += .2; g.save(); g.translate(p.x, p.y); g.rotate(p.q); g.fillStyle = p.m; g.fillRect(-p.r / 2, -p.r / 4, p.r, p.r / 2); g.restore(); });
+      if (++n < 90) requestAnimationFrame(ve); else c.remove();
+    })();
+  }
+  function taiVe(ten, noiDung, kieu) {
+    const b = new Blob([noiDung], { type: kieu || "text/plain;charset=utf-8" });
+    const a = document.createElement("a"); a.href = URL.createObjectURL(b); a.download = ten;
+    document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500);
+  }
+  function homNay() { const d = new Date(); return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); }
+  function saoLuu(khoa, tenFile) {
+    const goi = { ung_dung: "to-truong-so", ngay: homNay(), du_lieu: {} };
+    khoa.forEach(k => goi.du_lieu[k] = load(k, null));
+    taiVe((tenFile || "sao-luu") + "-" + homNay() + ".json", JSON.stringify(goi, null, 2), "application/json");
+    toast("Đã tải file sao lưu về máy", "ok");
+  }
+  function nhapLai(khoa, xong) {
+    const i = document.createElement("input"); i.type = "file"; i.accept = ".json,application/json";
+    i.onchange = () => {
+      const f = i.files[0]; if (!f) return;
+      const r = new FileReader();
+      r.onload = () => {
+        try {
+          const goi = JSON.parse(r.result);
+          if (!goi || goi.ung_dung !== "to-truong-so") throw 0;
+          let n = 0; Object.keys(goi.du_lieu || {}).forEach(k => { if ((!khoa || khoa.includes(k)) && goi.du_lieu[k] != null) { save(k, goi.du_lieu[k]); n++; } });
+          toast("Đã nhập lại " + n + " phần dữ liệu", "ok"); ting(); xong && xong();
+        } catch (e) { toast("File này không phải file sao lưu của Tổ trưởng số", "loi"); buzz(); }
+      };
+      r.readAsText(f);
+    };
+    i.click();
+  }
+  function csv(hang) { return "﻿" + hang.map(r => r.map(o => { o = String(o == null ? "" : o); return /[",\n;]/.test(o) ? '"' + o.replace(/"/g, '""') + '"' : o; }).join(",")).join("\r\n"); }
+  function docCSV(text) {
+    const dong = text.replace(/\r/g, "").split("\n").filter(d => d.trim());
+    if (!dong.length) return [];
+    const tach = dong[0].includes("\t") ? "\t" : (dong[0].split(";").length > dong[0].split(",").length ? ";" : ",");
+    return dong.map(d => {
+      const out = []; let o = "", q = false;
+      for (let i = 0; i < d.length; i++) {
+        const c = d[i];
+        if (q) { if (c === '"' && d[i + 1] === '"') { o += '"'; i++; } else if (c === '"') q = false; else o += c; }
+        else if (c === '"') q = true; else if (c === tach) { out.push(o.trim()); o = ""; } else o += c;
+      }
+      out.push(o.trim()); return out;
+    });
+  }
+  /* Biểu đồ cột (canvas, không thư viện). nhom: [{ten, mau, gt:[...]}] */
+  function bieuDoCot(cv, nhan, nhom, tuyChon) {
+    tuyChon = tuyChon || {};
+    const dpr = window.devicePixelRatio || 1, W = cv.clientWidth || 600, H = cv.clientHeight || 260;
+    cv.width = W * dpr; cv.height = H * dpr; const g = cv.getContext("2d"); g.scale(dpr, dpr); g.clearRect(0, 0, W, H);
+    const tren = 18, duoi = 34, trai = 34, phai = 8, cao = H - tren - duoi, rong = W - trai - phai;
+    let max = tuyChon.max || Math.max(1, ...nhom.flatMap(n => n.gt));
+    const buoc = max <= 5 ? 1 : max <= 12 ? 2 : Math.ceil(max / 5);
+    max = Math.ceil(max / buoc) * buoc;
+    g.font = "12px Segoe UI, Arial"; g.fillStyle = "#64748b"; g.strokeStyle = "#e2e8f0"; g.textAlign = "right";
+    for (let v = 0; v <= max; v += buoc) { const y = tren + cao - v / max * cao; g.beginPath(); g.moveTo(trai, y); g.lineTo(W - phai, y); g.stroke(); g.fillText(v + (tuyChon.donVi || ""), trai - 5, y + 4); }
+    const o = rong / nhan.length, cot = Math.min(46, (o * .74) / nhom.length);
+    nhan.forEach((t, i) => {
+      nhom.forEach((n, j) => {
+        const v = n.gt[i] || 0, h = v / max * cao, x = trai + i * o + (o - cot * nhom.length) / 2 + j * cot, y = tren + cao - h;
+        const gr = g.createLinearGradient(0, y, 0, y + h); gr.addColorStop(0, n.mau); gr.addColorStop(1, n.mau2 || n.mau + "99");
+        g.fillStyle = gr; const r = Math.min(6, cot / 2, h);
+        g.beginPath(); g.moveTo(x, y + h); g.lineTo(x, y + r); g.quadraticCurveTo(x, y, x + r, y); g.lineTo(x + cot - 2 - r, y); g.quadraticCurveTo(x + cot - 2, y, x + cot - 2, y + r); g.lineTo(x + cot - 2, y + h); g.fill();
+        if (v && tuyChon.soTren !== false) { g.fillStyle = "#1e1b4b"; g.textAlign = "center"; g.font = "bold 12px Segoe UI, Arial"; g.fillText(tuyChon.dinhDang ? tuyChon.dinhDang(v) : v, x + cot / 2 - 1, y - 4); g.font = "12px Segoe UI, Arial"; }
+      });
+      g.fillStyle = "#475569"; g.textAlign = "center"; g.fillText(t, trai + i * o + o / 2, H - duoi + 18);
+    });
+  }
+  /* Vành tròn SVG: phan [{gt, mau}] */
+  function vanh(phan, kich, day, giua) {
+    kich = kich || 140; day = day || 18; const r = (kich - day) / 2, cv = 2 * Math.PI * r, tong = phan.reduce((a, p) => a + p.gt, 0) || 1;
+    let bd = 0, s = `<svg viewBox="0 0 ${kich} ${kich}" width="${kich}" height="${kich}" role="img"><circle cx="${kich / 2}" cy="${kich / 2}" r="${r}" fill="none" stroke="#e2e8f0" stroke-width="${day}"/>`;
+    phan.forEach(p => { const l = p.gt / tong * cv; if (l > 0) s += `<circle cx="${kich / 2}" cy="${kich / 2}" r="${r}" fill="none" stroke="${p.mau}" stroke-width="${day}" stroke-dasharray="${l} ${cv - l}" stroke-dashoffset="${-bd}" transform="rotate(-90 ${kich / 2} ${kich / 2})" stroke-linecap="butt"/>`; bd += l; });
+    if (giua) s += `<text x="50%" y="50%" text-anchor="middle" dominant-baseline="central" font-size="${kich / 5.2}" font-weight="800" fill="#1e1b4b">${giua}</text>`;
+    return s + "</svg>";
+  }
+  function moDau() {
+    if (MAU) { const r = document.createElement("div"); r.className = "mau-ribbon"; r.textContent = "DỮ LIỆU THỬ"; document.body.appendChild(r); }
+  }
+  document.addEventListener("DOMContentLoaded", moDau);
+  return { MAU, load, save, esc, uid, toast, ting, buzz, phaoGiay, taiVe, homNay, saoLuu, nhapLai, csv, docCSV, bieuDoCot, vanh };
+})();
+
+</script>
+<script>
+const DANG = { TN: "Nhiều lựa chọn", DS: "Đúng – Sai", TLN: "Trả lời ngắn", TL: "Tự luận" };
+const MUC = { B: "Biết", H: "Hiểu", V: "Vận dụng" }, MAU = { B: "#0ea5e9", H: "#8b5cf6", V: "#f59e0b" };
+let S = TT.load("matran", null) || { ten: "", thang: 10, muc: { B: 40, H: 30, V: 30 }, lech: 5, cau: [] };
+function khuonTo(cd) {
+  const c = [], them = (n, dang, muc, diem, chuDe) => { for (let i = 0; i < n; i++) c.push({ id: TT.uid(), chuDe, dang, muc, diem }); };
+  cd = cd || ["Chủ đề 1", "Chủ đề 2", "Chủ đề 3"];
+  them(4, "TN", "B", .25, cd[0]); them(4, "TN", "B", .25, cd[1]); them(4, "TN", "B", .25, cd[2]);
+  them(1, "DS", "B", 1, cd[0]); them(1, "DS", "H", 1, cd[0]); them(1, "DS", "H", 1, cd[1]); them(1, "DS", "H", 1, cd[2]);
+  them(1, "TL", "V", 2, cd[1]); them(1, "TL", "V", 1, cd[2]);
+  return c;
+}
+if (TT.MAU) S = { ten: "Đề KT giữa kỳ I – Công nghệ 8 (DỮ LIỆU THỬ)", thang: 10, muc: { B: 40, H: 30, V: 30 }, lech: 5, cau: (() => { const c = khuonTo(["Bản vẽ kĩ thuật", "Cơ khí", "Kĩ thuật điện"]); c[11].muc = "H"; c[13].muc = "B"; c[16].diem = 1.5; return c; })() };
+function luu() { TT.save("matran", S); }
+const tron = x => Math.round(x * 100) / 100;
+function tinh() {
+  const tong = S.cau.reduce((a, c) => a + (+c.diem || 0), 0), theoMuc = { B: 0, H: 0, V: 0 }, theoDang = { TN: 0, DS: 0, TLN: 0, TL: 0 }, soDang = { TN: 0, DS: 0, TLN: 0, TL: 0 }, chuDe = {};
+  S.cau.forEach(c => { const d = +c.diem || 0; theoMuc[c.muc] += d; theoDang[c.dang] += d; soDang[c.dang]++; const k = (c.chuDe || "(chưa ghi chủ đề)").trim(); chuDe[k] = chuDe[k] || { B: 0, H: 0, V: 0, so: 0 }; chuDe[k][c.muc] += d; chuDe[k].so++; });
+  return { tong: tron(tong), theoMuc, theoDang, soDang, chuDe };
+}
+function veKiem() {
+  const t = tinh(), th = +S.thang || 10, kq = [];
+  kq.push(Math.abs(t.tong - th) < 1e-9 ? ["ok", "✓", `Tổng điểm ${t.tong}/${th}`] : ["loi", "✗", `Tổng điểm đang là ${t.tong}, cần đúng ${th} — ${t.tong > th ? "thừa " + tron(t.tong - th) : "thiếu " + tron(th - t.tong)} điểm`]);
+  const tongMT = S.muc.B + S.muc.H + S.muc.V;
+  if (tongMT !== 100) kq.push(["canh", "!", `Tỉ lệ mục tiêu cộng lại là ${tongMT}%, chưa đủ 100%`]);
+  Object.keys(MUC).forEach(m => {
+    const pt = t.tong ? t.theoMuc[m] / t.tong * 100 : 0, lech = pt - S.muc[m];
+    kq.push(Math.abs(lech) <= S.lech + 1e-9 ? ["ok", "✓", `${MUC[m]}: ${tron(pt)}% (mục tiêu ${S.muc[m]}%)`] : ["loi", "✗", `${MUC[m]}: ${tron(pt)}% — ${lech > 0 ? "nhiều hơn" : "ít hơn"} mục tiêu ${S.muc[m]}% là ${tron(Math.abs(lech))}% (≈ ${tron(Math.abs(lech) / 100 * t.tong)} điểm)`]);
+  });
+  const thieuCD = Object.entries(t.chuDe).filter(([k, v]) => v.so === 0);
+  const cdKhongMuc = Object.keys(t.chuDe).filter(k => k === "(chưa ghi chủ đề)");
+  if (cdKhongMuc.length) kq.push(["canh", "!", "Có câu chưa ghi chủ đề"]);
+  const khongDiem = S.cau.filter(c => !(+c.diem > 0)).length; if (khongDiem) kq.push(["canh", "!", `${khongDiem} câu chưa có điểm`]);
+  const cd = Object.keys(t.chuDe).length; if (cd) kq.push(["ok", "•", `Đề phủ ${cd} chủ đề · ${S.cau.length} câu`]);
+  dsKiem.innerHTML = kq.map(([l, i, s]) => `<div class="kiem ${l}"><span class="i">${i}</span><span>${s}</span></div>`).join("");
+  const dat = kq.every(k => k[0] !== "loi") && S.cau.length;
+  return dat;
+}
+function veVanh() {
+  const t = tinh(), W = 170, c = W / 2;
+  const cung = (r, ds, day) => { const cv = 2 * Math.PI * r, tg = ds.reduce((a, x) => a + x.gt, 0) || 1; let bd = 0, s = `<circle cx="${c}" cy="${c}" r="${r}" fill="none" stroke="#e2e8f0" stroke-width="${day}"/>`; ds.forEach(x => { const l = x.gt / tg * cv; if (l > 0) s += `<circle cx="${c}" cy="${c}" r="${r}" fill="none" stroke="${x.mau}" stroke-width="${day}" stroke-dasharray="${l} ${cv - l}" stroke-dashoffset="${-bd}" transform="rotate(-90 ${c} ${c})"/>`; bd += l; }); return s; };
+  vanhMuc.innerHTML = `<svg width="${W}" height="${W}" viewBox="0 0 ${W} ${W}">${cung(72, Object.keys(MUC).map(m => ({ gt: t.theoMuc[m], mau: MAU[m] })), 18)}${cung(50, Object.keys(MUC).map(m => ({ gt: S.muc[m], mau: MAU[m] + "88" })), 12)}
+    <text x="${c}" y="${c - 2}" text-anchor="middle" font-size="24" font-weight="800" fill="#1e1b4b">${t.tong}</text><text x="${c}" y="${c + 16}" text-anchor="middle" font-size="11" fill="#64748b">/ ${S.thang} điểm</text></svg>`;
+  chuMuc.innerHTML = Object.keys(MUC).map(m => `<div><span style="display:inline-block;width:12px;height:12px;border-radius:3px;background:${MAU[m]}"></span> ${MUC[m]}: <b>${tron(t.theoMuc[m])}đ</b> (${t.tong ? tron(t.theoMuc[m] / t.tong * 100) : 0}%)</div>`).join("");
+}
+function veNhiet() {
+  const t = tinh(), cd = Object.entries(t.chuDe), max = Math.max(.01, ...cd.flatMap(([, v]) => [v.B, v.H, v.V]));
+  const o = (m, v) => `<td style="background:${v ? MAU[m] + Math.round(40 + v / max * 215).toString(16).padStart(2, "0") : "#f1f5f9"};color:${v / max > .5 ? "#fff" : "#1e1b4b"}">${v ? tron(v) + "đ" : "–"}</td>`;
+  bangNhiet.innerHTML = `<tr><th>Chủ đề</th>${Object.keys(MUC).map(m => `<th class="m${m}">${MUC[m]}</th>`).join("")}<th>Số câu</th><th>Cộng</th></tr>` +
+    (cd.length ? cd.map(([k, v]) => `<tr><td>${TT.esc(k)}</td>${o("B", v.B)}${o("H", v.H)}${o("V", v.V)}<td style="background:#f8fafc">${v.so}</td><td style="background:#eef2ff">${tron(v.B + v.H + v.V)}đ</td></tr>`).join("") : `<tr><td colspan="6" style="text-align:center;color:#64748b">Chưa có câu nào — bấm «Dựng khung» hoặc «Thêm»</td></tr>`);
+  TT.bieuDoCot(cvDang, Object.keys(DANG).map(d => DANG[d] + " (" + t.soDang[d] + " câu)"), [{ ten: "Điểm", mau: "#6366f1", mau2: "#14b8a6", gt: Object.keys(DANG).map(d => tron(t.theoDang[d])) }], { dinhDang: v => v + "đ" });
+}
+function veCau() {
+  const opt = (o, v) => Object.entries(o).map(([k, t]) => `<option value="${k}"${k === v ? " selected" : ""}>${t}</option>`).join("");
+  dsCau.innerHTML = S.cau.map((c, i) => `<div class="cau" data-i="${i}"><span class="stt">${i + 1}</span><input data-k="chuDe" value="${TT.esc(c.chuDe)}" placeholder="Chủ đề"><select data-k="dang">${opt(DANG, c.dang)}</select>
+    <select data-k="muc" style="border-color:${MAU[c.muc]};color:${MAU[c.muc]};font-weight:700">${opt(MUC, c.muc)}</select><input data-k="diem" type="number" step="0.25" min="0" value="${c.diem}"><button title="Xoá">✕</button></div>`).join("");
+  dsCau.querySelectorAll("[data-i]").forEach(r => { const c = S.cau[+r.dataset.i];
+    r.querySelectorAll("input,select").forEach(e => e.onchange = () => { c[e.dataset.k] = e.dataset.k === "diem" ? +e.value : e.value; luu(); veTat(e.tagName === "SELECT"); });
+    r.querySelector("button").onclick = () => { S.cau.splice(+r.dataset.i, 1); luu(); veTat(true); }; });
+  tongCau.textContent = S.cau.length + " câu";
+}
+let datTruoc = null;
+function veTat(veLaiCau) { if (veLaiCau !== false) veCau(); const dat = veKiem(); veVanh(); veNhiet(); if (datTruoc === false && dat) { TT.ting(); TT.phaoGiay(); TT.toast("Đề đã khớp mục tiêu 🎉", "ok"); } datTruoc = !!dat; }
+nDang.innerHTML = Object.entries(DANG).map(([k, t]) => `<option value="${k}">${t}</option>`).join("");
+nMuc.innerHTML = Object.entries(MUC).map(([k, t]) => `<option value="${k}">${t}</option>`).join("");
+tenDe.value = S.ten; thangDiem.value = S.thang; tB.value = S.muc.B; tH.value = S.muc.H; tV.value = S.muc.V; tLech.value = S.lech;
+tenDe.oninput = () => { S.ten = tenDe.value; luu(); };
+thangDiem.oninput = () => { S.thang = +thangDiem.value || 10; luu(); veTat(false); };
+[["B", tB], ["H", tH], ["V", tV]].forEach(([m, e]) => e.oninput = () => { S.muc[m] = +e.value || 0; luu(); veTat(false); });
+tLech.oninput = () => { S.lech = +tLech.value || 0; luu(); veTat(false); };
+bKhuon.onclick = () => { if (S.cau.length && !confirm("Thay các câu hiện có bằng khung 12 TN + 4 Đ-S + 2 TL?")) return; S.cau = khuonTo(); S.muc = { B: 40, H: 30, V: 30 }; tB.value = 40; tH.value = 30; tV.value = 30; luu(); veTat(); TT.toast("Đã dựng khung — sếp sửa chủ đề, mức cho đúng đề của tổ", "ok"); };
+bThem.onclick = () => { const n = Math.max(1, Math.min(40, +nSo.value || 1)); for (let i = 0; i < n; i++) S.cau.push({ id: TT.uid(), chuDe: nChuDe.value.trim(), dang: nDang.value, muc: nMuc.value, diem: +nDiem.value || 0 }); luu(); TT.ting(); veTat(); };
+nDang.onchange = () => { nDiem.value = { TN: .25, DS: 1, TLN: .25, TL: 1 }[nDang.value]; };
+bCsv.onclick = () => {
+  const t = tinh(), h = [["MA TRẬN ĐỀ: " + (S.ten || "") + " (bản nháp — tổ thống nhất)"], ["Chủ đề", ...Object.keys(DANG).flatMap(d => Object.keys(MUC).map(m => DANG[d] + " – " + MUC[m])), "Tổng điểm"]];
+  Object.keys(t.chuDe).forEach(k => { const hang = [k]; Object.keys(DANG).forEach(d => Object.keys(MUC).forEach(m => { const ds = S.cau.filter(c => (c.chuDe || "(chưa ghi chủ đề)").trim() === k && c.dang === d && c.muc === m); hang.push(ds.length ? ds.length + " câu (" + tron(ds.reduce((a, c) => a + (+c.diem || 0), 0)) + "đ)" : ""); })); hang.push(tron(t.chuDe[k].B + t.chuDe[k].H + t.chuDe[k].V)); h.push(hang); });
+  h.push(["Tỉ lệ theo mức", ...Object.keys(MUC).map(m => MUC[m] + ": " + (t.tong ? tron(t.theoMuc[m] / t.tong * 100) : 0) + "%")]);
+  h.push([]); h.push(["Câu", "Chủ đề", "Dạng", "Mức", "Điểm"]); S.cau.forEach((c, i) => h.push([i + 1, c.chuDe, DANG[c.dang], MUC[c.muc], c.diem]));
+  TT.taiVe("ma-tran-de-" + TT.homNay() + ".csv", TT.csv(h), "text/csv;charset=utf-8"); TT.ting(); TT.toast("Đã xuất file mở bằng Excel", "ok");
+};
+bLuu.onclick = () => TT.saoLuu(["matran"], "ma-tran-de");
+bNhap.onclick = () => TT.nhapLai(["matran"], () => { S = TT.load("matran", S); tenDe.value = S.ten; thangDiem.value = S.thang; tB.value = S.muc.B; tH.value = S.muc.H; tV.value = S.muc.V; tLech.value = S.lech; veTat(); });
+addEventListener("resize", () => veNhiet());
+veTat();
+</script>
+</body>
+</html>

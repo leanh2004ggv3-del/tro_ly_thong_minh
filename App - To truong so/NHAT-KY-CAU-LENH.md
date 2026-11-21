@@ -1,0 +1,6 @@
+# NHẬT KÝ CÂU LỆNH — Bộ «Tổ trưởng số»
+
+- 20/11/2026 · Sếp: «gợi ý các trợ lý hỗ trợ tổ trưởng chuyên môn để chia sẻ với các tổ trưởng khác» · Em: gợi ý 10 trợ lý theo nhịp năm học.
+- 20/11/2026 · Sếp: «tạo các app để đẩy lên trang web https://leanh2004ggv3-del.github.io/tro_ly_thong_minh/» · Em: dựng 6 app + trang chủ (Lịch việc tổ, Phân công tiết, Biên bản họp tổ, Tiến độ chương trình, Kết quả kiểm tra, Kiểm ma trận đề), mỗi app một file HTML không mạng; dữ liệu thử ở `#mau`; cửa kiểm 7/7 XANH (sửa lỗi Phân công khi chưa chọn GV + tràn ngang điện thoại; sửa chú thích «bình quân quy ra %» ở Kết quả kiểm tra).
+  - Em tự đặt (sếp duyệt): không ghi sẵn định mức tiết (TT 05/2025 THCS–THPT kho chưa đối chiếu); số tuần thực học mặc định 35 (sửa được); ngưỡng tiến độ: chậm từ 2 tiết, hơi chậm dưới 2 tiết; khung đề 12 TN + 4 Đ-S + 2 TL, Biết 40 · Hiểu 30 · VD 30 theo khuôn tổ CN-HN; ngày gợi ý trong Lịch việc tổ là mốc ước, mốc thật theo kế hoạch trường.
+- 20/11/2026 · Sếp: «Có, em gửi file» (gắn nút menu) · Em: hộp nạp chưa có file → lấy index.html đang chạy trên web (bản gốc lưu trang-chinh/), thêm mục «Tổ Trưởng Số» vào menu trái + menu điện thoại + vùng nội dung có iframe to-truong/index.html; chạy thử trên máy: bấm mục hiện đủ 6 công cụ, không lỗi mới.

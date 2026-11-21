@@ -3063,6 +3063,20 @@
                   <span className="bg-emerald-100 text-emerald-700 text-[10px] px-1.5 py-0.5 rounded-full font-bold">68</span>
                 </button>
 
+                {/* TAB MỚI: TỔ TRƯỞNG SỐ */}
+                <button
+                  onClick={() => setActiveTab('TO_TRUONG')}
+                  className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                    activeTab === 'TO_TRUONG' ? 'bg-violet-50 text-violet-800 font-bold border-l-4 border-violet-600 shadow-sm' : 'text-slate-700 hover:bg-slate-50'
+                  }`}
+                >
+                  <div className="flex items-center space-x-2.5 truncate">
+                    <i data-lucide="briefcase" className="w-4 h-4 text-violet-600 shrink-0"></i>
+                    <span className="truncate">Tổ Trưởng Số</span>
+                  </div>
+                  <span className="bg-violet-100 text-violet-700 text-[10px] px-1.5 py-0.5 rounded-full font-bold">8</span>
+                </button>
+
                 {/* TAB 5: THƯ VIỆN HỌC LIỆU */}
                 <button
                   onClick={() => setActiveTab('MATERIALS')}
@@ -3164,6 +3178,14 @@
                 }`}
               >
                 📺 Kho E-Learning (68)
+              </button>
+              <button
+                onClick={() => setActiveTab('TO_TRUONG')}
+                className={`px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap ${
+                  activeTab === 'TO_TRUONG' ? 'bg-violet-600 text-white font-bold' : 'bg-white text-slate-700 border border-slate-200'
+                }`}
+              >
+                🧑‍💼 Tổ Trưởng Số (8)
               </button>
 
               <button
@@ -5408,6 +5430,31 @@
                       allowFullScreen
                     ></iframe>
                   </div>
+                </div>
+              )}
+
+              {activeTab === 'TO_TRUONG' && (
+                <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                  <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3 border-b border-slate-100 bg-gradient-to-r from-violet-50 to-cyan-50">
+                    <div className="flex items-center gap-2.5">
+                      <i data-lucide="briefcase" className="w-5 h-5 text-violet-600"></i>
+                      <div>
+                        <h3 className="font-bold text-slate-800 text-base">Tổ Trưởng Số — 8 công cụ cho tổ trưởng, giáo viên</h3>
+                        <p className="text-xs text-slate-500">Lịch việc tổ · Phân công tiết · Biên bản họp tổ · Tiến độ chương trình · Kết quả kiểm tra · Kiểm ma trận đề · Tích hợp NLS – NLAI vào giáo án · Song ngữ Việt – Anh cho giáo án — dữ liệu chỉ lưu trên trình duyệt máy này</p>
+                      </div>
+                    </div>
+                    <a href="to-truong/index.html" target="_blank" rel="noopener noreferrer"
+                      className="px-3 py-1.5 bg-violet-600 hover:bg-violet-700 text-white rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors">
+                      <i data-lucide="external-link" className="w-3.5 h-3.5"></i>
+                      <span>Mở Tab Riêng</span>
+                    </a>
+                  </div>
+                  <iframe
+                    src="to-truong/index.html"
+                    className="w-full border-0 block"
+                    style={{ height: 'calc(100vh - 170px)', minHeight: '640px' }}
+                    title="Tổ Trưởng Số"
+                  ></iframe>
                 </div>
               )}
 
