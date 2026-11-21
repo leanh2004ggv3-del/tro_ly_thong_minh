@@ -2774,20 +2774,7 @@
   </div>
   ` : ''}
 
-  <!-- Đăng ký Service Worker lưu đệm ngoại tuyến (Offline & Fast Cache Storage) -->
-  <script>
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js')
-          .then((reg) => {
-            console.log('✅ Service Worker đã kích hoạt lưu đệm tài nguyên thành công:', reg.scope);
-          })
-          .catch((err) => {
-            console.warn('Lỗi đăng ký Service Worker:', err);
-          });
-      });
-    }
-  </script>
+
 
 </body>
 </html>
@@ -7706,6 +7693,21 @@ CREATE TABLE IF NOT EXISTS public.materials (
     }
 
     ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+
+  <!-- Đăng ký Service Worker lưu đệm ngoại tuyến (Offline & Fast Cache Storage) -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+          .then((reg) => {
+            console.log('✅ Service Worker đã kích hoạt lưu đệm tài nguyên thành công:', reg.scope);
+          })
+          .catch((err) => {
+            console.warn('Lỗi đăng ký Service Worker:', err);
+          });
+      });
+    }
   </script>
 </body>
 </html>
