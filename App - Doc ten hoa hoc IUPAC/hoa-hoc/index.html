@@ -1,0 +1,1165 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Đọc chuẩn Hoá học · IUPAC</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath d='M24 6h16v4h-3v14l16 26a6 6 0 0 1-5 9H16a6 6 0 0 1-5-9l16-26V10h-3z' fill='%2363b3ff'/%3E%3Cpath d='M16 44h32l4 7a3 3 0 0 1-3 4H15a3 3 0 0 1-3-4z' fill='%2334d399'/%3E%3C/svg%3E">
+<style>
+:root{
+  --nen1:#0b1530; --nen2:#13224a; --kinh:rgba(255,255,255,.07); --vien:rgba(255,255,255,.14); --chu:#eef3ff; --mo:#a9b8dc;
+  --chinh:#63b3ff; --nhan1:#34d399; --nhan2:#fb923c; --dung:#22c55e; --sai:#f87171;
+  --cat:#63b3ff; --so:#c084fc; --an:#fb923c; --d:#34d399; --t:#f472b6; --acid:#facc15; --rieng:#7dd3fc;
+  --goc:#63b3ff; --bao:#c084fc; --vt:#f472b6;
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{font-family:"Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif;color:var(--chu);
+  background:radial-gradient(900px 500px at 10% -5%,rgba(99,179,255,.22),transparent 60%),radial-gradient(800px 500px at 95% 10%,rgba(52,211,153,.16),transparent 60%),linear-gradient(160deg,var(--nen1),var(--nen2) 60%,#1a1540);
+  background-attachment:fixed}
+button{font:inherit;color:inherit;cursor:pointer}
+.kinh{background:var(--kinh);border:1px solid var(--vien);border-radius:20px;box-shadow:0 10px 30px rgba(0,0,0,.25);backdrop-filter:blur(6px)}
+header{display:flex;align-items:center;gap:16px;padding:14px 22px;flex-wrap:wrap}
+.logo{display:flex;align-items:center;gap:12px}
+.logo h1{margin:0;font-size:26px;letter-spacing:.5px;background:linear-gradient(90deg,#9fd3ff,#6ee7b7 55%,#fde68a);-webkit-background-clip:text;background-clip:text;color:transparent;font-weight:800}
+.logo small{display:block;color:var(--mo);font-size:13px;margin-top:2px}
+.tim{flex:1;min-width:240px;max-width:460px;margin-left:auto;position:relative}
+.tim input{width:100%;padding:12px 16px 12px 42px;border-radius:14px;border:1px solid var(--vien);background:rgba(255,255,255,.08);color:var(--chu);font-size:16px;outline:none}
+.tim input:focus{border-color:var(--chinh);box-shadow:0 0 0 3px rgba(99,179,255,.25)}
+.tim::before{content:"🔍";position:absolute;left:14px;top:11px;font-size:17px}
+.goi-y{position:absolute;left:0;right:0;top:50px;z-index:30;padding:6px;display:none;max-height:360px;overflow:auto;background:#162650}
+.goi-y.mo{display:block}
+.goi-y button{display:flex;gap:10px;align-items:center;width:100%;text-align:left;padding:9px 10px;border:0;background:none;border-radius:10px}
+.goi-y button:hover,.goi-y button.chon{background:rgba(99,179,255,.18)}
+.goi-y b{min-width:76px;font-size:15px}
+.goi-y span{color:var(--mo);font-size:13px}
+nav{display:flex;gap:8px;padding:0 22px 12px;flex-wrap:wrap}
+nav button{padding:10px 18px;border-radius:14px;border:1px solid var(--vien);background:rgba(255,255,255,.05);font-size:16px;font-weight:600;transition:.2s}
+nav button:hover{transform:translateY(-2px);background:rgba(255,255,255,.1)}
+nav button.on{background:linear-gradient(135deg,#3b82f6,#10b981);border-color:transparent;box-shadow:0 6px 18px rgba(16,185,129,.3)}
+main{padding:0 22px 16px}
+.man{display:none;animation:hien .3s ease}
+.man.on{display:block}
+.chup .man{animation:none}
+@keyframes hien{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+footer{padding:10px 22px 18px;color:var(--mo);font-size:13px;display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+.nhap{background:rgba(250,204,21,.14);border:1px solid rgba(250,204,21,.4);color:#fde68a;padding:5px 12px;border-radius:999px;font-weight:600}
+.nut{padding:11px 18px;border-radius:14px;border:0;font-weight:700;font-size:16px;background:linear-gradient(135deg,#3b82f6,#06b6d4);box-shadow:0 6px 16px rgba(59,130,246,.35);transition:.15s;min-height:44px}
+.nut:hover{transform:translateY(-2px)} .nut:active{transform:translateY(1px)}
+.nut.phu{background:rgba(255,255,255,.06);border:1px solid var(--vien);box-shadow:none}
+.nut.xanh{background:linear-gradient(135deg,#10b981,#22c55e)}
+.loa{width:52px;height:52px;border-radius:50%;border:0;font-size:24px;background:linear-gradient(135deg,#f59e0b,#f97316);box-shadow:0 6px 16px rgba(249,115,22,.4);transition:.15s;flex:none}
+.loa:hover{transform:scale(1.07)} .loa.cham{background:linear-gradient(135deg,#8b5cf6,#6366f1);box-shadow:0 6px 16px rgba(99,102,241,.4);width:44px;height:44px;font-size:19px}
+.loa.dang{animation:nhip .7s ease infinite}
+@keyframes nhip{50%{transform:scale(1.12)}}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:7px 12px;border-radius:999px;border:1px solid var(--vien);background:rgba(255,255,255,.06);font-size:14px;margin:3px}
+button.chip:hover{background:rgba(99,179,255,.18)}
+.k-cat{color:var(--cat)}.k-so{color:var(--so)}.k-an{color:var(--an)}.k-d{color:var(--d)}.k-t{color:var(--t)}.k-acid{color:var(--acid)}.k-rieng{color:var(--rieng)}.k-goc{color:var(--goc)}.k-bao{color:var(--bao)}.k-vt{color:var(--vt)}
+.ten-lon{font-size:44px;font-weight:800;letter-spacing:.3px;line-height:1.15;word-break:break-word}
+.ten-lon span{border-bottom:4px solid currentColor;padding:0;margin:0 .5px;border-radius:2px;cursor:help}
+.ten-lon span.k-{border:0}
+.ct{font-family:"Cambria Math","Times New Roman",serif;font-weight:700}
+.nhan-nho{color:var(--mo);font-size:13px;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
+
+/* Bảng tuần hoàn */
+.bang-wrap{display:grid;grid-template-columns:minmax(0,1fr) 440px;gap:18px}
+.bang-cuon{overflow-x:auto;padding:14px}
+.bth{display:grid;grid-template-columns:repeat(18,minmax(46px,1fr));grid-template-rows:repeat(7,54px) 14px repeat(2,54px);gap:4px;min-width:880px}
+.o{position:relative;border-radius:9px;border:0;padding:3px 0 0;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#0b1530;transition:transform .12s, box-shadow .12s, opacity .2s;font-weight:700}
+.o:hover{transform:scale(1.14);z-index:5;box-shadow:0 8px 20px rgba(0,0,0,.45)}
+.o i{position:absolute;left:4px;top:2px;font-style:normal;font-size:10px;font-weight:600;opacity:.8}
+.o b{font-size:19px;line-height:1}
+.o small{font-size:8.5px;font-weight:600;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:0 2px}
+.o.chon{outline:3px solid #fff;outline-offset:1px;transform:scale(1.12);z-index:6;box-shadow:0 0 0 6px rgba(255,255,255,.18),0 10px 24px rgba(0,0,0,.5)}
+.o.mo{opacity:.18}
+.o.cho{background:rgba(255,255,255,.06)!important;color:var(--mo);font-size:10px;border:1px dashed var(--vien)}
+.chu-thich{display:flex;flex-wrap:wrap;gap:4px;margin-top:12px}
+.chu-thich button{font-size:12.5px;padding:5px 10px}
+.chu-thich i{width:12px;height:12px;border-radius:4px;display:inline-block}
+.chi-tiet{padding:20px;position:sticky;top:10px;align-self:start}
+.the-nt{display:flex;gap:16px;align-items:center}
+.o-to{width:118px;height:118px;border-radius:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#0b1530;position:relative;flex:none;box-shadow:0 10px 30px rgba(0,0,0,.35)}
+.o-to i{position:absolute;left:10px;top:7px;font-style:normal;font-weight:700}
+.o-to b{font-size:50px;line-height:1}
+.dong{display:flex;gap:10px;align-items:center;margin-top:14px;flex-wrap:wrap}
+.ipa{font-family:"Segoe UI","Lucida Sans Unicode","Arial Unicode MS",sans-serif;font-size:22px;color:#fde68a}
+.goi-doc{font-size:20px;font-weight:700;letter-spacing:.5px}
+.goi-doc em{font-style:normal;color:#fb923c}
+.hang-tt{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px}
+.hang-tt div{background:rgba(255,255,255,.05);border-radius:12px;padding:8px 12px}
+.hang-tt b{display:block;font-size:17px}
+.hang-tt span{color:var(--mo);font-size:12px}
+.luu-y{margin-top:12px;padding:10px 14px;border-left:4px solid #facc15;background:rgba(250,204,21,.08);border-radius:10px;font-size:14.5px}
+.nguyen-tu{width:120px;height:120px;flex:none}
+
+/* Ghép tên */
+.ghep-wrap{display:grid;grid-template-columns:420px minmax(0,1fr);gap:18px}
+.o-nhap{padding:20px}
+.o-nhap input{width:100%;font-size:34px;padding:14px 16px;border-radius:16px;border:2px solid var(--vien);background:rgba(0,0,0,.2);color:#fff;font-family:"Cambria Math","Times New Roman",serif;font-weight:700;outline:none}
+.o-nhap input:focus{border-color:var(--chinh)}
+.xem-ct{font-size:28px;margin:10px 4px;min-height:40px;color:#c7e3ff}
+.phim{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin-top:10px}
+.phim button{padding:10px 0;border-radius:10px;border:1px solid var(--vien);background:rgba(255,255,255,.06);font-weight:700;font-size:16px}
+.phim button:hover{background:rgba(99,179,255,.2)}
+.ket-qua{padding:22px;min-height:420px}
+.ion-hinh{width:100%;height:170px;margin:8px 0 6px}
+.buoc{list-style:none;padding:0;margin:14px 0 0;counter-reset:b}
+.buoc li{counter-increment:b;position:relative;padding:9px 12px 9px 46px;margin:6px 0;background:rgba(255,255,255,.04);border-radius:12px;font-size:15.5px;line-height:1.45}
+.buoc li::before{content:counter(b);position:absolute;left:10px;top:8px;width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,#3b82f6,#10b981);display:grid;place-items:center;font-weight:800;font-size:14px}
+.ten-cu{font-size:16px;color:var(--mo);margin-top:6px}
+.ten-cu b{color:#e2e8f0}
+.loi-the{display:flex;gap:16px;align-items:center;padding:18px;border-radius:16px;background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.4);animation:rung .4s}
+@keyframes rung{20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+.chu-giai{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;font-size:13px}
+.chu-giai span{padding:3px 10px;border-radius:999px;background:rgba(255,255,255,.06)}
+
+/* Hữu cơ */
+.hc-wrap{display:grid;grid-template-columns:400px minmax(0,1fr);gap:18px}
+.dieu-khien{padding:20px}
+.dieu-khien label{display:block;margin:14px 0 6px;font-weight:700}
+input[type=range]{width:100%;accent-color:#34d399;height:28px}
+.ho{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.ho button{padding:10px 8px;border-radius:12px;border:1px solid var(--vien);background:rgba(255,255,255,.05);font-weight:600;font-size:14.5px;text-align:left}
+.ho button.on{background:linear-gradient(135deg,rgba(59,130,246,.5),rgba(16,185,129,.5));border-color:transparent}
+.ho small{display:block;color:var(--mo);font-weight:400;font-size:12px}
+.mach{width:100%;height:230px}
+
+/* Quy tắc */
+.qt-luoi{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.qt{padding:18px}
+.qt h3{margin:0 0 4px;font-size:20px}
+.qt p{margin:6px 0;color:#d6e2ff;font-size:15px;line-height:1.45}
+.khoi{display:flex;gap:6px;flex-wrap:wrap;margin:12px 0}
+.khoi span{padding:8px 12px;border-radius:12px;font-weight:800;font-size:16px;color:#0b1530}
+.vd{display:flex;align-items:center;gap:8px;margin:6px 0;padding:6px 8px;border-radius:12px;background:rgba(255,255,255,.04)}
+.vd .ct{min-width:92px;font-size:18px}
+.vd button.loa{width:36px;height:36px;font-size:16px}
+.vd a{color:inherit;text-decoration:none;flex:1;cursor:pointer}
+
+/* Luyện */
+.che-do{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.che{padding:22px;text-align:left;border:1px solid var(--vien);transition:.2s}
+.che:hover{transform:translateY(-4px);border-color:var(--chinh)}
+.che .bieu{font-size:46px}
+.che h3{margin:6px 0;font-size:21px}
+.che p{margin:0;color:var(--mo)}
+.cau-wrap{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:18px}
+.cau{padding:24px;min-height:440px}
+.cham{display:flex;gap:6px;margin-bottom:16px}
+.cham i{flex:1;height:10px;border-radius:6px;background:rgba(255,255,255,.12)}
+.cham i.dung{background:var(--dung)}.cham i.sai{background:var(--sai)}.cham i.dang{background:#fde68a;box-shadow:0 0 10px #fde68a}
+.de{display:flex;align-items:center;justify-content:center;gap:20px;min-height:150px;font-size:64px}
+.lua-chon{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.lua-chon button{padding:18px 16px;border-radius:16px;border:2px solid var(--vien);background:rgba(255,255,255,.05);font-size:21px;font-weight:700;text-align:left;transition:.15s}
+.lua-chon button:hover{border-color:var(--chinh);transform:translateY(-2px)}
+.lua-chon button.dung{background:rgba(34,197,94,.22);border-color:var(--dung)}
+.lua-chon button.sai{background:rgba(248,113,113,.2);border-color:var(--sai);animation:rung .4s}
+.lua-chon button:disabled{cursor:default}
+.phan-hoi{margin-top:14px;padding:14px 16px;border-radius:14px;font-size:16px;line-height:1.45;display:none}
+.phan-hoi.dung{display:block;background:rgba(34,197,94,.14);border:1px solid rgba(34,197,94,.5)}
+.phan-hoi.sai{display:block;background:rgba(248,113,113,.12);border:1px solid rgba(248,113,113,.45)}
+.ben{padding:20px;text-align:center}
+.diem-to{font-size:56px;font-weight:800;background:linear-gradient(90deg,#6ee7b7,#fde68a);-webkit-background-clip:text;background-clip:text;color:transparent}
+.sao{font-size:46px;letter-spacing:6px}
+canvas.bieu-do{width:100%;height:200px}
+.bong{position:relative;background:#fff;color:#0b1530;padding:10px 14px;border-radius:16px;font-weight:600;font-size:15px;margin-bottom:8px}
+.bong::after{content:"";position:absolute;bottom:-9px;left:50%;margin-left:-9px;border:9px solid transparent;border-top-color:#fff;border-bottom:0}
+.linh-vat{animation:noi 3s ease-in-out infinite}
+.chup .linh-vat{animation:none}
+@keyframes noi{50%{transform:translateY(-6px)}}
+.du-lieu-thu{display:inline-block;background:#facc15;color:#0b1530;font-weight:800;padding:3px 10px;border-radius:8px;font-size:12px;margin-left:8px}
+#phao{position:fixed;inset:0;pointer-events:none;z-index:50}
+.toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);background:#1e293b;border:1px solid var(--vien);padding:12px 18px;border-radius:14px;z-index:60;opacity:0;transition:.3s;pointer-events:none;max-width:90vw}
+.toast.hien{opacity:1}
+@media (max-width:1100px){.bang-wrap,.ghep-wrap,.hc-wrap,.cau-wrap{grid-template-columns:1fr}.qt-luoi,.che-do{grid-template-columns:1fr 1fr}.chi-tiet{position:static}}
+@media (max-width:640px){.qt-luoi,.che-do,.lua-chon{grid-template-columns:1fr}.ten-lon{font-size:32px}.logo h1{font-size:21px}.de{font-size:46px}header{padding:12px}main{padding:0 12px 12px}nav{padding:0 12px 10px}nav button{padding:8px 12px;font-size:14.5px}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <linearGradient id="gBinh" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e0f2fe"/><stop offset="1" stop-color="#93c5fd"/></linearGradient>
+    <linearGradient id="gNuoc" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#34d399"/><stop offset="1" stop-color="#06b6d4"/></linearGradient>
+    <radialGradient id="gHat" cx=".35" cy=".35" r=".7"><stop offset="0" stop-color="#fff"/><stop offset=".35" stop-color="#fca5a5"/><stop offset="1" stop-color="#dc2626"/></radialGradient>
+    <radialGradient id="gC" cx=".35" cy=".35" r=".7"><stop offset="0" stop-color="#94a3b8"/><stop offset="1" stop-color="#1e293b"/></radialGradient>
+    <radialGradient id="gO" cx=".35" cy=".35" r=".7"><stop offset="0" stop-color="#fecaca"/><stop offset="1" stop-color="#dc2626"/></radialGradient>
+    <radialGradient id="gN" cx=".35" cy=".35" r=".7"><stop offset="0" stop-color="#bfdbfe"/><stop offset="1" stop-color="#2563eb"/></radialGradient>
+    <radialGradient id="gCat" cx=".35" cy=".35" r=".7"><stop offset="0" stop-color="#dbeafe"/><stop offset="1" stop-color="#3b82f6"/></radialGradient>
+    <radialGradient id="gAn" cx=".35" cy=".35" r=".7"><stop offset="0" stop-color="#ffedd5"/><stop offset="1" stop-color="#f97316"/></radialGradient>
+    <filter id="bong" x="-20%" y="-20%" width="140%" height="150%"><feDropShadow dx="0" dy="4" stdDeviation="4" flood-opacity=".35"/></filter>
+  </defs>
+</svg>
+
+<header>
+  <div class="logo">
+    <svg width="54" height="54" viewBox="0 0 64 64" aria-hidden="true"><path d="M24 6h16v4h-3v14l16 26a6 6 0 0 1-5 9H16a6 6 0 0 1-5-9l16-26V10h-3z" fill="url(#gBinh)" filter="url(#bong)"/><path d="M14.5 44h35l3.5 6.5a4 4 0 0 1-3.5 6H14.5a4 4 0 0 1-3.5-6z" fill="url(#gNuoc)"/><circle cx="26" cy="49" r="2.5" fill="#fff" opacity=".8"/><circle cx="36" cy="46" r="1.8" fill="#fff" opacity=".7"/><text x="32" y="38" font-size="11" text-anchor="middle" font-weight="800" fill="#1e3a8a">Aa</text></svg>
+    <div><h1>ĐỌC CHUẨN HOÁ HỌC</h1><small>Tên nguyên tố &amp; hợp chất theo IUPAC · nghe đọc mẫu · luyện đọc</small></div>
+  </div>
+  <div class="tim">
+    <input id="tim" placeholder="Gõ: Na, sắt, natri clorua, H2SO4…" autocomplete="off" aria-label="Tìm nguyên tố hoặc hợp chất">
+    <div class="goi-y kinh" id="goiY"></div>
+  </div>
+</header>
+<nav id="nav">
+  <button data-man="bang">🧪 Bảng tuần hoàn</button>
+  <button data-man="ghep">🔤 Công thức → Tên</button>
+  <button data-man="huu-co">⛓️ Hữu cơ</button>
+  <button data-man="quy-tac">📏 Quy tắc gọi tên</button>
+  <button data-man="luyen">🎯 Luyện đọc</button>
+</nav>
+
+<main>
+  <!-- 1. BẢNG TUẦN HOÀN -->
+  <section class="man" id="m-bang">
+    <div class="bang-wrap">
+      <div class="kinh bang-cuon">
+        <div class="bth" id="bth"></div>
+        <div class="chu-thich" id="chuThich"></div>
+      </div>
+      <aside class="kinh chi-tiet" id="chiTiet"></aside>
+    </div>
+  </section>
+
+  <!-- 2. GHÉP TÊN -->
+  <section class="man" id="m-ghep">
+    <div class="ghep-wrap">
+      <div class="kinh o-nhap">
+        <div class="nhan-nho">Gõ công thức hoá học</div>
+        <input id="ctVao" value="Fe2(SO4)3" autocomplete="off" spellcheck="false" aria-label="Công thức hoá học">
+        <div class="xem-ct ct" id="xemCt"></div>
+        <div class="phim" id="phim"></div>
+        <div class="nhan-nho" style="margin-top:16px">Thử nhanh</div>
+        <div id="thuNhanh"></div>
+      </div>
+      <div class="kinh ket-qua" id="ketQua"></div>
+    </div>
+  </section>
+
+  <!-- 3. HỮU CƠ -->
+  <section class="man" id="m-huu-co">
+    <div class="hc-wrap">
+      <div class="kinh dieu-khien">
+        <div class="nhan-nho">Dựng mạch carbon</div>
+        <label>Số nguyên tử carbon: <span id="soC" class="k-goc" style="font-size:22px">3</span></label>
+        <input type="range" id="cC" min="1" max="10" value="3">
+        <label>Loại chất</label>
+        <div class="ho" id="hoBtn"></div>
+        <div id="vtKhung"><label>Vị trí nhóm chức / liên kết bội: <span id="soVt" class="k-vt" style="font-size:22px">1</span></label>
+        <input type="range" id="cVt" min="1" max="2" value="1"></div>
+      </div>
+      <div class="kinh ket-qua" id="hcKetQua"></div>
+    </div>
+  </section>
+
+  <!-- 4. QUY TẮC -->
+  <section class="man" id="m-quy-tac"><div class="qt-luoi" id="qtLuoi"></div></section>
+
+  <!-- 5. LUYỆN ĐỌC -->
+  <section class="man" id="m-luyen"><div id="luyen"></div></section>
+</main>
+
+<footer>
+  <span class="nhap">✅ BẢN NHÁP — thầy/cô duyệt trước khi dùng</span>
+  <span>Tên theo khuyến nghị IUPAC (Red Book 2005 · Blue Book 2013) · Phiên âm giọng Anh – Anh · Tiếng đọc thu sẵn, không cần mạng.</span>
+  <span>Nhờ GV Hoá học soát lại trước khi dạy.</span>
+</footer>
+<canvas id="phao"></canvas>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ten.js — dữ liệu + bộ ghép tên Hoá học theo IUPAC (dùng chung cho app và cho lệnh liệt kê câu cần thu tiếng).
+   ✅ BẢN NHÁP — GV Hoá/KHTN soát lại tên, phiên âm trước khi dùng.
+   Nguồn quy tắc: IUPAC «Nomenclature of Inorganic Chemistry» (Red Book 2005) · «Nomenclature of Organic Chemistry» (Blue Book 2013).
+   Phiên âm IPA: giọng Anh – Anh theo từ điển phổ thông. «Gợi ý đọc» chỉ là cách ghi gần đúng bằng chữ Việt, CHỮ IN HOA = âm nhấn. */
+(function (G) {
+"use strict";
+
+/* Z|kí hiệu|tên IUPAC|IPA|gợi ý đọc|tên tiếng Việt quen gọi (SGK trước 2018)|nhóm */
+const NT_THO = `1|H|hydrogen|ˈhaɪdrədʒən|HAI-đrơ-giần|hiđro|pk
+2|He|helium|ˈhiːliəm|HI-li-ầm|heli|kh
+3|Li|lithium|ˈlɪθiəm|LI-thi-ầm|liti|k
+4|Be|beryllium|bəˈrɪliəm|bơ-RI-li-ầm|beri|kt
+5|B|boron|ˈbɔːrɒn|BO-rơn|bo|a
+6|C|carbon|ˈkɑːbən|CA-bần|cacbon|pk
+7|N|nitrogen|ˈnaɪtrədʒən|NAI-trơ-giần|nitơ|pk
+8|O|oxygen|ˈɒksɪdʒən|OC-xi-giần|oxi|pk
+9|F|fluorine|ˈflɔːriːn|FLO-rin|flo|h
+10|Ne|neon|ˈniːɒn|NI-on|neon|kh
+11|Na|sodium|ˈsəʊdiəm|XÂU-đi-ầm|natri|k
+12|Mg|magnesium|mæɡˈniːziəm|mắc-NI-di-ầm|magie|kt
+13|Al|aluminium|ˌæljəˈmɪniəm|a-liu-MI-ni-ầm|nhôm|kl
+14|Si|silicon|ˈsɪlɪkən|XI-li-cần|silic|a
+15|P|phosphorus|ˈfɒsfərəs|PHỐT-phơ-rợt|photpho|pk
+16|S|sulfur|ˈsʌlfə|XAN-phờ|lưu huỳnh|pk
+17|Cl|chlorine|ˈklɔːriːn|CLO-rin|clo|h
+18|Ar|argon|ˈɑːɡɒn|A-gon|agon|kh
+19|K|potassium|pəˈtæsiəm|pơ-TA-xi-ầm|kali|k
+20|Ca|calcium|ˈkælsiəm|CAN-xi-ầm|canxi|kt
+21|Sc|scandium|ˈskændiəm|XCAN-đi-ầm||cht
+22|Ti|titanium|tɪˈteɪniəm|ti-TÂY-ni-ầm|titan|cht
+23|V|vanadium|vəˈneɪdiəm|vơ-NÂY-đi-ầm||cht
+24|Cr|chromium|ˈkrəʊmiəm|CRÂU-mi-ầm|crom|cht
+25|Mn|manganese|ˈmæŋɡəniːz|MĂNG-gơ-niz|mangan|cht
+26|Fe|iron|ˈaɪən|AI-ần|sắt|cht
+27|Co|cobalt|ˈkəʊbɒlt|CÂU-bôn|coban|cht
+28|Ni|nickel|ˈnɪkl|NÍCH-cồ|niken|cht
+29|Cu|copper|ˈkɒpə|CÓP-pờ|đồng|cht
+30|Zn|zinc|zɪŋk|DINH-k|kẽm|cht
+31|Ga|gallium|ˈɡæliəm|GA-li-ầm|gali|kl
+32|Ge|germanium|dʒəˈmeɪniəm|giơ-MÂY-ni-ầm||a
+33|As|arsenic|ˈɑːsnɪk|A-xơ-ních|asen|a
+34|Se|selenium|səˈliːniəm|xơ-LI-ni-ầm||pk
+35|Br|bromine|ˈbrəʊmiːn|BRÂU-min|brom|h
+36|Kr|krypton|ˈkrɪptɒn|CRÍP-tơn||kh
+37|Rb|rubidium|ruːˈbɪdiəm|ru-BI-đi-ầm||k
+38|Sr|strontium|ˈstrɒntiəm|XTRÔN-ti-ầm||kt
+39|Y|yttrium|ˈɪtriəm|Í-tri-ầm||cht
+40|Zr|zirconium|zɜːˈkəʊniəm|dơ-CÂU-ni-ầm||cht
+41|Nb|niobium|naɪˈəʊbiəm|nai-ÂU-bi-ầm||cht
+42|Mo|molybdenum|məˈlɪbdənəm|mơ-LÍP-đơ-nầm||cht
+43|Tc|technetium|tekˈniːʃiəm|téc-NI-si-ầm||cht
+44|Ru|ruthenium|ruːˈθiːniəm|ru-THI-ni-ầm||cht
+45|Rh|rhodium|ˈrəʊdiəm|RÂU-đi-ầm||cht
+46|Pd|palladium|pəˈleɪdiəm|pơ-LÂY-đi-ầm||cht
+47|Ag|silver|ˈsɪlvə|XIU-vờ|bạc|cht
+48|Cd|cadmium|ˈkædmiəm|CÁT-mi-ầm||cht
+49|In|indium|ˈɪndiəm|IN-đi-ầm||kl
+50|Sn|tin|tɪn|TIN|thiếc|kl
+51|Sb|antimony|ˈæntɪməni|AN-ti-mơ-ni||a
+52|Te|tellurium|təˈlʊəriəm|tơ-LUA-ri-ầm||a
+53|I|iodine|ˈaɪədiːn|AI-ơ-đin|iot|h
+54|Xe|xenon|ˈzenɒn|DE-non||kh
+55|Cs|caesium|ˈsiːziəm|XI-di-ầm||k
+56|Ba|barium|ˈbeəriəm|BE-ri-ầm|bari|kt
+57|La|lanthanum|ˈlænθənəm|LAN-thơ-nầm||la
+58|Ce|cerium|ˈsɪəriəm|XIA-ri-ầm||la
+59|Pr|praseodymium|ˌpreɪziəˈdɪmiəm|prây-di-ơ-ĐI-mi-ầm||la
+60|Nd|neodymium|ˌniːəˈdɪmiəm|ni-ơ-ĐI-mi-ầm||la
+61|Pm|promethium|prəˈmiːθiəm|prơ-MI-thi-ầm||la
+62|Sm|samarium|səˈmeəriəm|xơ-ME-ri-ầm||la
+63|Eu|europium|jʊəˈrəʊpiəm|diu-RÂU-pi-ầm||la
+64|Gd|gadolinium|ˌɡædəˈlɪniəm|ga-đơ-LI-ni-ầm||la
+65|Tb|terbium|ˈtɜːbiəm|TƠ-bi-ầm||la
+66|Dy|dysprosium|dɪsˈprəʊziəm|đít-PRÂU-di-ầm||la
+67|Ho|holmium|ˈhəʊlmiəm|HÂU-mi-ầm||la
+68|Er|erbium|ˈɜːbiəm|Ơ-bi-ầm||la
+69|Tm|thulium|ˈθjuːliəm|THIU-li-ầm||la
+70|Yb|ytterbium|ɪˈtɜːbiəm|i-TƠ-bi-ầm||la
+71|Lu|lutetium|luːˈtiːʃiəm|lu-TI-si-ầm||la
+72|Hf|hafnium|ˈhæfniəm|HÁP-ni-ầm||cht
+73|Ta|tantalum|ˈtæntələm|TAN-tơ-lầm||cht
+74|W|tungsten|ˈtʌŋstən|TĂNG-xtần|vonfram|cht
+75|Re|rhenium|ˈriːniəm|RI-ni-ầm||cht
+76|Os|osmium|ˈɒzmiəm|ÔT-mi-ầm||cht
+77|Ir|iridium|ɪˈrɪdiəm|i-RI-đi-ầm||cht
+78|Pt|platinum|ˈplætɪnəm|PLA-ti-nầm|platin|cht
+79|Au|gold|ɡəʊld|GÂU-đ|vàng|cht
+80|Hg|mercury|ˈmɜːkjəri|MƠ-kiu-ri|thuỷ ngân|cht
+81|Tl|thallium|ˈθæliəm|THA-li-ầm||kl
+82|Pb|lead|led|LÉT|chì|kl
+83|Bi|bismuth|ˈbɪzməθ|BÍT-mợt|bitmut|kl
+84|Po|polonium|pəˈləʊniəm|pơ-LÂU-ni-ầm||kl
+85|At|astatine|ˈæstətiːn|A-xtơ-tin||h
+86|Rn|radon|ˈreɪdɒn|RÂY-đon||kh
+87|Fr|francium|ˈfrænsiəm|FRAN-xi-ầm||k
+88|Ra|radium|ˈreɪdiəm|RÂY-đi-ầm||kt
+89|Ac|actinium|ækˈtɪniəm|ắc-TI-ni-ầm||ac
+90|Th|thorium|ˈθɔːriəm|THO-ri-ầm||ac
+91|Pa|protactinium|ˌprəʊtækˈtɪniəm|prâu-tắc-TI-ni-ầm||ac
+92|U|uranium|jʊˈreɪniəm|diu-RÂY-ni-ầm|urani|ac
+93|Np|neptunium|nepˈtjuːniəm|nép-TIU-ni-ầm||ac
+94|Pu|plutonium|pluːˈtəʊniəm|plu-TÂU-ni-ầm||ac
+95|Am|americium|ˌæməˈrɪsiəm|a-mơ-RI-xi-ầm||ac
+96|Cm|curium|ˈkjʊəriəm|KIUA-ri-ầm||ac
+97|Bk|berkelium|bɜːˈkiːliəm|bơ-KI-li-ầm||ac
+98|Cf|californium|ˌkælɪˈfɔːniəm|ca-li-PHO-ni-ầm||ac
+99|Es|einsteinium|aɪnˈstaɪniəm|ai-XTAI-ni-ầm||ac
+100|Fm|fermium|ˈfɜːmiəm|PHƠ-mi-ầm||ac
+101|Md|mendelevium|ˌmendəˈliːviəm|men-đơ-LI-vi-ầm||ac
+102|No|nobelium|nəʊˈbiːliəm|nâu-BI-li-ầm||ac
+103|Lr|lawrencium|lɒˈrensiəm|lo-REN-xi-ầm||ac
+104|Rf|rutherfordium|ˌrʌðəˈfɔːdiəm|ra-đơ-PHO-đi-ầm||cht
+105|Db|dubnium|ˈduːbniəm|ĐÚP-ni-ầm||cht
+106|Sg|seaborgium|siːˈbɔːɡiəm|xi-BO-gi-ầm||cht
+107|Bh|bohrium|ˈbɔːriəm|BO-ri-ầm||cht
+108|Hs|hassium|ˈhæsiəm|HA-xi-ầm||cht
+109|Mt|meitnerium|maɪtˈnɪəriəm|mai-NIA-ri-ầm||cr
+110|Ds|darmstadtium|dɑːmˈʃtætiəm|đam-STA-ti-ầm||cr
+111|Rg|roentgenium|rɜːntˈɡeniəm|rơnt-GHE-ni-ầm||cr
+112|Cn|copernicium|ˌkəʊpəˈnɪsiəm|câu-pơ-NI-xi-ầm||cr
+113|Nh|nihonium|nɪˈhəʊniəm|ni-HÂU-ni-ầm||cr
+114|Fl|flerovium|fləˈrəʊviəm|flơ-RÂU-vi-ầm||cr
+115|Mc|moscovium|mɒsˈkəʊviəm|mốt-CÂU-vi-ầm||cr
+116|Lv|livermorium|ˌlɪvəˈmɔːriəm|li-vơ-MO-ri-ầm||cr
+117|Ts|tennessine|ˈtenəsiːn|TE-nơ-xin||cr
+118|Og|oganesson|ˌɒɡəˈnesɒn|o-gơ-NE-xơn||cr`;
+
+const NHOM = {
+  k:  ["Kim loại kiềm", "#ff7a59"], kt: ["Kim loại kiềm thổ", "#ffb347"], cht: ["Kim loại chuyển tiếp", "#f6d365"],
+  kl: ["Kim loại khác", "#9bd77a"], a: ["Á kim", "#4fd1c5"], pk: ["Phi kim", "#63b3ff"], h: ["Halogen", "#a78bfa"],
+  kh: ["Khí hiếm", "#f472b6"], la: ["Họ lanthanide", "#fda4af"], ac: ["Họ actinide", "#fdba74"], cr: ["Chưa rõ tính chất", "#94a3b8"]
+};
+
+/* Ghi chú chính tả IUPAC hay nhầm */
+const GHI_CHU_NT = {
+  S: "IUPAC viết «sulfur» — không viết «sulphur» (cách viết cũ của Anh).",
+  Al: "IUPAC viết «aluminium». Ở Mỹ hay viết «aluminum».",
+  Cs: "IUPAC viết «caesium». Ở Mỹ hay viết «cesium».",
+  Na: "Kí hiệu Na lấy từ tên Latin natrium, nhưng tên IUPAC là «sodium».",
+  K: "Kí hiệu K lấy từ tên Latin kalium, nhưng tên IUPAC là «potassium».",
+  Fe: "Kí hiệu Fe lấy từ tên Latin ferrum; tên IUPAC là «iron», đọc /ˈaɪən/, không đọc «ai-rôn».",
+  Cu: "Kí hiệu Cu lấy từ tên Latin cuprum; tên IUPAC là «copper».",
+  Ag: "Kí hiệu Ag lấy từ tên Latin argentum; tên IUPAC là «silver».",
+  Au: "Kí hiệu Au lấy từ tên Latin aurum; tên IUPAC là «gold».",
+  Hg: "Kí hiệu Hg lấy từ tên Latin hydrargyrum; tên IUPAC là «mercury».",
+  Pb: "Kí hiệu Pb lấy từ tên Latin plumbum; tên IUPAC là «lead», đọc /led/ (như «led»).",
+  Sn: "Kí hiệu Sn lấy từ tên Latin stannum; tên IUPAC là «tin».",
+  W: "Kí hiệu W lấy từ tên wolfram; tên IUPAC là «tungsten».",
+  Sb: "Kí hiệu Sb lấy từ tên Latin stibium; tên IUPAC là «antimony».",
+  F: "Viết «fluorine» — chữ u đứng trước o (không viết «flourine»).",
+  I: "Tên IUPAC là «iodine»; gốc trong hợp chất là «iod-»: iodide."
+};
+
+const NT = NT_THO.split("\n").map(d => {
+  const [z, k, ten, ipa, goi, cu, nhom] = d.split("|");
+  return { z: +z, k, ten, ipa, goi, cu, nhom };
+});
+const NT_K = {}; NT.forEach(e => NT_K[e.k] = e);
+
+/* Vị trí trên bảng tuần hoàn: [hàng, cột]; hàng 9–10 là họ lanthanide/actinide */
+function viTri(z) {
+  if (z === 1) return [1, 1]; if (z === 2) return [1, 18];
+  const chuKi = [[3, 10, 2], [11, 18, 3]];
+  for (const [a, b, h] of chuKi) if (z >= a && z <= b) { const i = z - a; return [h, i < 2 ? i + 1 : i + 11]; }
+  if (z <= 36) return [4, z - 18]; if (z <= 54) return [5, z - 36];
+  if (z <= 56) return [6, z - 54]; if (z <= 71) return [9, z - 57 + 3]; if (z <= 86) return [6, z - 68];
+  if (z <= 88) return [7, z - 86]; if (z <= 103) return [10, z - 89 + 3]; return [7, z - 100];
+}
+
+/* Kim loại: hoá trị (điện tích ion) có thể có. Nhiều hơn 1 → phải ghi số La Mã. */
+const KL = { Li:[1],Na:[1],K:[1],Rb:[1],Cs:[1],Ag:[1],Be:[2],Mg:[2],Ca:[2],Sr:[2],Ba:[2],Zn:[2],Cd:[2],Al:[3],Ga:[3],
+  Fe:[2,3],Cu:[1,2],Cr:[2,3,6],Mn:[2,3,4,7],Co:[2,3],Ni:[2,3],Pb:[2,4],Sn:[2,4],Hg:[1,2],Au:[1,3],Pt:[2,4],Ti:[2,3,4],V:[2,3,4,5] };
+const LA_MA = ["", "I", "II", "III", "IV", "V", "VI", "VII", "VIII"];
+const SO_DOC = ["", "one", "two", "three", "four", "five", "six", "seven", "eight"];
+
+/* Gốc acid / anion: công thức | điện tích | mảnh tên | tên acid | tên gốc tiếng Việt cũ | tên acid tiếng Việt cũ */
+const AN_THO = [
+  ["F", 1, "fluor:an ide:d", "hydrofluoric acid", "florua", "axit flohiđric"],
+  ["Cl", 1, "chlor:an ide:d", "hydrochloric acid", "clorua", "axit clohiđric"],
+  ["Br", 1, "brom:an ide:d", "hydrobromic acid", "bromua", "axit bromhiđric"],
+  ["I", 1, "iod:an ide:d", "hydroiodic acid", "iotua", "axit iothiđric"],
+  ["O", 2, "ox:an ide:d", "", "oxit", ""],
+  ["S", 2, "sulf:an ide:d", "hydrosulfuric acid", "sunfua", "axit sunfuhiđric"],
+  ["N", 3, "nitr:an ide:d", "", "nitrua", ""],
+  ["P", 3, "phosph:an ide:d", "", "photphua", ""],
+  ["H", 1, "hydr:an ide:d", "", "hiđrua", ""],
+  ["OH", 1, "hydrox:an ide:d", "", "hiđroxit", ""],
+  ["CN", 1, "cyan:an ide:d", "hydrocyanic acid", "xianua", "axit xianhiđric"],
+  ["NO3", 1, "nitr:an ate:d", "nitric acid", "nitrat", "axit nitric"],
+  ["NO2", 1, "nitr:an ite:d", "nitrous acid", "nitrit", "axit nitrơ"],
+  ["SO4", 2, "sulf:an ate:d", "sulfuric acid", "sunfat", "axit sunfuric"],
+  ["SO3", 2, "sulf:an ite:d", "sulfurous acid", "sunfit", "axit sunfurơ"],
+  ["HSO4", 1, "hydrogen:t sulf:an ate:d", "", "hiđrosunfat", ""],
+  ["HSO3", 1, "hydrogen:t sulf:an ite:d", "", "hiđrosunfit", ""],
+  ["CO3", 2, "carbon:an ate:d", "carbonic acid", "cacbonat", "axit cacbonic"],
+  ["HCO3", 1, "hydrogen:t carbon:an ate:d", "", "hiđrocacbonat", ""],
+  ["PO4", 3, "phosph:an ate:d", "phosphoric acid", "photphat", "axit photphoric"],
+  ["HPO4", 2, "hydrogen:t phosph:an ate:d", "", "hiđrophotphat", ""],
+  ["H2PO4", 1, "dihydrogen:t phosph:an ate:d", "", "đihiđrophotphat", ""],
+  ["SiO3", 2, "silic:an ate:d", "silicic acid", "silicat", "axit silicic"],
+  ["ClO", 1, "hypo:t chlor:an ite:d", "hypochlorous acid", "hipoclorit", "axit hipoclorơ"],
+  ["ClO3", 1, "chlor:an ate:d", "chloric acid", "clorat", "axit cloric"],
+  ["ClO4", 1, "per:t chlor:an ate:d", "perchloric acid", "peclorat", "axit pecloric"],
+  ["MnO4", 1, "per:t mangan:an ate:d", "permanganic acid", "pemanganat", "axit pemanganic"],
+  ["CrO4", 2, "chrom:an ate:d", "chromic acid", "cromat", "axit cromic"],
+  ["Cr2O7", 2, "di:t chrom:an ate:d", "dichromic acid", "đicromat", "axit đicromic"],
+  ["CH3COO", 1, "ethano:an ate:d", "ethanoic acid", "axetat", "axit axetic"]
+];
+const AN = {}; AN_THO.forEach(([ct, q, m, acid, cu, acidCu]) => {
+  AN[ct] = { ct, q, manh: m.split(" ").map(x => { const [t, k] = x.split(":"); return { t, k }; }), acid, cu, acidCu };
+});
+AN.CH3COO.thuong = "acetate"; AN.CH3COO.acidThuong = "acetic acid";
+
+/* Phi kim — thứ tự IUPAC khi gọi tên hợp chất hai phi kim (nguyên tố đứng trước gọi trước) */
+const THU_TU_PK = ["Rn","Xe","Kr","B","Si","C","Sb","As","P","N","H","Te","Se","S","At","I","Br","Cl","O","F"];
+const GOC_PK = { O:"ox", S:"sulf", N:"nitr", P:"phosph", C:"carb", Si:"silic", Se:"selen", Te:"tellur", As:"arsen", H:"hydr", B:"bor", F:"fluor", Cl:"chlor", Br:"brom", I:"iod", Sb:"antimon", Xe:"xen", Kr:"krypt" };
+const TIEN_TO = ["", "mono", "di", "tri", "tetra", "penta", "hexa", "hepta", "octa", "nona", "deca"];
+const TIEN_TO_VN = ["", "mono", "đi", "tri", "tetra", "penta", "hexa", "hepta", "octa", "nona", "đeca"];
+
+/* Chất có tên riêng (IUPAC chấp nhận) — tra trước khi ghép */
+const RIENG = {
+  "H2O": ["water", "nước", "Tên riêng được IUPAC giữ lại; tên hệ thống: oxidane."],
+  "H2O2": ["hydrogen peroxide", "hiđro peoxit", "Gốc peroxide O₂²⁻ (hai O nối nhau)."],
+  "Na2O2": ["sodium peroxide", "natri peoxit", "Gốc peroxide O₂²⁻."],
+  "K2O2": ["potassium peroxide", "kali peoxit", "Gốc peroxide O₂²⁻."],
+  "BaO2": ["barium peroxide", "bari peoxit", "Gốc peroxide O₂²⁻."],
+  "NH3": ["ammonia", "amoniac", "Tên riêng được IUPAC giữ lại; tên hệ thống: azane."],
+  "CH4": ["methane", "metan", "Alkane đơn giản nhất."],
+  "PH3": ["phosphane", "photphin", "Tên cũ: phosphine."],
+  "SiH4": ["silane", "silan", ""],
+  "H2S": ["hydrogen sulfide", "hiđro sunfua", "Khí H₂S. Khi tan trong nước gọi là hydrosulfuric acid."],
+  "HCl": ["hydrogen chloride", "hiđro clorua", "Khí HCl. Dung dịch trong nước: hydrochloric acid."],
+  "HF": ["hydrogen fluoride", "hiđro florua", "Khí HF. Dung dịch trong nước: hydrofluoric acid."],
+  "HBr": ["hydrogen bromide", "hiđro bromua", "Khí HBr. Dung dịch trong nước: hydrobromic acid."],
+  "HI": ["hydrogen iodide", "hiđro iotua", "Khí HI. Dung dịch trong nước: hydroiodic acid."],
+  "O3": ["ozone", "ozon", "Tên hệ thống: trioxygen."],
+  "O2": ["oxygen", "oxi", "Phân tử O₂, tên hệ thống: dioxygen."],
+  "N2": ["nitrogen", "nitơ", "Phân tử N₂, tên hệ thống: dinitrogen."],
+  "H2": ["hydrogen", "hiđro", "Phân tử H₂, tên hệ thống: dihydrogen."],
+  "Cl2": ["chlorine", "clo", "Phân tử Cl₂, tên hệ thống: dichlorine."],
+  "Br2": ["bromine", "brom", "Phân tử Br₂."], "I2": ["iodine", "iot", "Phân tử I₂."], "F2": ["fluorine", "flo", "Phân tử F₂."],
+  "Fe3O4": ["iron(II,III) oxide", "oxit sắt từ", "Hỗn hợp FeO·Fe₂O₃: có cả Fe²⁺ và Fe³⁺."],
+  "NH4OH": ["ammonium hydroxide", "amoni hiđroxit", "Thực chất là dung dịch NH₃ trong nước."],
+  "P4O10": ["tetraphosphorus decaoxide", "điphotpho pentaoxit", "Hay viết gọn là P₂O₅: diphosphorus pentaoxide."]
+};
+
+/* Chất hữu cơ hay gặp (tra theo công thức) — tên hệ thống | tên thường | tên tiếng Việt cũ */
+const HUU_CO = {
+  "C2H6": ["ethane", "", "etan"], "C3H8": ["propane", "", "propan"], "C4H10": ["butane", "", "butan"],
+  "C2H4": ["ethene", "ethylene", "etilen"], "C3H6": ["propene", "propylene", "propilen"], "C2H2": ["ethyne", "acetylene", "axetilen"],
+  "C6H6": ["benzene", "", "benzen"], "C6H5CH3": ["methylbenzene", "toluene", "toluen"],
+  "CH3OH": ["methanol", "", "ancol metylic"], "C2H5OH": ["ethanol", "", "ancol etylic"], "CH3CH2OH": ["ethanol", "", "ancol etylic"],
+  "C3H7OH": ["propan-1-ol", "", "ancol propylic"], "C6H5OH": ["phenol", "", "phenol"],
+  "C2H4(OH)2": ["ethane-1,2-diol", "ethylene glycol", "etylen glicol"], "C3H5(OH)3": ["propane-1,2,3-triol", "glycerol", "glixerol"],
+  "HCHO": ["methanal", "formaldehyde", "anđehit fomic"], "CH3CHO": ["ethanal", "acetaldehyde", "anđehit axetic"],
+  "HCOOH": ["methanoic acid", "formic acid", "axit fomic"], "CH3COOH": ["ethanoic acid", "acetic acid", "axit axetic"],
+  "CH3COCH3": ["propanone", "acetone", "axeton"], "CH3COOC2H5": ["ethyl ethanoate", "ethyl acetate", "etyl axetat"],
+  "CH3Cl": ["chloromethane", "methyl chloride", "metyl clorua"], "CH2Cl2": ["dichloromethane", "", "điclometan"],
+  "CHCl3": ["trichloromethane", "chloroform", "clorofom"], "CCl4": ["tetrachloromethane", "carbon tetrachloride", "cacbon tetraclorua"],
+  "C2H5Cl": ["chloroethane", "ethyl chloride", "etyl clorua"], "CH3NH2": ["methanamine", "methylamine", "metylamin"],
+  "C2H5NH2": ["ethanamine", "ethylamine", "etylamin"], "C6H5NH2": ["aniline", "", "anilin"],
+  "C6H12O6": ["glucose", "", "glucozơ"], "C12H22O11": ["sucrose", "", "saccarozơ"]
+};
+
+
+/* Hợp chất hay gặp ở THCS–THPT (dùng cho tra cứu, luyện tập, thu tiếng cả câu) */
+const DS_HC = ("H2O H2O2 NH3 CH4 O3 CO CO2 SO2 SO3 NO NO2 N2O N2O5 P2O5 SiO2 CS2 PCl3 PCl5 " +
+  "HCl HF HBr HI H2S H2SO4 H2SO3 HNO3 HNO2 H3PO4 H2CO3 HClO HClO3 HClO4 HCN " +
+  "NaOH KOH LiOH Ca(OH)2 Ba(OH)2 Mg(OH)2 Al(OH)3 Fe(OH)2 Fe(OH)3 Cu(OH)2 Zn(OH)2 NH4OH " +
+  "Na2O K2O CaO MgO BaO Al2O3 ZnO FeO Fe2O3 Fe3O4 CuO Cu2O MnO2 PbO CrO3 Cr2O3 Ag2O HgO " +
+  "NaCl KCl CaCl2 MgCl2 BaCl2 AlCl3 FeCl2 FeCl3 CuCl2 ZnCl2 AgCl NH4Cl NaBr KBr KI AgBr AgI NaF CaF2 " +
+  "Na2S K2S FeS ZnS CuS PbS Ag2S " +
+  "Na2SO4 K2SO4 CuSO4 FeSO4 Fe2(SO4)3 Al2(SO4)3 ZnSO4 MgSO4 CaSO4 BaSO4 (NH4)2SO4 NaHSO4 Na2SO3 " +
+  "NaNO3 KNO3 AgNO3 Ca(NO3)2 Cu(NO3)2 Fe(NO3)3 Pb(NO3)2 NH4NO3 NaNO2 " +
+  "Na2CO3 K2CO3 CaCO3 MgCO3 BaCO3 NaHCO3 Ca(HCO3)2 (NH4)2CO3 " +
+  "Na3PO4 Ca3(PO4)2 Ca(H2PO4)2 (NH4)3PO4 NaH2PO4 Na2HPO4 Na2SiO3 " +
+  "KMnO4 KClO3 NaClO K2Cr2O7 K2CrO4 KCN CH3COONa (CH3COO)2Ca NaH CuSO4·5H2O " +
+  "C2H6 C3H8 C4H10 C2H4 C3H6 C2H2 C6H6 CH3OH C2H5OH C3H5(OH)3 C6H5OH HCHO CH3CHO HCOOH CH3COOH CH3COCH3 CH3COOC2H5 CH3Cl CHCl3 CCl4 CH3NH2 C6H5NH2 C6H12O6 C12H22O11").split(" ");
+
+/* ---------- Đọc công thức ---------- */
+const CHI_SO = { "₀":"0","₁":"1","₂":"2","₃":"3","₄":"4","₅":"5","₆":"6","₇":"7","₈":"8","₉":"9" };
+function chuan(ct) { return String(ct || "").replace(/[₀-₉]/g, c => CHI_SO[c]).replace(/\s+/g, "").replace(/[\[{]/g, "(").replace(/[\]}]/g, ")").replace(/[.*•]/g, "·"); }
+
+function phanTich(s) { // → [{e:'Fe',n:2} | {g:[...], n:3, chu:'SO4'}]
+  let i = 0;
+  function so() { let t = ""; while (i < s.length && /\d/.test(s[i])) t += s[i++]; return t ? +t : 1; }
+  function day(dong) {
+    const ra = [];
+    while (i < s.length) {
+      const c = s[i];
+      if (c === "(") { const bd = ++i; const g = day(true); const chu = s.slice(bd, i); if (s[i] !== ")") throw "Thiếu dấu ngoặc đóng «)»."; i++; ra.push({ g, n: so(), chu }); }
+      else if (c === ")") { if (!dong) throw "Thừa dấu ngoặc đóng «)»."; return ra; }
+      else if (/[A-Z]/.test(c)) { let e = c; i++; if (i < s.length && /[a-z]/.test(s[i])) e += s[i++];
+        if (!NT_K[e]) { if (e.length === 2 && NT_K[e[0]]) { e = e[0]; i--; } else throw "Không có nguyên tố «" + e + "». Kí hiệu viết chữ hoa đầu, chữ thường sau (Co là cobalt, CO là carbon monoxide)."; }
+        ra.push({ e, n: so() }); }
+      else if (/[a-z]/.test(c)) throw "Kí hiệu nguyên tố phải bắt đầu bằng chữ HOA: gõ «" + c.toUpperCase() + "…» thay cho «" + c + "…».";
+      else if (/\d/.test(c)) throw "Chỉ số đứng SAU kí hiệu nguyên tố (VD H2O, không gõ 2HO).";
+      else throw "Kí tự lạ «" + c + "» trong công thức.";
+    }
+    if (dong) throw "Thiếu dấu ngoặc đóng «)».";
+    return ra;
+  }
+  return day(false);
+}
+function demNT(ds, k, ra) { ra = ra || {}; ds.forEach(u => { if (u.e) ra[u.e] = (ra[u.e] || 0) + u.n * k; else demNT(u.g, u.n * k, ra); }); return ra; }
+function chuDon(ds) { return ds.map(u => u.e ? u.e + (u.n > 1 ? u.n : "") : "(" + u.chu + ")" + (u.n > 1 ? u.n : "")).join(""); }
+
+/* ---------- Ghép tên ---------- */
+function ketQua(manh, cu, buoc, them) {
+  const ten = manh.map(m => m.t).join("");
+  return Object.assign({ ok: true, ten, manh, cu: cu || "", buoc: buoc || [] }, them || {});
+}
+function m(t, k) { return { t, k }; }
+function tenCation(e, q) {
+  const kl = KL[e], ten = e === "NH4" ? "ammonium" : NT_K[e].ten;
+  const cu = e === "NH4" ? "amoni" : (NT_K[e].cu || NT_K[e].ten);
+  const manh = [m(ten, "cat")]; let cuTen = cu;
+  if (kl && kl.length > 1) { manh.push(m("(" + LA_MA[q] + ")", "so")); cuTen += "(" + LA_MA[q] + ")"; }
+  return { manh, cu: cuTen };
+}
+
+function ghep(ctVao) {
+  const s0 = chuan(ctVao);
+  if (!s0) return { ok: false, loi: "Sếp gõ công thức, VD: Fe2(SO4)3" };
+  // ngậm nước: CuSO4·5H2O
+  const nn = s0.match(/^(.+)·(\d*)H2O$/);
+  if (nn) {
+    const r = ghep(nn[1]); if (!r.ok) return r;
+    const k = nn[2] ? +nn[2] : 1;
+    const manh = r.manh.concat([m(" ", ""), m(TIEN_TO[k] === "mono" ? "mono" : TIEN_TO[k], "t"), m("hydrate", "d")]);
+    return ketQua(manh, r.cu + " ngậm " + k + " phân tử nước", r.buoc.concat(["Có " + k + " phân tử nước kết tinh → thêm «" + TIEN_TO[k] + "hydrate»."]), { loai: r.loai });
+  }
+  if (RIENG[s0]) { const [t, cu, gc] = RIENG[s0]; return ketQua([m(t, "rieng")], cu, ["Chất này có tên riêng được IUPAC chấp nhận."], { ghiChu: gc, loai: "riêng" }); }
+  if (HUU_CO[s0]) { const [t, th, cu] = HUU_CO[s0]; return ketQua([m(t, "rieng")], cu, ["Chất hữu cơ — tra bảng chất hay gặp. Muốn hiểu cách ghép tên, mở mục «Hữu cơ»."], { thuong: th, loai: "hữu cơ" }); }
+
+  // muối acetate: CH3COONa, (CH3COO)2Ca
+  let ac = s0.match(/^\(CH3COO\)(\d+)([A-Z][a-z]?)$/) || s0.match(/^CH3COO([A-Z][a-z]?)$/);
+  let ds;
+  try { ds = ac ? null : phanTich(s0); } catch (e) { return { ok: false, loi: e }; }
+  let cat, catN, anCt, anN;
+  if (ac) { if (ac.length === 3) { anN = +ac[1]; cat = ac[2]; } else { anN = 1; cat = ac[1]; } catN = 1; anCt = "CH3COO"; }
+  else {
+    const dem = demNT(ds, 1); const loai = Object.keys(dem);
+    if (loai.length === 1) { const e = NT_K[loai[0]]; return ketQua([m(e.ten, "cat")], e.cu || e.ten, ["Chỉ có một nguyên tố → đơn chất, gọi theo tên nguyên tố."], { loai: "đơn chất" }); }
+    if (ds[0].e === "C" && dem.H) return { ok: false, loi: "Chất hữu cơ này chưa có trong bảng tra. Sếp mở mục «Hữu cơ» để dựng mạch carbon và ghép tên." };
+    // tách cation
+    let u0 = ds[0], phan = ds.slice(1);
+    if (u0.g && u0.chu === "NH4") { cat = "NH4"; catN = u0.n; }
+    else if (u0.e === "N" && ds[1] && ds[1].e === "H" && ds[1].n === 4 && ds.length > 2) { cat = "NH4"; catN = 1; phan = ds.slice(2); }
+    else if (u0.e) { cat = u0.e; catN = u0.n; }
+    else return { ok: false, loi: "Công thức nên viết phần dương (kim loại, H hoặc NH4) trước, gốc âm sau." };
+    if (phan.length === 0) return { ok: false, loi: "Công thức chưa có phần gốc âm." };
+    if (phan.length === 1 && phan[0].g) { anCt = phan[0].chu; anN = phan[0].n; }
+    else if (phan.length === 1 && phan[0].e) { anCt = phan[0].e; anN = phan[0].n; }
+    else { anCt = chuDon(phan); anN = 1; }
+    if (anCt === "OH" || anCt === "HO") anCt = "OH";
+  }
+
+  const an = AN[anCt];
+  const laKL = cat === "NH4" || !!KL[cat];
+  // hai phi kim
+  if (!laKL) {
+    const e2 = /^[A-Z][a-z]?$/.test(anCt) ? { e: anCt, n: anN } : null;
+    const coPK = e2 && THU_TU_PK.indexOf(cat) >= 0 && THU_TU_PK.indexOf(e2.e) >= 0 && cat !== e2.e;
+    if (cat === "H" && an && !coPK) { /* acid có oxygen — xử lí ở dưới */ }
+    else if (coPK && !(cat === "H" && an && an.acid)) {
+      const n1 = catN, n2 = e2.n, a = NT_K[cat], b = e2.e;
+      const t1 = n1 > 1 ? TIEN_TO[n1] : "";
+      let t2 = TIEN_TO[n2];
+      if (b === "O" && n2 === 1) t2 = "mon"; // monoxide: ngoại lệ IUPAC cho phép bỏ «o»
+      const manh = []; if (t1) manh.push(m(t1, "t")); manh.push(m(a.ten, "cat")); manh.push(m(" ", "")); manh.push(m(t2, "t")); manh.push(m(GOC_PK[b], "an")); manh.push(m("ide", "d"));
+      const vn1 = (n1 > 1 ? TIEN_TO_VN[n1] : "") + (a.cu || a.ten);
+      const vnGoc = { O: "oxit", S: "sunfua", N: "nitrua", Cl: "clorua", F: "florua", Br: "bromua", I: "iotua", H: "hiđrua", P: "photphua", C: "cacbua", Se: "selenua" }[b] || GOC_PK[b] + "ua";
+      const vn2 = (b === "O" && n2 === 1 ? "mono" : n2 > 1 ? TIEN_TO_VN[n2] : "") + vnGoc;
+      const buoc = ["Hai phi kim liên kết với nhau → dùng tiền tố chỉ số nguyên tử: mono-1, di-2, tri-3, tetra-4, penta-5, hexa-6, hepta-7.",
+        "Phi kim đứng trước: tên nguyên tố" + (n1 > 1 ? " kèm tiền tố «" + t1 + "»" : " (chỉ 1 nguyên tử thì không ghi mono)") + ".",
+        "Phi kim đứng sau: tiền tố «" + TIEN_TO[n2] + "» + gốc «" + GOC_PK[b] + "» + đuôi «-ide»." + (b === "O" && n2 === 1 ? " Riêng «monooxide» viết gọn là «monoxide»." : "")];
+      if (THU_TU_PK.indexOf(cat) > THU_TU_PK.indexOf(b)) buoc.push("⚠️ Theo IUPAC, " + b + " thường được viết và gọi trước " + cat + ".");
+      return ketQua(manh, vn1 + " " + vn2, buoc, { loai: "hai phi kim", n1, n2 });
+    }
+    else if (cat !== "H") return { ok: false, loi: "Em chưa có quy tắc cho «" + s0 + "». Bản này ghép được: muối, oxide, acid, base vô cơ và hợp chất hai phi kim; chất hữu cơ xem mục «Hữu cơ»." };
+  }
+  if (!an) {
+    return { ok: false, loi: "Em chưa nhận ra gốc «" + anCt + "». Các gốc em biết: " + Object.keys(AN).filter(k => k !== "H").join(", ") + "." };
+  }
+  const tongAm = an.q * anN;
+  // acid
+  if (cat === "H") {
+    if (catN !== an.q) return { ok: false, loi: "Gốc " + anCt + " có điện tích " + an.q + "−, nên acid cần " + an.q + " nguyên tử H (không phải " + catN + ")." };
+    if (!an.acid) return { ok: false, loi: "Gốc «" + anCt + "» không tạo acid thông dụng." };
+    const [goc, ...sau] = an.acid.split(" ");
+    let manh;
+    const daDuoi = an.acid.match(/^(hydro)?(.+?)(ic|ous) acid$/);
+    if (daDuoi) { manh = []; if (daDuoi[1]) manh.push(m("hydro", "t")); manh.push(m(daDuoi[2], "an")); manh.push(m(daDuoi[3], "d")); manh.push(m(" acid", "acid")); }
+    else manh = [m(an.acid, "acid")];
+    const coO = /O/.test(anCt);
+    const buoc = [coO ? "Acid có oxygen: lấy tên gốc, đổi «-ate» → «-ic acid», «-ite» → «-ous acid»." : "Acid không có oxygen: «hydro» + gốc phi kim + «-ic acid».",
+      "Gốc " + anCt + " (" + an.manh.map(x => x.t).join("") + ") → " + an.acid + "."];
+    return ketQua(manh, an.acidCu, buoc, { loai: "acid", thuong: an.acidThuong || "" });
+  }
+  // muối / oxide / base
+  let q = tongAm / catN;
+  const hopLe = cat === "NH4" ? [1] : KL[cat];
+  if (!hopLe) return { ok: false, loi: NT_K[cat].ten + " (" + cat + ") không phải kim loại; em chưa ghép được kiểu chất này." };
+  if (!Number.isInteger(q) || hopLe.indexOf(q) < 0) {
+    return { ok: false, loi: "Hoá trị không khớp: " + anN + " × " + anCt + "(" + an.q + "−) = " + tongAm + "−, chia cho " + catN + " " + cat + " thì mỗi " + cat + " mang " + (Number.isInteger(q) ? q : q.toFixed(2)) + "+. Nhưng " + cat + " chỉ có hoá trị " + hopLe.join(", ") + ". Sếp xem lại chỉ số nhé.", goiY: hopLe.map(h => goiYCT(cat, h, anCt, an.q)) };
+  }
+  const c = tenCation(cat, q);
+  const manh = c.manh.concat([m(" ", "")]).concat(an.manh.map(x => m(x.t, x.k)));
+  const loai = anCt === "O" ? "oxide" : anCt === "OH" ? "base (hydroxide)" : "muối";
+  const buoc = [];
+  if (KL[cat] && KL[cat].length > 1) buoc.push(cat + " có nhiều hoá trị (" + KL[cat].map(h => LA_MA[h]).join(", ") + ") → tính: " + anN + " × " + an.q + "− = " + tongAm + "−, chia " + catN + " nguyên tử " + cat + " → " + cat + " mang " + q + "+ → ghi (" + LA_MA[q] + ") ngay sau tên, không cách.");
+  else buoc.push((cat === "NH4" ? "Cation NH₄⁺ gọi là ammonium" : cat + " chỉ có một hoá trị (" + LA_MA[q] + ") → không ghi số La Mã") + ".");
+  buoc.push("Gốc " + anCt + ": " + an.manh.map(x => x.t).join("") + (anCt === "O" ? " (oxide)." : anCt === "OH" ? " (hydroxide)." : an.manh.some(x => x.t === "ate") ? " — gốc có oxygen nhiều hơn → đuôi «-ate»." : an.manh.some(x => x.t === "ite") ? " — gốc có oxygen ít hơn → đuôi «-ite»." : " — gốc không có oxygen → đuôi «-ide»."));
+  buoc.push("Ghép: tên cation + dấu cách + tên gốc.");
+  const r = ketQua(manh, c.cu + " " + an.cu, buoc, { loai, cat, q, anCt, coSo: !!(KL[cat] && KL[cat].length > 1) });
+  if (an.thuong) r.thuong = r.ten.replace(/ethanoate$/, "acetate");
+  return r;
+}
+function phan1(ct) { const r = ct.match(/^([A-Z][a-z]?)(\d*)$/); return r && NT_K[r[1]] ? { e: r[1], n: r[2] ? +r[2] : 1 } : null; }
+function bcnn(a, b) { const g = (x, y) => y ? g(y, x % y) : x; return a * b / g(a, b); }
+function goiYCT(cat, q, anCt, aq) {
+  const l = bcnn(q, aq), nc = l / q, na = l / aq;
+  const goc = anCt.length > 2 || /\d/.test(anCt) && na > 1 ? "(" + anCt + ")" : anCt;
+  return cat + (nc > 1 ? nc : "") + (na > 1 ? (/^[A-Z][a-z]?$/.test(anCt) ? anCt : "(" + anCt + ")") + na : anCt);
+}
+
+/* ---------- Hữu cơ: dựng mạch ---------- */
+const GOC_HC = ["", "meth", "eth", "prop", "but", "pent", "hex", "hept", "oct", "non", "dec"];
+const GOC_HC_VN = ["", "met", "et", "prop", "but", "pent", "hex", "hept", "oct", "non", "đec"];
+const HO = {
+  an:  { ten: "Alkane", duoi: "ane", ct: "CₙH₂ₙ₊₂", min: 1, vt: false },
+  en:  { ten: "Alkene", duoi: "ene", ct: "CₙH₂ₙ", min: 2, vt: true },
+  yn:  { ten: "Alkyne", duoi: "yne", ct: "CₙH₂ₙ₋₂", min: 2, vt: true },
+  ol:  { ten: "Alcohol", duoi: "ol", ct: "CₙH₂ₙ₊₁OH", min: 1, vt: true },
+  al:  { ten: "Aldehyde", duoi: "al", ct: "Cₙ₋₁H₂ₙ₋₁CHO", min: 1, vt: false },
+  oic: { ten: "Carboxylic acid", duoi: "oic acid", ct: "Cₙ₋₁H₂ₙ₋₁COOH", min: 1, vt: false },
+  one: { ten: "Ketone", duoi: "one", ct: "CₙH₂ₙO", min: 3, vt: true },
+  amin:{ ten: "Amine", duoi: "amine", ct: "CₙH₂ₙ₊₁NH₂", min: 1, vt: true }
+};
+const THUONG_HC = { "ethene": "ethylene", "propene": "propylene", "ethyne": "acetylene", "methanal": "formaldehyde", "ethanal": "acetaldehyde",
+  "methanoic acid": "formic acid", "ethanoic acid": "acetic acid", "propanone": "acetone", "methanamine": "methylamine", "ethanamine": "ethylamine" };
+function viTriHopLe(n, loai) { // danh sách vị trí nhỏ nhất có thể
+  if (!HO[loai].vt) return [1];
+  if (loai === "en" || loai === "yn") { const ra = []; for (let i = 1; i <= Math.floor(n / 2); i++) ra.push(i); return ra; }
+  if (loai === "one") { const ra = []; for (let i = 2; i <= Math.ceil(n / 2); i++) ra.push(i); return ra; }
+  const ra = []; for (let i = 1; i <= Math.ceil(n / 2); i++) ra.push(i); return ra;
+}
+function tenHuuCo(n, loai, vt) {
+  const h = HO[loai]; vt = vt || 1;
+  if (n < h.min) return { ok: false, loi: h.ten + " cần ít nhất " + h.min + " nguyên tử carbon." };
+  let dao = false;
+  if (h.vt) {
+    const doiXung = (loai === "en" || loai === "yn") ? n - vt : n + 1 - vt;
+    if (vt > doiXung) { vt = doiXung; dao = true; }
+  }
+  const canSo = h.vt && ((loai === "en" || loai === "yn") ? n >= 4 : loai === "one" ? n >= 4 : n >= 3);
+  const manh = [m(GOC_HC[n], "goc")];
+  if (loai === "an") manh.push(m("ane", "bao"));
+  else if (loai === "en" || loai === "yn") { if (canSo) manh.push(m("-" + vt + "-", "vt")); manh.push(m(h.duoi, "bao")); }
+  else if (loai === "al") manh.push(m("an", "bao"), m("al", "d"));
+  else if (loai === "oic") manh.push(m("an", "bao"), m("oic acid", "d"));
+  else { manh.push(m("an", "bao")); if (canSo) manh.push(m("-" + vt + "-", "vt")); manh.push(m(h.duoi, "d")); }
+  const ten = manh.map(x => x.t).join("");
+  // công thức phân tử
+  const H = loai === "an" ? 2 * n + 2 : loai === "en" ? 2 * n : loai === "yn" ? 2 * n - 2 : loai === "ol" ? 2 * n + 2 : loai === "al" || loai === "one" ? 2 * n : loai === "oic" ? 2 * n : 2 * n + 3;
+  const O = loai === "ol" || loai === "al" || loai === "one" ? 1 : loai === "oic" ? 2 : 0; const N = loai === "amin" ? 1 : 0;
+  const ctpt = "C" + (n > 1 ? n : "") + "H" + H + (N ? "N" : "") + (O ? "O" + (O > 1 ? O : "") : "");
+  const buoc = ["Mạch chính có " + n + " C → gốc «" + GOC_HC[n] + "».",
+    loai === "an" ? "Toàn liên kết đơn → «-ane»." : loai === "en" ? "Có một liên kết đôi C=C → «-ene»." : loai === "yn" ? "Có một liên kết ba C≡C → «-yne»." : "Mạch no → «-an-», rồi thêm đuôi nhóm chức «-" + h.duoi + "».",
+    canSo ? "Đánh số từ đầu mạch GẦN nhóm chức hơn → vị trí " + vt + "; ghi số giữa hai gạch nối." : (h.vt ? "Mạch ngắn, nhóm chức chỉ có một vị trí → không cần ghi số." : "Nhóm chức luôn ở C số 1 → không ghi số.")];
+  if (dao) buoc.push("⚠️ Sếp chọn vị trí ở nửa sau mạch → em đánh số lại từ đầu kia cho số nhỏ nhất.");
+  return { ok: true, ten, manh, ctpt, vt, dao, thuong: THUONG_HC[ten] || "", cu: GOC_HC_VN[n] + (loai === "an" ? "an" : loai === "en" ? "en" : loai === "yn" ? "in" : ""), buoc };
+}
+
+/* ---------- Đọc thành lời (cho tiếng) ---------- */
+function loiDoc(ten) {
+  return String(ten).replace(/\((I{1,3}|IV|V|VI{0,3}|II,III)\)/g, (a, r) => " " + r.split(",").map(x => SO_DOC[LA_MA.indexOf(x)]).join(" ") + " ")
+    .replace(/-(\d)(,\d)*-/g, (a) => " " + a.slice(1, -1).split(",").map(x => SO_DOC[+x]).join(" ") + " ")
+    .replace(/hydrogen(?=[a-z])/g, "hydrogen ").replace(/\s+/g, " ").trim();
+}
+function slug(t) { return loiDoc(t).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, ""); }
+
+const API = { DS_HC, NT, NT_K, NHOM, GHI_CHU_NT, viTri, KL, AN, RIENG, HUU_CO, HO, GOC_HC, viTriHopLe, tenHuuCo, ghep, chuan, loiDoc, slug, LA_MA, TIEN_TO, THU_TU_PK };
+if (typeof module !== "undefined" && module.exports) module.exports = API; else G.TEN = API;
+})(typeof window !== "undefined" ? window : globalThis);
+
+</script>
+<script>
+"use strict";
+const AM = new Set(["acetaldehyde","acetic-acid","acetone","acetylene","acid","actinium","aluminium","aluminium-chloride","aluminium-hydroxide","aluminium-oxide","aluminium-sulfate","americium","ammonia","ammonium","ammonium-carbonate","ammonium-chloride","ammonium-hydroxide","ammonium-nitrate","ammonium-phosphate","ammonium-sulfate","aniline","antimony","argon","arsenic","astatine","barium","barium-carbonate","barium-chloride","barium-hydroxide","barium-oxide","barium-peroxide","barium-sulfate","benzene","berkelium","beryllium","bismuth","bohrium","boron","bromide","bromine","but-ene","but-one-ene","but-one-yne","but-two-ene","but-two-yne","but-yne","butan-one-amine","butan-one-ol","butan-one-one","butan-two-amine","butan-two-ol","butan-two-one","butanal","butane","butanoic-acid","cadmium","caesium","calcium","calcium-acetate","calcium-carbonate","calcium-chloride","calcium-dihydrogen-phosphate","calcium-ethanoate","calcium-fluoride","calcium-hydrogen-carbonate","calcium-hydroxide","calcium-nitrate","calcium-oxide","calcium-phosphate","calcium-sulfate","californium","carbon","carbon-dioxide","carbon-disulfide","carbon-monoxide","carbon-tetrachloride","carbonate","carbonic","carbonic-acid","cerium","chlorate","chloric","chloric-acid","chloride","chlorine","chloroethane","chloroform","chloromethane","chromate","chromic","chromium","chromium-six-oxide","chromium-three-oxide","cobalt","copernicium","copper","copper-one-oxide","copper-two-chloride","copper-two-hydroxide","copper-two-nitrate","copper-two-oxide","copper-two-sulfate","copper-two-sulfate-pentahydrate","copper-two-sulfide","curium","cyanide","darmstadtium","dec-ene","dec-five-ene","dec-five-yne","dec-four-ene","dec-four-yne","dec-one-ene","dec-one-yne","dec-three-ene","dec-three-yne","dec-two-ene","dec-two-yne","dec-yne","decaarsenide","decaboride","decabromide","decacarbide","decachloride","decafluoride","decahydrate","decahydride","decaiodide","decan-five-amine","decan-five-ol","decan-five-one","decan-four-amine","decan-four-ol","decan-four-one","decan-one-amine","decan-one-ol","decan-one-one","decan-three-amine","decan-three-ol","decan-three-one","decan-two-amine","decan-two-ol","decan-two-one","decanal","decane","decanitride","decanoic-acid","decaoxide","decaphosphide","decaselenide","decasilicide","decasulfide","diarsenic","diarsenide","diboride","diboron","dibromide","dibromine","dicarbide","dicarbon","dichloride","dichlorine","dichloromethane","dichromate","dichromic","difluoride","difluorine","dihydrate","dihydride","dihydrogen","diiodide","diiodine","dinitride","dinitrogen","dinitrogen-monoxide","dinitrogen-pentaoxide","dioxide","dioxygen","diphosphide","diphosphorus","diphosphorus-pentaoxide","diselenide","diselenium","disilicide","disilicon","disulfide","disulfur","dubnium","dysprosium","einsteinium","erbium","ethanal","ethanamine","ethane","ethane-one-two-diol","ethanoate","ethanoic","ethanoic-acid","ethanol","ethene","ethyl","ethyl-acetate","ethyl-chloride","ethyl-ethanoate","ethylamine","ethylene","ethylene-glycol","ethyne","europium","fermium","five","flerovium","fluoride","fluorine","formaldehyde","formic-acid","four","francium","gadolinium","gallium","germanium","glucose","glycerol","gold","hafnium","hassium","helium","hept-ene","hept-one-ene","hept-one-yne","hept-three-ene","hept-three-yne","hept-two-ene","hept-two-yne","hept-yne","heptaarsenide","heptaboride","heptabromide","heptacarbide","heptachloride","heptafluoride","heptahydrate","heptahydride","heptaiodide","heptan-four-amine","heptan-four-ol","heptan-four-one","heptan-one-amine","heptan-one-ol","heptan-one-one","heptan-three-amine","heptan-three-ol","heptan-three-one","heptan-two-amine","heptan-two-ol","heptan-two-one","heptanal","heptane","heptanitride","heptanoic-acid","heptaoxide","heptaphosphide","heptaselenide","heptasilicide","heptasulfide","hex-ene","hex-one-ene","hex-one-yne","hex-three-ene","hex-three-yne","hex-two-ene","hex-two-yne","hex-yne","hexaarsenide","hexaboride","hexabromide","hexacarbide","hexachloride","hexafluoride","hexahydrate","hexahydride","hexaiodide","hexan-one-amine","hexan-one-ol","hexan-one-one","hexan-three-amine","hexan-three-ol","hexan-three-one","hexan-two-amine","hexan-two-ol","hexan-two-one","hexanal","hexane","hexanitride","hexanoic-acid","hexaoxide","hexaphosphide","hexaselenide","hexasilicide","hexasulfide","holmium","hydride","hydrobromic","hydrochloric","hydrocyanic","hydrocyanic-acid","hydrofluoric","hydrogen","hydrogen-bromide","hydrogen-chloride","hydrogen-fluoride","hydrogen-iodide","hydrogen-peroxide","hydrogen-sulfide","hydroiodic","hydrosulfuric","hydroxide","hypochlorite","hypochlorous","hypochlorous-acid","indium","iodide","iodine","iridium","iron","iron-three-chloride","iron-three-hydroxide","iron-three-nitrate","iron-three-oxide","iron-three-sulfate","iron-two-chloride","iron-two-hydroxide","iron-two-oxide","iron-two-sulfate","iron-two-sulfide","iron-two-three-oxide","krypton","lanthanum","lawrencium","lead","lead-two-nitrate","lead-two-oxide","lead-two-sulfide","lithium","lithium-hydroxide","livermorium","lutetium","magnesium","magnesium-carbonate","magnesium-chloride","magnesium-hydroxide","magnesium-oxide","magnesium-sulfate","manganese","manganese-four-oxide","meitnerium","mendelevium","mercury","mercury-two-oxide","methanal","methanamine","methane","methanoic","methanoic-acid","methanol","methyl-chloride","methylamine","methylbenzene","molybdenum","monoarsenide","monoboride","monobromide","monocarbide","monochloride","monofluoride","monohydrate","monohydride","monoiodide","mononitride","monophosphide","monoselenide","monosilicide","monosulfide","monoxide","moscovium","neodymium","neon","neptunium","nickel","nihonium","niobium","nitrate","nitric","nitric-acid","nitride","nitrite","nitrogen","nitrogen-dioxide","nitrogen-monoxide","nitrous","nitrous-acid","nobelium","non-ene","non-four-ene","non-four-yne","non-one-ene","non-one-yne","non-three-ene","non-three-yne","non-two-ene","non-two-yne","non-yne","nonahydrate","nonan-five-amine","nonan-five-ol","nonan-five-one","nonan-four-amine","nonan-four-ol","nonan-four-one","nonan-one-amine","nonan-one-ol","nonan-one-one","nonan-three-amine","nonan-three-ol","nonan-three-one","nonan-two-amine","nonan-two-ol","nonan-two-one","nonanal","nonane","nonanoic-acid","oct-ene","oct-four-ene","oct-four-yne","oct-one-ene","oct-one-yne","oct-three-ene","oct-three-yne","oct-two-ene","oct-two-yne","oct-yne","octahydrate","octan-four-amine","octan-four-ol","octan-four-one","octan-one-amine","octan-one-ol","octan-one-one","octan-three-amine","octan-three-ol","octan-three-one","octan-two-amine","octan-two-ol","octan-two-one","octanal","octane","octanoic-acid","oganesson","one","osmium","oxide","oxygen","ozone","palladium","pent-ene","pent-one-ene","pent-one-yne","pent-two-ene","pent-two-yne","pent-yne","pentaarsenide","pentaboride","pentabromide","pentacarbide","pentachloride","pentafluoride","pentahydrate","pentahydride","pentaiodide","pentan-one-amine","pentan-one-ol","pentan-one-one","pentan-three-amine","pentan-three-ol","pentan-three-one","pentan-two-amine","pentan-two-ol","pentan-two-one","pentanal","pentane","pentanitride","pentanoic-acid","pentaoxide","pentaphosphide","pentaselenide","pentasilicide","pentasulfide","perchlorate","perchloric","perchloric-acid","permanganate","permanganic","peroxide","phenol","phosphane","phosphate","phosphide","phosphoric","phosphoric-acid","phosphorus","phosphorus-pentachloride","phosphorus-trichloride","platinum","plutonium","polonium","potassium","potassium-bromide","potassium-carbonate","potassium-chlorate","potassium-chloride","potassium-chromate","potassium-cyanide","potassium-dichromate","potassium-hydroxide","potassium-iodide","potassium-nitrate","potassium-oxide","potassium-permanganate","potassium-peroxide","potassium-sulfate","potassium-sulfide","praseodymium","promethium","propan-one-amine","propan-one-ol","propan-two-amine","propan-two-ol","propanal","propane","propane-one-two-three-triol","propanoic-acid","propanone","propene","propylene","propyne","protactinium","radium","radon","rhenium","rhodium","roentgenium","rubidium","ruthenium","rutherfordium","samarium","scandium","seaborgium","selenium","seven","silane","silicate","silicic","silicon","silicon-dioxide","silver","silver-bromide","silver-chloride","silver-iodide","silver-nitrate","silver-oxide","silver-sulfide","six","sodium","sodium-acetate","sodium-bromide","sodium-carbonate","sodium-chloride","sodium-dihydrogen-phosphate","sodium-ethanoate","sodium-fluoride","sodium-hydride","sodium-hydrogen-carbonate","sodium-hydrogen-phosphate","sodium-hydrogen-sulfate","sodium-hydroxide","sodium-hypochlorite","sodium-nitrate","sodium-nitrite","sodium-oxide","sodium-peroxide","sodium-phosphate","sodium-silicate","sodium-sulfate","sodium-sulfide","sodium-sulfite","strontium","sucrose","sulfate","sulfide","sulfite","sulfur","sulfur-dioxide","sulfur-trioxide","sulfuric","sulfuric-acid","sulfurous","sulfurous-acid","tantalum","technetium","tellurium","tennessine","terbium","tetraarsenic","tetraarsenide","tetraboride","tetraboron","tetrabromide","tetrabromine","tetracarbide","tetracarbon","tetrachloride","tetrachlorine","tetrachloromethane","tetrafluoride","tetrafluorine","tetrahydrate","tetrahydride","tetrahydrogen","tetraiodide","tetraiodine","tetranitride","tetranitrogen","tetraoxide","tetraoxygen","tetraphosphide","tetraphosphorus","tetraphosphorus-decaoxide","tetraselenide","tetraselenium","tetrasilicide","tetrasilicon","tetrasulfide","tetrasulfur","thallium","thorium","three","thulium","tin","titanium","toluene","triarsenic","triarsenide","triboride","triboron","tribromide","tribromine","tricarbide","tricarbon","trichloride","trichlorine","trichloromethane","trifluoride","trifluorine","trihydrate","trihydride","trihydrogen","triiodide","triiodine","trinitride","trinitrogen","triol","trioxide","trioxygen","triphosphide","triphosphorus","triselenide","triselenium","trisilicide","trisilicon","trisulfide","trisulfur","tungsten","two","uranium","vanadium","water","xenon","ytterbium","yttrium","zinc","zinc-chloride","zinc-hydroxide","zinc-oxide","zinc-sulfate","zinc-sulfide","zirconium"]);
+const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const HASH0 = location.hash, CHUP = /chup/.test(HASH0);
+if (CHUP) document.body.classList.add("chup");
+const CHI = { 0:"₀",1:"₁",2:"₂",3:"₃",4:"₄",5:"₅",6:"₆",7:"₇",8:"₈",9:"₉" };
+const dep = ct => esc(TEN.chuan(ct)).replace(/(\d+)/g, (a, so, i, s) => { const tr = s[i - 1]; return tr === "·" ? a : a.replace(/\d/g, d => CHI[d]); });
+const KHOA = "hhiupac_v1";
+function doc_luu() { try { return JSON.parse(localStorage.getItem(KHOA)) || { lich: [], sai: {} }; } catch (e) { return { lich: [], sai: {} }; } }
+function luu(d) { try { localStorage.setItem(KHOA, JSON.stringify(d)); } catch (e) {} }
+
+/* ---------- âm thanh ---------- */
+let ac = null;
+function ting(dung) {
+  try { ac = ac || new (window.AudioContext || window.webkitAudioContext)(); const t = ac.currentTime;
+    const ds = dung ? [880, 1320] : [220, 180];
+    ds.forEach((f, i) => { const o = ac.createOscillator(), g = ac.createGain(); o.type = dung ? "sine" : "triangle"; o.frequency.value = f;
+      g.gain.setValueAtTime(.0001, t + i * .09); g.gain.exponentialRampToValueAtTime(.25, t + i * .09 + .02); g.gain.exponentialRampToValueAtTime(.0001, t + i * .09 + .28);
+      o.connect(g).connect(ac.destination); o.start(t + i * .09); o.stop(t + i * .09 + .3); });
+  } catch (e) {}
+}
+let dangPhat = null, nutDang = null;
+function dungAm() { if (dangPhat) { dangPhat.huy = true; if (dangPhat.a) dangPhat.a.pause(); } dangPhat = null; if (nutDang) nutDang.classList.remove("dang"); }
+function doc(ten, cham, nut) {
+  dungAm();
+  const s = TEN.slug(ten); let ds;
+  if (AM.has(s)) ds = [s];
+  else { ds = TEN.loiDoc(ten).split(" ").map(w => TEN.slug(w)).filter(Boolean); if (!ds.every(w => AM.has(w))) ds = ds.filter(w => AM.has(w)), ds.length && toast("Một vài từ chưa có tiếng thu sẵn — sếp đọc theo phiên âm giúp em ạ."); }
+  if (!ds.length) { toast("Tên này chưa có tiếng thu sẵn."); return; }
+  const phien = { huy: false }; dangPhat = phien; nutDang = nut || null; if (nut) nut.classList.add("dang");
+  let i = 0;
+  (function tiep() {
+    if (phien.huy) return;
+    if (i >= ds.length) { if (nut) nut.classList.remove("dang"); dangPhat = null; return; }
+    const a = new Audio("am/" + ds[i++] + ".mp3"); phien.a = a; a.playbackRate = cham ? .7 : 1;
+    a.onended = () => setTimeout(tiep, ds.length > 1 ? 60 : 0);
+    a.onerror = () => { if (nut) nut.classList.remove("dang"); toast("Không mở được tệp tiếng (thư mục «am» phải nằm cạnh trang)."); };
+    a.play().catch(() => { if (nut) nut.classList.remove("dang"); });
+  })();
+}
+function nutLoa(ten, cham) { return `<button class="loa${cham ? " cham" : ""}" title="${cham ? "Nghe chậm" : "Nghe đọc"}" data-doc="${esc(ten)}"${cham ? " data-cham=1" : ""}>${cham ? "🐢" : "🔊"}</button>`; }
+document.addEventListener("click", e => { const b = e.target.closest("[data-doc]"); if (b) { e.stopPropagation(); doc(b.dataset.doc, !!b.dataset.cham, b); } }, true);
+let hToast; function toast(t) { const el = $("#toast"); el.textContent = t; el.classList.add("hien"); clearTimeout(hToast); hToast = setTimeout(() => el.classList.remove("hien"), 2600); }
+
+/* ---------- pháo giấy ---------- */
+function phaoGiay() {
+  if (CHUP) return; const c = $("#phao"), x = c.getContext("2d"); c.width = innerWidth; c.height = innerHeight;
+  const mau = ["#63b3ff", "#34d399", "#fb923c", "#f472b6", "#facc15", "#c084fc"];
+  const ht = Array.from({ length: 140 }, () => ({ x: innerWidth / 2, y: innerHeight / 3, vx: (Math.random() - .5) * 14, vy: Math.random() * -12 - 3, r: Math.random() * 6 + 3, m: mau[Math.random() * 6 | 0], g: Math.random() * 6 }));
+  let k = 0; (function ve() { x.clearRect(0, 0, c.width, c.height); ht.forEach(p => { p.x += p.vx; p.y += p.vy; p.vy += .35; p.g += .2; x.save(); x.translate(p.x, p.y); x.rotate(p.g); x.fillStyle = p.m; x.fillRect(-p.r, -p.r / 2, p.r * 2, p.r); x.restore(); });
+    if (k++ < 110) requestAnimationFrame(ve); else x.clearRect(0, 0, c.width, c.height); })();
+}
+
+/* ---------- linh vật «Bé Bình Cầu» ---------- */
+function linhVat(cam, co) {
+  co = co || 110; const mieng = cam === "buon" ? "M44 74 Q50 69 56 74" : cam === "nghi" ? "M44 73 L56 73" : "M42 70 Q50 80 58 70";
+  return `<svg class="linh-vat" width="${co}" height="${co * 1.1}" viewBox="0 0 100 110" aria-hidden="true">
+  <path d="M38 6h24v6h-4v20l24 40a12 12 0 0 1-10 18H28a12 12 0 0 1-10-18l24-40V12h-4z" fill="url(#gBinh)" stroke="#bfdbfe" stroke-width="2" filter="url(#bong)"/>
+  <path d="M22 74h56l4 7a8 8 0 0 1-7 11H25a8 8 0 0 1-7-11z" fill="url(#gNuoc)" opacity=".9"/>
+  <circle cx="41" cy="58" r="5" fill="#0b1530"/><circle cx="59" cy="58" r="5" fill="#0b1530"/><circle cx="42.5" cy="56.5" r="1.6" fill="#fff"/><circle cx="60.5" cy="56.5" r="1.6" fill="#fff"/>
+  <circle cx="34" cy="66" r="4" fill="#fda4af" opacity=".7"/><circle cx="66" cy="66" r="4" fill="#fda4af" opacity=".7"/>
+  <path d="${mieng}" stroke="#0b1530" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <circle cx="35" cy="86" r="3" fill="#fff" opacity=".7"/><circle cx="62" cy="82" r="2" fill="#fff" opacity=".6"/></svg>`;
+}
+
+/* ---------- MÀN 1: BẢNG TUẦN HOÀN ---------- */
+let zChon = 26, nhomLoc = "";
+function veBang() {
+  const el = $("#bth"); let h = "";
+  TEN.NT.forEach(e => { const [r, c] = TEN.viTri(e.z); const mau = TEN.NHOM[e.nhom][1];
+    h += `<button class="o" data-z="${e.z}" style="grid-row:${r};grid-column:${c};background:${mau}" title="${e.z} · ${e.k} · ${e.ten}"><i>${e.z}</i><b>${e.k}</b><small>${e.ten}</small></button>`; });
+  h += `<div class="o cho" style="grid-row:6;grid-column:3">57–71</div><div class="o cho" style="grid-row:7;grid-column:3">89–103</div>`;
+  el.innerHTML = h;
+  el.onclick = e => { const b = e.target.closest(".o[data-z]"); if (b) { chonNT(+b.dataset.z, true); } };
+  $("#chuThich").innerHTML = Object.entries(TEN.NHOM).map(([k, [t, m]]) => `<button class="chip" data-nhom="${k}"><i style="background:${m}"></i>${t}</button>`).join("");
+  $("#chuThich").onclick = e => { const b = e.target.closest("[data-nhom]"); if (!b) return; nhomLoc = nhomLoc === b.dataset.nhom ? "" : b.dataset.nhom;
+    $$(".o[data-z]").forEach(o => o.classList.toggle("mo", !!nhomLoc && TEN.NT[o.dataset.z - 1].nhom !== nhomLoc)); };
+}
+function nguyenTuSVG(e) {
+  const mau = TEN.NHOM[e.nhom][1]; let h = `<svg class="nguyen-tu" viewBox="0 0 120 120"><circle cx="60" cy="60" r="13" fill="url(#gHat)"/><text x="60" y="64" font-size="10" text-anchor="middle" font-weight="800" fill="#fff">+${e.z}</text>`;
+  if (e.z <= 20) {
+    const lop = []; let con = e.z; [2, 8, 8, 2].forEach(t => { if (con > 0) { lop.push(Math.min(t, con)); con -= t; } });
+    lop.forEach((n, i) => { const r = 24 + i * 11; h += `<circle cx="60" cy="60" r="${r}" fill="none" stroke="${mau}" stroke-opacity=".5" stroke-width="1.4"/>`;
+      h += `<g>${CHUP ? "" : `<animateTransform attributeName="transform" type="rotate" from="0 60 60" to="${i % 2 ? -360 : 360} 60 60" dur="${8 + i * 4}s" repeatCount="indefinite"/>`}`;
+      for (let k = 0; k < n; k++) { const g = k / n * Math.PI * 2; h += `<circle cx="${60 + r * Math.cos(g)}" cy="${60 + r * Math.sin(g)}" r="3.3" fill="#fde68a" stroke="#0b1530" stroke-width=".8"/>`; } h += `</g>`; });
+    h += `<text x="60" y="118" font-size="9" text-anchor="middle" fill="#a9b8dc">electron: ${lop.join(", ")}</text>`;
+  } else {
+    for (let i = 0; i < 3; i++) h += `<ellipse cx="60" cy="60" rx="50" ry="17" fill="none" stroke="${mau}" stroke-opacity=".55" stroke-width="1.4" transform="rotate(${i * 60} 60 60)"/>`;
+  }
+  return h + "</svg>";
+}
+function chonNT(z, docLuon) {
+  zChon = z; const e = TEN.NT[z - 1], mau = TEN.NHOM[e.nhom][1], [r, c] = TEN.viTri(z);
+  $$(".o.chon").forEach(o => o.classList.remove("chon")); const o = $(`.o[data-z="${z}"]`); if (o) o.classList.add("chon");
+  const chuKi = r === 9 ? 6 : r === 10 ? 7 : r, nhom = r >= 9 ? "3 (họ f)" : c;
+  const goi = esc(e.goi).replace(/([A-ZĐÂĂÊÔƠƯÁÀẢÃẠẤẦẨẪẬẮẰẲẴẶÉÈẺẼẸẾỀỂỄỆÍÌỈĨỊÓÒỎÕỌỐỒỔỖỘỚỜỞỠỢÚÙỦŨỤỨỪỬỮỰÝỲỶỸỴ]{1,}[A-ZĐÂĂÊÔƠƯÁÀẢÃẠẤẦẨẪẬẮẰẲẴẶÉÈẺẼẸẾỀỂỄỆÍÌỈĨỊÓÒỎÕỌỐỒỔỖỘỚỜỞỠỢÚÙỦŨỤỨỪỬỮỰÝỲỶỸỴ-]*)/g, "<em>$1</em>");
+  const hc = TEN.DS_HC.filter(f => { try { return new RegExp(e.k + "(?![a-z])").test(f); } catch (x) { return false; } }).slice(0, 8);
+  $("#chiTiet").innerHTML = `
+    <div class="the-nt"><div class="o-to" style="background:${mau}"><i>${e.z}</i><b>${e.k}</b></div>${nguyenTuSVG(e)}</div>
+    <div class="dong"><div class="ten-lon k-cat" style="font-size:40px">${e.ten}</div>${nutLoa(e.ten)}${nutLoa(e.ten, 1)}</div>
+    <div class="dong"><span class="ipa">/${esc(e.ipa)}/</span></div>
+    <div class="dong" title="Gợi ý đọc gần đúng — chữ IN HOA là âm nhấn"><span class="nhan-nho" style="margin:0">Gợi ý đọc</span><span class="goi-doc">${goi}</span></div>
+    <div class="hang-tt">
+      <div><span>Tên tiếng Việt quen gọi</span><b>${esc(e.cu || "—")}</b></div>
+      <div><span>Nhóm chất</span><b style="color:${mau}">${TEN.NHOM[e.nhom][0]}</b></div>
+      <div><span>Chu kì</span><b>${chuKi}</b></div><div><span>Nhóm (cột)</span><b>${nhom}</b></div>
+    </div>
+    ${TEN.GHI_CHU_NT[e.k] ? `<div class="luu-y">💡 ${esc(TEN.GHI_CHU_NT[e.k])}</div>` : ""}
+    ${hc.length ? `<div class="nhan-nho" style="margin-top:14px">Hợp chất hay gặp</div><div>${hc.map(f => `<button class="chip" data-ct="${esc(f)}"><span class="ct">${dep(f)}</span></button>`).join("")}</div>` : ""}`;
+  if (docLuon) doc(e.ten, false, $("#chiTiet .loa"));
+  if (!CHUP) history.replaceState(null, "", "#bang&z=" + z);
+}
+document.addEventListener("click", e => { const b = e.target.closest("[data-ct]"); if (b) { moGhep(b.dataset.ct); } });
+
+/* ---------- MÀN 2: CÔNG THỨC → TÊN ---------- */
+const PHIM = ["(", ")", "2", "3", "4", "5", "Na", "K", "Ca", "Fe", "Cu", "Al", "O", "H", "Cl", "S", "N", "C", "OH", "SO4", "NO3", "CO3", "PO4", "⌫"];
+const THU = ["NaCl", "Fe2(SO4)3", "CuO", "Ca(OH)2", "H2SO4", "HNO3", "CO2", "N2O5", "P2O5", "NaHCO3", "KMnO4", "(NH4)2SO4", "CuSO4·5H2O", "CH3COOH"];
+function moGhep(ct) { $("#ctVao").value = ct; chuyen("ghep"); ghepTen(); }
+function ionSVG(r, ct) {
+  if (!r.ok) return "";
+  if (r.loai === "hai phi kim") {
+    const ten1 = r.manh.find(x => x.k === "cat").t; const e1 = TEN.NT.find(e => e.ten === ten1), e2 = ct.match(/^[A-Z][a-z]?\d*([A-Z][a-z]?)/)[1];
+    const n1 = r.n1, n2 = r.n2, tong = n1 + n2, rr = 24, kc = Math.min(70, 760 / tong); let h = `<svg class="ion-hinh" viewBox="0 0 800 170">`;
+    const x0 = 400 - (tong - 1) * kc / 2;
+    for (let i = 0; i < tong; i++) { const la1 = i < n1, x = x0 + i * kc; h += `<circle cx="${x}" cy="80" r="${rr}" fill="url(#${la1 ? "gCat" : "gAn"})" filter="url(#bong)"/><text x="${x}" y="86" text-anchor="middle" font-weight="800" font-size="17" fill="#0b1530">${la1 ? e1.k : e2}</text>`; }
+    h += `<text x="${x0 + (n1 - 1) * kc / 2}" y="140" text-anchor="middle" fill="#f472b6" font-weight="800" font-size="18">${n1 > 1 ? TEN.TIEN_TO[n1] + "-" : "(không ghi mono)"}</text><text x="${x0 + (n1 + (n2 - 1) / 2) * kc}" y="140" text-anchor="middle" fill="#f472b6" font-weight="800" font-size="18">${TEN.TIEN_TO[n2]}-</text>`;
+    return h + `<text x="400" y="28" text-anchor="middle" fill="#a9b8dc" font-size="15">Hai phi kim → đếm nguyên tử, dùng tiền tố</text></svg>`;
+  }
+  if (!r.anCt) return "";
+  const an = TEN.AN[r.anCt], m = TEN.chuan(ct).match(/^(\(?NH4\)?|[A-Z][a-z]?)(\d*)/);
+  let nc, na; const dem = (s) => s ? +s : 1;
+  if (r.anCt === "CH3COO") { const k = TEN.chuan(ct).match(/\)(\d+)/); na = k ? +k[1] : 1; nc = 1; }
+  else { nc = dem((TEN.chuan(ct).match(/^\(NH4\)(\d+)/) || [])[1] || m[2]); na = r.q * nc / an.q; }
+  const kyC = r.cat === "NH4" ? "NH₄" : r.cat, kyA = dep(r.anCt);
+  const tong = nc + na, kc = Math.min(92, 740 / tong), x0 = 400 - (tong - 1) * kc / 2;
+  let h = `<svg class="ion-hinh" viewBox="0 0 800 170">`;
+  for (let i = 0; i < tong; i++) { const la = i < nc, x = x0 + i * kc, rr = la ? 30 : 34;
+    h += `<circle cx="${x}" cy="78" r="${rr}" fill="url(#${la ? "gCat" : "gAn"})" filter="url(#bong)"/><text x="${x}" y="${la ? 84 : 83}" text-anchor="middle" font-weight="800" font-size="${la ? 17 : 14}" fill="#0b1530">${la ? kyC : kyA}</text>
+      <text x="${x + rr - 4}" y="${78 - rr + 10}" font-weight="800" font-size="15" fill="${la ? "#93c5fd" : "#fdba74"}">${la ? r.q + "+" : an.q + "−"}</text>`; }
+  h += `<text x="${x0 + (nc - 1) * kc / 2}" y="146" text-anchor="middle" fill="#93c5fd" font-weight="700" font-size="16">${nc} × ${r.q}+ = ${nc * r.q}+</text>`;
+  h += `<text x="${x0 + (nc + (na - 1) / 2) * kc}" y="146" text-anchor="middle" fill="#fdba74" font-weight="700" font-size="16">${na} × ${an.q}− = ${na * an.q}−</text>`;
+  return h + `<text x="400" y="24" text-anchor="middle" fill="#6ee7b7" font-size="15" font-weight="700">⚖️ Tổng điện tích dương = tổng điện tích âm</text></svg>`;
+}
+const CHU_GIAI = { cat: "tên cation / nguyên tố", so: "số La Mã = hoá trị", t: "tiền tố", an: "gốc", d: "đuôi", acid: "acid", rieng: "tên riêng" };
+function tenMau(manh) { return manh.map(x => x.t === " " ? " " : `<span class="k-${x.k}" title="${CHU_GIAI[x.k] || ""}">${esc(x.t)}</span>`).join(""); }
+function ghepTen() {
+  const ct = $("#ctVao").value; $("#xemCt").innerHTML = ct ? dep(ct) : "&nbsp;";
+  const r = TEN.ghep(ct), el = $("#ketQua");
+  if (!CHUP && ct) history.replaceState(null, "", "#ghep&ct=" + encodeURIComponent(ct));
+  if (!r.ok) {
+    el.innerHTML = `<div class="loi-the">${linhVat("nghi", 90)}<div><b style="font-size:18px">Em chưa ghép được tên</b><p style="margin:6px 0 0;font-size:16px;line-height:1.5">${esc(r.loi)}</p>
+      ${r.goiY ? `<div style="margin-top:8px">Có phải sếp định gõ: ${r.goiY.map(g => `<button class="chip" data-ct="${esc(g)}"><span class="ct">${dep(g)}</span></button>`).join("")}</div>` : ""}</div></div>
+      <div class="nhan-nho" style="margin-top:20px">Mẹo gõ</div><p style="color:#d6e2ff;line-height:1.6;margin:0">Chữ hoa đầu kí hiệu: <b>Co</b> (cobalt) ≠ <b>CO</b> (carbon monoxide) · Chỉ số gõ thường: H2SO4 · Nhóm nguyên tử trong ngoặc: Ca(OH)2 · Muối ngậm nước dùng dấu chấm: CuSO4.5H2O</p>`;
+    return;
+  }
+  const kinds = [...new Set(r.manh.map(x => x.k).filter(k => CHU_GIAI[k]))];
+  el.innerHTML = `
+    <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap"><div class="ct" style="font-size:40px;color:#c7e3ff">${dep(ct)}</div><span class="chip">${esc(r.loai)}</span></div>
+    ${ionSVG(r, ct)}
+    <div class="nhan-nho">Tên IUPAC</div>
+    <div class="dong" style="margin-top:0"><div class="ten-lon">${tenMau(r.manh)}</div>${nutLoa(r.ten)}${nutLoa(r.ten, 1)}</div>
+    <div class="chu-giai">${kinds.map(k => `<span class="k-${k}">■ ${CHU_GIAI[k]}</span>`).join("")}</div>
+    ${r.thuong && r.thuong !== r.ten ? `<div class="ten-cu">Tên thường dùng: <b>${esc(r.thuong)}</b> ${nutLoa(r.thuong).replace('class="loa"', 'class="loa cham" style="width:34px;height:34px;font-size:15px;vertical-align:middle"')}</div>` : ""}
+    <div class="ten-cu">Tên tiếng Việt cũ (SGK trước 2018): <b>${esc(r.cu)}</b></div>
+    ${r.ghiChu ? `<div class="luu-y">💡 ${esc(r.ghiChu)}</div>` : ""}
+    <ol class="buoc">${r.buoc.map(b => `<li>${esc(b)}</li>`).join("")}</ol>`;
+}
+function dungGhep() {
+  $("#phim").innerHTML = PHIM.map(p => `<button data-p="${p}">${p}</button>`).join("");
+  $("#phim").onclick = e => { const b = e.target.closest("[data-p]"); if (!b) return; const i = $("#ctVao"); i.value = b.dataset.p === "⌫" ? i.value.slice(0, -1) : i.value + b.dataset.p; ghepTen(); };
+  $("#thuNhanh").innerHTML = THU.map(f => `<button class="chip" data-ct="${esc(f)}"><span class="ct">${dep(f)}</span></button>`).join("");
+  $("#ctVao").addEventListener("input", ghepTen);
+}
+
+/* ---------- MÀN 3: HỮU CƠ ---------- */
+let hc = { c: 3, loai: "ol", vt: 1 };
+const HO_TA = { an: "chỉ liên kết đơn", en: "có C=C", yn: "có C≡C", ol: "nhóm –OH", al: "nhóm –CHO", oic: "nhóm –COOH", one: "nhóm C=O giữa mạch", amin: "nhóm –NH₂" };
+function machSVG(n, loai, vt) {
+  const W = 800, kc = Math.min(70, 640 / Math.max(n, 2)), x0 = W / 2 - (n - 1) * kc / 2, y = i => i % 2 ? 138 : 98;
+  let h = `<svg class="mach" viewBox="0 0 ${W} 230">`;
+  for (let i = 0; i < n - 1; i++) { const x1 = x0 + i * kc, x2 = x1 + kc, y1 = y(i), y2 = y(i + 1), boi = (loai === "en" && i + 1 === vt) ? 2 : (loai === "yn" && i + 1 === vt) ? 3 : 1;
+    const dx = x2 - x1, dy = y2 - y1, l = Math.hypot(dx, dy), px = -dy / l * 6, py = dx / l * 6;
+    for (let k = 0; k < boi; k++) { const o = (k - (boi - 1) / 2); h += `<line x1="${x1 + px * o}" y1="${y1 + py * o}" x2="${x2 + px * o}" y2="${y2 + py * o}" stroke="${boi > 1 ? "#c084fc" : "#cbd5e1"}" stroke-width="${boi > 1 ? 5 : 6}" stroke-linecap="round"/>`; } }
+  const nhom = (i, chu, mau, gd) => { const x = x0 + i * kc, yy = y(i), len = i % 2 ? 1 : -1, y2 = yy + len * 58;
+    h += `<line x1="${x}" y1="${yy}" x2="${x}" y2="${y2}" stroke="${mau}" stroke-width="${gd ? 4 : 6}" stroke-linecap="round"/>${gd ? `<line x1="${x + 8}" y1="${yy + len * 8}" x2="${x + 8}" y2="${y2 + len * -10}" stroke="${mau}" stroke-width="4"/>` : ""}
+      <rect x="${x - 34}" y="${y2 - 18 + len * 6}" width="68" height="34" rx="12" fill="${mau}" filter="url(#bong)"/><text x="${x}" y="${y2 + 6 + len * 6}" text-anchor="middle" font-weight="800" font-size="18" fill="#0b1530">${chu}</text>`; };
+  if (loai === "ol") nhom(vt - 1, "OH", "#f87171");
+  if (loai === "amin") nhom(vt - 1, "NH₂", "#60a5fa");
+  if (loai === "one") nhom(vt - 1, "O", "#f87171", true);
+  if (loai === "al") nhom(0, "O", "#f87171", true);
+  if (loai === "oic") { nhom(0, "O", "#f87171", true); }
+  for (let i = 0; i < n; i++) { const x = x0 + i * kc;
+    h += `<circle cx="${x}" cy="${y(i)}" r="19" fill="url(#gC)" stroke="#63b3ff" stroke-width="2" filter="url(#bong)"/><text x="${x}" y="${y(i) + 6}" text-anchor="middle" font-weight="800" font-size="16" fill="#fff">C</text>
+      <text x="${x}" y="${i % 2 ? 184 : 52}" text-anchor="middle" font-weight="800" font-size="15" fill="#f472b6">${i + 1}</text>`; }
+  if (loai === "oic") { const x = x0, yy = y(0); h += `<line x1="${x}" y1="${yy}" x2="${x - 52}" y2="${yy + 30}" stroke="#f87171" stroke-width="6" stroke-linecap="round"/><rect x="${x - 98}" y="${yy + 14}" width="64" height="34" rx="12" fill="#f87171" filter="url(#bong)"/><text x="${x - 66}" y="${yy + 38}" text-anchor="middle" font-weight="800" font-size="18" fill="#0b1530">OH</text>`; }
+  return h + `<text x="${W - 10}" y="222" text-anchor="end" font-size="13" fill="#a9b8dc">Số hồng = thứ tự đánh số mạch chính · H không vẽ</text></svg>`;
+}
+function veHC() {
+  $("#soC").textContent = hc.c; $("#cC").value = hc.c;
+  $$("#hoBtn button").forEach(b => b.classList.toggle("on", b.dataset.ho === hc.loai));
+  const h = TEN.HO[hc.loai], cv = $("#cVt");
+  const dsVt = TEN.viTriHopLe(hc.c, hc.loai), toiDa = hc.loai === "en" || hc.loai === "yn" ? hc.c - 1 : hc.loai === "one" ? hc.c - 1 : hc.c;
+  const coVt = h.vt && toiDa > (hc.loai === "one" ? 2 : 1);
+  $("#vtKhung").style.display = coVt ? "" : "none";
+  if (h.vt) { cv.min = hc.loai === "one" ? 2 : 1; cv.max = Math.max(+cv.min, toiDa); hc.vt = Math.min(Math.max(hc.vt, +cv.min), +cv.max); cv.value = hc.vt; $("#soVt").textContent = hc.vt; }
+  const r = TEN.tenHuuCo(hc.c, hc.loai, hc.vt);
+  if (!CHUP) history.replaceState(null, "", `#huu-co&c=${hc.c}&loai=${hc.loai}&vt=${hc.vt}`);
+  if (!r.ok) { $("#hcKetQua").innerHTML = `<div class="loi-the">${linhVat("nghi", 90)}<div><b style="font-size:18px">Chưa dựng được</b><p style="margin:6px 0 0;font-size:16px">${esc(r.loi)}</p></div></div>`; return; }
+  const ctpt = r.ctpt.replace(/(\d+)/g, a => a.replace(/\d/g, d => CHI[d]));
+  $("#hcKetQua").innerHTML = `
+    <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap"><span class="chip">${h.ten} · ${HO_TA[hc.loai]}</span><span class="ct" style="font-size:26px;color:#c7e3ff">${ctpt}</span></div>
+    ${machSVG(hc.c, hc.loai, r.vt)}
+    <div class="nhan-nho">Tên IUPAC</div>
+    <div class="dong" style="margin-top:0"><div class="ten-lon">${r.manh.map(x => `<span class="k-${x.k}">${esc(x.t)}</span>`).join("")}</div>${nutLoa(r.ten)}${nutLoa(r.ten, 1)}</div>
+    <div class="chu-giai"><span class="k-goc">■ gốc: số C</span><span class="k-bao">■ an / en / yn: kiểu liên kết</span><span class="k-vt">■ số chỉ vị trí</span><span class="k-d">■ đuôi nhóm chức</span></div>
+    ${r.thuong ? `<div class="ten-cu">Tên thường dùng: <b>${esc(r.thuong)}</b></div>` : ""}
+    <ol class="buoc">${r.buoc.map(b => `<li>${esc(b)}</li>`).join("")}</ol>`;
+}
+function dungHC() {
+  $("#hoBtn").innerHTML = Object.entries(TEN.HO).map(([k, h]) => `<button data-ho="${k}">${h.ten}<small>${HO_TA[k]} · -${h.duoi}</small></button>`).join("");
+  $("#hoBtn").onclick = e => { const b = e.target.closest("[data-ho]"); if (!b) return; hc.loai = b.dataset.ho; if (hc.c < TEN.HO[hc.loai].min) hc.c = TEN.HO[hc.loai].min; veHC(); };
+  $("#cC").oninput = e => { hc.c = +e.target.value; veHC(); };
+  $("#cVt").oninput = e => { hc.vt = +e.target.value; veHC(); };
+}
+
+/* ---------- MÀN 4: QUY TẮC ---------- */
+const QT = [
+  { t: "⚛️ Nguyên tố", k: [["tên IUPAC", "#63b3ff"]], p: "Dùng tên IUPAC tiếng Anh. Kí hiệu có thể lấy từ tên Latin nên không giống tên: Na – sodium, K – potassium, Fe – iron.", vd: ["Na", "K", "Fe", "S"] , nt: true },
+  { t: "🔥 Oxide", k: [["kim loại", "#63b3ff"], ["(hoá trị)", "#c084fc"], ["oxide", "#34d399"]], p: "Kim loại nhiều hoá trị phải ghi số La Mã ngay sau tên, không cách. Phi kim: dùng tiền tố mono, di, tri, penta…", vd: ["Na2O", "Fe2O3", "CO2", "P2O5"] },
+  { t: "🍋 Acid", k: [["hydro", "#f472b6"], ["gốc", "#fb923c"], ["-ic", "#34d399"], ["acid", "#facc15"]], p: "Không có oxygen: hydro + gốc + -ic acid. Có oxygen: gốc -ate → -ic acid; gốc -ite → -ous acid.", vd: ["HCl", "H2SO4", "H2SO3", "HNO3"] },
+  { t: "🧼 Base", k: [["kim loại", "#63b3ff"], ["(hoá trị)", "#c084fc"], ["hydroxide", "#34d399"]], p: "Tên kim loại (kèm hoá trị nếu có nhiều) + hydroxide.", vd: ["NaOH", "Ca(OH)2", "Fe(OH)3", "Cu(OH)2"] },
+  { t: "🧂 Muối", k: [["cation", "#63b3ff"], ["(hoá trị)", "#c084fc"], ["gốc", "#fb923c"], ["-ide/-ate/-ite", "#34d399"]], p: "Gốc không oxygen: -ide. Gốc nhiều oxygen: -ate, ít oxygen: -ite. Gốc còn H: thêm hydrogen-.", vd: ["NaCl", "CuSO4", "Na2SO3", "NaHCO3"] },
+  { t: "⛓️ Hữu cơ", k: [["gốc số C", "#63b3ff"], ["an/en/yn", "#c084fc"], ["-số-", "#f472b6"], ["đuôi", "#34d399"]], p: "meth 1 · eth 2 · prop 3 · but 4 · pent 5 · hex 6. Đánh số mạch từ đầu gần nhóm chức hơn.", vd: ["C2H5OH", "CH3COOH", "C2H4", "CH3COCH3"] }
+];
+function veQT() {
+  $("#qtLuoi").innerHTML = QT.map(q => `<div class="kinh qt"><h3>${q.t}</h3><div class="khoi">${q.k.map(([t, m]) => `<span style="background:${m}">${t}</span>`).join('<b style="align-self:center">+</b>')}</div><p>${esc(q.p)}</p>
+    ${q.vd.map(f => { const ten = q.nt ? TEN.NT_K[f].ten : TEN.ghep(f).ten; const r = q.nt ? null : TEN.ghep(f);
+      return `<div class="vd"><span class="ct">${dep(f)}</span><a ${q.nt ? `data-z="${TEN.NT_K[f].z}"` : `data-ct="${esc(f)}"`}>${q.nt ? `<span class="k-cat">${ten}</span>` : tenMau(r.manh)}</a>${nutLoa(ten)}</div>`; }).join("")}</div>`).join("");
+  $("#qtLuoi").onclick = e => { const a = e.target.closest("a[data-z]"); if (a) { chuyen("bang"); chonNT(+a.dataset.z); } };
+}
+
+/* ---------- MÀN 5: LUYỆN ĐỌC ---------- */
+const POOL_NT = [..."1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 24 25 26 29 30 35 47 50 53 56 78 79 80 82".split(" ").map(Number)];
+const POOL_HC = TEN.DS_HC.filter(f => { const r = TEN.ghep(f); return r.ok && r.loai !== "hữu cơ" && r.loai !== "riêng"; });
+const VIET_SAI = { S: [["sulphur", "chinh-ta"]], Al: [["aluminum", "chinh-ta"]], Cs: [["cesium", "chinh-ta"]], F: [["flourine", "chinh-ta"]], P: [["phosphorous", "chinh-ta"]], I: [["iodin", "chinh-ta"]], Na: [["natrium", "latin"]], K: [["kalium", "latin"]], Fe: [["ferrum", "latin"]], Cu: [["cuprum", "latin"]], Ag: [["argentum", "latin"]], Au: [["aurum", "latin"]], Hg: [["hydrargyrum", "latin"]], Pb: [["plumbum", "latin"]], Sn: [["stannum", "latin"]], W: [["wolfram", "latin"]], Mg: [["magnesum", "chinh-ta"]], Mn: [["magnesium", "khac-nt"]], Ca: [["calcum", "chinh-ta"]], N: [["nitrogenium", "latin"]] };
+const GIAI = {
+  so: "Sai số La Mã — tính lại hoá trị kim loại từ tổng điện tích của gốc.", "thieu-so": "Thiếu số La Mã — kim loại này có nhiều hoá trị nên bắt buộc ghi.",
+  "thua-so": "Thừa số La Mã — kim loại này chỉ có một hoá trị, không ghi.", duoi: "Nhầm đuôi — -ide: gốc không oxygen · -ate: gốc nhiều oxygen · -ite: gốc ít oxygen.",
+  cu: "Đây là tên tiếng Việt cũ, chưa phải tên IUPAC.", tien: "Sai tiền tố — đếm lại số nguyên tử: mono 1 · di 2 · tri 3 · tetra 4 · penta 5.",
+  acid: "Nhầm đuôi acid — gốc -ate thành -ic acid, gốc -ite thành -ous acid.", khac: "Tên này là của chất khác.",
+  "chinh-ta": "Sai chính tả so với IUPAC.", latin: "Đây là tên Latin (nguồn gốc kí hiệu), không phải tên IUPAC.", "khac-nt": "Đây là tên của nguyên tố khác.", "cu-nt": "Đây là tên tiếng Việt quen gọi, chưa phải tên IUPAC."
+};
+const tron = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.random() * (i + 1) | 0; [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const chon1 = a => a[Math.random() * a.length | 0];
+function nhieuHC(f) {
+  const r = TEN.ghep(f), ra = [], them = (t, k) => { if (t && t !== r.ten && !ra.some(x => x.t === t)) ra.push({ t, k }); };
+  if (r.coSo) { TEN.KL[r.cat].filter(q => q !== r.q).forEach(q => them(r.ten.replace(/\([IVX]+\)/, "(" + TEN.LA_MA[q] + ")"), "so")); them(r.ten.replace(/\([IVX]+\)/, ""), "thieu-so"); }
+  else if (r.cat && TEN.KL[r.cat]) them(r.ten.replace(/^(\S+)/, "$1(" + TEN.LA_MA[r.q] + ")"), "thua-so");
+  if (/ate$/.test(r.ten)) { them(r.ten.replace(/ate$/, "ite"), "duoi"); them(r.ten.replace(/ate$/, "ide"), "duoi"); }
+  if (/ite$/.test(r.ten)) them(r.ten.replace(/ite$/, "ate"), "duoi");
+  if (/ide$/.test(r.ten) && !/oxide$|hydroxide$/.test(r.ten)) them(r.ten.replace(/ide$/, "ate"), "duoi");
+  if (/ic acid$/.test(r.ten)) them(r.ten.replace(/ic acid$/, "ous acid"), "acid");
+  if (/ous acid$/.test(r.ten)) them(r.ten.replace(/ous acid$/, "ic acid"), "acid");
+  if (r.loai === "hai phi kim") { const p = ["mon", "di", "tri", "tetra", "penta"]; const w = r.ten.split(" ")[1]; p.forEach(x => { const tg = w.replace(/^(mon|di|tri|tetra|penta|hexa|hepta)/, x); if (tg !== w) them(r.ten.split(" ")[0] + " " + tg, "tien"); }); }
+  them(r.cu, "cu");
+  while (ra.length < 6) { const g = TEN.ghep(chon1(POOL_HC)); them(g.ten, "khac"); }
+  return { r, sai: tron(ra.slice(0, 5)).slice(0, 3) };
+}
+function nhieuNT(z) {
+  const e = TEN.NT[z - 1], ra = (VIET_SAI[e.k] || []).map(([t, k]) => ({ t, k }));
+  if (e.cu && e.cu !== e.ten) ra.push({ t: e.cu, k: "cu-nt" });
+  while (ra.length < 3) { const k = TEN.NT[chon1(POOL_NT) - 1]; if (k.z !== z && !ra.some(x => x.t === k.ten)) ra.push({ t: k.ten, k: "khac-nt" }); }
+  return tron(ra).slice(0, 3);
+}
+let L = null;
+const CHE = { nghe: ["🎧", "Nghe – chọn tên", "Nghe đọc mẫu rồi chọn tên đúng."], ct: ["🧪", "Công thức → Tên", "Nhìn công thức, chọn tên IUPAC đúng."], nt: ["🔠", "Viết đúng tên nguyên tố", "Nhìn kí hiệu, chọn cách viết IUPAC đúng."] };
+function taoCau(che) {
+  if (che === "nt" || (che === "nghe" && Math.random() < .4)) { const z = chon1(POOL_NT), e = TEN.NT[z - 1]; return { che, loai: "nt", z, dung: e.ten, ds: tron([{ t: e.ten, k: "dung" }].concat(nhieuNT(z))) }; }
+  const f = chon1(POOL_HC), { r, sai } = nhieuHC(f); return { che, loai: "hc", f, dung: r.ten, ds: tron([{ t: r.ten, k: "dung" }].concat(sai)) };
+}
+function moLuyen() {
+  const d = doc_luu();
+  $("#luyen").innerHTML = `<div style="display:flex;gap:18px;align-items:flex-end;margin-bottom:16px"><div>${linhVat("vui", 100)}</div><div class="bong" style="max-width:520px">Chào cả lớp! Mỗi lượt 10 câu. Chọn sai, em sẽ chỉ ra sai ở đâu nhé.</div></div>
+    <div class="che-do">${Object.entries(CHE).map(([k, [b, t, p]]) => `<button class="kinh che" data-che="${k}"><div class="bieu">${b}</div><h3>${t}</h3><p>${p}</p></button>`).join("")}</div>
+    ${d.lich.length ? `<div class="kinh" style="padding:18px;margin-top:16px"><div class="nhan-nho">Các lượt gần đây trên máy này</div><canvas class="bieu-do" id="bd"></canvas></div>` : ""}`;
+  $$("[data-che]").forEach(b => b.onclick = () => batDau(b.dataset.che));
+  if (d.lich.length) bieuDo($("#bd"), d.lich.slice(-10));
+}
+function batDau(che, mau) {
+  L = { che, i: 0, cau: Array.from({ length: 10 }, () => taoCau(che)), kq: [] };
+  if (mau) { L.cau[3] = (() => { const { r, sai } = nhieuHC("Fe2(SO4)3"); return { che, loai: "hc", f: "Fe2(SO4)3", dung: r.ten, ds: [{ t: r.ten, k: "dung" }].concat(sai) }; })(); L.i = 3; L.kq = [1, 1, 0]; }
+  veCau(); if (!CHUP) history.replaceState(null, "", "#luyen&che=" + che);
+}
+function veCau() {
+  const c = L.cau[L.i];
+  const de = c.loai === "nt" && c.che !== "nghe" ? `<div class="o-to" style="background:${TEN.NHOM[TEN.NT[c.z - 1].nhom][1]};width:150px;height:150px"><i>${c.z}</i><b style="font-size:66px">${TEN.NT[c.z - 1].k}</b></div>`
+    : c.che === "nghe" ? `<button class="loa" style="width:120px;height:120px;font-size:56px" data-doc="${esc(c.dung)}">🔊</button><button class="loa cham" style="width:80px;height:80px;font-size:36px" data-doc="${esc(c.dung)}" data-cham="1">🐢</button>`
+    : `<span class="ct" style="color:#c7e3ff">${dep(c.f)}</span>`;
+  const hoi = c.che === "nghe" ? "Bấm loa, nghe rồi chọn tên vừa đọc" : c.loai === "nt" ? "Tên IUPAC của nguyên tố này viết thế nào?" : "Tên IUPAC của chất này là gì?";
+  $("#luyen").innerHTML = `<div class="cau-wrap"><div class="kinh cau">
+    <div class="cham">${L.cau.map((_, i) => `<i class="${i < L.kq.length ? (L.kq[i] ? "dung" : "sai") : i === L.i ? "dang" : ""}"></i>`).join("")}</div>
+    <div class="nhan-nho">Câu ${L.i + 1}/10 · ${CHE[L.che][1]}${HASH0.includes("mau") ? '<span class="du-lieu-thu">DỮ LIỆU THỬ</span>' : ""}</div>
+    <div style="font-size:19px;font-weight:600">${hoi}</div>
+    <div class="de">${de}</div>
+    <div class="lua-chon">${c.ds.map((d, i) => `<button data-i="${i}">${esc(d.t)}</button>`).join("")}</div>
+    <div class="phan-hoi" id="ph"></div></div>
+    <div class="kinh ben">${linhVat("vui", 120)}<div class="diem-to">${L.kq.filter(Boolean).length}</div><div style="color:var(--mo)">câu đúng</div>
+    <button class="nut phu" style="margin-top:20px" id="thoat">↩ Chọn kiểu luyện khác</button></div></div>`;
+  $$(".lua-chon button").forEach(b => b.onclick = () => traLoi(+b.dataset.i));
+  $("#thoat").onclick = moLuyen;
+  if (c.che === "nghe" && !CHUP) setTimeout(() => doc(c.dung, false, $(".de .loa")), 350);
+}
+function traLoi(i) {
+  const c = L.cau[L.i], d = c.ds[i], dung = d.k === "dung";
+  $$(".lua-chon button").forEach((b, j) => { b.disabled = true; if (c.ds[j].k === "dung") b.classList.add("dung"); });
+  if (!dung) $$(".lua-chon button")[i].classList.add("sai");
+  L.kq.push(dung ? 1 : 0); ting(dung); if (dung) phaoGiay();
+  const ph = $("#ph"); ph.className = "phan-hoi " + (dung ? "dung" : "sai");
+  const giai = c.loai === "hc" ? TEN.ghep(c.f).buoc.slice(0, 2).join(" ") : (TEN.GHI_CHU_NT[TEN.NT[c.z - 1].k] || "");
+  ph.innerHTML = `<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><b style="font-size:18px">${dung ? "✅ Chính xác!" : "❌ " + esc(GIAI[d.k] || "Chưa đúng.")}</b>
+    ${nutLoa(c.dung).replace('class="loa"', 'class="loa" style="width:40px;height:40px;font-size:18px"')}<span>Đáp án: <b>${esc(c.dung)}</b></span></div>
+    ${giai ? `<div style="margin-top:6px;color:#d6e2ff">${esc(giai)}</div>` : ""}<div style="margin-top:10px"><button class="nut xanh" id="tiep">${L.i < 9 ? "Câu tiếp ➜" : "Xem kết quả 🏁"}</button></div>`;
+  if (!dung) { const s = doc_luu(); s.sai[c.dung] = (s.sai[c.dung] || 0) + 1; luu(s); }
+  $("#tiep").onclick = () => { L.i++; if (L.i < 10) veCau(); else ketThuc(); };
+  if (!CHUP && !dung) doc(c.dung);
+}
+function ketThuc(mau) {
+  const dung = L ? L.kq.filter(Boolean).length : 7, d = doc_luu();
+  if (!mau) { d.lich.push({ t: Date.now(), che: L.che, dung }); d.lich = d.lich.slice(-30); luu(d); }
+  const lich = mau ? [{ dung: 4 }, { dung: 5 }, { dung: 7 }, { dung: 6 }, { dung: 8 }, { dung: 9 }] : d.lich.slice(-10);
+  const sao = dung >= 9 ? 3 : dung >= 7 ? 2 : dung >= 5 ? 1 : 0;
+  const saiNhieu = Object.entries(mau ? { "iron(III) sulfate": 3, "sodium hydrogencarbonate": 2, "dinitrogen pentaoxide": 2, "potassium": 1 } : d.sai).sort((a, b) => b[1] - a[1]).slice(0, 6);
+  $("#luyen").innerHTML = `<div class="cau-wrap"><div class="kinh cau" style="text-align:center">
+    ${mau ? '<span class="du-lieu-thu">DỮ LIỆU THỬ</span>' : ""}
+    <div class="sao">${"⭐".repeat(sao)}${"☆".repeat(3 - sao)}</div><div class="diem-to" style="font-size:80px">${dung}/10</div>
+    <div style="font-size:19px;margin-bottom:14px">${dung >= 9 ? "Xuất sắc! Đọc chuẩn như chuyên gia." : dung >= 7 ? "Tốt lắm! Luyện thêm chút nữa nhé." : "Cố lên! Nghe mẫu nhiều lần sẽ quen."}</div>
+    <canvas class="bieu-do" id="bd"></canvas>
+    <div style="display:flex;gap:10px;justify-content:center;margin-top:14px;flex-wrap:wrap"><button class="nut xanh" id="lai">🔁 Luyện lượt mới</button><button class="nut phu" id="ve">↩ Chọn kiểu khác</button><button class="nut phu" id="xoa">🗑 Xoá lịch sử máy này</button></div></div>
+    <div class="kinh ben" style="text-align:left"><div class="nhan-nho">Tên hay đọc sai (máy này)</div>
+    ${saiNhieu.length ? saiNhieu.map(([t, n]) => `<div class="vd">${nutLoa(t).replace('class="loa"', 'class="loa" style="width:36px;height:36px;font-size:16px"')}<span style="flex:1">${esc(t)}</span><b class="k-an">${n}×</b></div>`).join("") : '<p style="color:var(--mo)">Chưa có.</p>'}</div></div>`;
+  bieuDo($("#bd"), lich);
+  if (dung >= 7) phaoGiay();
+  const che = L ? L.che : "ct";
+  $("#lai").onclick = () => batDau(che); $("#ve").onclick = moLuyen;
+  $("#xoa").onclick = () => { if (confirm("Xoá lịch sử luyện tập trên máy này?")) { luu({ lich: [], sai: {} }); moLuyen(); } };
+}
+function bieuDo(c, ds) {
+  const W = c.clientWidth || 600, H = 200, x = c.getContext("2d"), dpr = devicePixelRatio || 1; c.width = W * dpr; c.height = H * dpr; x.scale(dpr, dpr);
+  x.font = "13px Segoe UI, sans-serif"; const n = ds.length, bw = Math.min(56, (W - 40) / n - 10);
+  x.strokeStyle = "rgba(255,255,255,.12)"; for (let k = 0; k <= 10; k += 5) { const y = H - 26 - k / 10 * (H - 46); x.beginPath(); x.moveTo(30, y); x.lineTo(W, y); x.stroke(); x.fillStyle = "#a9b8dc"; x.fillText(k, 8, y + 4); }
+  ds.forEach((d, i) => { const h = d.dung / 10 * (H - 46), X = 40 + i * ((W - 40) / n) + 5, Y = H - 26 - h;
+    const g = x.createLinearGradient(0, Y, 0, H); g.addColorStop(0, d.dung >= 7 ? "#34d399" : d.dung >= 5 ? "#facc15" : "#fb923c"); g.addColorStop(1, "rgba(59,130,246,.4)");
+    x.fillStyle = g; x.beginPath(); x.roundRect ? x.roundRect(X, Y, bw, h, 8) : x.rect(X, Y, bw, h); x.fill(); x.fillStyle = "#fff"; x.fillText(d.dung, X + bw / 2 - 4, Y - 6); x.fillStyle = "#a9b8dc"; x.fillText("L" + (i + 1), X + bw / 2 - 7, H - 8); });
+}
+
+/* ---------- TÌM ---------- */
+const KHONG_DAU = s => s.normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/đ/g, "d").replace(/Đ/g, "D").toLowerCase();
+const CHI_MUC = [];
+TEN.NT.forEach(e => CHI_MUC.push({ loai: "nt", z: e.z, nhan: e.k, phu: e.ten + (e.cu ? " · " + e.cu : ""), khoa: KHONG_DAU([e.k, e.ten, e.cu].join(" ")) }));
+TEN.DS_HC.forEach(f => { const r = TEN.ghep(f); if (r.ok) CHI_MUC.push({ loai: "hc", f, nhan: f, phu: r.ten + " · " + r.cu, khoa: KHONG_DAU([TEN.chuan(f), r.ten, r.cu, r.thuong || ""].join(" ")) }); });
+let goiChon = -1;
+function timKiem() {
+  const q = $("#tim").value.trim(), box = $("#goiY");
+  if (!q) { box.classList.remove("mo"); return; }
+  const k = KHONG_DAU(q), kq = CHI_MUC.filter(m => m.nhan.toLowerCase() === q.toLowerCase()).concat(CHI_MUC.filter(m => m.nhan.toLowerCase() !== q.toLowerCase() && m.khoa.includes(k))).slice(0, 9);
+  const coCT = /^[A-Z(]/.test(q) && TEN.ghep(q).ok && !kq.some(m => m.loai === "hc" && TEN.chuan(m.f) === TEN.chuan(q));
+  box.innerHTML = (coCT ? `<button data-mo-ct="${esc(q)}"><b class="ct">${dep(q)}</b><span>Ghép tên: ${esc(TEN.ghep(q).ten)}</span></button>` : "") +
+    kq.map(m => `<button ${m.loai === "nt" ? `data-mo-z="${m.z}"` : `data-mo-ct="${esc(m.f)}"`}><b class="ct">${m.loai === "nt" ? esc(m.nhan) : dep(m.nhan)}</b><span>${esc(m.phu)}</span></button>`).join("") ||
+    `<div style="padding:10px;color:var(--mo)">Không thấy. Sếp gõ thử công thức, VD Fe2O3</div>`;
+  goiChon = -1; box.classList.add("mo");
+}
+function dungTim() {
+  const i = $("#tim"), box = $("#goiY");
+  i.addEventListener("input", timKiem);
+  i.addEventListener("keydown", e => { const ds = $$("#goiY button"); if (e.key === "ArrowDown" || e.key === "ArrowUp") { e.preventDefault(); goiChon = (goiChon + (e.key === "ArrowDown" ? 1 : -1) + ds.length) % ds.length; ds.forEach((b, j) => b.classList.toggle("chon", j === goiChon)); }
+    if (e.key === "Enter" && ds.length) (ds[goiChon] || ds[0]).click(); if (e.key === "Escape") box.classList.remove("mo"); });
+  box.addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return; box.classList.remove("mo"); i.value = "";
+    if (b.dataset.moZ) { chuyen("bang"); chonNT(+b.dataset.moZ, true); } else moGhep(b.dataset.moCt); });
+  document.addEventListener("click", e => { if (!e.target.closest(".tim")) box.classList.remove("mo"); });
+}
+
+/* ---------- ĐIỀU HƯỚNG ---------- */
+function chuyen(man) {
+  dungAm();
+  $$(".man").forEach(m => m.classList.toggle("on", m.id === "m-" + man)); $$("#nav button").forEach(b => b.classList.toggle("on", b.dataset.man === man));
+  if (man === "luyen" && !L) moLuyen();
+  if (!CHUP) { const giu = { bang: "#bang&z=" + zChon, ghep: "#ghep&ct=" + encodeURIComponent($("#ctVao").value), "huu-co": `#huu-co&c=${hc.c}&loai=${hc.loai}&vt=${hc.vt}`, "quy-tac": "#quy-tac", luyen: "#luyen" }; history.replaceState(null, "", giu[man]); }
+}
+$("#nav").onclick = e => { const b = e.target.closest("[data-man]"); if (b) { if (b.dataset.man === "luyen") { L = null; } chuyen(b.dataset.man); } };
+function docHash() {
+  const [man, ...ts] = HASH0.slice(1).split("&"), t = {}; ts.forEach(x => { const [a, b] = x.split("="); t[a] = decodeURIComponent(b || ""); });
+  switch (man) {
+    case "ghep": if (t.ct) $("#ctVao").value = t.ct; chuyen("ghep"); ghepTen(); break;
+    case "huu-co": hc = { c: +t.c || 3, loai: TEN.HO[t.loai] ? t.loai : "ol", vt: +t.vt || 1 }; veHC(); chuyen("huu-co"); break;
+    case "quy-tac": chuyen("quy-tac"); break;
+    case "luyen": chuyen("luyen"); if (t.che) batDau(t.che, !!t.mau); if (t.che && t.mau && t.chon) traLoi(L.cau[L.i].ds.findIndex(d => d.k !== "dung")); break;
+    case "ket-qua": chuyen("luyen"); L = null; ketThuc(true); break;
+    case "tra": chuyen("bang"); $("#tim").value = t.q || ""; timKiem(); break;
+    default: chonNT(+t.z || 26); chuyen("bang");
+  }
+  if (man === "bang" || !man) chonNT(+t.z || zChon);
+}
+veBang(); dungGhep(); dungHC(); veHC(); veQT(); dungTim(); ghepTen(); docHash();
+</script>
+</body>
+</html>
