@@ -7,8 +7,9 @@ Sau khi tải lên, bộ app sẽ ở: **`https://leanh2004ggv3-del.github.io/tr
 1. Mở kho `tro_ly_thong_minh` trên github.com (đăng nhập tài khoản của sếp).
 2. Bấm **Add file → Upload files**.
 3. **Kéo nguyên thư mục `to-truong`** (trong thư mục này) thả vào trang. GitHub giữ đúng tên thư mục, gồm 9 file:
-   `index.html` · `lich-nam.html` · `phan-cong.html` · `bien-ban.html` · `tien-do.html` · `ket-qua-kt.html` · `ma-tran-de.html` · `tich-hop.html` *(20/11: Tích hợp NLS – NLAI)* · `song-ngu.html` *(mới 21/11: Song ngữ Việt – Anh cho giáo án)*
-   > Nếu sếp **đã tải** bộ trước đó: chỉ cần tải thêm `to-truong/song-ngu.html` + `to-truong/index.html` (ghi đè) và `trang-chinh/index.html` (nhãn menu đổi 7 → 8). Chưa tải `tich-hop.html` thì tải luôn.
+   `index.html` · `lich-nam.html` · `phan-cong.html` · `bien-ban.html` · `tien-do.html` · `ket-qua-kt.html` · `ma-tran-de.html` · `tich-hop.html` *(20/11: Tích hợp NLS – NLAI)* · `song-ngu.html` *(21/11: Song ngữ Việt – Anh cho giáo án)* · `soan-de.html` *(mới 22/11: Trợ lý soạn đề kiểm tra theo CV 7991)*
+   > **Cập nhật 22/11 (app 9 Soạn đề):** chỉ cần tải thêm `to-truong/soan-de.html` + `to-truong/index.html` (ghi đè) và `trang-chinh/index.html` (nhãn menu đổi 8 → 9). Không tải thư mục `_cong-cu/`, `_phieu-kiem/`.
+> Nếu sếp **đã tải** bộ trước đó: chỉ cần tải thêm `to-truong/song-ngu.html` + `to-truong/index.html` (ghi đè) và `trang-chinh/index.html` (nhãn menu đổi 7 → 8). Chưa tải `tich-hop.html` thì tải luôn.
 4. Ô *Commit changes* ghi: `Thêm bộ Tổ trưởng số` → bấm **Commit changes**.
 5. Chờ 1–2 phút, mở link `…/tro_ly_thong_minh/to-truong/` để thử.
 

@@ -114,6 +114,43 @@ details.hop summary{cursor:pointer;font-weight:700;font-size:14.5px}
 .trang table.kv td{border:0;padding:0 2px}
 .trang p.cot{display:grid;gap:4px}.trang p.c2{grid-template-columns:1fr 1fr}.trang p.c4{grid-template-columns:repeat(4,1fr)}
 .goiy{margin-top:10px}
+.goiy code{background:#fff;border:1px solid #e2e8f0;border-radius:6px;padding:0 4px;font-size:12px;color:#4c1d95}
+.ct{font-family:"Times New Roman",Times,serif;white-space:nowrap}
+.ct-f{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;margin:0 2px;line-height:1.15}
+.ct-f>span:first-child{border-bottom:1px solid currentColor;padding:0 2px}
+.ct-f>span{font-size:.92em}
+.ct-r{white-space:nowrap}.ct-r sup{font-size:.6em;margin-right:-4px;vertical-align:.9em}
+.ct-rr{border-top:1px solid currentColor;padding:0 1px}
+.ct-he{display:inline-flex;align-items:center;vertical-align:middle}
+.ct-ng{font-size:2.1em;line-height:1;margin-right:2px;font-weight:300}
+.ct-dong{display:inline-flex;flex-direction:column;line-height:1.3}
+.ct-acc{position:relative;display:inline-block}
+.ct-acc::before{content:attr(data-c);position:absolute;left:0;right:0;top:-.75em;text-align:center;font-size:.8em;line-height:1}
+.ct-mui{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;line-height:1;margin:0 3px}
+.ct-mui small{font-size:.7em}
+.ct-n{font-size:1.3em;vertical-align:-.1em}
+.xem-ct:empty{display:none}
+.xem-ct{margin-top:6px;background:#fff;border:1.5px dashed #c4b5fd;border-radius:12px;padding:8px 12px;font-family:"Times New Roman",Times,serif;font-size:16.5px;line-height:1.8;color:#111}
+.xem-ct .xem-nhan{font:700 12px var(--font);color:#6d28d9;margin-bottom:2px}
+.xem-pa{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:2px 14px}
+.hop-de{margin-top:12px;border:2px dashed #a5b4fc;border-radius:16px;padding:10px 12px;background:linear-gradient(135deg,rgba(238,242,255,.9),rgba(255,247,237,.9))}
+.hop-de-trai{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.hop-de-trai>div:nth-child(2){flex:1 1 260px}
+.dem-de{display:flex;gap:6px;align-items:center}
+.dem-de input{width:64px;text-align:center;font-size:20px;font-weight:800;color:var(--chinh);min-height:44px}
+.dem-de .nut{font-size:20px;min-width:44px;justify-content:center}
+.ma-de{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.ma-de label{display:flex;align-items:center;gap:6px;background:#fff;border:1.5px solid #c7d2fe;border-radius:12px;padding:4px 8px;font-size:13.5px;font-weight:700;color:var(--chinh)}
+.ma-de input{width:86px;min-height:32px;padding:4px 6px}
+.chon-de{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0}
+.chon-de:empty{display:none}
+.chon-de button{display:flex;flex-direction:column;align-items:flex-start;gap:2px;border:2px solid #e2e8f0;background:#fff;border-radius:14px;padding:6px 12px;cursor:pointer;font:700 14px var(--font);color:var(--chu);min-width:110px;transition:.15s}
+.chon-de button small{font-weight:600;font-size:12px;color:var(--chu2)}
+.chon-de button i{display:block;height:5px;width:100%;border-radius:5px;background:#e2e8f0;overflow:hidden}
+.chon-de button i b{display:block;height:100%;background:#16a34a}
+.chon-de button.chon{border-color:var(--chinh);background:#eef2ff;box-shadow:0 6px 14px -8px rgba(79,70,229,.6)}
+.chon-de button.du{border-color:#86efac}
+.chon-de button.chon.du{border-color:var(--chinh)}
 @media (max-width:640px){#thanhBuoc a{flex:1 1 44%;font-size:13px}.cd-nut{margin-left:0}.o-mt input{width:38px}}
 @media print{#thanhBuoc{display:none}}
 </style>
@@ -146,7 +183,6 @@ details.hop summary{cursor:pointer;font-weight:700;font-size:14.5px}
     <label class="o">Bài kiểm tra<select data-tt="ky"><option>GIỮA HỌC KÌ I</option><option>CUỐI HỌC KÌ I</option><option>GIỮA HỌC KÌ II</option><option>CUỐI HỌC KÌ II</option></select></label>
     <label class="o">Năm học<input data-tt="nam" placeholder="2026 – 2027"></label>
     <label class="o">Thời gian (phút)<select data-tt="phut"><option value="45">45 phút</option><option value="60">60 phút</option><option value="90">90 phút</option></select></label>
-    <label class="o">Mã đề (nếu có)<input data-tt="maDe" placeholder="VD: 101"></label>
     <label class="o">Người ra đề (kí tên)<input data-tt="nguoiSoan" placeholder="Họ tên GV"></label>
     <label class="o">Tổ trưởng chuyên môn<input data-tt="toTruong" placeholder="Họ tên"></label>
   </div>
@@ -189,6 +225,14 @@ details.hop summary{cursor:pointer;font-weight:700;font-size:14.5px}
     </div>
   </div>
   <div class="mo nho2" style="margin-top:6px">Gõ số câu vào từng ô (Đúng – Sai: số <b>ý</b>, mỗi câu 4 ý) · phím mũi tên để di chuyển · thanh tím = % điểm, thanh xám = % số tiết.</div>
+  <div class="hop-de" id="hopDe">
+    <div class="hop-de-trai">
+      <svg width="64" height="54" viewBox="0 0 64 54" aria-hidden="true"><rect x="4" y="10" width="30" height="40" rx="5" fill="#c7d2fe"/><rect x="14" y="6" width="30" height="40" rx="5" fill="#a5b4fc"/><rect x="24" y="2" width="30" height="40" rx="5" fill="#6366f1"/><rect x="30" y="10" width="18" height="3" rx="1.5" fill="#fff"/><rect x="30" y="17" width="18" height="3" rx="1.5" fill="#fff" opacity=".8"/><rect x="30" y="24" width="12" height="3" rx="1.5" fill="#fff" opacity=".8"/><circle cx="52" cy="42" r="10" fill="#f59e0b"/><text x="52" y="46.5" text-anchor="middle" font-size="12" font-weight="800" fill="#fff" font-family="Segoe UI,Arial" id="soDeIcon">1</text></svg>
+      <div><b>Số đề cần tạo trên cùng ma trận này</b><div class="mo nho2">Các đề tương đương: chung ma trận, bản đặc tả; mỗi đề có câu hỏi, đáp án, hướng dẫn chấm riêng.</div></div>
+      <div class="dem-de"><button class="nut phu nho" id="bDeTru" aria-label="Bớt một đề">−</button><input id="soDe" inputmode="numeric" aria-label="Số đề"><button class="nut phu nho" id="bDeCong" aria-label="Thêm một đề">＋</button></div>
+    </div>
+    <div class="ma-de" id="dsMaDe"></div>
+  </div>
   <div class="luoi l2" style="margin-top:12px">
     <details class="hop" id="hopTl" open><summary>Điểm từng câu tự luận</summary><div id="dsTl"></div></details>
     <details class="hop"><summary>Tỉ lệ mức độ mục tiêu &amp; ghi chú dưới ma trận</summary>
@@ -202,7 +246,7 @@ details.hop summary{cursor:pointer;font-weight:700;font-size:14.5px}
   <div class="luoi l2">
     <div>
       <div class="goiy"><svg width="30" height="30" viewBox="0 0 40 40"><rect x="4" y="8" width="32" height="24" rx="8" fill="#8b5cf6"/><circle cx="14" cy="20" r="3" fill="#fff"/><circle cx="26" cy="20" r="3" fill="#fff"/><path d="M20 4v4" stroke="#8b5cf6" stroke-width="3"/><circle cx="20" cy="4" r="2.5" fill="#f59e0b"/></svg>
-        <div class="nho2"><b>Cách dùng:</b> bấm <b>Chép câu lệnh cho AI</b> (gồm nội dung đã nạp + ma trận + yêu cầu cần đạt + khuôn trả lời) → dán vào ChatGPT, Gemini hoặc Copilot → chép toàn bộ câu trả lời dán vào ô dưới → bấm <b>Đọc vào đề</b>. Thầy cô soát, sửa từng câu ở khung bên dưới. AI có thể sai — <b>thầy cô duyệt kiến thức</b>.</div></div>
+        <div class="nho2"><b>Cách dùng:</b> bấm <b>Chép câu lệnh cho AI</b> (gồm nội dung đã nạp + ma trận + yêu cầu cần đạt + khuôn trả lời) → dán vào ChatGPT, Gemini hoặc Copilot → chép toàn bộ câu trả lời dán vào ô dưới → bấm <b>Đọc vào đề</b>. Thầy cô soát, sửa từng câu ở khung bên dưới. AI có thể sai — <b>thầy cô duyệt kiến thức</b>.<br><b>∑ Công thức Toán, Lí, Hoá</b> viết giữa hai dấu $ (kiểu LaTeX), VD <code>$\frac{2}{3}$</code>, <code>$\sqrt{x+1}$</code>, <code>$x^2$</code>, <code>$H_2SO_4$</code>, <code>$\widehat{ABC}=60^\circ$</code>, <code>$2H_2+O_2 \xrightarrow{t^\circ} 2H_2O$</code> → app xuất thành <b>công thức Word (Equation)</b>, xem trước ngay dưới từng câu.</div></div>
       <details class="hop" id="hopLenh"><summary>Câu lệnh đã chép</summary><textarea id="oLenh" rows="6" style="margin-top:6px;font-size:13px" readonly></textarea></details>
       <label class="o" style="margin-top:8px">Dán câu trả lời của AI<textarea id="oDan" rows="6" placeholder="[I.1] …&#10;A. …&#10;B. …&#10;C. …&#10;D. …&#10;Đáp án: B"></textarea></label>
       <div class="hang" style="margin-top:6px"><button class="nut xanh" id="bDoc">⬇ Đọc vào đề</button><span id="ketQuaDoc" class="nho2"></span></div>
@@ -215,6 +259,7 @@ details.hop summary{cursor:pointer;font-weight:700;font-size:14.5px}
       <div id="dsKiem"></div>
     </div>
   </div>
+  <div class="chon-de" id="chonDe4"></div>
   <div class="hang" style="margin-top:10px;align-items:center"><span class="nho2 mo" style="flex:0 0 auto">Hiện:</span><div class="loc" id="locCau"><button data-loc="" class="chon">Tất cả câu</button><button data-loc="trong">Câu chưa đủ</button></div></div>
   <div id="dsCau"></div>
 </section>
@@ -223,6 +268,7 @@ details.hop summary{cursor:pointer;font-weight:700;font-size:14.5px}
   <div class="buoc"><span class="so">5</span><b>Xem trước &amp; xuất Word</b><span class="phai"><button class="nut xanh" id="bXuat2">📝 Xuất Word (.docx)</button></span></div>
   <div class="luoi l2" style="grid-template-columns:minmax(0,1fr) 300px;align-items:start">
     <div>
+      <div class="chon-de" id="chonDe5"></div>
       <div id="tabXem"><button data-tab="mt">🧩 Ma trận</button><button data-tab="dt">📋 Bản đặc tả</button><button data-tab="de" class="chon">📄 Đề</button><button data-tab="hd">✅ Hướng dẫn chấm</button></div>
       <div id="a4"></div>
     </div>
@@ -234,6 +280,7 @@ details.hop summary{cursor:pointer;font-weight:700;font-size:14.5px}
         <label class="tl-o"><input type="checkbox" data-p="de" checked style="width:18px;min-height:0"> 📄 Đề kiểm tra (khổ dọc)</label>
         <label class="tl-o"><input type="checkbox" data-p="hd" checked style="width:18px;min-height:0"> ✅ Hướng dẫn chấm (khổ dọc)</label>
       </div>
+      <div id="hopXuatDe"><b class="nho2">Xuất những đề nào</b><div class="luoi" id="xuatDe" style="gap:4px;margin:6px 0 10px"></div></div>
       <div class="mo nho2">Mỗi phần sang trang mới · toàn bộ <b>Times New Roman cỡ 13</b> · lề 2 – 1,5 – 2 – 3 cm · bảng kẻ viền, đầu bảng tô nhạt.</div>
       <div id="dsKiem2" style="margin-top:8px"></div>
     </div>
@@ -247,6 +294,7 @@ details.hop summary{cursor:pointer;font-weight:700;font-size:14.5px}
 <!--JS-->
 <script>
 const MAU_DE = <!--NHUNG:soan-de/mau.json-->;
+<!--NHUNG:soan-de/cong_thuc.js-->
 <!--NHUNG:soan-de/docx_viet.js-->
 <!--NHUNG:soan-de/doc_file.js-->
 <!--NHUNG:soan-de/soan_de.js-->

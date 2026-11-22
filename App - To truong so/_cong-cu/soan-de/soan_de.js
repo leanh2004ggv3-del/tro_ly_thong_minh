@@ -16,13 +16,24 @@ const esc = TT.esc;
 
 function moi() {
   return {
-    tt: { so: "", truong: "", to: "", mon: "", lop: "", ky: "GIỮA HỌC KÌ I", nam: "2026 – 2027", phut: 45, maDe: "", nguoiSoan: "", toTruong: "", cap: "THCS" },
+    tt: { so: "", truong: "", to: "", mon: "", lop: "", ky: "GIỮA HỌC KÌ I", nam: "2026 – 2027", phut: 45, nguoiSoan: "", toTruong: "", cap: "THCS" },
     cd: [],
     dang: { NLC: { bat: true, d: 0.25 }, DS: { bat: true, d: 1, cham: "764" }, TLN: { bat: true, d: 0.25 }, TL: { bat: true, d: 1 } },
-    o: {}, tlDiem: {}, cau: {}, muc: { B: 40, H: 30, V: 30 }
+    o: {}, tlDiem: {}, bo: [{ ma: "", cau: {} }], deHien: 0, muc: { B: 40, H: 30, V: 30 }
   };
 }
-let S = TT.MAU ? JSON.parse(JSON.stringify(MAU_DE)) : (TT.load("soande", null) || moi());
+/* nhiều đề cùng một ma trận: S.bo[i] = {ma, cau}; S.cau luôn trỏ tới đề đang soạn (không lưu trùng) */
+function chuan(x) {
+  if (!x.bo) { x.bo = [{ ma: (x.tt && x.tt.maDe) || "", cau: x.cau || {} }]; delete x.cau; }
+  if (x.tt) delete x.tt.maDe;
+  x.bo.forEach(b => { b.cau = b.cau || {}; b.ma = b.ma || ""; });
+  x.deHien = Math.min(Math.max(0, x.deHien | 0), x.bo.length - 1);
+  Object.defineProperty(x, "cau", { get() { return x.bo[x.deHien].cau; }, set(v) { x.bo[x.deHien].cau = v; }, enumerable: false, configurable: true });
+  return x;
+}
+const tenDe = i => S.bo[i].ma ? "Mã đề " + S.bo[i].ma : "Đề " + (i + 1);
+function voiDe(i, fn) { const cu = S.deHien; S.deHien = i; try { return fn(); } finally { S.deHien = cu; } }
+let S = chuan(TT.MAU ? JSON.parse(JSON.stringify(MAU_DE)) : (TT.load("soande", null) || moi()));
 function luu() { clearTimeout(luu.t); luu.t = setTimeout(() => TT.save("soande", S), 250); }
 function oCua(id) {
   S.o[id] = S.o[id] || {};
@@ -128,7 +139,7 @@ const KHOA_PA = /(cả\s+[A-D]\s+(và|,)|tất cả|cả (hai|ba|bốn)|đều (
 /* đáp án đúng là phương án dài nhất hẳn (dài hơn mọi nhiễu từ 2 kí tự) → HS dễ đoán */
 function daiNhat(q) {
   if (!q || !q.pa || q.pa.length !== 4 || q.dung == null || q.pa.some(p => !String(p || "").trim())) return false;
-  const n = q.pa.map(p => DF.gon(p).length), L = n[q.dung], M = Math.max(...n.filter((_, i) => i !== q.dung));
+  const n = q.pa.map(p => DF.gon(CT.thuan(p)).length), L = n[q.dung], M = Math.max(...n.filter((_, i) => i !== q.dung));
   return L >= M + 2;
 }
 function daXong(s) {
@@ -167,9 +178,21 @@ function soat(P, t) {
     (lechDa || maxL > 2) ? them("canh", `Đáp án A–B–C–D: ${dem.map((c, i) => "ABCD"[i] + " " + c).join(" · ")}${maxL > 2 ? ` · có ${maxL} câu liền cùng đáp án` : ""} → bấm «Cân đáp án».`)
       : them("ok", `Đáp án rải đều: ${dem.map((c, i) => "ABCD"[i] + " " + c).join(" · ")}.`);
   }
-  P.TLN.forEach(s => { const q = S.cau[s.k]; if (q && q.da && !/^-?\d+([.,]\d+)?$/.test(String(q.da).trim())) them("canh", `Câu ${s.la}.${s.so}: đáp án trả lời ngắn nên là MỘT SỐ (đang là «${q.da}»).`); else if (q && q.da && String(q.da).trim().length > 4) them("canh", `Câu ${s.la}.${s.so}: đáp án quá 4 kí tự — phiếu trả lời ngắn thường có 4 ô.`); });
+  P.TLN.forEach(s => { const q = S.cau[s.k]; if (q && q.da && !/^-?\d+([.,]\d+)?$/.test(CT.thuan(q.da).trim())) them("canh", `Câu ${s.la}.${s.so}: đáp án trả lời ngắn nên là MỘT SỐ (đang là «${q.da}»).`); else if (q && q.da && CT.thuan(q.da).trim().length > 4) them("canh", `Câu ${s.la}.${s.so}: đáp án quá 4 kí tự — phiếu trả lời ngắn thường có 4 ô.`); });
   P.TL.forEach(s => { const q = S.cau[s.k]; if (q && q.hdc && q.hdc.length) { const c = tong(q.hdc.map(h => so(h.d))); if (Math.abs(c - s.diem) > .001) them("loi", `Câu ${s.la}.${s.so}: hướng dẫn chấm cộng ${f2(c)} điểm, câu là ${f2(s.diem)} điểm.`); } });
   const de = {}; P.phan.forEach(d => P[d].forEach(s => { const q = S.cau[s.k]; if (!q || !q.de) return; const k = DF.gon(q.de).toLowerCase(); if (de[k]) them("canh", `Câu ${s.la}.${s.so} trùng câu dẫn với ${de[k]}.`); else de[k] = s.la + "." + s.so; }));
+  if (S.bo.length > 1) {
+    const khac = {}; S.bo.forEach((b, i) => { if (i === S.deHien) return; Object.values(b.cau).forEach(q => { if (q && q.de) khac[DF.gon(q.de).toLowerCase()] = tenDe(i); }); });
+    P.phan.forEach(d => P[d].forEach(s => { const q = S.cau[s.k]; if (q && q.de && khac[DF.gon(q.de).toLowerCase()]) them("canh", `Câu ${s.la}.${s.so} trùng nguyên câu hỏi với ${khac[DF.gon(q.de).toLowerCase()]} — đề tương đương cần đổi ngữ liệu, số liệu.`); }));
+  }
+  // công thức Toán, Lí, Hoá: lỗi cú pháp → Word sẽ hỏng công thức
+  let nCT = 0;
+  P.phan.forEach(d => P[d].forEach(s => {
+    const q = S.cau[s.k]; if (!q) return;
+    const o = [["câu hỏi", q.de], ...(q.pa || []).map((p, i) => ["phương án " + "ABCD"[i], p]), ...(q.y || []).map((y, i) => ["ý " + "abcd"[i] + ")", y && y.t]), ["đáp án", q.da], ...(q.hdc || []).map((h, i) => ["HDC ý " + (i + 1), h && h.nd])];
+    o.forEach(([ten, chu]) => { if (!chu) return; nCT += CT.tach(chu).filter(p => p.t === "ct").length; CT.kiem(chu).forEach(l => them("loi", `Câu ${s.la}.${s.so} (${ten}): công thức ${l}.`)); });
+  }));
+  if (nCT) them("ok", `${nCT} công thức đọc được — xuất ra thành công thức Word (Equation), sửa được trong Word.`);
   const dai = P.NLC.filter(s => daiNhat(S.cau[s.k]));
   if (dai.length) them("canh", `Đáp án đúng đang là phương án DÀI NHẤT ở ${dai.length} câu: ${dai.map(s => s.la + "." + s.so).join(", ")} — học sinh dễ đoán. Sửa cho phương án nhiễu dài tương đương, hoặc bấm «Câu lệnh sửa phương án».`);
   else if (P.NLC.some(s => S.cau[s.k] && S.cau[s.k].dung != null)) them("ok", "Không câu nào có đáp án đúng dài nhất hẳn so với phương án nhiễu.");
@@ -214,7 +237,7 @@ YÊU CẦU CHUNG
 - Chỉ dùng kiến thức trong phần NỘI DUNG BÀI HỌC ở cuối (giáo viên cung cấp). Không đưa kiến thức ngoài phạm vi, không bịa số liệu.
 - Mỗi câu đo đúng yêu cầu cần đạt (YCCĐ) và đúng mức độ ghi ở từng câu. Ngữ liệu, số liệu, tình huống mới — không chép nguyên câu hỏi, bài tập có sẵn trong bài.
 - Lệnh hỏi rõ, một nghĩa, đúng thuật ngữ của sách. Viết tiếng Việt chuẩn.
-- Chỉ số viết x^2, H_2O, 10^{-3}. Không dùng LaTeX, không dùng Markdown (không **, không #, không bảng).
+- MỌI công thức Toán, Vật lí, Hoá học viết LaTeX đặt giữa hai dấu $, mỗi công thức nằm trọn trên một dòng. Ví dụ: $\\frac{2}{3}$, $\\sqrt{x+1}$, $x^2-5x+6=0$, $\\begin{cases} x+y=3 \\\\ 2x-y=0 \\end{cases}$, $\\widehat{ABC}=60^\\circ$, $\\Delta ABC$, $v=\\frac{s}{t}$, $10^{-3}$, $H_2SO_4$, $Fe^{3+}$, $2H_2+O_2 \\xrightarrow{t^\\circ} 2H_2O$. Không dùng \\( \\), \\[ \\], $$; không viết công thức bằng ảnh hay chữ thường kiểu x2, H2O. Không dùng Markdown (không **, không #, không bảng).
 - Giữ đúng nhãn [${ds[0].la}.${ds[0].so}]… ở đầu mỗi câu, đúng thứ tự, không thêm lời mở đầu hay kết luận.
 `;
   if (co("NLC")) s += `- Phần ${la("NLC")} (nhiều lựa chọn): 4 phương án A, B, C, D, chỉ 1 phương án đúng; các phương án dài tương đương, cùng cấu trúc ngữ pháp, nhiễu hợp lí; ĐÁP ÁN ĐÚNG KHÔNG ĐƯỢC LÀ PHƯƠNG ÁN DÀI NHẤT — luôn có ít nhất một phương án nhiễu dài bằng hoặc dài hơn, đáp án đúng không chi tiết hơn hẳn các phương án khác; không dùng «Cả A và B», «Tất cả đều đúng». Cuối câu ghi «Đáp án: X».
@@ -224,6 +247,8 @@ YÊU CẦU CHUNG
   if (co("TLN")) s += `- Phần ${la("TLN")} (trả lời ngắn): đáp án là MỘT SỐ, tối đa 4 kí tự kể cả dấu phẩy và dấu trừ; ghi rõ yêu cầu làm tròn nếu có. Không hỏi «mấy câu», «mấy từ». Cuối câu ghi «Đáp án: …».
 `;
   if (co("TL")) s += `- Phần ${la("TL")} (tự luận): ghi đúng số điểm của câu; có thể chia ý a), b). Sau câu hỏi viết dòng «Hướng dẫn chấm:» rồi từng ý một dòng, cuối mỗi dòng ghi điểm trong ngoặc, ví dụ «- Nêu đúng …(0,5 điểm)»; tổng điểm các ý bằng điểm của câu.
+`;
+  if (S.bo.length > 1) s += `- ĐÂY LÀ ${tenDe(S.deHien).toUpperCase()} trong bộ ${S.bo.length} đề TƯƠNG ĐƯƠNG trên cùng một ma trận: giữ đúng chủ đề, YCCĐ, mức độ, dạng câu và độ khó của từng câu; nhưng đổi ngữ liệu, số liệu, tình huống, cách hỏi — KHÔNG lặp lại câu hỏi ở các đề khác (ghi kèm từng câu bên dưới nếu đã có).
 `;
   s += `
 KHUÔN TRẢ LỜI (làm đúng như mẫu)
@@ -254,7 +279,7 @@ Hướng dẫn chấm:
 `;
   s += `
 DANH SÁCH ${ds.length} CÂU CẦN SOẠN
-${ds.map(moTaO).join("\n")}
+${ds.map(s => { let m = moTaO(s); if (S.bo.length > 1) { const cu = S.bo.map((b, i) => i !== S.deHien && b.cau[s.k] && b.cau[s.k].de ? tenDe(i) + " đã hỏi: «" + DF.gon(b.cau[s.k].de).slice(0, 160) + "»" : "").filter(Boolean); if (cu.length) m += " | " + cu.join(" ; "); } return m; }).join("\n")}
 
 NỘI DUNG BÀI HỌC (giáo viên cung cấp)
 ${noiDung}
@@ -270,7 +295,7 @@ function lenhSuaDai() {
 - Giữ nguyên câu hỏi, giữ nguyên nội dung và VỊ TRÍ (chữ cái) của đáp án đúng.
 - Làm cho 4 phương án dài tương đương, cùng cấu trúc: viết gọn đáp án đúng và/hoặc viết các phương án nhiễu đầy đủ hơn, sao cho ít nhất một phương án nhiễu dài bằng hoặc dài hơn đáp án đúng.
 - Phương án nhiễu vẫn phải SAI rõ ràng, hợp lí, đúng phạm vi bài học; không dùng «Cả A và B», «Tất cả đều đúng».
-- Không dùng Markdown. Trả lời đúng khuôn, giữ nguyên nhãn, không thêm lời mở đầu:
+- Giữ nguyên công thức LaTeX trong $…$ (mỗi công thức trên một dòng). Không dùng Markdown. Trả lời đúng khuôn, giữ nguyên nhãn, không thêm lời mở đầu:
 [I.1] Câu hỏi …
 A. …
 B. …
@@ -342,7 +367,7 @@ function docCau(d, than, s) {
 function docTraLoi(txt) {
   const P = khe(), map = {};
   P.phan.forEach(d => P[d].forEach(s => map[s.la + "." + s.so] = s));
-  txt = String(txt || "").replace(/\r/g, "").replace(/\*\*|__|`/g, "").replace(/^#+\s*/gm, "").replace(/\\\(|\\\)|\$/g, "");
+  txt = String(txt || "").replace(/\r/g, "").replace(/\*\*|__|`/g, "").replace(/^#+\s*/gm, "").replace(/\\\(|\\\)/g, "$").replace(/\$\$|\\\[|\\\]/g, "$").replace(/\$[^$]*\$/g, m => m.replace(/\s*\n\s*/g, " "));
   const re = /^\s*\[?\s*(IV|I{1,3})\s*[.\-]\s*(\d+)\s*\]?\s*[:.)]?/gm, moc = []; let m;
   while ((m = re.exec(txt))) moc.push({ k: m[1] + "." + m[2], i: m.index, j: re.lastIndex });
   let duoc = 0, loi = [];
@@ -482,16 +507,17 @@ function kyTen(rong) {
   return { t: "bang", vien: false, cot: [rong / 3, rong / 3, rong / 3], hang: [[o("DUYỆT CỦA BAN GIÁM HIỆU", ""), o("TỔ TRƯỞNG CHUYÊN MÔN", tt.toTruong), o("NGƯỜI RA ĐỀ", tt.nguoiSoan)]] };
 }
 function luaChon(q, rong) {
-  const tw = DX.cm(rong), thut = 284, len = Math.max(...q.pa.map(p => String(p).length));
+  const tw = DX.cm(rong), thut = 284, len = Math.max(...q.pa.map(p => CT.thuan(p).length + (CT.coCT(p) ? 4 : 0)));
   const r = i => [{ t: "ABCD"[i] + ". ", b: true }, ...R(q.pa[i])];
   if (len <= 15) { const b = (tw - thut) / 4; return [P_([...r(0), { tab: true }, ...r(1), { tab: true }, ...r(2), { tab: true }, ...r(3)], { thut, tab: [1, 2, 3].map(k => Math.round(thut + b * k)), jc: "left" })]; }
   if (len <= 34) { const b = (tw - thut) / 2; return [P_([...r(0), { tab: true }, ...r(1)], { thut, tab: [Math.round(thut + b)], jc: "left" }), P_([...r(2), { tab: true }, ...r(3)], { thut, tab: [Math.round(thut + b)], jc: "left" })]; }
   return [0, 1, 2, 3].map(i => P_(r(i), { thut: thut + 340, treo: 340 }));
 }
+const dongMa = () => S.bo[S.deHien].ma ? "Mã đề: " + S.bo[S.deHien].ma : S.bo.length > 1 ? "ĐỀ SỐ " + (S.deHien + 1) : "";
 function phanDe(P, t) {
   const rong = 16.5, tt = S.tt, khoi = [];
   khoi.push(dauVb(rong, [[`ĐỀ KIỂM TRA ${tenKy()}`, { b: true }], [`NĂM HỌC ${tt.nam || "…"}`, { b: true }], [monLop(), { b: true }], [`Thời gian làm bài: ${tt.phut || "…"} phút`, { i: true }], ["(không kể thời gian phát đề)", { i: true }]]));
-  if (tt.maDe) khoi.push(P_([{ t: "Mã đề: " + tt.maDe, b: true }], { jc: "right", sau: 0 }));
+  if (dongMa()) khoi.push(P_([{ t: dongMa(), b: true }], { jc: "right", sau: 0 }));
   khoi.push(P_([{ t: "Họ và tên: ………………………………………………… Lớp: ………… SBD: …………" }], { truoc: 160, sau: 160, jc: "left" }));
   P.phan.forEach(d => {
     const ds = P[d], la = ds[0].la, n = ds.length, diem = t.dang[d];
@@ -514,7 +540,7 @@ function phanDe(P, t) {
 function phanHdc(P, t) {
   const rong = 16.5, tt = S.tt, D = S.dang, khoi = [];
   khoi.push(dauVb(rong, [["HƯỚNG DẪN CHẤM", { b: true }], [`ĐỀ KIỂM TRA ${tenKy()}`, { b: true }], [`NĂM HỌC ${tt.nam || "…"}`, { b: true }], [monLop(), { b: true }]]));
-  if (tt.maDe) khoi.push(P_([{ t: "Mã đề: " + tt.maDe, b: true }], { jc: "right", sau: 0 }));
+  if (dongMa()) khoi.push(P_([{ t: dongMa(), b: true }], { jc: "right", sau: 0 }));
   const H = n => ({ t: n, b: true, jc: "center", nen: "D9E2F3" });
   P.phan.forEach(d => {
     const ds = P[d], la = ds[0].la;
@@ -557,7 +583,7 @@ function dungPhan(chon) {
   if (!P.phan.length) return out;
   if (chon.mt) out.push(phanMaTran(P, t));
   if (chon.dt) out.push(phanDacTa(P, t));
-  if (chon.de) out.push(phanDe(P, t));
-  if (chon.hd) out.push(phanHdc(P, t));
+  const ds = chon.ds || [S.deHien];
+  ds.forEach(i => voiDe(i, () => { if (chon.de) out.push(phanDe(P, t)); if (chon.hd) out.push(phanHdc(P, t)); }));
   return out;
 }

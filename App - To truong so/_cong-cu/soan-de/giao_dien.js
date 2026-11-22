@@ -53,7 +53,7 @@ async function napFile(files) {
       const r = await DF.doc(f);
       themCd(r.cd, f.name);
       const nYc = tong(r.cd.map(c => MUC.filter(m => c.yc[m]).length));
-      tt.innerHTML = `<div class="ok-dong">✔ ${esc(f.name)} (${r.kieu}): nhận ra <b>${r.cd.length}</b> bài/chủ đề, ${nYc} nhóm yêu cầu cần đạt. Thầy cô nhập <b>số tiết</b> từng bài.</div>`;
+      tt.innerHTML = `<div class="ok-dong">✔ ${esc(f.name)} (${r.kieu}): nhận ra <b>${r.cd.length}</b> bài/chủ đề, ${nYc} nhóm yêu cầu cần đạt. Thầy cô nhập <b>số tiết</b> từng bài.</div>` + (r.ct && r.ct.nCT ? `<div class="ok-dong" style="margin-top:6px">∑ Giữ được <b>${r.ct.nCT}</b> công thức Equation (phân số, căn, mũ…) để AI đọc đúng.</div>` : "") + (r.ct && r.ct.nOle ? `<div class="canh" style="margin-top:6px">⚠ File có <b>${r.ct.nOle}</b> công thức MathType/đối tượng nhúng — app không đọc được chữ bên trong. Thầy cô gõ lại công thức quan trọng vào ô «Nội dung» của bài, hoặc trong Word chọn MathType → Convert Equations sang Word Equation rồi nạp lại.</div>` : "");
       TT.ting();
     } catch (e) { tt.innerHTML = `<div class="canh">✖ ${esc(f.name)}: ${esc(e.message || e)}</div>`; TT.buzz(); }
   }
@@ -96,6 +96,20 @@ function veB3() {
   if (document.activeElement !== $("ghiChu")) $("ghiChu").value = S.ghiChu || "";
 }
 /* ---------- bước 4 ---------- */
+/* xem trước công thức của một câu (chỉ hiện khi câu có công thức hoặc chỉ số) */
+function xemCau(q, d) {
+  if (!q) return "";
+  const o = [q.de, ...(q.pa || []), ...((q.y || []).map(y => y && y.t)), q.da, ...((q.hdc || []).map(h => h && h.nd))].filter(Boolean);
+  if (!o.some(x => CT.coCT(x) || /[\^_]/.test(x))) return "";
+  const h = CT.htmlChu, dong = [];
+  String(q.de || "").split("\n").forEach(x => dong.push(h(x)));
+  if (d === "NLC" && q.pa) dong.push(`<span class="xem-pa">${q.pa.map((p, i) => `<span><b>${"ABCD"[i]}.</b> ${h(p)}</span>`).join("")}</span>`);
+  if (d === "DS" && q.y) q.y.forEach((y, i) => dong.push(`<b>${"abcd"[i]})</b> ${h(y && y.t)}`));
+  if (d === "TLN" && q.da) dong.push(`<b>Đáp án:</b> ${h(q.da)}`);
+  if (d === "TL" && q.hdc) q.hdc.forEach(x => x && x.nd && dong.push("– " + h(x.nd)));
+  const loi = o.flatMap(x => CT.kiem(x));
+  return `<div class="xem-nhan">∑ Xem trước công thức (như trong Word)${loi.length ? ` <span class="do">· ${esc(loi[0])}</span>` : ""}</div>` + dong.map(x => `<div>${x}</div>`).join("");
+}
 function moiCau(s) {
   if (s.d === "NLC") return { de: "", pa: ["", "", "", ""], dung: null };
   if (s.d === "DS") return { de: "", y: s.ys.map(() => ({ t: "", d: null })) };
@@ -116,7 +130,7 @@ function veSoan() {
       if (d === "DS") b += `<div class="ds">${s.ys.map((m, i) => { const y = (q.y || [])[i] || {}; return `<div class="ds-o"><b>${"abcd"[i]})</b>${MUC_CHIP(m)}<input data-f="y${i}-${k}" data-q="${k}" data-x="y.${i}" value="${esc(y.t || "")}"><span class="ds-ds"><button class="${y.d === true ? "chon d" : ""}" data-q="${k}" data-yd="${i}|1">Đúng</button><button class="${y.d === false ? "chon s" : ""}" data-q="${k}" data-yd="${i}|0">Sai</button></span></div>`; }).join("")}</div>`;
       if (d === "TLN") b += `<label class="o tln">Đáp án (một số)<input data-f="da-${k}" data-q="${k}" data-x="da" value="${esc(q.da || "")}" inputmode="decimal" placeholder="VD: 12,5"></label>`;
       if (d === "TL") b += `<div class="hdc"><div class="mo nho2">Hướng dẫn chấm — tổng phải bằng <b>${f2(s.diem)}</b> điểm (đang ${f2(tong((q.hdc || []).map(x => so(x.d))))})</div>${(q.hdc || []).map((x, i) => `<div class="hdc-o"><input data-f="h${i}-${k}" data-q="${k}" data-x="hdc.${i}.nd" value="${esc(x.nd)}" placeholder="Ý cần đạt…"><input class="hdc-d" data-f="hd${i}-${k}" data-q="${k}" data-x="hdc.${i}.d" value="${esc(x.d)}" placeholder="điểm" inputmode="decimal"><button class="nut phu nho" data-q="${k}" data-bohdc="${i}">✕</button></div>`).join("")}<button class="nut phu nho" data-q="${k}" data-themhdc="1">＋ Thêm ý chấm</button></div>`;
-      return `<div class="cau-o ${ok ? "xong" : ""}" id="c-${k}"><div class="cau-dau"><span class="cau-so">${s.la}.${s.so}</span>${d === "DS" ? [...new Set(s.ys)].map(MUC_CHIP).join("") : MUC_CHIP(s.m)}<span class="mo nho2">${esc(s.cd.ten)}${d === "TL" ? " · " + f2(s.diem) + " điểm" : ""}</span><span class="canh-dai"${d === "NLC" && daiNhat(q) ? "" : " hidden"} title="Học sinh dễ đoán đáp án đúng vì nó dài nhất">⚠ đáp án đúng dài nhất</span><span class="cau-tt">${ok ? "✔ đủ" : "… chưa đủ"}</span><button class="nut phu nho" data-q="${k}" data-xoacau="1" title="Xoá nội dung câu">🧹</button></div>${b}</div>`;
+      return `<div class="cau-o ${ok ? "xong" : ""}" id="c-${k}"><div class="cau-dau"><span class="cau-so">${s.la}.${s.so}</span>${d === "DS" ? [...new Set(s.ys)].map(MUC_CHIP).join("") : MUC_CHIP(s.m)}<span class="mo nho2">${esc(s.cd.ten)}${d === "TL" ? " · " + f2(s.diem) + " điểm" : ""}</span><span class="canh-dai"${d === "NLC" && daiNhat(q) ? "" : " hidden"} title="Học sinh dễ đoán đáp án đúng vì nó dài nhất">⚠ đáp án đúng dài nhất</span><span class="cau-tt">${ok ? "✔ đủ" : "… chưa đủ"}</span><button class="nut phu nho" data-q="${k}" data-xoacau="1" title="Xoá nội dung câu">🧹</button></div>${b}<div class="xem-ct" data-xem="${k}">${xemCau(S.cau[s.k], d)}</div></div>`;
     }).join("") + "</div>").join("");
   veDapAn(P);
 }
@@ -134,6 +148,32 @@ function veKiem() {
   $("dsKiem2").innerHTML = $("dsKiem").innerHTML;
   return { nLoi, nCanh };
 }
+/* ---------- nhiều đề ---------- */
+const xuatChon = new Set();
+function tienDoDe(i) { return voiDe(i, () => { const P = khe(), tat = P.phan.flatMap(d => P[d]); return { xong: tat.filter(daXong).length, tong: tat.length }; }); }
+function veDe() {
+  const n = S.bo.length;
+  if (document.activeElement !== $("soDe")) $("soDe").value = n;
+  $("soDeIcon").textContent = n;
+  $("dsMaDe").innerHTML = S.bo.map((b, i) => `<label>Đề ${i + 1} · mã đề <input data-f="ma-${i}" data-ma="${i}" value="${esc(b.ma)}" placeholder="${n > 1 ? "VD: " + (101 + i) : "(nếu có)"}"></label>`).join("");
+  const nut = S.bo.map((b, i) => { const p = tienDoDe(i), du = p.tong && p.xong === p.tong; return `<button data-de="${i}" class="${i === S.deHien ? "chon" : ""}${du ? " du" : ""}">${du ? "✔ " : ""}${esc(tenDe(i))}<small>${p.xong}/${p.tong} câu</small><i><b style="width:${p.tong ? p.xong / p.tong * 100 : 0}%"></b></i></button>`; }).join("");
+  $("chonDe4").innerHTML = n > 1 ? `<span class="nho2 mo" style="align-self:center">Đang soạn:</span>` + nut : "";
+  $("chonDe5").innerHTML = n > 1 ? `<span class="nho2 mo" style="align-self:center">Xem trước:</span>` + nut : "";
+  for (const i of [...xuatChon]) if (i >= n) xuatChon.delete(i);
+  $("hopXuatDe").classList.toggle("an", n < 2);
+  $("xuatDe").innerHTML = S.bo.map((b, i) => `<label class="tl-o"><input type="checkbox" data-xd="${i}" ${xuatChon.has(i) ? "checked" : ""} style="width:18px;min-height:0"> 📄 ${esc(tenDe(i))} + hướng dẫn chấm</label>`).join("");
+}
+function datSoDe(n) {
+  n = Math.max(1, Math.min(10, n | 0));
+  if (n < S.bo.length) {
+    const bo = S.bo.slice(n).filter(b => Object.keys(b.cau).length);
+    if (bo.length && !confirm(`Bớt còn ${n} đề sẽ xoá câu hỏi đã soạn của ${S.bo.length - n} đề cuối. Tiếp tục?`)) { veDe(); return; }
+    S.bo.length = n;
+  }
+  while (S.bo.length < n) { const tr = S.bo[S.bo.length - 1].ma, so = /^\d+$/.test(tr) ? String(+tr + 1) : ""; S.bo.push({ ma: so, cau: {} }); xuatChon.add(S.bo.length - 1); }
+  if (S.deHien >= n) S.deHien = n - 1;
+  luu(); ve(); TT.ting();
+}
 /* ---------- bước 5 ---------- */
 let tabXem = "de";
 function chonPhan() { const c = {}; document.querySelectorAll("[data-p]").forEach(i => c[i.dataset.p] = i.checked); return c; }
@@ -150,11 +190,11 @@ function veXem() {
 }
 function veBuoc() {
   const P = khe(), t = tinh(P), tat = P.phan.flatMap(d => P[d]);
-  const tr = [!!(S.tt.mon && S.tt.lop), S.cd.length > 0, tat.length > 0 && Math.abs(t.tong - 10) < .001, tat.length > 0 && tat.every(daXong), !!S.daXuat];
+  const tr = [!!(S.tt.mon && S.tt.lop), S.cd.length > 0, tat.length > 0 && Math.abs(t.tong - 10) < .001, tat.length > 0 && S.bo.every((b, i) => { const p = tienDoDe(i); return p.tong && p.xong === p.tong; }), !!S.daXuat];
   document.querySelectorAll("#thanhBuoc a").forEach((a, i) => { a.classList.toggle("xong", tr[i]); });
   $("tienDo").style.width = (tr.filter(Boolean).length / 5 * 100) + "%";
 }
-function ve() { veB1(); veB2(); veB3(); veSoan(); veKiem(); veXem(); veBuoc(); }
+function ve() { veB1(); veB2(); veB3(); veDe(); veSoan(); veKiem(); veXem(); veBuoc(); }
 
 /* ---------- gắn sự kiện ---------- */
 function datGiaTri(q, duong, v) {
@@ -166,7 +206,7 @@ function datGiaTri(q, duong, v) {
 }
 function timKhe(k) { const P = khe(); return P.phan.flatMap(d => P[d]).find(s => s.k === k); }
 function layCau(k) { if (!S.cau[k]) { const s = timKhe(k); S.cau[k] = s ? moiCau(s) : {}; } return S.cau[k]; }
-function capNhat() { luu(); veKiem(); veBuoc(); veXem(); }
+function capNhat() { luu(); veKiem(); veBuoc(); veXem(); clearTimeout(capNhat.t); capNhat.t = setTimeout(() => giuFocus(veDe), 400); }
 
 document.addEventListener("DOMContentLoaded", () => {
   document.querySelectorAll("[data-tt]").forEach(i => i.addEventListener("input", () => { S.tt[i.dataset.tt] = i.dataset.tt === "phut" ? (+i.value || i.value) : i.value; capNhat(); }));
@@ -220,6 +260,14 @@ document.addEventListener("DOMContentLoaded", () => {
   $("dsTl").addEventListener("input", e => { const i = e.target; if (!i.dataset.tl) return; S.tlDiem[i.dataset.tl] = so(i.value); luu(); giuFocus(() => { veB3(); veSoan(); }); veKiem(); veBuoc(); veXem(); });
   MUC.forEach(m => $("muc" + m).addEventListener("input", () => { S.muc[m] = so($("muc" + m).value); luu(); giuFocus(veB3); veKiem(); }));
   $("ghiChu").addEventListener("input", () => { S.ghiChu = $("ghiChu").value; capNhat(); });
+  // nhiều đề
+  S.bo.forEach((b, i) => xuatChon.add(i));
+  $("bDeTru").addEventListener("click", () => datSoDe(S.bo.length - 1));
+  $("bDeCong").addEventListener("click", () => datSoDe(S.bo.length + 1));
+  $("soDe").addEventListener("change", () => datSoDe(parseInt($("soDe").value, 10) || 1));
+  $("dsMaDe").addEventListener("input", e => { const i = e.target.dataset.ma; if (i == null) return; S.bo[+i].ma = e.target.value.trim(); luu(); giuFocus(veDe); veXem(); });
+  ["chonDe4", "chonDe5"].forEach(id => $(id).addEventListener("click", e => { const b = e.target.closest("[data-de]"); if (!b) return; S.deHien = +b.dataset.de; luu(); ve(); TT.toast("Đang soạn " + tenDe(S.deHien), ""); }));
+  $("xuatDe").addEventListener("change", e => { const i = e.target.dataset.xd; if (i == null) return; e.target.checked ? xuatChon.add(+i) : xuatChon.delete(+i); });
   // bước 4
   $("bLenh").addEventListener("click", () => chepLenh(false));
   $("bLenhTrong").addEventListener("click", () => chepLenh(true));
@@ -237,7 +285,7 @@ document.addEventListener("DOMContentLoaded", () => {
   $("dsCau").addEventListener("input", e => {
     const i = e.target; if (!i.dataset.q || !i.dataset.x) return;
     const q = layCau(i.dataset.q); datGiaTri(q, i.dataset.x, i.value);
-    const the = i.closest(".cau-o"), s = timKhe(i.dataset.q); if (the && s) { const ok = daXong(s); the.classList.toggle("xong", ok); the.querySelector(".cau-tt").textContent = ok ? "✔ đủ" : "… chưa đủ"; if (s.d === "NLC") { const dn = daiNhat(S.cau[s.k]); the.querySelector(".canh-dai").hidden = !dn; the.querySelectorAll(".pa-o").forEach((o, i) => o.classList.toggle("dai", dn && S.cau[s.k].dung === i)); } }
+    const the = i.closest(".cau-o"), s = timKhe(i.dataset.q); if (the && s) { const ok = daXong(s); the.classList.toggle("xong", ok); the.querySelector(".cau-tt").textContent = ok ? "✔ đủ" : "… chưa đủ"; the.querySelector(".xem-ct").innerHTML = xemCau(S.cau[s.k], s.d); if (s.d === "NLC") { const dn = daiNhat(S.cau[s.k]); the.querySelector(".canh-dai").hidden = !dn; the.querySelectorAll(".pa-o").forEach((o, i) => o.classList.toggle("dai", dn && S.cau[s.k].dung === i)); } }
     capNhat();
   });
   $("dsCau").addEventListener("click", e => {
@@ -254,8 +302,8 @@ document.addEventListener("DOMContentLoaded", () => {
   document.querySelectorAll("#tabXem button").forEach(b => b.addEventListener("click", () => { tabXem = b.dataset.tab; veXem(); }));
   $("bXuat").addEventListener("click", xuatWord); $("bXuat2").addEventListener("click", xuatWord);
   $("bSaoLuu").addEventListener("click", () => TT.saoLuu(["soande"], "soan-de"));
-  $("bNhap").addEventListener("click", () => TT.nhapLai(["soande"], () => { S = TT.load("soande", moi()); ve(); }));
-  $("bMoi").addEventListener("click", () => { if (!confirm("Làm đề mới? Đề đang làm sẽ bị xoá khỏi máy này (thầy cô Sao lưu trước nếu cần).")) return; const giu = S.tt; S = moi(); ["so", "truong", "to", "mon", "nguoiSoan", "toTruong", "nam", "cap"].forEach(k => S.tt[k] = giu[k]); luu(); ve(); });
+  $("bNhap").addEventListener("click", () => TT.nhapLai(["soande"], () => { S = chuan(TT.load("soande", moi())); xuatChon.clear(); S.bo.forEach((b, i) => xuatChon.add(i)); ve(); }));
+  $("bMoi").addEventListener("click", () => { if (!confirm("Làm đề mới? Đề đang làm sẽ bị xoá khỏi máy này (thầy cô Sao lưu trước nếu cần).")) return; const giu = S.tt; S = chuan(moi()); xuatChon.clear(); xuatChon.add(0); ["so", "truong", "to", "mon", "nguoiSoan", "toTruong", "nam", "cap"].forEach(k => S.tt[k] = giu[k]); luu(); ve(); });
   document.querySelectorAll("#thanhBuoc a").forEach(a => a.addEventListener("click", e => { e.preventDefault(); $(a.getAttribute("href").slice(1)).scrollIntoView({ behavior: "smooth", block: "start" }); }));
   window.addEventListener("resize", () => veDapAn(khe()));
   ve();
@@ -278,12 +326,14 @@ function chepLenh(chiTrong) {
 async function xuatWord() {
   const c = chonPhan();
   if (!Object.values(c).some(Boolean)) { TT.toast("Thầy cô chọn ít nhất một phần để xuất ạ", "loi"); return; }
+  c.ds = S.bo.length > 1 ? [...xuatChon].sort((a, b) => a - b) : [0];
+  if ((c.de || c.hd) && !c.ds.length) { TT.toast("Thầy cô tick ít nhất một đề để xuất ạ", "loi"); return; }
   const ph = dungPhan(c);
   if (!ph.length) { TT.toast("Ma trận chưa có câu nào", "loi"); TT.buzz(); return; }
   const k = veKiem();
   try {
     const blob = await DX.taoDocx(ph);
-    const ten = ("De KT " + (S.tt.ky || "") + " " + (S.tt.mon || "") + " " + (S.tt.lop || "")).trim().replace(/[\\/:*?"<>|]+/g, "").replace(/\s+/g, "_") + ".docx";
+    const ten = ("De KT " + (S.tt.ky || "") + " " + (S.tt.mon || "") + " " + (S.tt.lop || "")).trim().replace(/[\\/:*?"<>|]+/g, "").replace(/\s+/g, "_") + (c.ds.length > 1 && (c.de || c.hd) ? "_" + c.ds.length + "-de" : S.bo.length > 1 && (c.de || c.hd) ? "_" + tenDe(c.ds[0]).replace(/\s+/g, "-") : "") + ".docx";
     TT.taiVe(ten, blob, blob.type);
     S.daXuat = true; luu(); veBuoc();
     if (k.nLoi) TT.toast(`Đã xuất Word — còn ${k.nLoi} lỗi ở phần soát, thầy cô xem lại trước khi dùng`, "");

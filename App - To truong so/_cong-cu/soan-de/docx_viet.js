@@ -10,9 +10,13 @@ const DX = (() => {
   const x = s => String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
   const cm = v => Math.round(v * 567);
   /* tách x^2, H_2O, 10^{-3} thành run chỉ số */
-  function chu(s, o) {
-    o = o || {}; const out = []; let i = 0, m;
-    s = String(s == null ? "" : s);
+  function chu(s, o) {   // công thức $…$ → run công thức (Equation Word); phần chữ thường tách chỉ số
+    o = o || {}; const out = [];
+    CT.tach(s).forEach(p => { if (p.t === "ct") out.push(Object.assign({}, o, { math: p.src })); else out.push(...chuThuong(p.s, o)); });
+    return out;
+  }
+  function chuThuong(s, o) {
+    const out = []; let i = 0, m;
     const re = /([\^_])(\{([^{}]*)\}|[+\-−]?[0-9]+|[A-Za-zα-ωΑ-Ω])/g;
     while ((m = re.exec(s))) {
       if (m.index > i) out.push(Object.assign({}, o, { t: s.slice(i, m.index) }));
@@ -25,7 +29,9 @@ const DX = (() => {
   const P = (r, o) => Object.assign({ t: "p", r: typeof r === "string" ? chu(r) : r }, o || {});
 
   /* ---------- XML ---------- */
+  let demCT = 0;
   function rXml(r) {
+    if (r.math != null) { demCT++; return `<m:oMath>${CT.omml(r.math)}</m:oMath>`; }
     let pr = "";
     if (r.b) pr += "<w:b/><w:bCs/>";
     if (r.i) pr += "<w:i/><w:iCs/>";
@@ -43,6 +49,9 @@ const DX = (() => {
     if (p.thut || p.treo) pr += `<w:ind w:left="${p.thut || 0}"${p.treo ? ` w:hanging="${p.treo}"` : ""}/>`;
     pr += `<w:jc w:val="${p.jc || "both"}"/>`;
     if (sect) pr += sect;
+    const rs = (p.r || []).filter(r => r.math != null || r.t || r.tab);
+    // đoạn chỉ có công thức: Word tự coi là công thức riêng dòng và căn giữa → giữ căn như đoạn chữ
+    if (rs.length && rs.every(r => r.math != null)) return `<w:p><w:pPr>${pr}</w:pPr><m:oMathPara><m:oMathParaPr><m:jc m:val="${p.jc === "center" ? "center" : p.jc === "right" ? "right" : "left"}"/></m:oMathParaPr>${rs.map(rXml).join("")}</m:oMathPara></w:p>`;
     return `<w:p><w:pPr>${pr}</w:pPr>${(p.r || []).map(rXml).join("")}</w:p>`;
   }
   const VIEN = c => `<w:tblBorders>${["top", "left", "bottom", "right", "insideH", "insideV"].map(k => `<w:${k} w:val="${c ? "single" : "nil"}" w:sz="4" w:space="0" w:color="000000"/>`).join("")}</w:tblBorders>`;
@@ -83,7 +92,7 @@ const DX = (() => {
       if (i < phan.length - 1) body += pXml(P([], { sau: 0 }), sectXml(ph.ngang));
       else body += sectXml(ph.ngang);
     });
-    return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\r\n<w:document xmlns:w="${W}" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><w:body>${body}</w:body></w:document>`;
+    return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\r\n<w:document xmlns:w="${W}" xmlns:m="http://schemas.openxmlformats.org/officeDocument/2006/math" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><w:body>${body}</w:body></w:document>`;
   }
   const STYLES = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\r\n<w:styles xmlns:w="${W}"><w:docDefaults><w:rPrDefault><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="Times New Roman" w:cs="Times New Roman"/><w:sz w:val="26"/><w:szCs w:val="26"/><w:lang w:val="vi-VN" w:eastAsia="en-US" w:bidi="ar-SA"/></w:rPr></w:rPrDefault><w:pPrDefault><w:pPr><w:spacing w:after="40" w:line="264" w:lineRule="auto"/></w:pPr></w:pPrDefault></w:docDefaults><w:style w:type="paragraph" w:default="1" w:styleId="Normal"><w:name w:val="Normal"/><w:qFormat/><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:cs="Times New Roman"/><w:sz w:val="26"/><w:szCs w:val="26"/></w:rPr></w:style><w:style w:type="table" w:default="1" w:styleId="TableNormal"><w:name w:val="Normal Table"/><w:tblPr><w:tblInd w:w="0" w:type="dxa"/><w:tblCellMar><w:top w:w="0" w:type="dxa"/><w:left w:w="108" w:type="dxa"/><w:bottom w:w="0" w:type="dxa"/><w:right w:w="108" w:type="dxa"/></w:tblCellMar></w:tblPr></w:style></w:styles>`;
   const FOOTER = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\r\n<w:ftr xmlns:w="${W}"><w:p><w:pPr><w:jc w:val="center"/></w:pPr><w:r><w:rPr><w:sz w:val="26"/></w:rPr><w:t xml:space="preserve">Trang </w:t></w:r><w:r><w:rPr><w:sz w:val="26"/></w:rPr><w:fldChar w:fldCharType="begin"/></w:r><w:r><w:rPr><w:sz w:val="26"/></w:rPr><w:instrText xml:space="preserve"> PAGE </w:instrText></w:r><w:r><w:rPr><w:sz w:val="26"/></w:rPr><w:fldChar w:fldCharType="separate"/></w:r><w:r><w:rPr><w:sz w:val="26"/></w:rPr><w:t>1</w:t></w:r><w:r><w:rPr><w:sz w:val="26"/></w:rPr><w:fldChar w:fldCharType="end"/></w:r></w:p></w:ftr>`;
@@ -95,13 +104,24 @@ const DX = (() => {
     z.file("docProps/core.xml", '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><cp:coreProperties xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties" xmlns:dc="http://purl.org/dc/elements/1.1/"><dc:title>Đề kiểm tra — Tổ trưởng số</dc:title><dc:creator>Tổ trưởng số — Soạn đề CV 7991</dc:creator></cp:coreProperties>');
     z.file("word/styles.xml", STYLES);
     z.file("word/footer1.xml", FOOTER);
-    z.file("word/document.xml", docXml(phan));
+    // kiểm trước khi tải: XML đúng cấu trúc, đủ công thức
+    let can = 0; const dem = k => { if (k.t === "bang") k.hang.forEach(h => h.forEach(o => { if (o.vm !== "c") oP(o).forEach(dem); })); else (k.r || []).forEach(r => { if (r.math != null) can++; }); };
+    phan.forEach(ph => ph.khoi.forEach(dem));
+    demCT = 0; const xml = docXml(phan);
+    if (demCT !== can) throw new Error(`Số công thức trong file (${demCT}) khác số công thức đã soạn (${can}) — chưa xuất để tránh mất công thức.`);
+    if (typeof DOMParser !== "undefined") {
+      const d = new DOMParser().parseFromString(xml, "application/xml"), e = d.getElementsByTagName("parsererror")[0];
+      if (e) throw new Error("File Word dựng ra bị lỗi cấu trúc (thường do công thức): " + (e.textContent || "").slice(0, 160));
+      if (d.getElementsByTagNameNS("http://schemas.openxmlformats.org/officeDocument/2006/math", "oMath").length !== can) throw new Error("Công thức trong file không khớp số đã soạn — chưa xuất.");
+    }
+    z.file("word/document.xml", xml);
     return z.generateAsync({ type: "blob", compression: "DEFLATE", mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document" });
   }
 
   /* ---------- HTML xem trước (cùng mô hình) ---------- */
   const h = s => String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
   function rHtml(r) {
+    if (r.math != null) return CT.html(r.math);
     let s = h(r.t);
     if (r.va) s = `<${r.va === "superscript" ? "sup" : "sub"}>${s}</${r.va === "superscript" ? "sup" : "sub"}>`;
     if (r.b) s = "<b>" + s + "</b>"; if (r.i) s = "<i>" + s + "</i>"; if (r.u) s = "<u>" + s + "</u>";
@@ -111,7 +131,7 @@ const DX = (() => {
   function pHtml(p) {
     const st = `text-align:${p.jc === "both" || !p.jc ? "justify" : p.jc};margin:${(p.truoc || 0) / 20}pt 0 ${(p.sau == null ? 40 : p.sau) / 20}pt ${((p.thut || 0) - (p.treo || 0)) / 567 * 37.8}px` + (p.treo ? `;padding-left:${p.treo / 567 * 37.8}px;text-indent:-${p.treo / 567 * 37.8}px` : "");
     if (p.tab && p.tab.length) {
-      const o = [[]]; (p.r || []).forEach(r => { if (r.tab) o.push([]); if (r.t) o[o.length - 1].push(Object.assign({}, r, { tab: false })); });
+      const o = [[]]; (p.r || []).forEach(r => { if (r.tab) o.push([]); if (r.t || r.math != null) o[o.length - 1].push(Object.assign({}, r, { tab: false })); });
       return `<p style="${st}" class="cot c${o.length}">${o.map(g => "<span>" + g.map(rHtml).join("") + "</span>").join("")}</p>`;
     }
     const nd = (p.r || []).map(rHtml).join("");

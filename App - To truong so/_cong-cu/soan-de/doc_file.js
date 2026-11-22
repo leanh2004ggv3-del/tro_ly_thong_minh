@@ -9,22 +9,69 @@ const DF = (() => {
     const f = z.file("word/document.xml");
     if (!f) throw new Error("File này không phải Word .docx (có thể là .doc cũ — thầy cô mở bằng Word, Lưu thành .docx giúp ạ).");
     const doc = new DOMParser().parseFromString(await f.async("string"), "application/xml");
-    const dong = [];
+    const dong = []; let nCT = 0;
+    // chữ của một nút trong đoạn: run thường (giữ chỉ số trên/dưới), công thức Equation → $LaTeX$
+    const di = e => {
+      if (e.nodeType !== 1) return "";
+      if (e.namespaceURI === MNS && e.localName === "oMath") { nCT++; return " $" + tex(e).replace(/\s+/g, " ").trim() + "$ "; }
+      if (e.namespaceURI === WNS && e.localName === "r") {
+        const va = e.getElementsByTagNameNS(WNS, "vertAlign")[0], v = va && va.getAttribute("w:val");
+        let t = ""; for (const c of e.childNodes) if (c.nodeType === 1 && c.namespaceURI === WNS) { if (c.localName === "t") t += c.textContent; else if (c.localName === "tab" || c.localName === "br") t += " "; }
+        if (t && v === "superscript") t = "^{" + t + "}"; else if (t && v === "subscript") t = "_{" + t + "}";
+        return t;
+      }
+      if (e.localName === "txbxContent" || e.localName === "Fallback") return "";
+      let s = ""; for (const c of e.childNodes) s += di(c); return s;
+    };
     for (const p of doc.getElementsByTagNameNS(WNS, "p")) {
       let bo = false; for (let a = p.parentNode; a; a = a.parentNode) if (a.localName === "txbxContent" || a.localName === "Fallback") { bo = true; break; }
       if (bo) continue;
-      let s = "";
-      for (const e of p.getElementsByTagName("*")) {
-        if (e.localName === "t" && (e.namespaceURI === WNS || e.namespaceURI === MNS)) {
-          let t = e.textContent;
-          const r = e.parentNode, va = r && r.getElementsByTagNameNS(WNS, "vertAlign")[0];
-          if (va && e.namespaceURI === WNS) { const v = va.getAttribute("w:val"); if (v === "superscript") t = "^" + (t.length > 1 ? "{" + t + "}" : t); else if (v === "subscript") t = "_" + (t.length > 1 ? "{" + t + "}" : t); }
-          s += t;
-        } else if (e.localName === "tab" && e.namespaceURI === WNS) s += " ";
-      }
-      s = gon(s); if (s) dong.push(s);
+      const s = gon(di(p)); if (s) dong.push(s);
     }
+    // công thức MathType / ảnh: app không đọc được chữ bên trong
+    const nOle = doc.getElementsByTagNameNS(WNS, "object").length;
+    dong.thongTin = { nCT, nOle };
     return dong;
+  }
+  /* công thức Word (OMML) → LaTeX gọn để gửi AI */
+  const CHR = { "∑": "\\sum", "∏": "\\prod", "∫": "\\int", "∬": "\\iint", "∮": "\\oint" };
+  function tex(e) {
+    const con = (el, ten) => el && [...el.childNodes].find(c => c.nodeType === 1 && c.localName === ten);
+    const gt = (el, ten) => { const p = con(el, ten); return p ? p.getAttributeNS(MNS, "val") || p.getAttribute("m:val") || "" : null; };
+    const pr = (el, ten) => con(el, ten);
+    const di = el => {
+      if (!el || el.nodeType !== 1) return "";
+      const k = el.localName;
+      if (/Pr$/.test(k) && el.namespaceURI === MNS) return "";
+      if (k === "t") return el.textContent;
+      if (el.namespaceURI === WNS && k !== "r") return "";
+      const e = n => di(con(el, n));
+      switch (k) {
+        case "f": return `\\frac{${e("num")}}{${e("den")}}`;
+        case "sSup": return `{${e("e")}}^{${e("sup")}}`;
+        case "sSub": return `{${e("e")}}_{${e("sub")}}`;
+        case "sSubSup": return `{${e("e")}}_{${e("sub")}}^{${e("sup")}}`;
+        case "sPre": return `{}_{${e("sub")}}^{${e("sup")}}{${e("e")}}`;
+        case "rad": { const d = e("deg"); return d.trim() ? `\\sqrt[${d}]{${e("e")}}` : `\\sqrt{${e("e")}}`; }
+        case "d": {
+          const p = pr(el, "dPr"), b = p && gt(p, "begChr"), c = p && gt(p, "endChr");
+          const cac = [...el.childNodes].filter(x => x.nodeType === 1 && x.localName === "e").map(di);
+          if (b === "{" && (c === "" || c === null && false) && cac.length === 1 && con(con(el, "e"), "eqArr")) return `\\begin{cases}${di(con(con(el, "e"), "eqArr")).replace(/^\\begin\{array\}\{l\}|\\end\{array\}$/g, "")}\\end{cases}`;
+          const L = b == null ? "(" : b, R = c == null ? ")" : c;
+          return `\\left${L === "" ? "." : L === "{" ? "\\{" : L}${cac.join(",")}\\right${R === "" ? "." : R === "}" ? "\\}" : R}`;
+        }
+        case "eqArr": return "\\begin{array}{l}" + [...el.childNodes].filter(x => x.nodeType === 1 && x.localName === "e").map(di).join(" \\\\ ") + "\\end{array}";
+        case "nary": { const p = pr(el, "naryPr"), c = (p && gt(p, "chr")) || "∫"; const sb = e("sub"), sp = e("sup"); return `${CHR[c] || c}${sb ? "_{" + sb + "}" : ""}${sp ? "^{" + sp + "}" : ""} ${e("e")}`; }
+        case "acc": { const p = pr(el, "accPr"), c = (p && gt(p, "chr")) || "̂"; return c === "⃗" || c === "→" ? `\\vec{${e("e")}}` : c === "̅" || c === "¯" ? `\\overline{${e("e")}}` : `\\widehat{${e("e")}}`; }
+        case "bar": return `\\overline{${e("e")}}`;
+        case "limLow": return `{${e("e")}}_{${e("lim")}}`;
+        case "limUpp": { const b = e("e"); return /[→⟶⇌]/.test(b) ? `\\xrightarrow{${e("lim")}}` : `{${b}}^{${e("lim")}}`; }
+        case "func": return `${e("fName")} ${e("e")}`;
+        case "groupChr": case "box": case "borderBox": case "phant": return e("e");
+        default: return [...el.childNodes].map(di).join("");
+      }
+    };
+    return di(e);
   }
   function napThuVien(url) { return new Promise((ok, loi) => { const s = document.createElement("script"); s.src = url; s.onload = ok; s.onerror = () => loi(new Error("Không tải được bộ đọc PDF (cần có mạng). Thầy cô dùng file Word giúp ạ.")); document.head.appendChild(s); }); }
   async function docPdf(buf) {
@@ -94,7 +141,7 @@ const DF = (() => {
   async function doc(file) {
     const ten = file.name.replace(/\.[^.]+$/, ""), buf = await file.arrayBuffer();
     if (/\.pdf$/i.test(file.name) || file.type === "application/pdf") { const r = await docPdf(buf); return { cd: tach(r.dong, ten), dong: r.dong.length, kieu: "PDF " + r.trang + " trang" }; }
-    if (/\.docx$/i.test(file.name)) { const d = await docDocx(buf); return { cd: tach(d, ten), dong: d.length, kieu: "Word" }; }
+    if (/\.docx$/i.test(file.name)) { const d = await docDocx(buf); return { cd: tach(d, ten), dong: d.length, kieu: "Word", ct: d.thongTin }; }
     if (/\.(txt|md)$/i.test(file.name)) { const d = new TextDecoder().decode(buf).split(/\r?\n/).map(gon).filter(Boolean); return { cd: tach(d, ten), dong: d.length, kieu: "chữ" }; }
     throw new Error("App nhận file Word (.docx) hoặc PDF. File .doc cũ: mở bằng Word → Lưu thành .docx.");
   }

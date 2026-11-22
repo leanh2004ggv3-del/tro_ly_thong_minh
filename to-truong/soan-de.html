@@ -197,6 +197,43 @@ details.hop summary{cursor:pointer;font-weight:700;font-size:14.5px}
 .trang table.kv td{border:0;padding:0 2px}
 .trang p.cot{display:grid;gap:4px}.trang p.c2{grid-template-columns:1fr 1fr}.trang p.c4{grid-template-columns:repeat(4,1fr)}
 .goiy{margin-top:10px}
+.goiy code{background:#fff;border:1px solid #e2e8f0;border-radius:6px;padding:0 4px;font-size:12px;color:#4c1d95}
+.ct{font-family:"Times New Roman",Times,serif;white-space:nowrap}
+.ct-f{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;margin:0 2px;line-height:1.15}
+.ct-f>span:first-child{border-bottom:1px solid currentColor;padding:0 2px}
+.ct-f>span{font-size:.92em}
+.ct-r{white-space:nowrap}.ct-r sup{font-size:.6em;margin-right:-4px;vertical-align:.9em}
+.ct-rr{border-top:1px solid currentColor;padding:0 1px}
+.ct-he{display:inline-flex;align-items:center;vertical-align:middle}
+.ct-ng{font-size:2.1em;line-height:1;margin-right:2px;font-weight:300}
+.ct-dong{display:inline-flex;flex-direction:column;line-height:1.3}
+.ct-acc{position:relative;display:inline-block}
+.ct-acc::before{content:attr(data-c);position:absolute;left:0;right:0;top:-.75em;text-align:center;font-size:.8em;line-height:1}
+.ct-mui{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;line-height:1;margin:0 3px}
+.ct-mui small{font-size:.7em}
+.ct-n{font-size:1.3em;vertical-align:-.1em}
+.xem-ct:empty{display:none}
+.xem-ct{margin-top:6px;background:#fff;border:1.5px dashed #c4b5fd;border-radius:12px;padding:8px 12px;font-family:"Times New Roman",Times,serif;font-size:16.5px;line-height:1.8;color:#111}
+.xem-ct .xem-nhan{font:700 12px var(--font);color:#6d28d9;margin-bottom:2px}
+.xem-pa{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:2px 14px}
+.hop-de{margin-top:12px;border:2px dashed #a5b4fc;border-radius:16px;padding:10px 12px;background:linear-gradient(135deg,rgba(238,242,255,.9),rgba(255,247,237,.9))}
+.hop-de-trai{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.hop-de-trai>div:nth-child(2){flex:1 1 260px}
+.dem-de{display:flex;gap:6px;align-items:center}
+.dem-de input{width:64px;text-align:center;font-size:20px;font-weight:800;color:var(--chinh);min-height:44px}
+.dem-de .nut{font-size:20px;min-width:44px;justify-content:center}
+.ma-de{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.ma-de label{display:flex;align-items:center;gap:6px;background:#fff;border:1.5px solid #c7d2fe;border-radius:12px;padding:4px 8px;font-size:13.5px;font-weight:700;color:var(--chinh)}
+.ma-de input{width:86px;min-height:32px;padding:4px 6px}
+.chon-de{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0}
+.chon-de:empty{display:none}
+.chon-de button{display:flex;flex-direction:column;align-items:flex-start;gap:2px;border:2px solid #e2e8f0;background:#fff;border-radius:14px;padding:6px 12px;cursor:pointer;font:700 14px var(--font);color:var(--chu);min-width:110px;transition:.15s}
+.chon-de button small{font-weight:600;font-size:12px;color:var(--chu2)}
+.chon-de button i{display:block;height:5px;width:100%;border-radius:5px;background:#e2e8f0;overflow:hidden}
+.chon-de button i b{display:block;height:100%;background:#16a34a}
+.chon-de button.chon{border-color:var(--chinh);background:#eef2ff;box-shadow:0 6px 14px -8px rgba(79,70,229,.6)}
+.chon-de button.du{border-color:#86efac}
+.chon-de button.chon.du{border-color:var(--chinh)}
 @media (max-width:640px){#thanhBuoc a{flex:1 1 44%;font-size:13px}.cd-nut{margin-left:0}.o-mt input{width:38px}}
 @media print{#thanhBuoc{display:none}}
 </style>
@@ -229,7 +266,6 @@ details.hop summary{cursor:pointer;font-weight:700;font-size:14.5px}
     <label class="o">Bài kiểm tra<select data-tt="ky"><option>GIỮA HỌC KÌ I</option><option>CUỐI HỌC KÌ I</option><option>GIỮA HỌC KÌ II</option><option>CUỐI HỌC KÌ II</option></select></label>
     <label class="o">Năm học<input data-tt="nam" placeholder="2026 – 2027"></label>
     <label class="o">Thời gian (phút)<select data-tt="phut"><option value="45">45 phút</option><option value="60">60 phút</option><option value="90">90 phút</option></select></label>
-    <label class="o">Mã đề (nếu có)<input data-tt="maDe" placeholder="VD: 101"></label>
     <label class="o">Người ra đề (kí tên)<input data-tt="nguoiSoan" placeholder="Họ tên GV"></label>
     <label class="o">Tổ trưởng chuyên môn<input data-tt="toTruong" placeholder="Họ tên"></label>
   </div>
@@ -272,6 +308,14 @@ details.hop summary{cursor:pointer;font-weight:700;font-size:14.5px}
     </div>
   </div>
   <div class="mo nho2" style="margin-top:6px">Gõ số câu vào từng ô (Đúng – Sai: số <b>ý</b>, mỗi câu 4 ý) · phím mũi tên để di chuyển · thanh tím = % điểm, thanh xám = % số tiết.</div>
+  <div class="hop-de" id="hopDe">
+    <div class="hop-de-trai">
+      <svg width="64" height="54" viewBox="0 0 64 54" aria-hidden="true"><rect x="4" y="10" width="30" height="40" rx="5" fill="#c7d2fe"/><rect x="14" y="6" width="30" height="40" rx="5" fill="#a5b4fc"/><rect x="24" y="2" width="30" height="40" rx="5" fill="#6366f1"/><rect x="30" y="10" width="18" height="3" rx="1.5" fill="#fff"/><rect x="30" y="17" width="18" height="3" rx="1.5" fill="#fff" opacity=".8"/><rect x="30" y="24" width="12" height="3" rx="1.5" fill="#fff" opacity=".8"/><circle cx="52" cy="42" r="10" fill="#f59e0b"/><text x="52" y="46.5" text-anchor="middle" font-size="12" font-weight="800" fill="#fff" font-family="Segoe UI,Arial" id="soDeIcon">1</text></svg>
+      <div><b>Số đề cần tạo trên cùng ma trận này</b><div class="mo nho2">Các đề tương đương: chung ma trận, bản đặc tả; mỗi đề có câu hỏi, đáp án, hướng dẫn chấm riêng.</div></div>
+      <div class="dem-de"><button class="nut phu nho" id="bDeTru" aria-label="Bớt một đề">−</button><input id="soDe" inputmode="numeric" aria-label="Số đề"><button class="nut phu nho" id="bDeCong" aria-label="Thêm một đề">＋</button></div>
+    </div>
+    <div class="ma-de" id="dsMaDe"></div>
+  </div>
   <div class="luoi l2" style="margin-top:12px">
     <details class="hop" id="hopTl" open><summary>Điểm từng câu tự luận</summary><div id="dsTl"></div></details>
     <details class="hop"><summary>Tỉ lệ mức độ mục tiêu &amp; ghi chú dưới ma trận</summary>
@@ -285,7 +329,7 @@ details.hop summary{cursor:pointer;font-weight:700;font-size:14.5px}
   <div class="luoi l2">
     <div>
       <div class="goiy"><svg width="30" height="30" viewBox="0 0 40 40"><rect x="4" y="8" width="32" height="24" rx="8" fill="#8b5cf6"/><circle cx="14" cy="20" r="3" fill="#fff"/><circle cx="26" cy="20" r="3" fill="#fff"/><path d="M20 4v4" stroke="#8b5cf6" stroke-width="3"/><circle cx="20" cy="4" r="2.5" fill="#f59e0b"/></svg>
-        <div class="nho2"><b>Cách dùng:</b> bấm <b>Chép câu lệnh cho AI</b> (gồm nội dung đã nạp + ma trận + yêu cầu cần đạt + khuôn trả lời) → dán vào ChatGPT, Gemini hoặc Copilot → chép toàn bộ câu trả lời dán vào ô dưới → bấm <b>Đọc vào đề</b>. Thầy cô soát, sửa từng câu ở khung bên dưới. AI có thể sai — <b>thầy cô duyệt kiến thức</b>.</div></div>
+        <div class="nho2"><b>Cách dùng:</b> bấm <b>Chép câu lệnh cho AI</b> (gồm nội dung đã nạp + ma trận + yêu cầu cần đạt + khuôn trả lời) → dán vào ChatGPT, Gemini hoặc Copilot → chép toàn bộ câu trả lời dán vào ô dưới → bấm <b>Đọc vào đề</b>. Thầy cô soát, sửa từng câu ở khung bên dưới. AI có thể sai — <b>thầy cô duyệt kiến thức</b>.<br><b>∑ Công thức Toán, Lí, Hoá</b> viết giữa hai dấu $ (kiểu LaTeX), VD <code>$\frac{2}{3}$</code>, <code>$\sqrt{x+1}$</code>, <code>$x^2$</code>, <code>$H_2SO_4$</code>, <code>$\widehat{ABC}=60^\circ$</code>, <code>$2H_2+O_2 \xrightarrow{t^\circ} 2H_2O$</code> → app xuất thành <b>công thức Word (Equation)</b>, xem trước ngay dưới từng câu.</div></div>
       <details class="hop" id="hopLenh"><summary>Câu lệnh đã chép</summary><textarea id="oLenh" rows="6" style="margin-top:6px;font-size:13px" readonly></textarea></details>
       <label class="o" style="margin-top:8px">Dán câu trả lời của AI<textarea id="oDan" rows="6" placeholder="[I.1] …&#10;A. …&#10;B. …&#10;C. …&#10;D. …&#10;Đáp án: B"></textarea></label>
       <div class="hang" style="margin-top:6px"><button class="nut xanh" id="bDoc">⬇ Đọc vào đề</button><span id="ketQuaDoc" class="nho2"></span></div>
@@ -298,6 +342,7 @@ details.hop summary{cursor:pointer;font-weight:700;font-size:14.5px}
       <div id="dsKiem"></div>
     </div>
   </div>
+  <div class="chon-de" id="chonDe4"></div>
   <div class="hang" style="margin-top:10px;align-items:center"><span class="nho2 mo" style="flex:0 0 auto">Hiện:</span><div class="loc" id="locCau"><button data-loc="" class="chon">Tất cả câu</button><button data-loc="trong">Câu chưa đủ</button></div></div>
   <div id="dsCau"></div>
 </section>
@@ -306,6 +351,7 @@ details.hop summary{cursor:pointer;font-weight:700;font-size:14.5px}
   <div class="buoc"><span class="so">5</span><b>Xem trước &amp; xuất Word</b><span class="phai"><button class="nut xanh" id="bXuat2">📝 Xuất Word (.docx)</button></span></div>
   <div class="luoi l2" style="grid-template-columns:minmax(0,1fr) 300px;align-items:start">
     <div>
+      <div class="chon-de" id="chonDe5"></div>
       <div id="tabXem"><button data-tab="mt">🧩 Ma trận</button><button data-tab="dt">📋 Bản đặc tả</button><button data-tab="de" class="chon">📄 Đề</button><button data-tab="hd">✅ Hướng dẫn chấm</button></div>
       <div id="a4"></div>
     </div>
@@ -317,6 +363,7 @@ details.hop summary{cursor:pointer;font-weight:700;font-size:14.5px}
         <label class="tl-o"><input type="checkbox" data-p="de" checked style="width:18px;min-height:0"> 📄 Đề kiểm tra (khổ dọc)</label>
         <label class="tl-o"><input type="checkbox" data-p="hd" checked style="width:18px;min-height:0"> ✅ Hướng dẫn chấm (khổ dọc)</label>
       </div>
+      <div id="hopXuatDe"><b class="nho2">Xuất những đề nào</b><div class="luoi" id="xuatDe" style="gap:4px;margin:6px 0 10px"></div></div>
       <div class="mo nho2">Mỗi phần sang trang mới · toàn bộ <b>Times New Roman cỡ 13</b> · lề 2 – 1,5 – 2 – 3 cm · bảng kẻ viền, đầu bảng tô nhạt.</div>
       <div id="dsKiem2" style="margin-top:8px"></div>
     </div>
@@ -475,6 +522,229 @@ const TT = (() => {
 </script>
 <script>
 const MAU_DE = {"tt": {"so": "UBND PHƯỜNG ……………", "truong": "TRƯỜNG THCS ……………", "to": "TỔ: CÔNG NGHỆ – HƯỚNG NGHIỆP", "mon": "Công nghệ", "lop": "9", "ky": "GIỮA HỌC KÌ I", "nam": "2026 – 2027", "phut": 45, "maDe": "", "nguoiSoan": "", "toTruong": "", "cap": "THCS"}, "cd": [{"id": "B1", "chuong": "Trồng cây ăn quả", "ten": "Bài 1. Giới thiệu chung về cây ăn quả", "tiet": 3, "yc": {"B": "- Trình bày được vai trò của cây ăn quả.\n- Nêu được đặc điểm thực vật học (rễ, thân và cành, lá, hoa, quả và hạt) và yêu cầu ngoại cảnh chung của cây ăn quả.", "H": "- Giải thích được mối liên hệ giữa đặc điểm thực vật học, yêu cầu ngoại cảnh với biện pháp kĩ thuật (bón phân theo vùng rễ, trồng cây chắn gió,…).", "V": ""}, "text": "(Dữ liệu thử) Bài 1. Giới thiệu chung về cây ăn quả — SGK Công nghệ 9, Trồng cây ăn quả.", "nguon": "dữ liệu thử"}, {"id": "B2", "chuong": "Trồng cây ăn quả", "ten": "Bài 2. Nhân giống vô tính cây ăn quả", "tiet": 6, "yc": {"B": "- Nêu được khái niệm, thời vụ, ưu điểm và nhược điểm của các phương pháp giâm cành, chiết cành, ghép.\n- Nêu được các bước nhân giống bằng giâm cành, chiết cành, ghép mắt nhỏ có gỗ.", "H": "- Giải thích được yêu cầu kĩ thuật trong các bước giâm cành, chiết cành, ghép.", "V": "- Lựa chọn được phương pháp nhân giống vô tính phù hợp với tình huống thực tế; phát hiện và sửa được sai sót kĩ thuật khi thực hiện giâm cành, chiết cành."}, "text": "(Dữ liệu thử) Bài 2. Nhân giống vô tính cây ăn quả — SGK Công nghệ 9, Trồng cây ăn quả.", "nguon": "dữ liệu thử"}, {"id": "B3", "chuong": "Trồng cây ăn quả", "ten": "Bài 3. Kĩ thuật trồng và chăm sóc cây ăn quả có múi", "tiet": 3, "yc": {"B": "- Nêu được đặc điểm thực vật học, yêu cầu ngoại cảnh của cây ăn quả có múi.", "H": "- Giải thích được mục đích của các biện pháp chăm sóc, cắt tỉa, điều khiển ra hoa cho cây ăn quả có múi.", "V": "- Vận dụng quy trình kĩ thuật trồng, chăm sóc cây có múi để tính lượng phân bón và giải thích việc làm trong tình huống thực tế."}, "text": "(Dữ liệu thử) Bài 3. Kĩ thuật trồng và chăm sóc cây ăn quả có múi — SGK Công nghệ 9, Trồng cây ăn quả.", "nguon": "dữ liệu thử"}, {"id": "B4", "chuong": "Trồng cây ăn quả", "ten": "Bài 4. Kĩ thuật trồng và chăm sóc cây nhãn", "tiet": 3, "yc": {"B": "- Nêu được đặc điểm thực vật học, yêu cầu ngoại cảnh của cây nhãn.\n- Nêu được quy trình trồng, chăm sóc, kĩ thuật cắt tỉa, điều khiển ra hoa, đậu quả cho cây nhãn.", "H": "", "V": ""}, "text": "(Dữ liệu thử) Bài 4. Kĩ thuật trồng và chăm sóc cây nhãn — SGK Công nghệ 9, Trồng cây ăn quả.", "nguon": "dữ liệu thử"}, {"id": "B5", "chuong": "Trồng cây ăn quả", "ten": "Bài 5. Kĩ thuật trồng và chăm sóc cây xoài", "tiet": 3, "yc": {"B": "- Nêu được đặc điểm thực vật học, yêu cầu ngoại cảnh và quy trình kĩ thuật trồng cây xoài.", "H": "- Giải thích được các yêu cầu kĩ thuật trồng, chăm sóc, phòng trừ sâu bệnh, điều khiển ra hoa cho cây xoài.", "V": ""}, "text": "(Dữ liệu thử) Bài 5. Kĩ thuật trồng và chăm sóc cây xoài — SGK Công nghệ 9, Trồng cây ăn quả.", "nguon": "dữ liệu thử"}], "dang": {"NLC": {"bat": true, "d": 0.25}, "DS": {"bat": true, "d": 1, "cham": "deu"}, "TLN": {"bat": false, "d": 0.25}, "TL": {"bat": true, "d": 1}}, "o": {"B1": {"NLC": {"B": 2, "H": 1, "V": 0}, "DS": {"B": 4, "H": 0, "V": 0}, "TLN": {"B": 0, "H": 0, "V": 0}, "TL": {"B": 0, "H": 0, "V": 0}}, "B2": {"NLC": {"B": 2, "H": 1, "V": 0}, "DS": {"B": 0, "H": 4, "V": 0}, "TLN": {"B": 0, "H": 0, "V": 0}, "TL": {"B": 0, "H": 0, "V": 1}}, "B3": {"NLC": {"B": 1, "H": 1, "V": 0}, "DS": {"B": 0, "H": 0, "V": 0}, "TLN": {"B": 0, "H": 0, "V": 0}, "TL": {"B": 0, "H": 0, "V": 1}}, "B4": {"NLC": {"B": 2, "H": 0, "V": 0}, "DS": {"B": 4, "H": 0, "V": 0}, "TLN": {"B": 0, "H": 0, "V": 0}, "TL": {"B": 0, "H": 0, "V": 0}}, "B5": {"NLC": {"B": 1, "H": 1, "V": 0}, "DS": {"B": 0, "H": 4, "V": 0}, "TLN": {"B": 0, "H": 0, "V": 0}, "TL": {"B": 0, "H": 0, "V": 0}}}, "tlDiem": {"TL|B2|V|0": 2.0, "TL|B3|V|0": 1.0}, "cau": {"NLC|B1|B|0": {"de": "Nhiều loại quả như xoài, mít, nhãn, vải, dứa,… được các nhà máy dùng để sản xuất bánh kẹo, đồ uống, đồ hộp. Đây là vai trò nào của cây ăn quả?", "pa": ["Tạo cảnh quan, bảo vệ môi trường sinh thái.", "Cung cấp nguyên liệu cho công nghiệp chế biến.", "Là nguồn hàng quan trọng cho xuất khẩu.", "Một số loại quả có tác dụng chữa bệnh."], "dung": 1}, "NLC|B1|B|1": {"de": "Ở cây ăn quả, cành mang quả thường là", "pa": ["thân chính của cây.", "cành cấp 1 và cành cấp 2.", "cành cấp 2 và cành cấp 3.", "cành cấp 4 và cành cấp 5."], "dung": 3}, "NLC|B1|H|0": {"de": "Rễ ngang (rễ bên) của cây ăn quả phân bố tập trung ở tầng đất mặt, độ sâu khoảng 0,1 m đến 1,0 m và có chức năng chính là hút nước, chất dinh dưỡng. Vì vậy, khi bón phân cho cây ăn quả cần", "pa": ["đưa phân vào lớp đất mặt trong vùng rễ ngang phân bố.", "đào hố thật sâu trên 2 m sát gốc rồi bón phân.", "rải phân lên thân và cành cấp 1 của cây.", "chỉ phun phân lên lá, không bón vào đất."], "dung": 0}, "NLC|B2|B|0": {"de": "Chiết cành là phương pháp nhân giống bằng cách", "pa": ["cắt rời đoạn cành khỏi cây mẹ rồi cắm vào giá thể cho ra rễ.", "lấy mắt ghép của cây này ghép vào gốc ghép của cây khác.", "kích thích cho cành ra rễ trên cây mẹ, sau đó tách cành tạo thành cây con.", "gieo hạt của cây mẹ vào bầu đất để tạo cây con."], "dung": 2}, "NLC|B2|B|1": {"de": "Thời vụ ghép cây ăn quả thích hợp là", "pa": ["từ tháng 1 đến tháng 4 (vụ xuân) và từ tháng 8 đến tháng 9 (vụ thu).", "từ tháng 5 đến tháng 7 (vụ hè).", "từ tháng 11 đến tháng 12 (vụ đông).", "bất kì tháng nào trong năm."], "dung": 0}, "NLC|B2|H|0": {"de": "Khi giâm cành, cành giâm được cắt thành đoạn 5 – 10 cm, có 2 – 4 lá và cắt bớt phiến lá. Việc cắt bớt phiến lá nhằm", "pa": ["giúp cành giâm ra hoa sớm hơn sau khi trồng.", "giảm thoát hơi nước, giúp cành giâm không bị héo khi chưa có rễ.", "làm cho cành giâm mọc nhiều chồi ngọn hơn.", "giúp thuốc kích thích ra rễ thấm qua lá tốt hơn."], "dung": 1}, "NLC|B3|B|0": {"de": "Nhiệt độ thích hợp nhất cho cây ăn quả có múi sinh trưởng, phát triển là", "pa": ["từ 12 °C đến 18 °C.", "từ 7 °C đến 8 °C.", "từ 30 °C đến 39 °C.", "từ 23 °C đến 29 °C."], "dung": 3}, "NLC|B3|H|0": {"de": "Ở thời kì kinh doanh, trong giai đoạn phân hoá mầm hoa, người trồng cây có múi cần hạn chế nước tưới (có thể kết hợp với Paclobutrazol) vì", "pa": ["cây có múi chịu được úng nên không cần tưới.", "tưới nhiều nước sẽ làm rễ cây ăn sâu hơn.", "hạn chế nước giúp thúc đẩy cây phân hoá mầm hoa, ra hoa.", "nước làm mất tác dụng của mọi loại phân bón."], "dung": 2}, "NLC|B4|B|0": {"de": "Khoảng cách trồng phù hợp cho cây nhãn (cây cách cây và hàng cách hàng) là", "pa": ["từ 1 m đến 2 m.", "từ 6 m đến 7 m.", "từ 3 m đến 4 m.", "từ 12 m đến 15 m."], "dung": 1}, "NLC|B4|B|1": {"de": "Bệnh chổi rồng hại nhãn có trung gian truyền bệnh là", "pa": ["nhện lông nhung.", "bọ xít nâu.", "sâu đục quả.", "sâu đục gốc."], "dung": 0}, "NLC|B5|B|0": {"de": "Loại đất thích hợp nhất để trồng xoài là", "pa": ["đất sét nặng, thường xuyên bị ngập nước, độ pH dưới 4,5.", "đất cát biển khô hạn, nghèo dinh dưỡng, giữ nước kém.", "đất phù sa hoặc đất thịt pha cát, thoát nước tốt, độ pH từ 5,5 đến 7,0.", "đất nhiễm mặn nặng, thoát nước kém, độ pH trên 8,5."], "dung": 2}, "NLC|B5|H|0": {"de": "Ở những vùng đất trũng thấp như Đồng bằng sông Cửu Long, khi trồng xoài phải đào mương lên liếp hoặc đắp ụ cao nhằm", "pa": ["giúp cây xoài nhận được ít ánh sáng hơn.", "giữ nước đọng lâu quanh gốc cây.", "làm cho cây xoài thấp, dễ thu hoạch.", "tránh ngập úng làm hỏng rễ xoài."], "dung": 3}, "DS|B1|0": {"de": "Khi nói về đặc điểm thực vật học và yêu cầu ngoại cảnh của cây ăn quả:", "y": [{"t": "Lá của cây ăn quả có thể là lá đơn (xoài, ổi,…) hoặc lá kép (nhãn, vải,…).", "d": true}, {"t": "Hoa đực là hoa có nhuỵ phát triển, còn nhị không phát triển.", "d": false}, {"t": "Đa số cây ăn quả thích hợp với độ ẩm không khí khoảng 80% – 90%, lượng mưa hằng năm từ 1 000 mm đến 2 000 mm.", "d": true}, {"t": "Cây ăn quả là cây ưa bóng, nên trồng ở nơi ít ánh sáng.", "d": false}]}, "DS|B2|0": {"de": "Khi nói về yêu cầu kĩ thuật trong nhân giống vô tính cây ăn quả:", "y": [{"t": "Khi chiết cành, phải bóc hết lớp vỏ và cạo sạch phần vỏ sát phần gỗ ở vết khoanh để cành chiết ra rễ tốt.", "d": true}, {"t": "Mắt ghép phải được lấy từ cây đầu dòng để cây ghép giữ được đặc tính tốt của giống.", "d": true}, {"t": "Cây làm gốc ghép và cây lấy mắt ghép không cần cùng họ, vì phương pháp ghép có khả năng thích ứng cao.", "d": false}, {"t": "Khi giâm cành nên chọn cành thật non ở đầu ngọn, vì cành càng non càng dễ ra rễ.", "d": false}]}, "DS|B4|0": {"de": "Khi nói về đặc điểm thực vật học và yêu cầu ngoại cảnh của cây nhãn:", "y": [{"t": "Rễ nhãn có thể ăn sâu từ 4 m đến 5 m; rễ tơ tập trung chủ yếu ở khu vực hình chiếu của tán.", "d": true}, {"t": "Trên cây nhãn, số lượng hoa cái thường lớn hơn rất nhiều so với hoa đực.", "d": false}, {"t": "Đất trồng nhãn thích hợp nhất là đất cát, cát pha và phù sa ven sông, độ pH từ 5,5 đến 6,4.", "d": true}, {"t": "Thời vụ trồng nhãn tốt nhất là vào mùa khô.", "d": false}]}, "DS|B5|0": {"de": "Khi nói về yêu cầu ngoại cảnh và kĩ thuật chăm sóc cây xoài:", "y": [{"t": "Xoài là cây ưa sáng nên những cành bên ngoài nhận đủ ánh sáng sẽ ra hoa nhiều, quả có màu sắc đẹp hơn.", "d": true}, {"t": "Hoa lưỡng tính của xoài có tuyến mật nên thu hút côn trùng, tạo điều kiện cho quá trình thụ phấn.", "d": true}, {"t": "Trong giai đoạn phân hoá mầm hoa (tháng 12 đến tháng 1 năm sau) cần tưới thật nhiều nước để cây ra hoa sớm.", "d": false}, {"t": "Nên trồng xoài ở nơi thường có gió lớn để hoa thụ phấn tốt hơn.", "d": false}]}, "TL|B2|V|0": {"de": "Nhà bạn Minh có một cây bưởi cho quả to, ngọt, năng suất cao. Gia đình muốn nhân thêm khoảng 10 cây con giữ được đặc tính tốt của cây bưởi này và sớm cho quả.\na) (1,0 điểm) Em hãy chọn một phương pháp nhân giống vô tính phù hợp cho gia đình Minh và giải thích vì sao chọn phương pháp đó.\nb) (1,0 điểm) Minh thực hiện chiết cành như sau: chọn một cành nhỏ sát gốc, nằm trong tán bị che khuất; khoanh vỏ dài khoảng 1 cm, chỉ bóc lớp vỏ ngoài mà không cạo phần vỏ sát gỗ; khoanh xong bó bầu ngay. Em hãy chỉ ra những chỗ chưa đúng kĩ thuật của Minh và nêu cách làm đúng.", "hdc": [{"nd": "a) Chọn phương pháp chiết cành (hoặc ghép, nếu giải thích hợp lí).", "d": "0,5"}, {"nd": "Giải thích: cây chiết giữ được đặc tính của cây mẹ, cây con khoẻ, nhanh cho quả; số lượng cần ít (khoảng 10 cây) nên phù hợp. (Nếu chọn ghép: cây ghép giữ đặc tính của cây lấy mắt ghép, thích ứng cao, bộ rễ khoẻ, chống chịu sâu bệnh tốt.)", "d": "0,5"}, {"nd": "b) Chọn cành chưa đúng → chọn cành có đường kính khoảng 1 – 2 cm, ở giữa tầng tán, vươn ra ánh sáng, lóng ngắn, cành mập.", "d": "0,25"}, {"nd": "Khoanh vỏ quá ngắn → khoanh dài từ 3 cm đến 5 cm, cách chạc cành khoảng 10 – 15 cm.", "d": "0,25"}, {"nd": "Không cạo sạch vỏ sát gỗ → bóc hết lớp vỏ, cạo sạch phần vỏ sát phần gỗ.", "d": "0,25"}, {"nd": "Bó bầu ngay → để từ 2 đến 3 ngày cho khô vết khoanh rồi mới bôi thuốc kích thích ra rễ và bó bầu.", "d": "0,25"}]}, "TL|B3|V|0": {"de": "Gia đình bạn Hoa chuẩn bị trồng 20 cây cam theo hướng dẫn kĩ thuật trong SGK.\na) (0,5 điểm) Mỗi hố trồng cam cần bón lót từ 20 kg đến 30 kg phân hữu cơ và từ 1,0 kg đến 1,5 kg supe lân. Em hãy tính lượng phân hữu cơ và lượng supe lân tối thiểu cần chuẩn bị để bón lót cho cả 20 hố.\nb) (0,5 điểm) Khi bón phân thúc cho cam, bố của Hoa rải phân xong rồi để đó, không tưới nước. Em hãy giải thích cho bố Hoa vì sao sau khi bón phân cần tưới nước, giữ ẩm.", "hdc": [{"nd": "a) Phân hữu cơ tối thiểu: 20 × 20 = 400 (kg).", "d": "0,25"}, {"nd": "Supe lân tối thiểu: 20 × 1,0 = 20 (kg).", "d": "0,25"}, {"nd": "b) Tưới nước giúp phân tan và ngấm vào đất, đến được vùng rễ.", "d": "0,25"}, {"nd": "Nhờ đó cây hấp thụ được phân bón, phân bón phát huy hiệu quả (không tưới thì phân khó tan, cây khó hấp thụ, lãng phí phân).", "d": "0,25"}]}}, "muc": {"B": 40, "H": 30, "V": 30}};
+/* Công thức Toán, Lí, Hoá: chữ kiểu LaTeX trong $…$ → công thức Word thật (OMML/Equation) + HTML xem trước.
+   Hỗ trợ: \frac \sqrt[n]{} ^ _ \left( \right) \begin{cases}/array/aligned \widehat \vec \overline \xrightarrow{t^\circ}
+   \sum \int \lim, hàm sin cos log ln…, chữ Hi Lạp, kí hiệu (≤ ≥ ≠ ≈ ± · × ∈ ⇒ ⇔ → ⇌ °…), \text{}, \mathrm{}, \mathbb{R}. */
+const CT = (() => {
+  const SYM = {
+    cdot: "·", times: "×", div: ":", pm: "±", mp: "∓", le: "≤", leq: "≤", ge: "≥", geq: "≥", ne: "≠", neq: "≠", approx: "≈", equiv: "≡", sim: "∼", simeq: "≃",
+    infty: "∞", in: "∈", notin: "∉", ni: "∋", subset: "⊂", subseteq: "⊆", supset: "⊃", cup: "∪", cap: "∩", setminus: "∖", emptyset: "∅", varnothing: "∅", forall: "∀", exists: "∃",
+    Rightarrow: "⇒", Leftarrow: "⇐", Leftrightarrow: "⇔", rightarrow: "→", to: "→", leftarrow: "←", leftrightarrow: "↔", rightleftharpoons: "⇌", leftrightarrows: "⇄", uparrow: "↑", downarrow: "↓", longrightarrow: "⟶", implies: "⇒", iff: "⇔",
+    perp: "⊥", parallel: "∥", angle: "∠", triangle: "△", circ: "∘", degree: "°", prime: "′", ldots: "…", cdots: "⋯", dots: "…", vdots: "⋮", star: "⋆", bullet: "•", mid: "∣", nmid: "∤", propto: "∝", ell: "ℓ", hbar: "ℏ", partial: "∂", nabla: "∇", backslash: "\\",
+    alpha: "α", beta: "β", gamma: "γ", delta: "δ", epsilon: "ε", varepsilon: "ε", zeta: "ζ", eta: "η", theta: "θ", vartheta: "ϑ", iota: "ι", kappa: "κ", lambda: "λ", mu: "μ", nu: "ν", xi: "ξ", pi: "π", rho: "ρ", sigma: "σ", tau: "τ", upsilon: "υ", phi: "φ", varphi: "φ", chi: "χ", psi: "ψ", omega: "ω",
+    Gamma: "Γ", Delta: "Δ", Theta: "Θ", Lambda: "Λ", Xi: "Ξ", Pi: "Π", Sigma: "Σ", Upsilon: "Υ", Phi: "Φ", Psi: "Ψ", Omega: "Ω",
+    "%": "%", "$": "$", "#": "#", "&": "&", "_": "_", "{": "{", "}": "}", ",": " ", ";": " ", ":": " ", "!": "", " ": " ", quad: " ", qquad: "  ", "|": "‖", lbrace: "{", rbrace: "}", langle: "⟨", rangle: "⟩", lfloor: "⌊", rfloor: "⌋", lceil: "⌈", rceil: "⌉"
+  };
+  const HAM = new Set(["sin", "cos", "tan", "cot", "tg", "cotg", "log", "ln", "lg", "exp", "max", "min", "det", "arcsin", "arccos", "arctan", "sinh", "cosh"]);
+  const NARY = { sum: "∑", prod: "∏", int: "∫", iint: "∬", iiint: "∭", oint: "∮" };
+  const ACC = { widehat: "̂", hat: "̂", vec: "⃗", overrightarrow: "⃗", tilde: "̃", widetilde: "̃", dot: "̇" };
+  const BB = { R: "ℝ", N: "ℕ", Z: "ℤ", Q: "ℚ", C: "ℂ" };
+  const BO_QUA = new Set(["displaystyle", "textstyle", "limits", "nolimits", "big", "Big", "bigg", "Bigg", "bigl", "bigr", "Bigl", "Bigr", "biggl", "biggr", "nonumber", "notag"]);
+  const CHU = new Set(["text", "textrm", "mbox", "mathrm", "operatorname", "textit", "textbf", "textnormal", "rm"]);
+  const xe = s => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+
+  /* ---------- đọc LaTeX thành cây ---------- */
+  function phanTich(src, loi) {
+    let i = 0;
+    const khop = d => src.startsWith(d, i) && !(d[0] === "\\" && /[a-zA-Z]/.test(src[i + d.length] || ""));
+    const boTrang = () => { while (i < src.length && /\s/.test(src[i])) i++; };
+    const ten = () => { const m = src.slice(i).match(/^\\([a-zA-Z]+|.)/); if (!m) { i++; return ""; } i += m[0].length; return m[1]; };
+    function tho() {
+      boTrang(); if (src[i] !== "{") return src[i++] || "";
+      let d = 0, j = i; for (; j < src.length; j++) { if (src[j] === "{") d++; else if (src[j] === "}") { d--; if (!d) break; } }
+      if (j >= src.length) loi.push("thiếu dấu }");
+      const s = src.slice(i + 1, j); i = j + 1; return s;
+    }
+    function doiSo() {
+      boTrang();
+      if (src[i] === "{") { i++; const g = nhom("}"); if (src[i] === "}") i++; return g; }
+      if (src[i] === "\\") { const ds = []; lenh(ds); return ds; }
+      if (i < src.length) return [{ t: "x", s: src[i++] }];
+      loi.push("thiếu phần sau ^ / _ / \\frac"); return [];
+    }
+    function ngoac() {
+      boTrang();
+      if (src[i] === "\\") { const n = ten(); return { "{": "{", "}": "}", lbrace: "{", rbrace: "}", "|": "‖", langle: "⟨", rangle: "⟩", lfloor: "⌊", rfloor: "⌋", lceil: "⌈", rceil: "⌉" }[n] || ""; }
+      const c = src[i++]; return c === "." || c == null ? "" : c;
+    }
+    function lenh(ds) {
+      const n = ten();
+      if (n === "frac" || n === "dfrac" || n === "tfrac" || n === "cfrac") { const a = doiSo(), b = doiSo(); ds.push({ t: "frac", a, b }); return; }
+      if (n === "sqrt") { boTrang(); let k = null; if (src[i] === "[") { i++; k = nhom("]"); if (src[i] === "]") i++; } ds.push({ t: "sqrt", k, a: doiSo() }); return; }
+      if (n === "left") { const l = ngoac(); const a = nhom("\\right"); let r = ""; if (khop("\\right")) { i += 6; r = ngoac(); } else loi.push("thiếu \\right"); ds.push({ t: "d", l, r, a }); return; }
+      if (n === "right") { ngoac(); loi.push("thừa \\right"); return; }
+      if (n === "begin") {
+        const env = tho(); if (/array|tabular/.test(env)) { boTrang(); if (src[i] === "{") tho(); }
+        const a = nhom("\\end"); if (khop("\\end")) { i += 4; tho(); } else loi.push("thiếu \\end{" + env + "}");
+        const rows = [[]]; a.forEach(x => { if (x.t === "nl") rows.push([]); else if (x.t !== "amp") rows[rows.length - 1].push(x); });
+        const r = rows.filter(x => x.length);
+        if (/matrix/.test(env)) ds.push({ t: "d", l: env[0] === "b" ? "[" : env[0] === "v" ? "|" : "(", r: env[0] === "b" ? "]" : env[0] === "v" ? "|" : ")", a: [{ t: "arr", rows: r }] });
+        else ds.push({ t: "arr", cases: env === "cases", rows: r });
+        return;
+      }
+      if (n === "end") { tho(); loi.push("thừa \\end"); return; }
+      if (n === "\\") { boTrang(); if (src[i] === "[") { while (i < src.length && src[i] !== "]") i++; i++; } ds.push({ t: "nl" }); return; }
+      if (CHU.has(n)) { ds.push({ t: "x", s: tho().replace(/\\([%$#&_{}])/g, "$1").replace(/~/g, " "), up: true }); return; }
+      if (n === "mathbb" || n === "Bbb") { const s = tho(); ds.push({ t: "x", s: [...s].map(c => BB[c] || c).join(""), up: true }); return; }
+      if (n === "mathbf" || n === "boldsymbol" || n === "mathit" || n === "mathcal" || n === "bm") { ds.push({ t: "g", a: doiSo() }); return; }
+      if (ACC[n]) { ds.push({ t: "acc", c: ACC[n], a: doiSo() }); return; }
+      if (n === "overline" || n === "bar") { ds.push({ t: "bar", a: doiSo() }); return; }
+      if (/^x(right|left)/.test(n)) {
+        boTrang(); if (src[i] === "[") { i++; nhom("]"); if (src[i] === "]") i++; }
+        ds.push({ t: "mui", c: /harpoons/.test(n) ? "⇌" : /^xleftrightarrow/.test(n) ? "⟷" : /^xleft/.test(n) ? "⟵" : "⟶", a: doiSo() }); return;
+      }
+      if (n === "overset" || n === "stackrel") { const tren = doiSo(), duoi = doiSo(); ds.push({ t: "mui", c: duoi.map(x => x.s || "").join("") || "→", a: tren }); return; }
+      if (NARY[n]) { ds.push({ t: "nary", c: NARY[n] }); return; }
+      if (n === "lim") { ds.push({ t: "x", s: "lim", up: true, lim: true }); return; }
+      if (HAM.has(n)) { ds.push({ t: "x", s: n, up: true }); return; }
+      if (BO_QUA.has(n)) return;
+      if (n in SYM) { if (SYM[n]) ds.push({ t: "x", s: SYM[n] }); return; }
+      loi.push("lệnh lạ \\" + n); ds.push({ t: "x", s: n, up: true });
+    }
+    function nhom(dung) {
+      const ds = [];
+      while (i < src.length) {
+        if (dung && khop(dung)) return ds;
+        const c = src[i];
+        if (c === "{") { i++; ds.push({ t: "g", a: nhom("}") }); if (src[i] === "}") i++; continue; }
+        if (c === "}") { i++; loi.push("thừa dấu }"); continue; }
+        if (c === "^" || c === "_") {
+          i++; const a = doiSo(); let b = ds.pop() || { t: "x", s: "" };
+          if (b.t !== "sc") b = { t: "sc", e: b };
+          if (c === "^") { if (b.sup) loi.push("hai số mũ liền nhau (dùng ngoặc {})"); b.sup = a; } else { if (b.sub) loi.push("hai chỉ số dưới liền nhau"); b.sub = a; }
+          ds.push(b); continue;
+        }
+        if (c === "\\") { lenh(ds); continue; }
+        if (c === "&") { i++; ds.push({ t: "amp" }); continue; }
+        if (c === "~") { i++; ds.push({ t: "x", s: " " }); continue; }
+        if (/\s/.test(c)) { i++; continue; }
+        if (c === "'") { i++; ds.push({ t: "x", s: "′" }); continue; }
+        // nhiều chữ số / số thập phân đi liền: một khối
+        const m = src.slice(i).match(/^\d+(?:[.,]\d+)*/);
+        if (m) { ds.push({ t: "x", s: m[0] }); i += m[0].length; continue; }
+        ds.push({ t: "x", s: c }); i++;
+      }
+      if (dung === "}") loi.push("thiếu dấu }");
+      else if (dung === "]") loi.push("thiếu dấu ]");
+      return ds;
+    }
+    return nhom(null);
+  }
+  /* công thức hoá học (H_2SO_4, Fe^{3+}, phương trình có mũi tên) → chữ đứng, không nghiêng */
+  function laHoa(src) {
+    const s = src.replace(/\\x(right|left)[a-z]*(\[[^\]]*\])?\{[^}]*\}/g, " ").replace(/\\(text|mathrm)\{[^}]*\}/g, " ").replace(/\^\\circ/g, " ").replace(/\\[a-zA-Z]+/g, " ");
+    if (!/[A-Z]/.test(s) || /[a-z]/.test(s.replace(/[A-Z][a-z]?/g, ""))) return false;
+    return /_\{?\d|\\x?(right|left)|→|⇌|⟶|\^\{?\d*[+-]\}?/.test(src);
+  }
+
+  /* ---------- cây → OMML (Word) ---------- */
+  function rO(s, up) {
+    return `<m:r>${up ? '<m:rPr><m:sty m:val="p"/></m:rPr>' : ""}<w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:cs="Times New Roman"/><w:sz w:val="26"/><w:szCs w:val="26"/></w:rPr><m:t xml:space="preserve">${xe(s)}</m:t></m:r>`;
+  }
+  const doDo = n => n.sup && n.sup.length === 1 && n.sup[0].t === "x" && /^[∘°]$/.test(n.sup[0].s) && !n.sub;
+  function om(ds, hoa) {
+    let s = "", buf = "", up = null;
+    const xa = () => { if (buf) s += rO(buf, up); buf = ""; };
+    for (let k = 0; k < ds.length; k++) {
+      const n = ds[k];
+      if (n.t === "x") {   // chữ biến (x, y, α) nghiêng; số, dấu, chữ Hi Lạp hoa, đơn vị: đứng
+        for (const c of (n.up || hoa ? [n.s] : n.s.match(/[A-Za-zα-ω]+|[^A-Za-zα-ω]+/g) || [])) {
+          const u = !!(n.up || hoa || !/^[A-Za-zα-ω]/.test(c)); if (buf && u !== up) xa(); up = u; buf += c;
+        }
+        continue;
+      }
+      xa();
+      if (n.t === "nl" || n.t === "amp") continue;
+      if (n.t === "g") s += om(n.a, hoa);
+      else if (n.t === "frac") s += `<m:f><m:num>${om(n.a, hoa)}</m:num><m:den>${om(n.b, hoa)}</m:den></m:f>`;
+      else if (n.t === "sqrt") s += n.k && n.k.length ? `<m:rad><m:deg>${om(n.k, hoa)}</m:deg><m:e>${om(n.a, hoa)}</m:e></m:rad>` : `<m:rad><m:radPr><m:degHide m:val="1"/></m:radPr><m:deg/><m:e>${om(n.a, hoa)}</m:e></m:rad>`;
+      else if (n.t === "d") s += `<m:d><m:dPr><m:begChr m:val="${xe(n.l)}"/><m:endChr m:val="${xe(n.r)}"/></m:dPr><m:e>${om(n.a, hoa)}</m:e></m:d>`;
+      else if (n.t === "arr") { const a = `<m:eqArr>${n.rows.map(r => `<m:e>${om(r, hoa)}</m:e>`).join("") || "<m:e/>"}</m:eqArr>`; s += n.cases ? `<m:d><m:dPr><m:begChr m:val="{"/><m:endChr m:val=""/></m:dPr><m:e>${a}</m:e></m:d>` : a; }
+      else if (n.t === "acc") s += `<m:acc><m:accPr><m:chr m:val="${n.c}"/></m:accPr><m:e>${om(n.a, hoa)}</m:e></m:acc>`;
+      else if (n.t === "bar") s += `<m:bar><m:barPr><m:pos m:val="top"/></m:barPr><m:e>${om(n.a, hoa)}</m:e></m:bar>`;
+      else if (n.t === "mui") s += `<m:limUpp><m:e>${rO(n.c, true)}</m:e><m:lim>${om(n.a, hoa)}</m:lim></m:limUpp>`;
+      else if (n.t === "nary") { s += nary(n.c, null, null, ds.slice(k + 1), hoa); k = ds.length; }
+      else if (n.t === "sc") {
+        const e = n.e;
+        if (e.t === "nary") { s += nary(e.c, n.sub, n.sup, ds.slice(k + 1), hoa); k = ds.length; continue; }
+        if (e.lim && n.sub && !n.sup) { s += `<m:limLow><m:e>${om([e], hoa)}</m:e><m:lim>${om(n.sub, hoa)}</m:lim></m:limLow>`; continue; }
+        if (doDo(n)) { s += om([e, { t: "x", s: "°", up: true }], hoa); continue; }
+        const E = `<m:e>${om([e], hoa)}</m:e>`;
+        if (n.sub && n.sup) s += `<m:sSubSup>${E}<m:sub>${om(n.sub, hoa)}</m:sub><m:sup>${om(n.sup, hoa)}</m:sup></m:sSubSup>`;
+        else if (n.sup) s += `<m:sSup>${E}<m:sup>${om(n.sup, hoa)}</m:sup></m:sSup>`;
+        else s += `<m:sSub>${E}<m:sub>${om(n.sub || [], hoa)}</m:sub></m:sSub>`;
+      }
+    }
+    xa(); return s;
+  }
+  function nary(c, sub, sup, con, hoa) {
+    return `<m:nary><m:naryPr><m:chr m:val="${c}"/>${sub ? "" : '<m:subHide m:val="1"/>'}${sup ? "" : '<m:supHide m:val="1"/>'}</m:naryPr><m:sub>${sub ? om(sub, hoa) : ""}</m:sub><m:sup>${sup ? om(sup, hoa) : ""}</m:sup><m:e>${om(con, hoa)}</m:e></m:nary>`;
+  }
+
+  /* ---------- cây → HTML (xem trước) ---------- */
+  function ht(ds, hoa) {
+    let s = "";
+    for (let k = 0; k < ds.length; k++) {
+      const n = ds[k];
+      if (n.t === "x") { s += !n.up && !hoa && /^[A-Za-zα-ω]+$/.test(n.s) ? `<i>${xe(n.s)}</i>` : xe(n.s).replace(/^ $/, "&nbsp;"); continue; }
+      if (n.t === "nl" || n.t === "amp") continue;
+      if (n.t === "g") s += ht(n.a, hoa);
+      else if (n.t === "frac") s += `<span class="ct-f"><span>${ht(n.a, hoa)}</span><span>${ht(n.b, hoa)}</span></span>`;
+      else if (n.t === "sqrt") s += `<span class="ct-r">${n.k && n.k.length ? `<sup>${ht(n.k, hoa)}</sup>` : ""}√<span class="ct-rr">${ht(n.a, hoa)}</span></span>`;
+      else if (n.t === "d") s += `${xe(n.l)}${ht(n.a, hoa)}${xe(n.r)}`;
+      else if (n.t === "arr") s += `<span class="ct-he">${n.cases ? '<span class="ct-ng">{</span>' : ""}<span class="ct-dong">${n.rows.map(r => `<span>${ht(r, hoa)}</span>`).join("")}</span></span>`;
+      else if (n.t === "acc") s += `<span class="ct-acc" data-c="${n.c === "⃗" ? "→" : n.c === "̃" ? "~" : "^"}">${ht(n.a, hoa)}</span>`;
+      else if (n.t === "bar") s += `<span style="text-decoration:overline">${ht(n.a, hoa)}</span>`;
+      else if (n.t === "mui") s += `<span class="ct-mui"><small>${ht(n.a, hoa)}</small><span>${xe(n.c)}</span></span>`;
+      else if (n.t === "nary") s += `<span class="ct-n">${n.c}</span>`;
+      else if (n.t === "sc") {
+        const e = n.e;
+        if (e.lim && n.sub && !n.sup) { s += `<span class="ct-mui"><span>lim</span><small>${ht(n.sub, hoa)}</small></span>`; continue; }
+        if (doDo(n)) { s += ht([e], hoa) + "°"; continue; }
+        s += (e.t === "nary" ? `<span class="ct-n">${e.c}</span>` : ht([e], hoa)) + (n.sup ? `<sup>${ht(n.sup, hoa)}</sup>` : "") + (n.sub ? `<sub>${ht(n.sub, hoa)}</sub>` : "");
+      }
+    }
+    return s;
+  }
+
+  /* ---------- dùng ngoài ---------- */
+  function tach(s) {   // chữ thường / công thức $…$ ; \$ là dấu đô la thật
+    s = String(s == null ? "" : s); const out = []; let i = 0, chu = "";
+    while (i < s.length) {
+      if (s[i] === "\\" && s[i + 1] === "$") { chu += "$"; i += 2; continue; }
+      if (s[i] === "$") {
+        let j = i + 1; while (j < s.length && !(s[j] === "$" && s[j - 1] !== "\\")) j++;
+        if (j >= s.length) { chu += s.slice(i); break; }
+        if (chu) out.push({ t: "chu", s: chu }); chu = "";
+        out.push({ t: "ct", src: s.slice(i + 1, j) }); i = j + 1; continue;
+      }
+      chu += s[i++];
+    }
+    if (chu) out.push({ t: "chu", s: chu });
+    return out;
+  }
+  const cache = new Map();
+  function cay(src) { if (!cache.has(src)) { const loi = []; const c = phanTich(src, loi); cache.set(src, { c, loi: [...new Set(loi)], hoa: laHoa(src) }); if (cache.size > 3000) cache.clear(); } return cache.get(src); }
+  const omml = src => { const k = cay(src); return om(k.c, k.hoa); };
+  const html = src => { const k = cay(src); return `<span class="ct">${ht(k.c, k.hoa)}</span>`; };
+  function kiem(s) {   // lỗi công thức trong một đoạn chữ
+    const loi = [];
+    String(s == null ? "" : s).split("\n").forEach(d => {
+      const so$ = (d.replace(/\\\$/g, "").match(/\$/g) || []).length;
+      if (so$ % 2) loi.push("thiếu một dấu $ (công thức phải nằm giữa hai dấu $)");
+      tach(d).forEach(p => { if (p.t === "ct") cay(p.src).loi.forEach(l => loi.push(l + " trong $" + p.src.slice(0, 40) + (p.src.length > 40 ? "…" : "") + "$")); });
+      // LaTeX viết ngoài $…$
+      tach(d).forEach(p => { if (p.t === "chu" && /\\(frac|sqrt|left|begin|cdot|times|le|ge|ne|pi|alpha|Delta|widehat|xrightarrow|circ)\b/.test(p.s)) loi.push("có lệnh công thức nằm ngoài $…$"); });
+    });
+    return [...new Set(loi)];
+  }
+  const coCT = s => /\$[^$]+\$/.test(String(s || ""));
+  const htmlChu = s => tach(s).map(p => p.t === "ct" ? html(p.src) : xe(p.s).replace(/([\^_])(\{([^{}]*)\}|[+\-−]?[0-9]+|[A-Za-z])/g, (m, a, b, c) => `<${a === "^" ? "sup" : "sub"}>${c != null ? c : b}</${a === "^" ? "sup" : "sub"}>`)).join("");
+  const thuan = s => htmlChu(s).replace(/<[^>]+>/g, "").replace(/&nbsp;/g, " ").replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"');
+  return { tach, omml, html, htmlChu, kiem, thuan, coCT, laHoa };
+})();
+if (typeof module !== "undefined") module.exports = CT;
+
 /* Dựng Word (.docx) từ mô hình khối — Times New Roman 13 toàn bộ. Không thư viện ngoài (JSZip nhúng sẵn).
    Mô hình: phần = [{ngang:bool, khoi:[...]}]
    khối đoạn  : {t:"p", r:[run], jc:"left|center|right|both", truoc, sau, thut, treo, tab:[vị trí twip], giu:true}
@@ -487,9 +757,13 @@ const DX = (() => {
   const x = s => String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
   const cm = v => Math.round(v * 567);
   /* tách x^2, H_2O, 10^{-3} thành run chỉ số */
-  function chu(s, o) {
-    o = o || {}; const out = []; let i = 0, m;
-    s = String(s == null ? "" : s);
+  function chu(s, o) {   // công thức $…$ → run công thức (Equation Word); phần chữ thường tách chỉ số
+    o = o || {}; const out = [];
+    CT.tach(s).forEach(p => { if (p.t === "ct") out.push(Object.assign({}, o, { math: p.src })); else out.push(...chuThuong(p.s, o)); });
+    return out;
+  }
+  function chuThuong(s, o) {
+    const out = []; let i = 0, m;
     const re = /([\^_])(\{([^{}]*)\}|[+\-−]?[0-9]+|[A-Za-zα-ωΑ-Ω])/g;
     while ((m = re.exec(s))) {
       if (m.index > i) out.push(Object.assign({}, o, { t: s.slice(i, m.index) }));
@@ -502,7 +776,9 @@ const DX = (() => {
   const P = (r, o) => Object.assign({ t: "p", r: typeof r === "string" ? chu(r) : r }, o || {});
 
   /* ---------- XML ---------- */
+  let demCT = 0;
   function rXml(r) {
+    if (r.math != null) { demCT++; return `<m:oMath>${CT.omml(r.math)}</m:oMath>`; }
     let pr = "";
     if (r.b) pr += "<w:b/><w:bCs/>";
     if (r.i) pr += "<w:i/><w:iCs/>";
@@ -520,6 +796,9 @@ const DX = (() => {
     if (p.thut || p.treo) pr += `<w:ind w:left="${p.thut || 0}"${p.treo ? ` w:hanging="${p.treo}"` : ""}/>`;
     pr += `<w:jc w:val="${p.jc || "both"}"/>`;
     if (sect) pr += sect;
+    const rs = (p.r || []).filter(r => r.math != null || r.t || r.tab);
+    // đoạn chỉ có công thức: Word tự coi là công thức riêng dòng và căn giữa → giữ căn như đoạn chữ
+    if (rs.length && rs.every(r => r.math != null)) return `<w:p><w:pPr>${pr}</w:pPr><m:oMathPara><m:oMathParaPr><m:jc m:val="${p.jc === "center" ? "center" : p.jc === "right" ? "right" : "left"}"/></m:oMathParaPr>${rs.map(rXml).join("")}</m:oMathPara></w:p>`;
     return `<w:p><w:pPr>${pr}</w:pPr>${(p.r || []).map(rXml).join("")}</w:p>`;
   }
   const VIEN = c => `<w:tblBorders>${["top", "left", "bottom", "right", "insideH", "insideV"].map(k => `<w:${k} w:val="${c ? "single" : "nil"}" w:sz="4" w:space="0" w:color="000000"/>`).join("")}</w:tblBorders>`;
@@ -560,7 +839,7 @@ const DX = (() => {
       if (i < phan.length - 1) body += pXml(P([], { sau: 0 }), sectXml(ph.ngang));
       else body += sectXml(ph.ngang);
     });
-    return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\r\n<w:document xmlns:w="${W}" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><w:body>${body}</w:body></w:document>`;
+    return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\r\n<w:document xmlns:w="${W}" xmlns:m="http://schemas.openxmlformats.org/officeDocument/2006/math" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><w:body>${body}</w:body></w:document>`;
   }
   const STYLES = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\r\n<w:styles xmlns:w="${W}"><w:docDefaults><w:rPrDefault><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="Times New Roman" w:cs="Times New Roman"/><w:sz w:val="26"/><w:szCs w:val="26"/><w:lang w:val="vi-VN" w:eastAsia="en-US" w:bidi="ar-SA"/></w:rPr></w:rPrDefault><w:pPrDefault><w:pPr><w:spacing w:after="40" w:line="264" w:lineRule="auto"/></w:pPr></w:pPrDefault></w:docDefaults><w:style w:type="paragraph" w:default="1" w:styleId="Normal"><w:name w:val="Normal"/><w:qFormat/><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:cs="Times New Roman"/><w:sz w:val="26"/><w:szCs w:val="26"/></w:rPr></w:style><w:style w:type="table" w:default="1" w:styleId="TableNormal"><w:name w:val="Normal Table"/><w:tblPr><w:tblInd w:w="0" w:type="dxa"/><w:tblCellMar><w:top w:w="0" w:type="dxa"/><w:left w:w="108" w:type="dxa"/><w:bottom w:w="0" w:type="dxa"/><w:right w:w="108" w:type="dxa"/></w:tblCellMar></w:tblPr></w:style></w:styles>`;
   const FOOTER = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\r\n<w:ftr xmlns:w="${W}"><w:p><w:pPr><w:jc w:val="center"/></w:pPr><w:r><w:rPr><w:sz w:val="26"/></w:rPr><w:t xml:space="preserve">Trang </w:t></w:r><w:r><w:rPr><w:sz w:val="26"/></w:rPr><w:fldChar w:fldCharType="begin"/></w:r><w:r><w:rPr><w:sz w:val="26"/></w:rPr><w:instrText xml:space="preserve"> PAGE </w:instrText></w:r><w:r><w:rPr><w:sz w:val="26"/></w:rPr><w:fldChar w:fldCharType="separate"/></w:r><w:r><w:rPr><w:sz w:val="26"/></w:rPr><w:t>1</w:t></w:r><w:r><w:rPr><w:sz w:val="26"/></w:rPr><w:fldChar w:fldCharType="end"/></w:r></w:p></w:ftr>`;
@@ -572,13 +851,24 @@ const DX = (() => {
     z.file("docProps/core.xml", '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><cp:coreProperties xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties" xmlns:dc="http://purl.org/dc/elements/1.1/"><dc:title>Đề kiểm tra — Tổ trưởng số</dc:title><dc:creator>Tổ trưởng số — Soạn đề CV 7991</dc:creator></cp:coreProperties>');
     z.file("word/styles.xml", STYLES);
     z.file("word/footer1.xml", FOOTER);
-    z.file("word/document.xml", docXml(phan));
+    // kiểm trước khi tải: XML đúng cấu trúc, đủ công thức
+    let can = 0; const dem = k => { if (k.t === "bang") k.hang.forEach(h => h.forEach(o => { if (o.vm !== "c") oP(o).forEach(dem); })); else (k.r || []).forEach(r => { if (r.math != null) can++; }); };
+    phan.forEach(ph => ph.khoi.forEach(dem));
+    demCT = 0; const xml = docXml(phan);
+    if (demCT !== can) throw new Error(`Số công thức trong file (${demCT}) khác số công thức đã soạn (${can}) — chưa xuất để tránh mất công thức.`);
+    if (typeof DOMParser !== "undefined") {
+      const d = new DOMParser().parseFromString(xml, "application/xml"), e = d.getElementsByTagName("parsererror")[0];
+      if (e) throw new Error("File Word dựng ra bị lỗi cấu trúc (thường do công thức): " + (e.textContent || "").slice(0, 160));
+      if (d.getElementsByTagNameNS("http://schemas.openxmlformats.org/officeDocument/2006/math", "oMath").length !== can) throw new Error("Công thức trong file không khớp số đã soạn — chưa xuất.");
+    }
+    z.file("word/document.xml", xml);
     return z.generateAsync({ type: "blob", compression: "DEFLATE", mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document" });
   }
 
   /* ---------- HTML xem trước (cùng mô hình) ---------- */
   const h = s => String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
   function rHtml(r) {
+    if (r.math != null) return CT.html(r.math);
     let s = h(r.t);
     if (r.va) s = `<${r.va === "superscript" ? "sup" : "sub"}>${s}</${r.va === "superscript" ? "sup" : "sub"}>`;
     if (r.b) s = "<b>" + s + "</b>"; if (r.i) s = "<i>" + s + "</i>"; if (r.u) s = "<u>" + s + "</u>";
@@ -588,7 +878,7 @@ const DX = (() => {
   function pHtml(p) {
     const st = `text-align:${p.jc === "both" || !p.jc ? "justify" : p.jc};margin:${(p.truoc || 0) / 20}pt 0 ${(p.sau == null ? 40 : p.sau) / 20}pt ${((p.thut || 0) - (p.treo || 0)) / 567 * 37.8}px` + (p.treo ? `;padding-left:${p.treo / 567 * 37.8}px;text-indent:-${p.treo / 567 * 37.8}px` : "");
     if (p.tab && p.tab.length) {
-      const o = [[]]; (p.r || []).forEach(r => { if (r.tab) o.push([]); if (r.t) o[o.length - 1].push(Object.assign({}, r, { tab: false })); });
+      const o = [[]]; (p.r || []).forEach(r => { if (r.tab) o.push([]); if (r.t || r.math != null) o[o.length - 1].push(Object.assign({}, r, { tab: false })); });
       return `<p style="${st}" class="cot c${o.length}">${o.map(g => "<span>" + g.map(rHtml).join("") + "</span>").join("")}</p>`;
     }
     const nd = (p.r || []).map(rHtml).join("");
@@ -639,22 +929,69 @@ const DF = (() => {
     const f = z.file("word/document.xml");
     if (!f) throw new Error("File này không phải Word .docx (có thể là .doc cũ — thầy cô mở bằng Word, Lưu thành .docx giúp ạ).");
     const doc = new DOMParser().parseFromString(await f.async("string"), "application/xml");
-    const dong = [];
+    const dong = []; let nCT = 0;
+    // chữ của một nút trong đoạn: run thường (giữ chỉ số trên/dưới), công thức Equation → $LaTeX$
+    const di = e => {
+      if (e.nodeType !== 1) return "";
+      if (e.namespaceURI === MNS && e.localName === "oMath") { nCT++; return " $" + tex(e).replace(/\s+/g, " ").trim() + "$ "; }
+      if (e.namespaceURI === WNS && e.localName === "r") {
+        const va = e.getElementsByTagNameNS(WNS, "vertAlign")[0], v = va && va.getAttribute("w:val");
+        let t = ""; for (const c of e.childNodes) if (c.nodeType === 1 && c.namespaceURI === WNS) { if (c.localName === "t") t += c.textContent; else if (c.localName === "tab" || c.localName === "br") t += " "; }
+        if (t && v === "superscript") t = "^{" + t + "}"; else if (t && v === "subscript") t = "_{" + t + "}";
+        return t;
+      }
+      if (e.localName === "txbxContent" || e.localName === "Fallback") return "";
+      let s = ""; for (const c of e.childNodes) s += di(c); return s;
+    };
     for (const p of doc.getElementsByTagNameNS(WNS, "p")) {
       let bo = false; for (let a = p.parentNode; a; a = a.parentNode) if (a.localName === "txbxContent" || a.localName === "Fallback") { bo = true; break; }
       if (bo) continue;
-      let s = "";
-      for (const e of p.getElementsByTagName("*")) {
-        if (e.localName === "t" && (e.namespaceURI === WNS || e.namespaceURI === MNS)) {
-          let t = e.textContent;
-          const r = e.parentNode, va = r && r.getElementsByTagNameNS(WNS, "vertAlign")[0];
-          if (va && e.namespaceURI === WNS) { const v = va.getAttribute("w:val"); if (v === "superscript") t = "^" + (t.length > 1 ? "{" + t + "}" : t); else if (v === "subscript") t = "_" + (t.length > 1 ? "{" + t + "}" : t); }
-          s += t;
-        } else if (e.localName === "tab" && e.namespaceURI === WNS) s += " ";
-      }
-      s = gon(s); if (s) dong.push(s);
+      const s = gon(di(p)); if (s) dong.push(s);
     }
+    // công thức MathType / ảnh: app không đọc được chữ bên trong
+    const nOle = doc.getElementsByTagNameNS(WNS, "object").length;
+    dong.thongTin = { nCT, nOle };
     return dong;
+  }
+  /* công thức Word (OMML) → LaTeX gọn để gửi AI */
+  const CHR = { "∑": "\\sum", "∏": "\\prod", "∫": "\\int", "∬": "\\iint", "∮": "\\oint" };
+  function tex(e) {
+    const con = (el, ten) => el && [...el.childNodes].find(c => c.nodeType === 1 && c.localName === ten);
+    const gt = (el, ten) => { const p = con(el, ten); return p ? p.getAttributeNS(MNS, "val") || p.getAttribute("m:val") || "" : null; };
+    const pr = (el, ten) => con(el, ten);
+    const di = el => {
+      if (!el || el.nodeType !== 1) return "";
+      const k = el.localName;
+      if (/Pr$/.test(k) && el.namespaceURI === MNS) return "";
+      if (k === "t") return el.textContent;
+      if (el.namespaceURI === WNS && k !== "r") return "";
+      const e = n => di(con(el, n));
+      switch (k) {
+        case "f": return `\\frac{${e("num")}}{${e("den")}}`;
+        case "sSup": return `{${e("e")}}^{${e("sup")}}`;
+        case "sSub": return `{${e("e")}}_{${e("sub")}}`;
+        case "sSubSup": return `{${e("e")}}_{${e("sub")}}^{${e("sup")}}`;
+        case "sPre": return `{}_{${e("sub")}}^{${e("sup")}}{${e("e")}}`;
+        case "rad": { const d = e("deg"); return d.trim() ? `\\sqrt[${d}]{${e("e")}}` : `\\sqrt{${e("e")}}`; }
+        case "d": {
+          const p = pr(el, "dPr"), b = p && gt(p, "begChr"), c = p && gt(p, "endChr");
+          const cac = [...el.childNodes].filter(x => x.nodeType === 1 && x.localName === "e").map(di);
+          if (b === "{" && (c === "" || c === null && false) && cac.length === 1 && con(con(el, "e"), "eqArr")) return `\\begin{cases}${di(con(con(el, "e"), "eqArr")).replace(/^\\begin\{array\}\{l\}|\\end\{array\}$/g, "")}\\end{cases}`;
+          const L = b == null ? "(" : b, R = c == null ? ")" : c;
+          return `\\left${L === "" ? "." : L === "{" ? "\\{" : L}${cac.join(",")}\\right${R === "" ? "." : R === "}" ? "\\}" : R}`;
+        }
+        case "eqArr": return "\\begin{array}{l}" + [...el.childNodes].filter(x => x.nodeType === 1 && x.localName === "e").map(di).join(" \\\\ ") + "\\end{array}";
+        case "nary": { const p = pr(el, "naryPr"), c = (p && gt(p, "chr")) || "∫"; const sb = e("sub"), sp = e("sup"); return `${CHR[c] || c}${sb ? "_{" + sb + "}" : ""}${sp ? "^{" + sp + "}" : ""} ${e("e")}`; }
+        case "acc": { const p = pr(el, "accPr"), c = (p && gt(p, "chr")) || "̂"; return c === "⃗" || c === "→" ? `\\vec{${e("e")}}` : c === "̅" || c === "¯" ? `\\overline{${e("e")}}` : `\\widehat{${e("e")}}`; }
+        case "bar": return `\\overline{${e("e")}}`;
+        case "limLow": return `{${e("e")}}_{${e("lim")}}`;
+        case "limUpp": { const b = e("e"); return /[→⟶⇌]/.test(b) ? `\\xrightarrow{${e("lim")}}` : `{${b}}^{${e("lim")}}`; }
+        case "func": return `${e("fName")} ${e("e")}`;
+        case "groupChr": case "box": case "borderBox": case "phant": return e("e");
+        default: return [...el.childNodes].map(di).join("");
+      }
+    };
+    return di(e);
   }
   function napThuVien(url) { return new Promise((ok, loi) => { const s = document.createElement("script"); s.src = url; s.onload = ok; s.onerror = () => loi(new Error("Không tải được bộ đọc PDF (cần có mạng). Thầy cô dùng file Word giúp ạ.")); document.head.appendChild(s); }); }
   async function docPdf(buf) {
@@ -724,7 +1061,7 @@ const DF = (() => {
   async function doc(file) {
     const ten = file.name.replace(/\.[^.]+$/, ""), buf = await file.arrayBuffer();
     if (/\.pdf$/i.test(file.name) || file.type === "application/pdf") { const r = await docPdf(buf); return { cd: tach(r.dong, ten), dong: r.dong.length, kieu: "PDF " + r.trang + " trang" }; }
-    if (/\.docx$/i.test(file.name)) { const d = await docDocx(buf); return { cd: tach(d, ten), dong: d.length, kieu: "Word" }; }
+    if (/\.docx$/i.test(file.name)) { const d = await docDocx(buf); return { cd: tach(d, ten), dong: d.length, kieu: "Word", ct: d.thongTin }; }
     if (/\.(txt|md)$/i.test(file.name)) { const d = new TextDecoder().decode(buf).split(/\r?\n/).map(gon).filter(Boolean); return { cd: tach(d, ten), dong: d.length, kieu: "chữ" }; }
     throw new Error("App nhận file Word (.docx) hoặc PDF. File .doc cũ: mở bằng Word → Lưu thành .docx.");
   }
@@ -749,13 +1086,24 @@ const esc = TT.esc;
 
 function moi() {
   return {
-    tt: { so: "", truong: "", to: "", mon: "", lop: "", ky: "GIỮA HỌC KÌ I", nam: "2026 – 2027", phut: 45, maDe: "", nguoiSoan: "", toTruong: "", cap: "THCS" },
+    tt: { so: "", truong: "", to: "", mon: "", lop: "", ky: "GIỮA HỌC KÌ I", nam: "2026 – 2027", phut: 45, nguoiSoan: "", toTruong: "", cap: "THCS" },
     cd: [],
     dang: { NLC: { bat: true, d: 0.25 }, DS: { bat: true, d: 1, cham: "764" }, TLN: { bat: true, d: 0.25 }, TL: { bat: true, d: 1 } },
-    o: {}, tlDiem: {}, cau: {}, muc: { B: 40, H: 30, V: 30 }
+    o: {}, tlDiem: {}, bo: [{ ma: "", cau: {} }], deHien: 0, muc: { B: 40, H: 30, V: 30 }
   };
 }
-let S = TT.MAU ? JSON.parse(JSON.stringify(MAU_DE)) : (TT.load("soande", null) || moi());
+/* nhiều đề cùng một ma trận: S.bo[i] = {ma, cau}; S.cau luôn trỏ tới đề đang soạn (không lưu trùng) */
+function chuan(x) {
+  if (!x.bo) { x.bo = [{ ma: (x.tt && x.tt.maDe) || "", cau: x.cau || {} }]; delete x.cau; }
+  if (x.tt) delete x.tt.maDe;
+  x.bo.forEach(b => { b.cau = b.cau || {}; b.ma = b.ma || ""; });
+  x.deHien = Math.min(Math.max(0, x.deHien | 0), x.bo.length - 1);
+  Object.defineProperty(x, "cau", { get() { return x.bo[x.deHien].cau; }, set(v) { x.bo[x.deHien].cau = v; }, enumerable: false, configurable: true });
+  return x;
+}
+const tenDe = i => S.bo[i].ma ? "Mã đề " + S.bo[i].ma : "Đề " + (i + 1);
+function voiDe(i, fn) { const cu = S.deHien; S.deHien = i; try { return fn(); } finally { S.deHien = cu; } }
+let S = chuan(TT.MAU ? JSON.parse(JSON.stringify(MAU_DE)) : (TT.load("soande", null) || moi()));
 function luu() { clearTimeout(luu.t); luu.t = setTimeout(() => TT.save("soande", S), 250); }
 function oCua(id) {
   S.o[id] = S.o[id] || {};
@@ -861,7 +1209,7 @@ const KHOA_PA = /(cả\s+[A-D]\s+(và|,)|tất cả|cả (hai|ba|bốn)|đều (
 /* đáp án đúng là phương án dài nhất hẳn (dài hơn mọi nhiễu từ 2 kí tự) → HS dễ đoán */
 function daiNhat(q) {
   if (!q || !q.pa || q.pa.length !== 4 || q.dung == null || q.pa.some(p => !String(p || "").trim())) return false;
-  const n = q.pa.map(p => DF.gon(p).length), L = n[q.dung], M = Math.max(...n.filter((_, i) => i !== q.dung));
+  const n = q.pa.map(p => DF.gon(CT.thuan(p)).length), L = n[q.dung], M = Math.max(...n.filter((_, i) => i !== q.dung));
   return L >= M + 2;
 }
 function daXong(s) {
@@ -900,9 +1248,21 @@ function soat(P, t) {
     (lechDa || maxL > 2) ? them("canh", `Đáp án A–B–C–D: ${dem.map((c, i) => "ABCD"[i] + " " + c).join(" · ")}${maxL > 2 ? ` · có ${maxL} câu liền cùng đáp án` : ""} → bấm «Cân đáp án».`)
       : them("ok", `Đáp án rải đều: ${dem.map((c, i) => "ABCD"[i] + " " + c).join(" · ")}.`);
   }
-  P.TLN.forEach(s => { const q = S.cau[s.k]; if (q && q.da && !/^-?\d+([.,]\d+)?$/.test(String(q.da).trim())) them("canh", `Câu ${s.la}.${s.so}: đáp án trả lời ngắn nên là MỘT SỐ (đang là «${q.da}»).`); else if (q && q.da && String(q.da).trim().length > 4) them("canh", `Câu ${s.la}.${s.so}: đáp án quá 4 kí tự — phiếu trả lời ngắn thường có 4 ô.`); });
+  P.TLN.forEach(s => { const q = S.cau[s.k]; if (q && q.da && !/^-?\d+([.,]\d+)?$/.test(CT.thuan(q.da).trim())) them("canh", `Câu ${s.la}.${s.so}: đáp án trả lời ngắn nên là MỘT SỐ (đang là «${q.da}»).`); else if (q && q.da && CT.thuan(q.da).trim().length > 4) them("canh", `Câu ${s.la}.${s.so}: đáp án quá 4 kí tự — phiếu trả lời ngắn thường có 4 ô.`); });
   P.TL.forEach(s => { const q = S.cau[s.k]; if (q && q.hdc && q.hdc.length) { const c = tong(q.hdc.map(h => so(h.d))); if (Math.abs(c - s.diem) > .001) them("loi", `Câu ${s.la}.${s.so}: hướng dẫn chấm cộng ${f2(c)} điểm, câu là ${f2(s.diem)} điểm.`); } });
   const de = {}; P.phan.forEach(d => P[d].forEach(s => { const q = S.cau[s.k]; if (!q || !q.de) return; const k = DF.gon(q.de).toLowerCase(); if (de[k]) them("canh", `Câu ${s.la}.${s.so} trùng câu dẫn với ${de[k]}.`); else de[k] = s.la + "." + s.so; }));
+  if (S.bo.length > 1) {
+    const khac = {}; S.bo.forEach((b, i) => { if (i === S.deHien) return; Object.values(b.cau).forEach(q => { if (q && q.de) khac[DF.gon(q.de).toLowerCase()] = tenDe(i); }); });
+    P.phan.forEach(d => P[d].forEach(s => { const q = S.cau[s.k]; if (q && q.de && khac[DF.gon(q.de).toLowerCase()]) them("canh", `Câu ${s.la}.${s.so} trùng nguyên câu hỏi với ${khac[DF.gon(q.de).toLowerCase()]} — đề tương đương cần đổi ngữ liệu, số liệu.`); }));
+  }
+  // công thức Toán, Lí, Hoá: lỗi cú pháp → Word sẽ hỏng công thức
+  let nCT = 0;
+  P.phan.forEach(d => P[d].forEach(s => {
+    const q = S.cau[s.k]; if (!q) return;
+    const o = [["câu hỏi", q.de], ...(q.pa || []).map((p, i) => ["phương án " + "ABCD"[i], p]), ...(q.y || []).map((y, i) => ["ý " + "abcd"[i] + ")", y && y.t]), ["đáp án", q.da], ...(q.hdc || []).map((h, i) => ["HDC ý " + (i + 1), h && h.nd])];
+    o.forEach(([ten, chu]) => { if (!chu) return; nCT += CT.tach(chu).filter(p => p.t === "ct").length; CT.kiem(chu).forEach(l => them("loi", `Câu ${s.la}.${s.so} (${ten}): công thức ${l}.`)); });
+  }));
+  if (nCT) them("ok", `${nCT} công thức đọc được — xuất ra thành công thức Word (Equation), sửa được trong Word.`);
   const dai = P.NLC.filter(s => daiNhat(S.cau[s.k]));
   if (dai.length) them("canh", `Đáp án đúng đang là phương án DÀI NHẤT ở ${dai.length} câu: ${dai.map(s => s.la + "." + s.so).join(", ")} — học sinh dễ đoán. Sửa cho phương án nhiễu dài tương đương, hoặc bấm «Câu lệnh sửa phương án».`);
   else if (P.NLC.some(s => S.cau[s.k] && S.cau[s.k].dung != null)) them("ok", "Không câu nào có đáp án đúng dài nhất hẳn so với phương án nhiễu.");
@@ -947,7 +1307,7 @@ YÊU CẦU CHUNG
 - Chỉ dùng kiến thức trong phần NỘI DUNG BÀI HỌC ở cuối (giáo viên cung cấp). Không đưa kiến thức ngoài phạm vi, không bịa số liệu.
 - Mỗi câu đo đúng yêu cầu cần đạt (YCCĐ) và đúng mức độ ghi ở từng câu. Ngữ liệu, số liệu, tình huống mới — không chép nguyên câu hỏi, bài tập có sẵn trong bài.
 - Lệnh hỏi rõ, một nghĩa, đúng thuật ngữ của sách. Viết tiếng Việt chuẩn.
-- Chỉ số viết x^2, H_2O, 10^{-3}. Không dùng LaTeX, không dùng Markdown (không **, không #, không bảng).
+- MỌI công thức Toán, Vật lí, Hoá học viết LaTeX đặt giữa hai dấu $, mỗi công thức nằm trọn trên một dòng. Ví dụ: $\\frac{2}{3}$, $\\sqrt{x+1}$, $x^2-5x+6=0$, $\\begin{cases} x+y=3 \\\\ 2x-y=0 \\end{cases}$, $\\widehat{ABC}=60^\\circ$, $\\Delta ABC$, $v=\\frac{s}{t}$, $10^{-3}$, $H_2SO_4$, $Fe^{3+}$, $2H_2+O_2 \\xrightarrow{t^\\circ} 2H_2O$. Không dùng \\( \\), \\[ \\], $$; không viết công thức bằng ảnh hay chữ thường kiểu x2, H2O. Không dùng Markdown (không **, không #, không bảng).
 - Giữ đúng nhãn [${ds[0].la}.${ds[0].so}]… ở đầu mỗi câu, đúng thứ tự, không thêm lời mở đầu hay kết luận.
 `;
   if (co("NLC")) s += `- Phần ${la("NLC")} (nhiều lựa chọn): 4 phương án A, B, C, D, chỉ 1 phương án đúng; các phương án dài tương đương, cùng cấu trúc ngữ pháp, nhiễu hợp lí; ĐÁP ÁN ĐÚNG KHÔNG ĐƯỢC LÀ PHƯƠNG ÁN DÀI NHẤT — luôn có ít nhất một phương án nhiễu dài bằng hoặc dài hơn, đáp án đúng không chi tiết hơn hẳn các phương án khác; không dùng «Cả A và B», «Tất cả đều đúng». Cuối câu ghi «Đáp án: X».
@@ -957,6 +1317,8 @@ YÊU CẦU CHUNG
   if (co("TLN")) s += `- Phần ${la("TLN")} (trả lời ngắn): đáp án là MỘT SỐ, tối đa 4 kí tự kể cả dấu phẩy và dấu trừ; ghi rõ yêu cầu làm tròn nếu có. Không hỏi «mấy câu», «mấy từ». Cuối câu ghi «Đáp án: …».
 `;
   if (co("TL")) s += `- Phần ${la("TL")} (tự luận): ghi đúng số điểm của câu; có thể chia ý a), b). Sau câu hỏi viết dòng «Hướng dẫn chấm:» rồi từng ý một dòng, cuối mỗi dòng ghi điểm trong ngoặc, ví dụ «- Nêu đúng …(0,5 điểm)»; tổng điểm các ý bằng điểm của câu.
+`;
+  if (S.bo.length > 1) s += `- ĐÂY LÀ ${tenDe(S.deHien).toUpperCase()} trong bộ ${S.bo.length} đề TƯƠNG ĐƯƠNG trên cùng một ma trận: giữ đúng chủ đề, YCCĐ, mức độ, dạng câu và độ khó của từng câu; nhưng đổi ngữ liệu, số liệu, tình huống, cách hỏi — KHÔNG lặp lại câu hỏi ở các đề khác (ghi kèm từng câu bên dưới nếu đã có).
 `;
   s += `
 KHUÔN TRẢ LỜI (làm đúng như mẫu)
@@ -987,7 +1349,7 @@ Hướng dẫn chấm:
 `;
   s += `
 DANH SÁCH ${ds.length} CÂU CẦN SOẠN
-${ds.map(moTaO).join("\n")}
+${ds.map(s => { let m = moTaO(s); if (S.bo.length > 1) { const cu = S.bo.map((b, i) => i !== S.deHien && b.cau[s.k] && b.cau[s.k].de ? tenDe(i) + " đã hỏi: «" + DF.gon(b.cau[s.k].de).slice(0, 160) + "»" : "").filter(Boolean); if (cu.length) m += " | " + cu.join(" ; "); } return m; }).join("\n")}
 
 NỘI DUNG BÀI HỌC (giáo viên cung cấp)
 ${noiDung}
@@ -1003,7 +1365,7 @@ function lenhSuaDai() {
 - Giữ nguyên câu hỏi, giữ nguyên nội dung và VỊ TRÍ (chữ cái) của đáp án đúng.
 - Làm cho 4 phương án dài tương đương, cùng cấu trúc: viết gọn đáp án đúng và/hoặc viết các phương án nhiễu đầy đủ hơn, sao cho ít nhất một phương án nhiễu dài bằng hoặc dài hơn đáp án đúng.
 - Phương án nhiễu vẫn phải SAI rõ ràng, hợp lí, đúng phạm vi bài học; không dùng «Cả A và B», «Tất cả đều đúng».
-- Không dùng Markdown. Trả lời đúng khuôn, giữ nguyên nhãn, không thêm lời mở đầu:
+- Giữ nguyên công thức LaTeX trong $…$ (mỗi công thức trên một dòng). Không dùng Markdown. Trả lời đúng khuôn, giữ nguyên nhãn, không thêm lời mở đầu:
 [I.1] Câu hỏi …
 A. …
 B. …
@@ -1075,7 +1437,7 @@ function docCau(d, than, s) {
 function docTraLoi(txt) {
   const P = khe(), map = {};
   P.phan.forEach(d => P[d].forEach(s => map[s.la + "." + s.so] = s));
-  txt = String(txt || "").replace(/\r/g, "").replace(/\*\*|__|`/g, "").replace(/^#+\s*/gm, "").replace(/\\\(|\\\)|\$/g, "");
+  txt = String(txt || "").replace(/\r/g, "").replace(/\*\*|__|`/g, "").replace(/^#+\s*/gm, "").replace(/\\\(|\\\)/g, "$").replace(/\$\$|\\\[|\\\]/g, "$").replace(/\$[^$]*\$/g, m => m.replace(/\s*\n\s*/g, " "));
   const re = /^\s*\[?\s*(IV|I{1,3})\s*[.\-]\s*(\d+)\s*\]?\s*[:.)]?/gm, moc = []; let m;
   while ((m = re.exec(txt))) moc.push({ k: m[1] + "." + m[2], i: m.index, j: re.lastIndex });
   let duoc = 0, loi = [];
@@ -1215,16 +1577,17 @@ function kyTen(rong) {
   return { t: "bang", vien: false, cot: [rong / 3, rong / 3, rong / 3], hang: [[o("DUYỆT CỦA BAN GIÁM HIỆU", ""), o("TỔ TRƯỞNG CHUYÊN MÔN", tt.toTruong), o("NGƯỜI RA ĐỀ", tt.nguoiSoan)]] };
 }
 function luaChon(q, rong) {
-  const tw = DX.cm(rong), thut = 284, len = Math.max(...q.pa.map(p => String(p).length));
+  const tw = DX.cm(rong), thut = 284, len = Math.max(...q.pa.map(p => CT.thuan(p).length + (CT.coCT(p) ? 4 : 0)));
   const r = i => [{ t: "ABCD"[i] + ". ", b: true }, ...R(q.pa[i])];
   if (len <= 15) { const b = (tw - thut) / 4; return [P_([...r(0), { tab: true }, ...r(1), { tab: true }, ...r(2), { tab: true }, ...r(3)], { thut, tab: [1, 2, 3].map(k => Math.round(thut + b * k)), jc: "left" })]; }
   if (len <= 34) { const b = (tw - thut) / 2; return [P_([...r(0), { tab: true }, ...r(1)], { thut, tab: [Math.round(thut + b)], jc: "left" }), P_([...r(2), { tab: true }, ...r(3)], { thut, tab: [Math.round(thut + b)], jc: "left" })]; }
   return [0, 1, 2, 3].map(i => P_(r(i), { thut: thut + 340, treo: 340 }));
 }
+const dongMa = () => S.bo[S.deHien].ma ? "Mã đề: " + S.bo[S.deHien].ma : S.bo.length > 1 ? "ĐỀ SỐ " + (S.deHien + 1) : "";
 function phanDe(P, t) {
   const rong = 16.5, tt = S.tt, khoi = [];
   khoi.push(dauVb(rong, [[`ĐỀ KIỂM TRA ${tenKy()}`, { b: true }], [`NĂM HỌC ${tt.nam || "…"}`, { b: true }], [monLop(), { b: true }], [`Thời gian làm bài: ${tt.phut || "…"} phút`, { i: true }], ["(không kể thời gian phát đề)", { i: true }]]));
-  if (tt.maDe) khoi.push(P_([{ t: "Mã đề: " + tt.maDe, b: true }], { jc: "right", sau: 0 }));
+  if (dongMa()) khoi.push(P_([{ t: dongMa(), b: true }], { jc: "right", sau: 0 }));
   khoi.push(P_([{ t: "Họ và tên: ………………………………………………… Lớp: ………… SBD: …………" }], { truoc: 160, sau: 160, jc: "left" }));
   P.phan.forEach(d => {
     const ds = P[d], la = ds[0].la, n = ds.length, diem = t.dang[d];
@@ -1247,7 +1610,7 @@ function phanDe(P, t) {
 function phanHdc(P, t) {
   const rong = 16.5, tt = S.tt, D = S.dang, khoi = [];
   khoi.push(dauVb(rong, [["HƯỚNG DẪN CHẤM", { b: true }], [`ĐỀ KIỂM TRA ${tenKy()}`, { b: true }], [`NĂM HỌC ${tt.nam || "…"}`, { b: true }], [monLop(), { b: true }]]));
-  if (tt.maDe) khoi.push(P_([{ t: "Mã đề: " + tt.maDe, b: true }], { jc: "right", sau: 0 }));
+  if (dongMa()) khoi.push(P_([{ t: dongMa(), b: true }], { jc: "right", sau: 0 }));
   const H = n => ({ t: n, b: true, jc: "center", nen: "D9E2F3" });
   P.phan.forEach(d => {
     const ds = P[d], la = ds[0].la;
@@ -1290,8 +1653,8 @@ function dungPhan(chon) {
   if (!P.phan.length) return out;
   if (chon.mt) out.push(phanMaTran(P, t));
   if (chon.dt) out.push(phanDacTa(P, t));
-  if (chon.de) out.push(phanDe(P, t));
-  if (chon.hd) out.push(phanHdc(P, t));
+  const ds = chon.ds || [S.deHien];
+  ds.forEach(i => voiDe(i, () => { if (chon.de) out.push(phanDe(P, t)); if (chon.hd) out.push(phanHdc(P, t)); }));
   return out;
 }
 
@@ -1350,7 +1713,7 @@ async function napFile(files) {
       const r = await DF.doc(f);
       themCd(r.cd, f.name);
       const nYc = tong(r.cd.map(c => MUC.filter(m => c.yc[m]).length));
-      tt.innerHTML = `<div class="ok-dong">✔ ${esc(f.name)} (${r.kieu}): nhận ra <b>${r.cd.length}</b> bài/chủ đề, ${nYc} nhóm yêu cầu cần đạt. Thầy cô nhập <b>số tiết</b> từng bài.</div>`;
+      tt.innerHTML = `<div class="ok-dong">✔ ${esc(f.name)} (${r.kieu}): nhận ra <b>${r.cd.length}</b> bài/chủ đề, ${nYc} nhóm yêu cầu cần đạt. Thầy cô nhập <b>số tiết</b> từng bài.</div>` + (r.ct && r.ct.nCT ? `<div class="ok-dong" style="margin-top:6px">∑ Giữ được <b>${r.ct.nCT}</b> công thức Equation (phân số, căn, mũ…) để AI đọc đúng.</div>` : "") + (r.ct && r.ct.nOle ? `<div class="canh" style="margin-top:6px">⚠ File có <b>${r.ct.nOle}</b> công thức MathType/đối tượng nhúng — app không đọc được chữ bên trong. Thầy cô gõ lại công thức quan trọng vào ô «Nội dung» của bài, hoặc trong Word chọn MathType → Convert Equations sang Word Equation rồi nạp lại.</div>` : "");
       TT.ting();
     } catch (e) { tt.innerHTML = `<div class="canh">✖ ${esc(f.name)}: ${esc(e.message || e)}</div>`; TT.buzz(); }
   }
@@ -1393,6 +1756,20 @@ function veB3() {
   if (document.activeElement !== $("ghiChu")) $("ghiChu").value = S.ghiChu || "";
 }
 /* ---------- bước 4 ---------- */
+/* xem trước công thức của một câu (chỉ hiện khi câu có công thức hoặc chỉ số) */
+function xemCau(q, d) {
+  if (!q) return "";
+  const o = [q.de, ...(q.pa || []), ...((q.y || []).map(y => y && y.t)), q.da, ...((q.hdc || []).map(h => h && h.nd))].filter(Boolean);
+  if (!o.some(x => CT.coCT(x) || /[\^_]/.test(x))) return "";
+  const h = CT.htmlChu, dong = [];
+  String(q.de || "").split("\n").forEach(x => dong.push(h(x)));
+  if (d === "NLC" && q.pa) dong.push(`<span class="xem-pa">${q.pa.map((p, i) => `<span><b>${"ABCD"[i]}.</b> ${h(p)}</span>`).join("")}</span>`);
+  if (d === "DS" && q.y) q.y.forEach((y, i) => dong.push(`<b>${"abcd"[i]})</b> ${h(y && y.t)}`));
+  if (d === "TLN" && q.da) dong.push(`<b>Đáp án:</b> ${h(q.da)}`);
+  if (d === "TL" && q.hdc) q.hdc.forEach(x => x && x.nd && dong.push("– " + h(x.nd)));
+  const loi = o.flatMap(x => CT.kiem(x));
+  return `<div class="xem-nhan">∑ Xem trước công thức (như trong Word)${loi.length ? ` <span class="do">· ${esc(loi[0])}</span>` : ""}</div>` + dong.map(x => `<div>${x}</div>`).join("");
+}
 function moiCau(s) {
   if (s.d === "NLC") return { de: "", pa: ["", "", "", ""], dung: null };
   if (s.d === "DS") return { de: "", y: s.ys.map(() => ({ t: "", d: null })) };
@@ -1413,7 +1790,7 @@ function veSoan() {
       if (d === "DS") b += `<div class="ds">${s.ys.map((m, i) => { const y = (q.y || [])[i] || {}; return `<div class="ds-o"><b>${"abcd"[i]})</b>${MUC_CHIP(m)}<input data-f="y${i}-${k}" data-q="${k}" data-x="y.${i}" value="${esc(y.t || "")}"><span class="ds-ds"><button class="${y.d === true ? "chon d" : ""}" data-q="${k}" data-yd="${i}|1">Đúng</button><button class="${y.d === false ? "chon s" : ""}" data-q="${k}" data-yd="${i}|0">Sai</button></span></div>`; }).join("")}</div>`;
       if (d === "TLN") b += `<label class="o tln">Đáp án (một số)<input data-f="da-${k}" data-q="${k}" data-x="da" value="${esc(q.da || "")}" inputmode="decimal" placeholder="VD: 12,5"></label>`;
       if (d === "TL") b += `<div class="hdc"><div class="mo nho2">Hướng dẫn chấm — tổng phải bằng <b>${f2(s.diem)}</b> điểm (đang ${f2(tong((q.hdc || []).map(x => so(x.d))))})</div>${(q.hdc || []).map((x, i) => `<div class="hdc-o"><input data-f="h${i}-${k}" data-q="${k}" data-x="hdc.${i}.nd" value="${esc(x.nd)}" placeholder="Ý cần đạt…"><input class="hdc-d" data-f="hd${i}-${k}" data-q="${k}" data-x="hdc.${i}.d" value="${esc(x.d)}" placeholder="điểm" inputmode="decimal"><button class="nut phu nho" data-q="${k}" data-bohdc="${i}">✕</button></div>`).join("")}<button class="nut phu nho" data-q="${k}" data-themhdc="1">＋ Thêm ý chấm</button></div>`;
-      return `<div class="cau-o ${ok ? "xong" : ""}" id="c-${k}"><div class="cau-dau"><span class="cau-so">${s.la}.${s.so}</span>${d === "DS" ? [...new Set(s.ys)].map(MUC_CHIP).join("") : MUC_CHIP(s.m)}<span class="mo nho2">${esc(s.cd.ten)}${d === "TL" ? " · " + f2(s.diem) + " điểm" : ""}</span><span class="canh-dai"${d === "NLC" && daiNhat(q) ? "" : " hidden"} title="Học sinh dễ đoán đáp án đúng vì nó dài nhất">⚠ đáp án đúng dài nhất</span><span class="cau-tt">${ok ? "✔ đủ" : "… chưa đủ"}</span><button class="nut phu nho" data-q="${k}" data-xoacau="1" title="Xoá nội dung câu">🧹</button></div>${b}</div>`;
+      return `<div class="cau-o ${ok ? "xong" : ""}" id="c-${k}"><div class="cau-dau"><span class="cau-so">${s.la}.${s.so}</span>${d === "DS" ? [...new Set(s.ys)].map(MUC_CHIP).join("") : MUC_CHIP(s.m)}<span class="mo nho2">${esc(s.cd.ten)}${d === "TL" ? " · " + f2(s.diem) + " điểm" : ""}</span><span class="canh-dai"${d === "NLC" && daiNhat(q) ? "" : " hidden"} title="Học sinh dễ đoán đáp án đúng vì nó dài nhất">⚠ đáp án đúng dài nhất</span><span class="cau-tt">${ok ? "✔ đủ" : "… chưa đủ"}</span><button class="nut phu nho" data-q="${k}" data-xoacau="1" title="Xoá nội dung câu">🧹</button></div>${b}<div class="xem-ct" data-xem="${k}">${xemCau(S.cau[s.k], d)}</div></div>`;
     }).join("") + "</div>").join("");
   veDapAn(P);
 }
@@ -1431,6 +1808,32 @@ function veKiem() {
   $("dsKiem2").innerHTML = $("dsKiem").innerHTML;
   return { nLoi, nCanh };
 }
+/* ---------- nhiều đề ---------- */
+const xuatChon = new Set();
+function tienDoDe(i) { return voiDe(i, () => { const P = khe(), tat = P.phan.flatMap(d => P[d]); return { xong: tat.filter(daXong).length, tong: tat.length }; }); }
+function veDe() {
+  const n = S.bo.length;
+  if (document.activeElement !== $("soDe")) $("soDe").value = n;
+  $("soDeIcon").textContent = n;
+  $("dsMaDe").innerHTML = S.bo.map((b, i) => `<label>Đề ${i + 1} · mã đề <input data-f="ma-${i}" data-ma="${i}" value="${esc(b.ma)}" placeholder="${n > 1 ? "VD: " + (101 + i) : "(nếu có)"}"></label>`).join("");
+  const nut = S.bo.map((b, i) => { const p = tienDoDe(i), du = p.tong && p.xong === p.tong; return `<button data-de="${i}" class="${i === S.deHien ? "chon" : ""}${du ? " du" : ""}">${du ? "✔ " : ""}${esc(tenDe(i))}<small>${p.xong}/${p.tong} câu</small><i><b style="width:${p.tong ? p.xong / p.tong * 100 : 0}%"></b></i></button>`; }).join("");
+  $("chonDe4").innerHTML = n > 1 ? `<span class="nho2 mo" style="align-self:center">Đang soạn:</span>` + nut : "";
+  $("chonDe5").innerHTML = n > 1 ? `<span class="nho2 mo" style="align-self:center">Xem trước:</span>` + nut : "";
+  for (const i of [...xuatChon]) if (i >= n) xuatChon.delete(i);
+  $("hopXuatDe").classList.toggle("an", n < 2);
+  $("xuatDe").innerHTML = S.bo.map((b, i) => `<label class="tl-o"><input type="checkbox" data-xd="${i}" ${xuatChon.has(i) ? "checked" : ""} style="width:18px;min-height:0"> 📄 ${esc(tenDe(i))} + hướng dẫn chấm</label>`).join("");
+}
+function datSoDe(n) {
+  n = Math.max(1, Math.min(10, n | 0));
+  if (n < S.bo.length) {
+    const bo = S.bo.slice(n).filter(b => Object.keys(b.cau).length);
+    if (bo.length && !confirm(`Bớt còn ${n} đề sẽ xoá câu hỏi đã soạn của ${S.bo.length - n} đề cuối. Tiếp tục?`)) { veDe(); return; }
+    S.bo.length = n;
+  }
+  while (S.bo.length < n) { const tr = S.bo[S.bo.length - 1].ma, so = /^\d+$/.test(tr) ? String(+tr + 1) : ""; S.bo.push({ ma: so, cau: {} }); xuatChon.add(S.bo.length - 1); }
+  if (S.deHien >= n) S.deHien = n - 1;
+  luu(); ve(); TT.ting();
+}
 /* ---------- bước 5 ---------- */
 let tabXem = "de";
 function chonPhan() { const c = {}; document.querySelectorAll("[data-p]").forEach(i => c[i.dataset.p] = i.checked); return c; }
@@ -1447,11 +1850,11 @@ function veXem() {
 }
 function veBuoc() {
   const P = khe(), t = tinh(P), tat = P.phan.flatMap(d => P[d]);
-  const tr = [!!(S.tt.mon && S.tt.lop), S.cd.length > 0, tat.length > 0 && Math.abs(t.tong - 10) < .001, tat.length > 0 && tat.every(daXong), !!S.daXuat];
+  const tr = [!!(S.tt.mon && S.tt.lop), S.cd.length > 0, tat.length > 0 && Math.abs(t.tong - 10) < .001, tat.length > 0 && S.bo.every((b, i) => { const p = tienDoDe(i); return p.tong && p.xong === p.tong; }), !!S.daXuat];
   document.querySelectorAll("#thanhBuoc a").forEach((a, i) => { a.classList.toggle("xong", tr[i]); });
   $("tienDo").style.width = (tr.filter(Boolean).length / 5 * 100) + "%";
 }
-function ve() { veB1(); veB2(); veB3(); veSoan(); veKiem(); veXem(); veBuoc(); }
+function ve() { veB1(); veB2(); veB3(); veDe(); veSoan(); veKiem(); veXem(); veBuoc(); }
 
 /* ---------- gắn sự kiện ---------- */
 function datGiaTri(q, duong, v) {
@@ -1463,7 +1866,7 @@ function datGiaTri(q, duong, v) {
 }
 function timKhe(k) { const P = khe(); return P.phan.flatMap(d => P[d]).find(s => s.k === k); }
 function layCau(k) { if (!S.cau[k]) { const s = timKhe(k); S.cau[k] = s ? moiCau(s) : {}; } return S.cau[k]; }
-function capNhat() { luu(); veKiem(); veBuoc(); veXem(); }
+function capNhat() { luu(); veKiem(); veBuoc(); veXem(); clearTimeout(capNhat.t); capNhat.t = setTimeout(() => giuFocus(veDe), 400); }
 
 document.addEventListener("DOMContentLoaded", () => {
   document.querySelectorAll("[data-tt]").forEach(i => i.addEventListener("input", () => { S.tt[i.dataset.tt] = i.dataset.tt === "phut" ? (+i.value || i.value) : i.value; capNhat(); }));
@@ -1517,6 +1920,14 @@ document.addEventListener("DOMContentLoaded", () => {
   $("dsTl").addEventListener("input", e => { const i = e.target; if (!i.dataset.tl) return; S.tlDiem[i.dataset.tl] = so(i.value); luu(); giuFocus(() => { veB3(); veSoan(); }); veKiem(); veBuoc(); veXem(); });
   MUC.forEach(m => $("muc" + m).addEventListener("input", () => { S.muc[m] = so($("muc" + m).value); luu(); giuFocus(veB3); veKiem(); }));
   $("ghiChu").addEventListener("input", () => { S.ghiChu = $("ghiChu").value; capNhat(); });
+  // nhiều đề
+  S.bo.forEach((b, i) => xuatChon.add(i));
+  $("bDeTru").addEventListener("click", () => datSoDe(S.bo.length - 1));
+  $("bDeCong").addEventListener("click", () => datSoDe(S.bo.length + 1));
+  $("soDe").addEventListener("change", () => datSoDe(parseInt($("soDe").value, 10) || 1));
+  $("dsMaDe").addEventListener("input", e => { const i = e.target.dataset.ma; if (i == null) return; S.bo[+i].ma = e.target.value.trim(); luu(); giuFocus(veDe); veXem(); });
+  ["chonDe4", "chonDe5"].forEach(id => $(id).addEventListener("click", e => { const b = e.target.closest("[data-de]"); if (!b) return; S.deHien = +b.dataset.de; luu(); ve(); TT.toast("Đang soạn " + tenDe(S.deHien), ""); }));
+  $("xuatDe").addEventListener("change", e => { const i = e.target.dataset.xd; if (i == null) return; e.target.checked ? xuatChon.add(+i) : xuatChon.delete(+i); });
   // bước 4
   $("bLenh").addEventListener("click", () => chepLenh(false));
   $("bLenhTrong").addEventListener("click", () => chepLenh(true));
@@ -1534,7 +1945,7 @@ document.addEventListener("DOMContentLoaded", () => {
   $("dsCau").addEventListener("input", e => {
     const i = e.target; if (!i.dataset.q || !i.dataset.x) return;
     const q = layCau(i.dataset.q); datGiaTri(q, i.dataset.x, i.value);
-    const the = i.closest(".cau-o"), s = timKhe(i.dataset.q); if (the && s) { const ok = daXong(s); the.classList.toggle("xong", ok); the.querySelector(".cau-tt").textContent = ok ? "✔ đủ" : "… chưa đủ"; if (s.d === "NLC") { const dn = daiNhat(S.cau[s.k]); the.querySelector(".canh-dai").hidden = !dn; the.querySelectorAll(".pa-o").forEach((o, i) => o.classList.toggle("dai", dn && S.cau[s.k].dung === i)); } }
+    const the = i.closest(".cau-o"), s = timKhe(i.dataset.q); if (the && s) { const ok = daXong(s); the.classList.toggle("xong", ok); the.querySelector(".cau-tt").textContent = ok ? "✔ đủ" : "… chưa đủ"; the.querySelector(".xem-ct").innerHTML = xemCau(S.cau[s.k], s.d); if (s.d === "NLC") { const dn = daiNhat(S.cau[s.k]); the.querySelector(".canh-dai").hidden = !dn; the.querySelectorAll(".pa-o").forEach((o, i) => o.classList.toggle("dai", dn && S.cau[s.k].dung === i)); } }
     capNhat();
   });
   $("dsCau").addEventListener("click", e => {
@@ -1551,8 +1962,8 @@ document.addEventListener("DOMContentLoaded", () => {
   document.querySelectorAll("#tabXem button").forEach(b => b.addEventListener("click", () => { tabXem = b.dataset.tab; veXem(); }));
   $("bXuat").addEventListener("click", xuatWord); $("bXuat2").addEventListener("click", xuatWord);
   $("bSaoLuu").addEventListener("click", () => TT.saoLuu(["soande"], "soan-de"));
-  $("bNhap").addEventListener("click", () => TT.nhapLai(["soande"], () => { S = TT.load("soande", moi()); ve(); }));
-  $("bMoi").addEventListener("click", () => { if (!confirm("Làm đề mới? Đề đang làm sẽ bị xoá khỏi máy này (thầy cô Sao lưu trước nếu cần).")) return; const giu = S.tt; S = moi(); ["so", "truong", "to", "mon", "nguoiSoan", "toTruong", "nam", "cap"].forEach(k => S.tt[k] = giu[k]); luu(); ve(); });
+  $("bNhap").addEventListener("click", () => TT.nhapLai(["soande"], () => { S = chuan(TT.load("soande", moi())); xuatChon.clear(); S.bo.forEach((b, i) => xuatChon.add(i)); ve(); }));
+  $("bMoi").addEventListener("click", () => { if (!confirm("Làm đề mới? Đề đang làm sẽ bị xoá khỏi máy này (thầy cô Sao lưu trước nếu cần).")) return; const giu = S.tt; S = chuan(moi()); xuatChon.clear(); xuatChon.add(0); ["so", "truong", "to", "mon", "nguoiSoan", "toTruong", "nam", "cap"].forEach(k => S.tt[k] = giu[k]); luu(); ve(); });
   document.querySelectorAll("#thanhBuoc a").forEach(a => a.addEventListener("click", e => { e.preventDefault(); $(a.getAttribute("href").slice(1)).scrollIntoView({ behavior: "smooth", block: "start" }); }));
   window.addEventListener("resize", () => veDapAn(khe()));
   ve();
@@ -1575,12 +1986,14 @@ function chepLenh(chiTrong) {
 async function xuatWord() {
   const c = chonPhan();
   if (!Object.values(c).some(Boolean)) { TT.toast("Thầy cô chọn ít nhất một phần để xuất ạ", "loi"); return; }
+  c.ds = S.bo.length > 1 ? [...xuatChon].sort((a, b) => a - b) : [0];
+  if ((c.de || c.hd) && !c.ds.length) { TT.toast("Thầy cô tick ít nhất một đề để xuất ạ", "loi"); return; }
   const ph = dungPhan(c);
   if (!ph.length) { TT.toast("Ma trận chưa có câu nào", "loi"); TT.buzz(); return; }
   const k = veKiem();
   try {
     const blob = await DX.taoDocx(ph);
-    const ten = ("De KT " + (S.tt.ky || "") + " " + (S.tt.mon || "") + " " + (S.tt.lop || "")).trim().replace(/[\\/:*?"<>|]+/g, "").replace(/\s+/g, "_") + ".docx";
+    const ten = ("De KT " + (S.tt.ky || "") + " " + (S.tt.mon || "") + " " + (S.tt.lop || "")).trim().replace(/[\\/:*?"<>|]+/g, "").replace(/\s+/g, "_") + (c.ds.length > 1 && (c.de || c.hd) ? "_" + c.ds.length + "-de" : S.bo.length > 1 && (c.de || c.hd) ? "_" + tenDe(c.ds[0]).replace(/\s+/g, "-") : "") + ".docx";
     TT.taiVe(ten, blob, blob.type);
     S.daXuat = true; luu(); veBuoc();
     if (k.nLoi) TT.toast(`Đã xuất Word — còn ${k.nLoi} lỗi ở phần soát, thầy cô xem lại trước khi dùng`, "");
