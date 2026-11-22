@@ -97,38 +97,852 @@
 
     
     const INITIAL_MATERIALS = [
-      {
-        id: 'mat_1',
-        title: 'Bản vẽ chi tiết trục ren - CAD 2D chuẩn TCVN',
-        category: 'CAD_DRAWING',
-        file_path: 'materials/cad/truc_ren_chi_tiet_lop8.dwg',
-        file_size: '2.4 MB',
-        file_type: 'DWG/PDF',
-        created_at: '2026-08-20',
-        description: 'Bản vẽ kỹ thuật chi tiết dùng cho tiết thực hành môn Công nghệ lớp 8'
-      },
-      {
-        id: 'mat_2',
-        title: 'Slide bài giảng Mô hình nhà kính thông minh STEM',
-        category: 'SLIDE',
-        file_path: 'materials/slides/nha_kinh_thong_minh_lop8.pptx',
-        file_size: '15.8 MB',
-        file_type: 'PPTX',
-        created_at: '2026-08-22',
-        description: 'Bộ slide trực quan có chèn video và câu hỏi tương tác mở đầu'
-      },
-      {
-        id: 'mat_3',
-        title: 'Đề kiểm tra giữa kỳ I môn Công nghệ 8 (Ma trận + Đáp án)',
-        category: 'EXAM',
-        file_path: 'materials/exams/de_thi_giua_ky_1_cn8.docx',
-        file_size: '540 KB',
-        file_type: 'DOCX',
-        created_at: '2026-08-23',
-        description: 'Đề thi chuẩn 4 mức độ nhận thức theo định hướng Thông tư 22'
-      }
-    ];
-
+  {
+    "id": "mat_1",
+    "title": "Bản vẽ chi tiết trục ren - CAD 2D chuẩn TCVN",
+    "category": "CAD_DRAWING",
+    "grade": "8",
+    "file_path": "materials/cad/truc_ren_chi_tiet_lop8.dwg",
+    "download_url": "materials/cad/truc_ren_chi_tiet_lop8.dwg",
+    "view_url": "materials/cad/truc_ren_chi_tiet_lop8.dwg",
+    "size": "2.4 MB",
+    "file_size": "2.4 MB",
+    "file_type": "DWG/PDF",
+    "downloads": 342,
+    "created_at": "2026-08-20",
+    "description": "Bản vẽ kỹ thuật chi tiết dùng cho tiết thực hành môn Công nghệ lớp 8"
+  },
+  {
+    "id": "mat_2",
+    "title": "Slide bài giảng Mô hình nhà kính thông minh STEM",
+    "category": "SLIDE",
+    "grade": "8",
+    "file_path": "materials/slides/nha_kinh_thong_minh_lop8.pptx",
+    "download_url": "materials/slides/nha_kinh_thong_minh_lop8.pptx",
+    "view_url": "materials/slides/nha_kinh_thong_minh_lop8.pptx",
+    "size": "15.8 MB",
+    "file_size": "15.8 MB",
+    "file_type": "PPTX",
+    "downloads": 528,
+    "created_at": "2026-08-22",
+    "description": "Bộ slide trực quan có chèn video và câu hỏi tương tác mở đầu"
+  },
+  {
+    "id": "mat_3",
+    "title": "Đề kiểm tra giữa kỳ I môn Công nghệ 8 (Ma trận + Đáp án)",
+    "category": "EXAM",
+    "grade": "8",
+    "file_path": "materials/exams/de_thi_giua_ky_1_cn8.docx",
+    "download_url": "materials/exams/de_thi_giua_ky_1_cn8.docx",
+    "view_url": "materials/exams/de_thi_giua_ky_1_cn8.docx",
+    "size": "540 KB",
+    "file_size": "540 KB",
+    "file_type": "DOCX",
+    "downloads": 415,
+    "created_at": "2026-08-23",
+    "description": "Đề thi chuẩn 4 mức độ nhận thức theo định hướng Thông tư 22"
+  },
+  {
+    "id": "mat_game_4",
+    "title": "01 . Thư Viện STEM-STEAM.png",
+    "category": "SLIDE",
+    "grade": "Tư liệu",
+    "file_path": "https://drive.google.com/file/d/1v3gpijLS5cB4jHL6SGuZsJAIy6xI4G8-/view?usp=sharing",
+    "download_url": "https://drive.google.com/uc?export=download&id=1v3gpijLS5cB4jHL6SGuZsJAIy6xI4G8-",
+    "view_url": "https://drive.google.com/file/d/1v3gpijLS5cB4jHL6SGuZsJAIy6xI4G8-/view?usp=sharing",
+    "drive_id": "1v3gpijLS5cB4jHL6SGuZsJAIy6xI4G8-",
+    "size": "1.8 MB",
+    "file_size": "1.8 MB",
+    "file_type": "PNG",
+    "downloads": 268,
+    "created_at": "2026-08-25",
+    "description": "Tư liệu hình ảnh minh họa cho thư viện STEM-STEAM & tác giả"
+  },
+  {
+    "id": "mat_game_5",
+    "title": "01. VIDEO HƯỚNG DẪN TỪNG TRÒ TẠI ĐÂY.html",
+    "category": "VIDEO",
+    "grade": "Tập huấn",
+    "file_path": "https://drive.google.com/file/d/1xL-jWUHlTguzp1w5vxfqTNgF2Kex1uJt/view?usp=sharing",
+    "download_url": "https://drive.google.com/uc?export=download&id=1xL-jWUHlTguzp1w5vxfqTNgF2Kex1uJt",
+    "view_url": "https://drive.google.com/file/d/1xL-jWUHlTguzp1w5vxfqTNgF2Kex1uJt/view?usp=sharing",
+    "drive_id": "1xL-jWUHlTguzp1w5vxfqTNgF2Kex1uJt",
+    "size": "Online",
+    "file_size": "Online",
+    "file_type": "HTML/VIDEO",
+    "downloads": 305,
+    "created_at": "2026-08-25",
+    "description": "Bảng tra cứu và video hướng dẫn chi tiết từng trò chơi PowerPoint từ kênh Trợ Giảng"
+  },
+  {
+    "id": "mat_game_6",
+    "title": "02. THÔNG TIN TÁC GIẢ.png",
+    "category": "SLIDE",
+    "grade": "Tư liệu",
+    "file_path": "https://drive.google.com/file/d/1UZWMwhmoAcauy89JgLD3RmOnn-yR-0xN/view?usp=sharing",
+    "download_url": "https://drive.google.com/uc?export=download&id=1UZWMwhmoAcauy89JgLD3RmOnn-yR-0xN",
+    "view_url": "https://drive.google.com/file/d/1UZWMwhmoAcauy89JgLD3RmOnn-yR-0xN/view?usp=sharing",
+    "drive_id": "1UZWMwhmoAcauy89JgLD3RmOnn-yR-0xN",
+    "size": "1.8 MB",
+    "file_size": "1.8 MB",
+    "file_type": "PNG",
+    "downloads": 342,
+    "created_at": "2026-08-25",
+    "description": "Tư liệu hình ảnh minh họa cho thư viện STEM-STEAM & tác giả"
+  },
+  {
+    "id": "mat_game_7",
+    "title": "04. BỘ 70 TRÒ CHƠI PP-CHO THIẾT KẾ BÀI DẠY.rar",
+    "category": "GAME_PPTX",
+    "grade": "Toàn cấp",
+    "file_path": "https://drive.google.com/file/d/1lhAKsnOG0japM17eOwbo6Bl58czm018v/view?usp=sharing",
+    "download_url": "https://drive.google.com/uc?export=download&id=1lhAKsnOG0japM17eOwbo6Bl58czm018v",
+    "view_url": "https://drive.google.com/file/d/1lhAKsnOG0japM17eOwbo6Bl58czm018v/view?usp=sharing",
+    "drive_id": "1lhAKsnOG0japM17eOwbo6Bl58czm018v",
+    "size": "450 MB",
+    "file_size": "450 MB",
+    "file_type": "RAR",
+    "downloads": 379,
+    "created_at": "2026-08-25",
+    "description": "Trọn bộ tổng hợp 70 trò chơi PowerPoint thiết kế bài dạy chất lượng cao (File nén .rar)"
+  },
+  {
+    "id": "mat_game_8",
+    "title": "AI LÀ TRIỆU PHÚ 2.pptx",
+    "category": "GAME_PPTX",
+    "grade": "6-9",
+    "file_path": "https://drive.google.com/file/d/1OsWJ-DbBDxlPwhQB7TGrSnwg5_0qvvoA/view?usp=sharing",
+    "download_url": "https://drive.google.com/uc?export=download&id=1OsWJ-DbBDxlPwhQB7TGrSnwg5_0qvvoA",
+    "view_url": "https://drive.google.com/file/d/1OsWJ-DbBDxlPwhQB7TGrSnwg5_0qvvoA/view?usp=sharing",
+    "drive_id": "1OsWJ-DbBDxlPwhQB7TGrSnwg5_0qvvoA",
+    "size": "12.5 MB",
+    "file_size": "12.5 MB",
+    "file_type": "PPTX",
+    "downloads": 416,
+    "created_at": "2026-08-25",
+    "description": "Mẫu trò chơi Ai Là Triệu Phú với hiệu ứng âm thanh, câu hỏi 4 đáp án chuyên nghiệp"
+  },
+  {
+    "id": "mat_game_9",
+    "title": "AI LÀ TRIỆU PHÚ.pptx",
+    "category": "GAME_PPTX",
+    "grade": "6-9",
+    "file_path": "https://drive.google.com/file/d/18Euel8jVIMmIfCdxzNf131Y-WdtO51nc/view?usp=sharing",
+    "download_url": "https://drive.google.com/uc?export=download&id=18Euel8jVIMmIfCdxzNf131Y-WdtO51nc",
+    "view_url": "https://drive.google.com/file/d/18Euel8jVIMmIfCdxzNf131Y-WdtO51nc/view?usp=sharing",
+    "drive_id": "18Euel8jVIMmIfCdxzNf131Y-WdtO51nc",
+    "size": "12.5 MB",
+    "file_size": "12.5 MB",
+    "file_type": "PPTX",
+    "downloads": 453,
+    "created_at": "2026-08-25",
+    "description": "Mẫu trò chơi Ai Là Triệu Phú với hiệu ứng âm thanh, câu hỏi 4 đáp án chuyên nghiệp"
+  },
+  {
+    "id": "mat_game_10",
+    "title": "AI LÊN CAO HƠN.pptx",
+    "category": "GAME_PPTX",
+    "grade": "6-9",
+    "file_path": "https://drive.google.com/file/d/1_uZOSSnV38hgQKKS52iPT2OwxrJldQil/view?usp=sharing",
+    "download_url": "https://drive.google.com/uc?export=download&id=1_uZOSSnV38hgQKKS52iPT2OwxrJldQil",
+    "view_url": "https://drive.google.com/file/d/1_uZOSSnV38hgQKKS52iPT2OwxrJldQil/view?usp=sharing",
+    "drive_id": "1_uZOSSnV38hgQKKS52iPT2OwxrJldQil",
+    "size": "12.5 MB",
+    "file_size": "12.5 MB",
+    "file_type": "PPTX",
+    "downloads": 490,
+    "created_at": "2026-08-25",
+    "description": "Trò chơi tương tác PowerPoint \"AI LÊN CAO HƠN\" giúp học sinh hứng thú học tập"
+  },
+  {
+    "id": "mat_game_11",
+    "title": "ĂN KHẾ TRẢ VÀNG.pptx",
+    "category": "GAME_PPTX",
+    "grade": "6-9",
+    "file_path": "https://drive.google.com/file/d/1amv9WL3G5-YT2-A6m2Ag-fYgMdufpYpz/view?usp=sharing",
+    "download_url": "https://drive.google.com/uc?export=download&id=1amv9WL3G5-YT2-A6m2Ag-fYgMdufpYpz",
+    "view_url": "https://drive.google.com/file/d/1amv9WL3G5-YT2-A6m2Ag-fYgMdufpYpz/view?usp=sharing",
+    "drive_id": "1amv9WL3G5-YT2-A6m2Ag-fYgMdufpYpz",
+    "size": "12.5 MB",
+    "file_size": "12.5 MB",
+    "file_type": "PPTX",
+    "downloads": 127,
+    "created_at": "2026-08-25",
+    "description": "Trò chơi tương tác PowerPoint \"ĂN KHẾ TRẢ VÀNG\" giúp học sinh hứng thú học tập"
+  },
+  {
+    "id": "mat_game_12",
+    "title": "BẢO VỆ KHU PHỐ.pptx",
+    "category": "GAME_PPTX",
+    "grade": "6-9",
+    "file_path": "https://drive.google.com/file/d/1wV8Pdgja1aXjzodj0WvZO72mBlIUgF0Q/view?usp=sharing",
+    "download_url": "https://drive.google.com/uc?export=download&id=1wV8Pdgja1aXjzodj0WvZO72mBlIUgF0Q",
+    "view_url": "https://drive.google.com/file/d/1wV8Pdgja1aXjzodj0WvZO72mBlIUgF0Q/view?usp=sharing",
+    "drive_id": "1wV8Pdgja1aXjzodj0WvZO72mBlIUgF0Q",
+    "size": "12.5 MB",
+    "file_size": "12.5 MB",
+    "file_type": "PPTX",
+    "downloads": 164,
+    "created_at": "2026-08-25",
+    "description": "Trò chơi tương tác PowerPoint \"BẢO VỆ KHU PHỐ\" giúp học sinh hứng thú học tập"
+  },
+  {
+    "id": "mat_game_13",
+    "title": "BẮN CUNG.pptx",
+    "category": "GAME_PPTX",
+    "grade": "6-9",
+    "file_path": "https://drive.google.com/file/d/1ADfC3mIlP13sHNObd4PYTfQgI1kn0OaX/view?usp=sharing",
+    "download_url": "https://drive.google.com/uc?export=download&id=1ADfC3mIlP13sHNObd4PYTfQgI1kn0OaX",
+    "view_url": "https://drive.google.com/file/d/1ADfC3mIlP13sHNObd4PYTfQgI1kn0OaX/view?usp=sharing",
+    "drive_id": "1ADfC3mIlP13sHNObd4PYTfQgI1kn0OaX",
+    "size": "12.5 MB",
+    "file_size": "12.5 MB",
+    "file_type": "PPTX",
+    "downloads": 201,
+    "created_at": "2026-08-25",
+    "description": "Trò chơi tương tác PowerPoint \"BẮN CUNG\" giúp học sinh hứng thú học tập"
+  },
+  {
+    "id": "mat_game_14",
+    "title": "BẮT BƯỚM.pptx",
+    "category": "GAME_PPTX",
+    "grade": "6-9",
+    "file_path": "https://drive.google.com/file/d/1LzLcOMNrmsT6ieQ3cD238WlhbfI_YR_m/view?usp=sharing",
+    "download_url": "https://drive.google.com/uc?export=download&id=1LzLcOMNrmsT6ieQ3cD238WlhbfI_YR_m",
+    "view_url": "https://drive.google.com/file/d/1LzLcOMNrmsT6ieQ3cD238WlhbfI_YR_m/view?usp=sharing",
+    "drive_id": "1LzLcOMNrmsT6ieQ3cD238WlhbfI_YR_m",
+    "size": "12.5 MB",
+    "file_size": "12.5 MB",
+    "file_type": "PPTX",
+    "downloads": 238,
+    "created_at": "2026-08-25",
+    "description": "Trò chơi tương tác PowerPoint \"BẮT BƯỚM\" giúp học sinh hứng thú học tập"
+  },
+  {
+    "id": "mat_game_15",
+    "title": "BÍ MẬT KHO BÁU CỔ.pptx",
+    "category": "GAME_PPTX",
+    "grade": "6-9",
+    "file_path": "https://drive.google.com/file/d/1qawyvZuMvh_6qEv-nxWM8KK3CvFgQJlE/view?usp=sharing",
+    "download_url": "https://drive.google.com/uc?export=download&id=1qawyvZuMvh_6qEv-nxWM8KK3CvFgQJlE",
+    "view_url": "https://drive.google.com/file/d/1qawyvZuMvh_6qEv-nxWM8KK3CvFgQJlE/view?usp=sharing",
+    "drive_id": "1qawyvZuMvh_6qEv-nxWM8KK3CvFgQJlE",
+    "size": "12.5 MB",
+    "file_size": "12.5 MB",
+    "file_type": "PPTX",
+    "downloads": 275,
+    "created_at": "2026-08-25",
+    "description": "Trò chơi tương tác PowerPoint \"BÍ MẬT KHO BÁU CỔ\" giúp học sinh hứng thú học tập"
+  },
+  {
+    "id": "mat_game_16",
+    "title": "BÓNG BAY.pptx",
+    "category": "GAME_PPTX",
+    "grade": "6-9",
+    "file_path": "https://drive.google.com/file/d/1LtlMrAMLBDsLvGQn0e-1MrIra_wOb3_5/view?usp=sharing",
+    "download_url": "https://drive.google.com/uc?export=download&id=1LtlMrAMLBDsLvGQn0e-1MrIra_wOb3_5",
+    "view_url": "https://drive.google.com/file/d/1LtlMrAMLBDsLvGQn0e-1MrIra_wOb3_5/view?usp=sharing",
+    "drive_id": "1LtlMrAMLBDsLvGQn0e-1MrIra_wOb3_5",
+    "size": "12.5 MB",
+    "file_size": "12.5 MB",
+    "file_type": "PPTX",
+    "downloads": 312,
+    "created_at": "2026-08-25",
+    "description": "Trò chơi tương tác PowerPoint \"BÓNG BAY\" giúp học sinh hứng thú học tập"
+  },
+  {
+    "id": "mat_game_17",
+    "title": "BỘ ĐỒNG HỒ ĐẾM NGƯỢC.ppt",
+    "category": "GAME_PPTX",
+    "grade": "6-9",
+    "file_path": "https://drive.google.com/file/d/1IwVEGrM6hytv-TnfeWkeIlTx28lfvMkf/view?usp=sharing",
+    "download_url": "https://drive.google.com/uc?export=download&id=1IwVEGrM6hytv-TnfeWkeIlTx28lfvMkf",
+    "view_url": "https://drive.google.com/file/d/1IwVEGrM6hytv-TnfeWkeIlTx28lfvMkf/view?usp=sharing",
+    "drive_id": "1IwVEGrM6hytv-TnfeWkeIlTx28lfvMkf",
+    "size": "12.5 MB",
+    "file_size": "12.5 MB",
+    "file_type": "PPTX",
+    "downloads": 349,
+    "created_at": "2026-08-25",
+    "description": "Mẫu trò chơi đồng hồ đếm ngược, tính giờ tương tác sinh động cho hoạt động nhóm"
+  },
+  {
+    "id": "mat_game_18",
+    "title": "CÂU CÁ 1.pptx",
+    "category": "GAME_PPTX",
+    "grade": "6-9",
+    "file_path": "https://drive.google.com/file/d/1Tb_K8p-wpOgoF5gy0NYryAEtWn9FMoMu/view?usp=sharing",
+    "download_url": "https://drive.google.com/uc?export=download&id=1Tb_K8p-wpOgoF5gy0NYryAEtWn9FMoMu",
+    "view_url": "https://drive.google.com/file/d/1Tb_K8p-wpOgoF5gy0NYryAEtWn9FMoMu/view?usp=sharing",
+    "drive_id": "1Tb_K8p-wpOgoF5gy0NYryAEtWn9FMoMu",
+    "size": "12.5 MB",
+    "file_size": "12.5 MB",
+    "file_type": "PPTX",
+    "downloads": 386,
+    "created_at": "2026-08-25",
+    "description": "Trò chơi tương tác PowerPoint \"CÂU CÁ 1\" giúp học sinh hứng thú học tập"
+  },
+  {
+    "id": "mat_game_19",
+    "title": "CÂU CÁ 2.pptx",
+    "category": "GAME_PPTX",
+    "grade": "6-9",
+    "file_path": "https://drive.google.com/file/d/1226wbd3gdy7JTpmqBHsQ7WPKsEvhtJM8/view?usp=sharing",
+    "download_url": "https://drive.google.com/uc?export=download&id=1226wbd3gdy7JTpmqBHsQ7WPKsEvhtJM8",
+    "view_url": "https://drive.google.com/file/d/1226wbd3gdy7JTpmqBHsQ7WPKsEvhtJM8/view?usp=sharing",
+    "drive_id": "1226wbd3gdy7JTpmqBHsQ7WPKsEvhtJM8",
+    "size": "12.5 MB",
+    "file_size": "12.5 MB",
+    "file_type": "PPTX",
+    "downloads": 423,
+    "created_at": "2026-08-25",
+    "description": "Trò chơi tương tác PowerPoint \"CÂU CÁ 2\" giúp học sinh hứng thú học tập"
+  },
+  {
+    "id": "mat_game_20",
+    "title": "CÂU CÁ 3.pptx",
+    "category": "GAME_PPTX",
+    "grade": "6-9",
+    "file_path": "https://drive.google.com/file/d/1jB75B3nHPw9OTtkqx6pdQYefb4vyvs8_/view?usp=sharing",
+    "download_url": "https://drive.google.com/uc?export=download&id=1jB75B3nHPw9OTtkqx6pdQYefb4vyvs8_",
+    "view_url": "https://drive.google.com/file/d/1jB75B3nHPw9OTtkqx6pdQYefb4vyvs8_/view?usp=sharing",
+    "drive_id": "1jB75B3nHPw9OTtkqx6pdQYefb4vyvs8_",
+    "size": "12.5 MB",
+    "file_size": "12.5 MB",
+    "file_type": "PPTX",
+    "downloads": 460,
+    "created_at": "2026-08-25",
+    "description": "Trò chơi tương tác PowerPoint \"CÂU CÁ 3\" giúp học sinh hứng thú học tập"
+  },
+  {
+    "id": "mat_game_21",
+    "title": "CÂU CÁ 4.pptx",
+    "category": "GAME_PPTX",
+    "grade": "6-9",
+    "file_path": "https://drive.google.com/file/d/1shGoD0Wt9Pn39ZPPTNVe-DHgHUiTWFBR/view?usp=sharing",
+    "download_url": "https://drive.google.com/uc?export=download&id=1shGoD0Wt9Pn39ZPPTNVe-DHgHUiTWFBR",
+    "view_url": "https://drive.google.com/file/d/1shGoD0Wt9Pn39ZPPTNVe-DHgHUiTWFBR/view?usp=sharing",
+    "drive_id": "1shGoD0Wt9Pn39ZPPTNVe-DHgHUiTWFBR",
+    "size": "12.5 MB",
+    "file_size": "12.5 MB",
+    "file_type": "PPTX",
+    "downloads": 497,
+    "created_at": "2026-08-25",
+    "description": "Trò chơi tương tác PowerPoint \"CÂU CÁ 4\" giúp học sinh hứng thú học tập"
+  },
+  {
+    "id": "mat_game_22",
+    "title": "CÂU CÁ.pptx",
+    "category": "GAME_PPTX",
+    "grade": "6-9",
+    "file_path": "https://drive.google.com/file/d/18eklhQksDR9mUOsRhp_xK5wOaHbEMe2H/view?usp=sharing",
+    "download_url": "https://drive.google.com/uc?export=download&id=18eklhQksDR9mUOsRhp_xK5wOaHbEMe2H",
+    "view_url": "https://drive.google.com/file/d/18eklhQksDR9mUOsRhp_xK5wOaHbEMe2H/view?usp=sharing",
+    "drive_id": "18eklhQksDR9mUOsRhp_xK5wOaHbEMe2H",
+    "size": "12.5 MB",
+    "file_size": "12.5 MB",
+    "file_type": "PPTX",
+    "downloads": 134,
+    "created_at": "2026-08-25",
+    "description": "Trò chơi tương tác PowerPoint \"CÂU CÁ\" giúp học sinh hứng thú học tập"
+  },
+  {
+    "id": "mat_game_23",
+    "title": "CHUNG SỨC.pptx",
+    "category": "GAME_PPTX",
+    "grade": "6-9",
+    "file_path": "https://drive.google.com/file/d/1QqDOhtH2yyPg8tK3nS4sWSQiwsnrDVMl/view?usp=sharing",
+    "download_url": "https://drive.google.com/uc?export=download&id=1QqDOhtH2yyPg8tK3nS4sWSQiwsnrDVMl",
+    "view_url": "https://drive.google.com/file/d/1QqDOhtH2yyPg8tK3nS4sWSQiwsnrDVMl/view?usp=sharing",
+    "drive_id": "1QqDOhtH2yyPg8tK3nS4sWSQiwsnrDVMl",
+    "size": "12.5 MB",
+    "file_size": "12.5 MB",
+    "file_type": "PPTX",
+    "downloads": 171,
+    "created_at": "2026-08-25",
+    "description": "Trò chơi tương tác PowerPoint \"CHUNG SỨC\" giúp học sinh hứng thú học tập"
+  },
+  {
+    "id": "mat_game_24",
+    "title": "CỌN BỌ 2.pptx",
+    "category": "GAME_PPTX",
+    "grade": "6-9",
+    "file_path": "https://drive.google.com/file/d/18yK7dSnfCD1D0pamJgZjRIFk0VF0PSeP/view?usp=sharing",
+    "download_url": "https://drive.google.com/uc?export=download&id=18yK7dSnfCD1D0pamJgZjRIFk0VF0PSeP",
+    "view_url": "https://drive.google.com/file/d/18yK7dSnfCD1D0pamJgZjRIFk0VF0PSeP/view?usp=sharing",
+    "drive_id": "18yK7dSnfCD1D0pamJgZjRIFk0VF0PSeP",
+    "size": "12.5 MB",
+    "file_size": "12.5 MB",
+    "file_type": "PPTX",
+    "downloads": 208,
+    "created_at": "2026-08-25",
+    "description": "Trò chơi tương tác PowerPoint \"CỌN BỌ 2\" giúp học sinh hứng thú học tập"
+  },
+  {
+    "id": "mat_game_25",
+    "title": "CỜ CÁ NGỰA.pptx",
+    "category": "GAME_PPTX",
+    "grade": "6-9",
+    "file_path": "https://drive.google.com/file/d/1snqYooT4h0ZcHM-gzzMFngCgBWD6rk5S/view?usp=sharing",
+    "download_url": "https://drive.google.com/uc?export=download&id=1snqYooT4h0ZcHM-gzzMFngCgBWD6rk5S",
+    "view_url": "https://drive.google.com/file/d/1snqYooT4h0ZcHM-gzzMFngCgBWD6rk5S/view?usp=sharing",
+    "drive_id": "1snqYooT4h0ZcHM-gzzMFngCgBWD6rk5S",
+    "size": "12.5 MB",
+    "file_size": "12.5 MB",
+    "file_type": "PPTX",
+    "downloads": 245,
+    "created_at": "2026-08-25",
+    "description": "Trò chơi tương tác PowerPoint \"CỜ CÁ NGỰA\" giúp học sinh hứng thú học tập"
+  },
+  {
+    "id": "mat_game_26",
+    "title": "CỨU HỘ NẠN LỤT.pptx",
+    "category": "GAME_PPTX",
+    "grade": "6-9",
+    "file_path": "https://drive.google.com/file/d/13iuSYkyk9B61R1v4WeT_8jb4SzB5yNZ_/view?usp=sharing",
+    "download_url": "https://drive.google.com/uc?export=download&id=13iuSYkyk9B61R1v4WeT_8jb4SzB5yNZ_",
+    "view_url": "https://drive.google.com/file/d/13iuSYkyk9B61R1v4WeT_8jb4SzB5yNZ_/view?usp=sharing",
+    "drive_id": "13iuSYkyk9B61R1v4WeT_8jb4SzB5yNZ_",
+    "size": "12.5 MB",
+    "file_size": "12.5 MB",
+    "file_type": "PPTX",
+    "downloads": 282,
+    "created_at": "2026-08-25",
+    "description": "Trò chơi tương tác PowerPoint \"CỨU HỘ NẠN LỤT\" giúp học sinh hứng thú học tập"
+  },
+  {
+    "id": "mat_game_27",
+    "title": "CỨU LẤY CÁ VOI.pptx",
+    "category": "GAME_PPTX",
+    "grade": "6-9",
+    "file_path": "https://drive.google.com/file/d/1Oj1_rFrrpFXsp3ruKTdydcgzZ_ECbo6W/view?usp=sharing",
+    "download_url": "https://drive.google.com/uc?export=download&id=1Oj1_rFrrpFXsp3ruKTdydcgzZ_ECbo6W",
+    "view_url": "https://drive.google.com/file/d/1Oj1_rFrrpFXsp3ruKTdydcgzZ_ECbo6W/view?usp=sharing",
+    "drive_id": "1Oj1_rFrrpFXsp3ruKTdydcgzZ_ECbo6W",
+    "size": "12.5 MB",
+    "file_size": "12.5 MB",
+    "file_type": "PPTX",
+    "downloads": 319,
+    "created_at": "2026-08-25",
+    "description": "Trò chơi tương tác PowerPoint \"CỨU LẤY CÁ VOI\" giúp học sinh hứng thú học tập"
+  },
+  {
+    "id": "mat_game_28",
+    "title": "DU LỊCH CÙNG ĐOREMON.pptx",
+    "category": "GAME_PPTX",
+    "grade": "6-9",
+    "file_path": "https://drive.google.com/file/d/1Ztf_HsHwWgfg4k-G4uONut2E11RAbMhS/view?usp=sharing",
+    "download_url": "https://drive.google.com/uc?export=download&id=1Ztf_HsHwWgfg4k-G4uONut2E11RAbMhS",
+    "view_url": "https://drive.google.com/file/d/1Ztf_HsHwWgfg4k-G4uONut2E11RAbMhS/view?usp=sharing",
+    "drive_id": "1Ztf_HsHwWgfg4k-G4uONut2E11RAbMhS",
+    "size": "12.5 MB",
+    "file_size": "12.5 MB",
+    "file_type": "PPTX",
+    "downloads": 356,
+    "created_at": "2026-08-25",
+    "description": "Trò chơi tương tác PowerPoint \"DU LỊCH CÙNG ĐOREMON\" giúp học sinh hứng thú học tập"
+  },
+  {
+    "id": "mat_game_29",
+    "title": "ĐÁ BÓNG IOE.pptx",
+    "category": "GAME_PPTX",
+    "grade": "6-9",
+    "file_path": "https://drive.google.com/file/d/1UC8bWKs_gzMzj_uogCQ9e8JFtF0nyUhy/view?usp=sharing",
+    "download_url": "https://drive.google.com/uc?export=download&id=1UC8bWKs_gzMzj_uogCQ9e8JFtF0nyUhy",
+    "view_url": "https://drive.google.com/file/d/1UC8bWKs_gzMzj_uogCQ9e8JFtF0nyUhy/view?usp=sharing",
+    "drive_id": "1UC8bWKs_gzMzj_uogCQ9e8JFtF0nyUhy",
+    "size": "12.5 MB",
+    "file_size": "12.5 MB",
+    "file_type": "PPTX",
+    "downloads": 393,
+    "created_at": "2026-08-25",
+    "description": "Trò chơi tương tác PowerPoint \"ĐÁ BÓNG IOE\" giúp học sinh hứng thú học tập"
+  },
+  {
+    "id": "mat_game_30",
+    "title": "ĐÁ BÓNG.pptx",
+    "category": "GAME_PPTX",
+    "grade": "6-9",
+    "file_path": "https://drive.google.com/file/d/1ReDyDIMhV9Dy8cKNayV3qwfyskj-e3_0/view?usp=sharing",
+    "download_url": "https://drive.google.com/uc?export=download&id=1ReDyDIMhV9Dy8cKNayV3qwfyskj-e3_0",
+    "view_url": "https://drive.google.com/file/d/1ReDyDIMhV9Dy8cKNayV3qwfyskj-e3_0/view?usp=sharing",
+    "drive_id": "1ReDyDIMhV9Dy8cKNayV3qwfyskj-e3_0",
+    "size": "12.5 MB",
+    "file_size": "12.5 MB",
+    "file_type": "PPTX",
+    "downloads": 430,
+    "created_at": "2026-08-25",
+    "description": "Trò chơi tương tác PowerPoint \"ĐÁ BÓNG\" giúp học sinh hứng thú học tập"
+  },
+  {
+    "id": "mat_game_31",
+    "title": "ĐÀO VÀNG.pptx",
+    "category": "GAME_PPTX",
+    "grade": "6-9",
+    "file_path": "https://drive.google.com/file/d/1bSqp7TJp4qJp16AFpjbg2Ip_LZt3Gkfu/view?usp=sharing",
+    "download_url": "https://drive.google.com/uc?export=download&id=1bSqp7TJp4qJp16AFpjbg2Ip_LZt3Gkfu",
+    "view_url": "https://drive.google.com/file/d/1bSqp7TJp4qJp16AFpjbg2Ip_LZt3Gkfu/view?usp=sharing",
+    "drive_id": "1bSqp7TJp4qJp16AFpjbg2Ip_LZt3Gkfu",
+    "size": "12.5 MB",
+    "file_size": "12.5 MB",
+    "file_type": "PPTX",
+    "downloads": 467,
+    "created_at": "2026-08-25",
+    "description": "Trò chơi tương tác PowerPoint \"ĐÀO VÀNG\" giúp học sinh hứng thú học tập"
+  },
+  {
+    "id": "mat_game_32",
+    "title": "ĐIỀN KHUYẾT.pptx",
+    "category": "GAME_PPTX",
+    "grade": "6-9",
+    "file_path": "https://drive.google.com/file/d/1QNWcsR8tS_nOh-9_JfqgjhP4AI1xOt8r/view?usp=sharing",
+    "download_url": "https://drive.google.com/uc?export=download&id=1QNWcsR8tS_nOh-9_JfqgjhP4AI1xOt8r",
+    "view_url": "https://drive.google.com/file/d/1QNWcsR8tS_nOh-9_JfqgjhP4AI1xOt8r/view?usp=sharing",
+    "drive_id": "1QNWcsR8tS_nOh-9_JfqgjhP4AI1xOt8r",
+    "size": "12.5 MB",
+    "file_size": "12.5 MB",
+    "file_type": "PPTX",
+    "downloads": 504,
+    "created_at": "2026-08-25",
+    "description": "Trò chơi tương tác PowerPoint \"ĐIỀN KHUYẾT\" giúp học sinh hứng thú học tập"
+  },
+  {
+    "id": "mat_game_33",
+    "title": "ĐOÁN BÓNG CON VẬT.pptx",
+    "category": "GAME_PPTX",
+    "grade": "6-9",
+    "file_path": "https://drive.google.com/file/d/1r39I120mwsVkD1NaPQdSyea5yRaA-52c/view?usp=sharing",
+    "download_url": "https://drive.google.com/uc?export=download&id=1r39I120mwsVkD1NaPQdSyea5yRaA-52c",
+    "view_url": "https://drive.google.com/file/d/1r39I120mwsVkD1NaPQdSyea5yRaA-52c/view?usp=sharing",
+    "drive_id": "1r39I120mwsVkD1NaPQdSyea5yRaA-52c",
+    "size": "12.5 MB",
+    "file_size": "12.5 MB",
+    "file_type": "PPTX",
+    "downloads": 141,
+    "created_at": "2026-08-25",
+    "description": "Trò chơi tương tác PowerPoint \"ĐOÁN BÓNG CON VẬT\" giúp học sinh hứng thú học tập"
+  },
+  {
+    "id": "mat_game_34",
+    "title": "ĐỒNG HỒ BÁO THỨC.pptx",
+    "category": "GAME_PPTX",
+    "grade": "6-9",
+    "file_path": "https://drive.google.com/file/d/1nAGXXnBXIrMA1ALVI8RYMBNzdicKJqOv/view?usp=sharing",
+    "download_url": "https://drive.google.com/uc?export=download&id=1nAGXXnBXIrMA1ALVI8RYMBNzdicKJqOv",
+    "view_url": "https://drive.google.com/file/d/1nAGXXnBXIrMA1ALVI8RYMBNzdicKJqOv/view?usp=sharing",
+    "drive_id": "1nAGXXnBXIrMA1ALVI8RYMBNzdicKJqOv",
+    "size": "12.5 MB",
+    "file_size": "12.5 MB",
+    "file_type": "PPTX",
+    "downloads": 178,
+    "created_at": "2026-08-25",
+    "description": "Mẫu trò chơi đồng hồ đếm ngược, tính giờ tương tác sinh động cho hoạt động nhóm"
+  },
+  {
+    "id": "mat_game_35",
+    "title": "ĐỒNG HỒ CÁT.pptx",
+    "category": "GAME_PPTX",
+    "grade": "6-9",
+    "file_path": "https://drive.google.com/file/d/1hb9hNqagQ1q-g4999HT-Ox8p15T2g6hc/view?usp=sharing",
+    "download_url": "https://drive.google.com/uc?export=download&id=1hb9hNqagQ1q-g4999HT-Ox8p15T2g6hc",
+    "view_url": "https://drive.google.com/file/d/1hb9hNqagQ1q-g4999HT-Ox8p15T2g6hc/view?usp=sharing",
+    "drive_id": "1hb9hNqagQ1q-g4999HT-Ox8p15T2g6hc",
+    "size": "12.5 MB",
+    "file_size": "12.5 MB",
+    "file_type": "PPTX",
+    "downloads": 215,
+    "created_at": "2026-08-25",
+    "description": "Mẫu trò chơi đồng hồ đếm ngược, tính giờ tương tác sinh động cho hoạt động nhóm"
+  },
+  {
+    "id": "mat_game_36",
+    "title": "ĐỒNG HỒ ĐẾM NGƯỢC.pptx",
+    "category": "GAME_PPTX",
+    "grade": "6-9",
+    "file_path": "https://drive.google.com/file/d/16oVUrbQVmeYviE0-1_aYq3lNsi53DPM2/view?usp=sharing",
+    "download_url": "https://drive.google.com/uc?export=download&id=16oVUrbQVmeYviE0-1_aYq3lNsi53DPM2",
+    "view_url": "https://drive.google.com/file/d/16oVUrbQVmeYviE0-1_aYq3lNsi53DPM2/view?usp=sharing",
+    "drive_id": "16oVUrbQVmeYviE0-1_aYq3lNsi53DPM2",
+    "size": "12.5 MB",
+    "file_size": "12.5 MB",
+    "file_type": "PPTX",
+    "downloads": 252,
+    "created_at": "2026-08-25",
+    "description": "Mẫu trò chơi đồng hồ đếm ngược, tính giờ tương tác sinh động cho hoạt động nhóm"
+  },
+  {
+    "id": "mat_game_37",
+    "title": "ĐỒNG HỒ XEM GIỜ.pptx",
+    "category": "GAME_PPTX",
+    "grade": "6-9",
+    "file_path": "https://drive.google.com/file/d/1EEQwDQgyyzyYSiLsMc6YtzkAxlSShF6G/view?usp=sharing",
+    "download_url": "https://drive.google.com/uc?export=download&id=1EEQwDQgyyzyYSiLsMc6YtzkAxlSShF6G",
+    "view_url": "https://drive.google.com/file/d/1EEQwDQgyyzyYSiLsMc6YtzkAxlSShF6G/view?usp=sharing",
+    "drive_id": "1EEQwDQgyyzyYSiLsMc6YtzkAxlSShF6G",
+    "size": "12.5 MB",
+    "file_size": "12.5 MB",
+    "file_type": "PPTX",
+    "downloads": 289,
+    "created_at": "2026-08-25",
+    "description": "Mẫu trò chơi đồng hồ đếm ngược, tính giờ tương tác sinh động cho hoạt động nhóm"
+  },
+  {
+    "id": "mat_game_38",
+    "title": "ĐƯỜNG LÊN ĐỈNH OLYMPIA.pptx",
+    "category": "GAME_PPTX",
+    "grade": "6-9",
+    "file_path": "https://drive.google.com/file/d/1Pb3p4aFl76eaysrlOm-zMDr0CsZ2_1j1/view?usp=sharing",
+    "download_url": "https://drive.google.com/uc?export=download&id=1Pb3p4aFl76eaysrlOm-zMDr0CsZ2_1j1",
+    "view_url": "https://drive.google.com/file/d/1Pb3p4aFl76eaysrlOm-zMDr0CsZ2_1j1/view?usp=sharing",
+    "drive_id": "1Pb3p4aFl76eaysrlOm-zMDr0CsZ2_1j1",
+    "size": "12.5 MB",
+    "file_size": "12.5 MB",
+    "file_type": "PPTX",
+    "downloads": 326,
+    "created_at": "2026-08-25",
+    "description": "Bộ game Đường Lên Đỉnh Olympia với các vòng Khởi động, Vượt chướng ngại vật, Về đích"
+  },
+  {
+    "id": "mat_game_39",
+    "title": "EM HIỂU LOÀI VẬT.pptx",
+    "category": "GAME_PPTX",
+    "grade": "6-9",
+    "file_path": "https://drive.google.com/file/d/1j8q2IZVi1s_CDJV9JHYdy05RZJSx1izH/view?usp=sharing",
+    "download_url": "https://drive.google.com/uc?export=download&id=1j8q2IZVi1s_CDJV9JHYdy05RZJSx1izH",
+    "view_url": "https://drive.google.com/file/d/1j8q2IZVi1s_CDJV9JHYdy05RZJSx1izH/view?usp=sharing",
+    "drive_id": "1j8q2IZVi1s_CDJV9JHYdy05RZJSx1izH",
+    "size": "12.5 MB",
+    "file_size": "12.5 MB",
+    "file_type": "PPTX",
+    "downloads": 363,
+    "created_at": "2026-08-25",
+    "description": "Trò chơi tương tác PowerPoint \"EM HIỂU LOÀI VẬT\" giúp học sinh hứng thú học tập"
+  },
+  {
+    "id": "mat_game_40",
+    "title": "GIẢI CỨU BÃI BIẾN.pptx",
+    "category": "GAME_PPTX",
+    "grade": "6-9",
+    "file_path": "https://drive.google.com/file/d/1XBZoKIbjNXUz8C7RWe_SL8_h82C6-uF4/view?usp=sharing",
+    "download_url": "https://drive.google.com/uc?export=download&id=1XBZoKIbjNXUz8C7RWe_SL8_h82C6-uF4",
+    "view_url": "https://drive.google.com/file/d/1XBZoKIbjNXUz8C7RWe_SL8_h82C6-uF4/view?usp=sharing",
+    "drive_id": "1XBZoKIbjNXUz8C7RWe_SL8_h82C6-uF4",
+    "size": "12.5 MB",
+    "file_size": "12.5 MB",
+    "file_type": "PPTX",
+    "downloads": 400,
+    "created_at": "2026-08-25",
+    "description": "Trò chơi tương tác PowerPoint \"GIẢI CỨU BÃI BIẾN\" giúp học sinh hứng thú học tập"
+  },
+  {
+    "id": "mat_game_41",
+    "title": "GIẢI CỨU ĐẠI DƯƠNG.ppt",
+    "category": "GAME_PPTX",
+    "grade": "6-9",
+    "file_path": "https://drive.google.com/file/d/1y1HG1y5Z9A6PLeYUzFFdKbDvdTL5-89E/view?usp=sharing",
+    "download_url": "https://drive.google.com/uc?export=download&id=1y1HG1y5Z9A6PLeYUzFFdKbDvdTL5-89E",
+    "view_url": "https://drive.google.com/file/d/1y1HG1y5Z9A6PLeYUzFFdKbDvdTL5-89E/view?usp=sharing",
+    "drive_id": "1y1HG1y5Z9A6PLeYUzFFdKbDvdTL5-89E",
+    "size": "12.5 MB",
+    "file_size": "12.5 MB",
+    "file_type": "PPTX",
+    "downloads": 437,
+    "created_at": "2026-08-25",
+    "description": "Trò chơi tương tác PowerPoint \"GIẢI CỨU ĐẠI DƯƠNG\" giúp học sinh hứng thú học tập"
+  },
+  {
+    "id": "mat_game_42",
+    "title": "GIẢI Ô CHỮ 2.pptx",
+    "category": "GAME_PPTX",
+    "grade": "6-9",
+    "file_path": "https://drive.google.com/file/d/1B8MFVfejzoXZbDTGabLfS9HYK8tvE5Ag/view?usp=sharing",
+    "download_url": "https://drive.google.com/uc?export=download&id=1B8MFVfejzoXZbDTGabLfS9HYK8tvE5Ag",
+    "view_url": "https://drive.google.com/file/d/1B8MFVfejzoXZbDTGabLfS9HYK8tvE5Ag/view?usp=sharing",
+    "drive_id": "1B8MFVfejzoXZbDTGabLfS9HYK8tvE5Ag",
+    "size": "12.5 MB",
+    "file_size": "12.5 MB",
+    "file_type": "PPTX",
+    "downloads": 474,
+    "created_at": "2026-08-25",
+    "description": "Trò chơi Giải Ô Chữ tìm từ khóa hàng dọc tương tác thông minh cho tiết ôn tập"
+  },
+  {
+    "id": "mat_game_43",
+    "title": "GIẢI Ô CHỮ 3.pptx",
+    "category": "GAME_PPTX",
+    "grade": "6-9",
+    "file_path": "https://drive.google.com/file/d/1HSoHE8-7SNW6OVSI0-BZHSp9d4qLUZOg/view?usp=sharing",
+    "download_url": "https://drive.google.com/uc?export=download&id=1HSoHE8-7SNW6OVSI0-BZHSp9d4qLUZOg",
+    "view_url": "https://drive.google.com/file/d/1HSoHE8-7SNW6OVSI0-BZHSp9d4qLUZOg/view?usp=sharing",
+    "drive_id": "1HSoHE8-7SNW6OVSI0-BZHSp9d4qLUZOg",
+    "size": "12.5 MB",
+    "file_size": "12.5 MB",
+    "file_type": "PPTX",
+    "downloads": 511,
+    "created_at": "2026-08-25",
+    "description": "Trò chơi Giải Ô Chữ tìm từ khóa hàng dọc tương tác thông minh cho tiết ôn tập"
+  },
+  {
+    "id": "mat_game_44",
+    "title": "GIẢI Ô CHỮ.pptx",
+    "category": "GAME_PPTX",
+    "grade": "6-9",
+    "file_path": "https://drive.google.com/file/d/18FEF_uwO4px6Bhss2huOuzO2uX13VfaD/view?usp=sharing",
+    "download_url": "https://drive.google.com/uc?export=download&id=18FEF_uwO4px6Bhss2huOuzO2uX13VfaD",
+    "view_url": "https://drive.google.com/file/d/18FEF_uwO4px6Bhss2huOuzO2uX13VfaD/view?usp=sharing",
+    "drive_id": "18FEF_uwO4px6Bhss2huOuzO2uX13VfaD",
+    "size": "12.5 MB",
+    "file_size": "12.5 MB",
+    "file_type": "PPTX",
+    "downloads": 148,
+    "created_at": "2026-08-25",
+    "description": "Trò chơi Giải Ô Chữ tìm từ khóa hàng dọc tương tác thông minh cho tiết ôn tập"
+  },
+  {
+    "id": "mat_game_45",
+    "title": "GIÚP QUẠ UỐNG NƯỚC.pptx",
+    "category": "GAME_PPTX",
+    "grade": "6-9",
+    "file_path": "https://drive.google.com/file/d/1zQ7Zg0uMsz9i5TplY3dNs8BgZBZcCvq3/view?usp=sharing",
+    "download_url": "https://drive.google.com/uc?export=download&id=1zQ7Zg0uMsz9i5TplY3dNs8BgZBZcCvq3",
+    "view_url": "https://drive.google.com/file/d/1zQ7Zg0uMsz9i5TplY3dNs8BgZBZcCvq3/view?usp=sharing",
+    "drive_id": "1zQ7Zg0uMsz9i5TplY3dNs8BgZBZcCvq3",
+    "size": "12.5 MB",
+    "file_size": "12.5 MB",
+    "file_type": "PPTX",
+    "downloads": 185,
+    "created_at": "2026-08-25",
+    "description": "Trò chơi tương tác PowerPoint \"GIÚP QUẠ UỐNG NƯỚC\" giúp học sinh hứng thú học tập"
+  },
+  {
+    "id": "mat_game_46",
+    "title": "HÁI DỪA.pptx",
+    "category": "GAME_PPTX",
+    "grade": "6-9",
+    "file_path": "https://drive.google.com/file/d/1eFHzno50fiewhI362oreSb8F67aYJjN6/view?usp=sharing",
+    "download_url": "https://drive.google.com/uc?export=download&id=1eFHzno50fiewhI362oreSb8F67aYJjN6",
+    "view_url": "https://drive.google.com/file/d/1eFHzno50fiewhI362oreSb8F67aYJjN6/view?usp=sharing",
+    "drive_id": "1eFHzno50fiewhI362oreSb8F67aYJjN6",
+    "size": "12.5 MB",
+    "file_size": "12.5 MB",
+    "file_type": "PPTX",
+    "downloads": 222,
+    "created_at": "2026-08-25",
+    "description": "Trò chơi tương tác PowerPoint \"HÁI DỪA\" giúp học sinh hứng thú học tập"
+  },
+  {
+    "id": "mat_game_47",
+    "title": "HÁI HOA DÂN CHỦ.pptx",
+    "category": "GAME_PPTX",
+    "grade": "6-9",
+    "file_path": "https://drive.google.com/file/d/1qXeRrN11RcESLxjnHOH0p8bgUW7v--AL/view?usp=sharing",
+    "download_url": "https://drive.google.com/uc?export=download&id=1qXeRrN11RcESLxjnHOH0p8bgUW7v--AL",
+    "view_url": "https://drive.google.com/file/d/1qXeRrN11RcESLxjnHOH0p8bgUW7v--AL/view?usp=sharing",
+    "drive_id": "1qXeRrN11RcESLxjnHOH0p8bgUW7v--AL",
+    "size": "12.5 MB",
+    "file_size": "12.5 MB",
+    "file_type": "PPTX",
+    "downloads": 259,
+    "created_at": "2026-08-25",
+    "description": "Trò chơi tương tác PowerPoint \"HÁI HOA DÂN CHỦ\" giúp học sinh hứng thú học tập"
+  },
+  {
+    "id": "mat_game_48",
+    "title": "HÁI LỘC ĐẦU XUÂN.pptx",
+    "category": "GAME_PPTX",
+    "grade": "6-9",
+    "file_path": "https://drive.google.com/file/d/1UssMwLZAhKQ4P7zK2PwmkA3-DcDzHUP2/view?usp=sharing",
+    "download_url": "https://drive.google.com/uc?export=download&id=1UssMwLZAhKQ4P7zK2PwmkA3-DcDzHUP2",
+    "view_url": "https://drive.google.com/file/d/1UssMwLZAhKQ4P7zK2PwmkA3-DcDzHUP2/view?usp=sharing",
+    "drive_id": "1UssMwLZAhKQ4P7zK2PwmkA3-DcDzHUP2",
+    "size": "12.5 MB",
+    "file_size": "12.5 MB",
+    "file_type": "PPTX",
+    "downloads": 296,
+    "created_at": "2026-08-25",
+    "description": "Trò chơi tương tác PowerPoint \"HÁI LỘC ĐẦU XUÂN\" giúp học sinh hứng thú học tập"
+  },
+  {
+    "id": "mat_game_49",
+    "title": "HÁI TÁO.pptx",
+    "category": "GAME_PPTX",
+    "grade": "6-9",
+    "file_path": "https://drive.google.com/file/d/1NvnmSg1bkMQ2gwOh91dV4Yhd-fOoWJG9/view?usp=sharing",
+    "download_url": "https://drive.google.com/uc?export=download&id=1NvnmSg1bkMQ2gwOh91dV4Yhd-fOoWJG9",
+    "view_url": "https://drive.google.com/file/d/1NvnmSg1bkMQ2gwOh91dV4Yhd-fOoWJG9/view?usp=sharing",
+    "drive_id": "1NvnmSg1bkMQ2gwOh91dV4Yhd-fOoWJG9",
+    "size": "12.5 MB",
+    "file_size": "12.5 MB",
+    "file_type": "PPTX",
+    "downloads": 333,
+    "created_at": "2026-08-25",
+    "description": "Trò chơi tương tác PowerPoint \"HÁI TÁO\" giúp học sinh hứng thú học tập"
+  },
+  {
+    "id": "mat_game_50",
+    "title": "HÀNH TRÌNH TÌM MẬT.pptx",
+    "category": "GAME_PPTX",
+    "grade": "6-9",
+    "file_path": "https://drive.google.com/file/d/1iIxL4aeL7DD-b1PzGTJNMbF5WOhw1zs1/view?usp=sharing",
+    "download_url": "https://drive.google.com/uc?export=download&id=1iIxL4aeL7DD-b1PzGTJNMbF5WOhw1zs1",
+    "view_url": "https://drive.google.com/file/d/1iIxL4aeL7DD-b1PzGTJNMbF5WOhw1zs1/view?usp=sharing",
+    "drive_id": "1iIxL4aeL7DD-b1PzGTJNMbF5WOhw1zs1",
+    "size": "12.5 MB",
+    "file_size": "12.5 MB",
+    "file_type": "PPTX",
+    "downloads": 370,
+    "created_at": "2026-08-25",
+    "description": "Trò chơi tương tác PowerPoint \"HÀNH TRÌNH TÌM MẬT\" giúp học sinh hứng thú học tập"
+  },
+  {
+    "id": "mat_game_51",
+    "title": "HAPPY EASTER.pptx",
+    "category": "GAME_PPTX",
+    "grade": "6-9",
+    "file_path": "https://drive.google.com/file/d/1AtanwpVFWyqz71aGhpGAoZYwj1VyMvlK/view?usp=sharing",
+    "download_url": "https://drive.google.com/uc?export=download&id=1AtanwpVFWyqz71aGhpGAoZYwj1VyMvlK",
+    "view_url": "https://drive.google.com/file/d/1AtanwpVFWyqz71aGhpGAoZYwj1VyMvlK/view?usp=sharing",
+    "drive_id": "1AtanwpVFWyqz71aGhpGAoZYwj1VyMvlK",
+    "size": "12.5 MB",
+    "file_size": "12.5 MB",
+    "file_type": "PPTX",
+    "downloads": 407,
+    "created_at": "2026-08-25",
+    "description": "Trò chơi tương tác PowerPoint \"HAPPY EASTER\" giúp học sinh hứng thú học tập"
+  },
+  {
+    "id": "mat_game_52",
+    "title": "HỘP QUÀ BÍ MẬT.pptx",
+    "category": "GAME_PPTX",
+    "grade": "6-9",
+    "file_path": "https://drive.google.com/file/d/13iKiUAvXYeoLaPJ0VMU0yz00SwSciMYr/view?usp=sharing",
+    "download_url": "https://drive.google.com/uc?export=download&id=13iKiUAvXYeoLaPJ0VMU0yz00SwSciMYr",
+    "view_url": "https://drive.google.com/file/d/13iKiUAvXYeoLaPJ0VMU0yz00SwSciMYr/view?usp=sharing",
+    "drive_id": "13iKiUAvXYeoLaPJ0VMU0yz00SwSciMYr",
+    "size": "12.5 MB",
+    "file_size": "12.5 MB",
+    "file_type": "PPTX",
+    "downloads": 444,
+    "created_at": "2026-08-25",
+    "description": "Trò chơi tương tác PowerPoint \"HỘP QUÀ BÍ MẬT\" giúp học sinh hứng thú học tập"
+  },
+  {
+    "id": "mat_game_53",
+    "title": "HU GÔ.pptx",
+    "category": "GAME_PPTX",
+    "grade": "6-9",
+    "file_path": "https://drive.google.com/file/d/1IzLFeYcHL5tynp8c_4m7LiW8Slx-8yo5/view?usp=sharing",
+    "download_url": "https://drive.google.com/uc?export=download&id=1IzLFeYcHL5tynp8c_4m7LiW8Slx-8yo5",
+    "view_url": "https://drive.google.com/file/d/1IzLFeYcHL5tynp8c_4m7LiW8Slx-8yo5/view?usp=sharing",
+    "drive_id": "1IzLFeYcHL5tynp8c_4m7LiW8Slx-8yo5",
+    "size": "12.5 MB",
+    "file_size": "12.5 MB",
+    "file_type": "PPTX",
+    "downloads": 481,
+    "created_at": "2026-08-25",
+    "description": "Trò chơi tương tác PowerPoint \"HU GÔ\" giúp học sinh hứng thú học tập"
+  }
+];
 
     const INITIAL_QUESTIONS = [
       {
@@ -2904,6 +3718,86 @@
       const [generatedStreamText, setGeneratedStreamText] = useState('');
       const [filterCategory, setFilterCategory] = useState('ALL');
       const [showUploadModal, setShowUploadModal] = useState(false);
+      const [materialSearchQuery, setMaterialSearchQuery] = useState('');
+      const [uploadMaterialForm, setUploadMaterialForm] = useState({
+        title: '',
+        category: 'GAME_PPTX',
+        grade: '8',
+        file_path: '',
+        file_size: '15 MB',
+        file_type: 'PPTX',
+        description: ''
+      });
+
+      const handlePreviewMaterial = (mat) => {
+        let embedUrl = mat.view_url || mat.file_path;
+        if (mat.drive_id) {
+          embedUrl = 'https://drive.google.com/file/d/' + mat.drive_id + '/preview';
+        } else if (embedUrl && embedUrl.includes('drive.google.com/file/d/')) {
+          embedUrl = embedUrl.replace(/\/view(\?usp=sharing)?/g, '/preview');
+        }
+        setPreviewItem({
+          title: mat.title,
+          grade: mat.grade || 'Toàn cấp',
+          url: embedUrl,
+          raw_url: mat.view_url || mat.file_path,
+          download_url: mat.download_url || mat.file_path,
+          matId: mat.id
+        });
+      };
+
+      const handleDownloadMaterial = (matId, downloadUrl) => {
+        setMaterials(prev => {
+          const updated = prev.map(m => m.id === matId ? { ...m, downloads: (m.downloads || 0) + 1 } : m);
+          try {
+            localStorage.setItem('app_materials_v2', JSON.stringify(updated));
+          } catch (e) {}
+          return updated;
+        });
+        if (downloadUrl) {
+          window.open(downloadUrl, '_blank');
+        }
+      };
+
+      const handleAddMaterialSubmit = (e) => {
+        e.preventDefault();
+        if (!uploadMaterialForm.title.trim()) {
+          alert('Vui lòng nhập tiêu đề học liệu!');
+          return;
+        }
+        const newMat = {
+          id: 'mat_custom_' + Date.now(),
+          title: uploadMaterialForm.title.trim(),
+          category: uploadMaterialForm.category,
+          grade: uploadMaterialForm.grade,
+          file_path: uploadMaterialForm.file_path.trim() || '#',
+          download_url: uploadMaterialForm.file_path.trim() || '#',
+          view_url: uploadMaterialForm.file_path.trim() || '',
+          size: uploadMaterialForm.file_size || '10 MB',
+          file_size: uploadMaterialForm.file_size || '10 MB',
+          file_type: uploadMaterialForm.file_type || 'PPTX',
+          downloads: 1,
+          created_at: new Date().toISOString().split('T')[0],
+          description: uploadMaterialForm.description.trim() || 'Học liệu mới do giáo viên đăng tải'
+        };
+
+        const updated = [newMat, ...materials];
+        setMaterials(updated);
+        try {
+          localStorage.setItem('app_materials_v2', JSON.stringify(updated));
+        } catch (e) {}
+        setShowUploadModal(false);
+        setUploadMaterialForm({
+          title: '',
+          category: 'GAME_PPTX',
+          grade: '8',
+          file_path: '',
+          file_size: '15 MB',
+          file_type: 'PPTX',
+          description: ''
+        });
+        alert('Đã thêm học liệu mới thành công vào Thư viện!');
+      };
 
       const [showAuthModal, setShowAuthModal] = useState(false);
       const [authTab, setAuthTab] = useState('LOGIN'); // 'LOGIN' or 'REGISTER'
@@ -3669,17 +4563,23 @@
         if (window.lucide) {
           window.lucide.createIcons();
         }
-      }, [activeTab, lessons, isGenerating, generatedStreamText, showUploadModal, showAuthModal, currentUser, showProfileMenu, authTab, hdtnActiveSubTab, hdtnActivePeriodTab, currentHdtnPlan, isHdtnFullscreen, previewItem, app3dGradeFilter, elearningGradeFilter, registeredUsers, usageLogs, userSearchQuery, userRoleFilter]);
+      }, [activeTab, lessons, isGenerating, generatedStreamText, showUploadModal, showAiGameModal, generatedQuestionsList, materialSearchQuery, showAuthModal, currentUser, showProfileMenu, authTab, hdtnActiveSubTab, hdtnActivePeriodTab, currentHdtnPlan, isHdtnFullscreen, previewItem, app3dGradeFilter, elearningGradeFilter, registeredUsers, usageLogs, userSearchQuery, userRoleFilter]);
 
       // AI Lesson Plan Streaming Generator Handler
       
       // XỬ LÝ SINH CÂU HỎI TRÒ CHƠI BẰNG AI
       const handleOpenAiGameModal = (game) => {
         setAiSelectedGame(game);
-        if (!aiTopicInput) {
-          setAiTopicInput('Ôn tập kiến thức trọng tâm ' + (game ? game.name : ''));
+        const gameTitle = game ? (game.title || game.name || '').replace(/\.pptx?$/i, '').trim() : '';
+        setAiTopicInput('Ôn tập kiến thức trọng tâm: ' + gameTitle);
+        if (game && game.grade && game.grade !== 'Toàn cấp') {
+          const num = game.grade.replace(/[^0-9]/g, '').slice(0, 1);
+          if (num) setAiGradeSelect(num);
         }
         setShowAiGameModal(true);
+        setTimeout(() => {
+          if (window.lucide) window.lucide.createIcons();
+        }, 100);
       };
 
       const handleSaveApiKey = (val) => {
@@ -4281,7 +5181,7 @@
                     <i data-lucide="briefcase" className="w-4 h-4 text-violet-600 shrink-0"></i>
                     <span className="truncate">Tổ Trưởng Số</span>
                   </div>
-                  <span className="bg-violet-100 text-violet-700 text-[10px] px-1.5 py-0.5 rounded-full font-bold">8</span>
+                  <span className="bg-violet-100 text-violet-700 text-[10px] px-1.5 py-0.5 rounded-full font-bold">9</span>
                 </button>
 
                 {/* TAB 5: THƯ VIỆN HỌC LIỆU */}
@@ -4408,7 +5308,7 @@
                   activeTab === 'TO_TRUONG' ? 'bg-violet-600 text-white font-bold' : 'bg-white text-slate-700 border border-slate-200'
                 }`}
               >
-                🧑‍💼 Tổ Trưởng Số (8)
+                🧑‍💼 Tổ Trưởng Số (9)
               </button>
 
               <button
@@ -6652,6 +7552,37 @@
                         </button>
                       </div>
                     </div>
+
+                    {/* Gợi Ý 1: Bộ lọc Danh Mục Hóa Học */}
+                    <div className="mt-5 pt-4 border-t border-white/10">
+                      <p className="text-xs text-orange-200/70 mb-2 font-semibold uppercase tracking-wider">Lọc theo nhóm chất:</p>
+                      <div className="flex flex-wrap gap-2">
+                        {[
+                          { key: 'ALL', label: '📚 Tất Cả' },
+                          { key: 'nguyen-to', label: '⚗️ Nguyên Tố' },
+                          { key: 'oxit', label: '🔴 Oxit' },
+                          { key: 'axit', label: '🟡 Axit' },
+                          { key: 'bazo', label: '🟢 Bazơ' },
+                          { key: 'muoi', label: '🔵 Muối' },
+                          { key: 'huu-co', label: '🟣 Hữu Cơ' },
+                        ].map(cat => (
+                          <button
+                            key={cat.key}
+                            onClick={() => setIupacCategoryFilter(cat.key)}
+                            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                              iupacCategoryFilter === cat.key
+                                ? 'bg-orange-400 text-slate-950 shadow-md scale-105'
+                                : 'bg-white/10 hover:bg-white/20 text-white'
+                            }`}
+                          >
+                            {cat.label}
+                          </button>
+                        ))}
+                      </div>
+                      <p className="text-[11px] text-orange-200/50 mt-2 italic">
+                        ℹ️ App hiện có 1 gói — mỗi gói thêm sẽ hiển thị ở đây. Bộ lọc sẵn sàng cho phép mở rộng.
+                      </p>
+                    </div>
                   </div>
 
                   {/* Thẻ thông tin chi tiết */}
@@ -6684,6 +7615,42 @@
                       <p className="text-xs text-slate-500">Hỗ trợ GV Hóa học phát âm đúng tên các hợp chất, nguyên tố, chuỗi phản ứng theo danh pháp IUPAC quốc tế.</p>
                     </div>
                   </div>
+
+                  {/* Thẻ App - có thể nhân rộng khi có nhiều app hơn */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                    {DATA_IUPAC.map((item, idx) => (
+                      <div key={idx} className="bg-white rounded-xl border-2 border-orange-200 hover:border-orange-400 p-5 shadow-sm hover:shadow-md transition-all flex flex-col justify-between group">
+                        <div>
+                          <div className="flex items-center gap-3 mb-3">
+                            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-100 to-amber-100 flex items-center justify-center shrink-0 shadow-sm">
+                              <span className="text-2xl">🧪</span>
+                            </div>
+                            <div>
+                              <span className="px-2 py-0.5 rounded text-[10px] font-black uppercase bg-orange-100 text-orange-700 border border-orange-200">{item.category}</span>
+                              <h3 className="font-bold text-slate-800 text-sm mt-1 group-hover:text-orange-700 transition-colors">{item.title}</h3>
+                            </div>
+                          </div>
+                          <p className="text-xs text-slate-500 line-clamp-2 mb-4">{item.desc}</p>
+                        </div>
+                        <div className="pt-3 border-t border-slate-100 flex items-center gap-2">
+                          <button
+                            onClick={() => setPreviewItem(item)}
+                            className="flex-1 bg-orange-500 hover:bg-orange-600 text-white text-xs font-bold py-2 px-3 rounded-lg flex items-center justify-center gap-1.5 shadow-sm transition-colors"
+                          >
+                            <i data-lucide="play" className="w-3.5 h-3.5"></i>
+                            <span>Xem Trước</span>
+                          </button>
+                          <a
+                            href={item.url} target="_blank" rel="noopener noreferrer"
+                            className="p-2 border border-slate-200 hover:border-orange-400 hover:bg-orange-50 text-slate-600 hover:text-orange-700 rounded-lg transition-colors"
+                            title="Mở toàn màn hình"
+                          >
+                            <i data-lucide="external-link" className="w-4 h-4"></i>
+                          </a>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               )}
 
@@ -6707,8 +7674,18 @@
                           Vẽ hình 3D tương tác · Nhận biết hình · Chứng minh định lí · Thử ngay trên trình duyệt. Chạy không cần mạng, theo chương trình Kết Nối Tri Thức.
                         </p>
                       </div>
-                      <div className="flex items-center gap-3">
-                        <span className="px-4 py-2 bg-white/10 rounded-xl text-xs font-bold border border-white/20">
+
+                      {/* Gợi Ý 3: Nút Mở Mục Lục cố định trên header */}
+                      <div className="flex flex-col gap-3">
+                        <a
+                          href="3D%20HH%20to%C3%A1n/Bai%20giang%203D%20Hinh%20hoc%20Toan%206-9/00%20-%20MUC%20LUC%20Bai%20giang%203D%20Hinh%20hoc.html"
+                          target="_blank" rel="noopener noreferrer"
+                          className="px-5 py-2.5 bg-blue-500 hover:bg-blue-400 text-white font-bold rounded-xl flex items-center gap-2 shadow-lg transition-colors text-sm"
+                        >
+                          <i data-lucide="list" className="w-4 h-4"></i>
+                          Mở Mục Lục 55 Bài
+                        </a>
+                        <span className="px-4 py-2 bg-white/10 rounded-xl text-xs font-bold border border-white/20 text-center">
                           Tổng: {DATA_3D_HINH_HOC.length - 1} Bài + 1 Mục Lục
                         </span>
                       </div>
@@ -6744,56 +7721,78 @@
                     </div>
                   </div>
 
-                  {/* Lưới hiển thị bài giảng 3D Hình Học */}
+                  {/* Gợi Ý 2: Lưới hiển thị bài giảng 3D Hình Học với icon SVG động */}
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                     {DATA_3D_HINH_HOC
                       .filter(item => hinhHoc3dGradeFilter === 'ALL' || item.grade === hinhHoc3dGradeFilter)
                       .filter(item => item.title.toLowerCase().includes(hinhHoc3dSearch.toLowerCase()))
-                      .map((item, idx) => (
-                        <div key={idx} className={`bg-white rounded-xl border p-5 shadow-sm hover:shadow-md transition-all flex flex-col justify-between group ${
-                          item.grade === 'ALL' ? 'border-blue-300 hover:border-blue-500 col-span-1 md:col-span-2 lg:col-span-3' : 'border-slate-200 hover:border-blue-400'
-                        }`}>
-                          <div>
-                            <div className="flex items-center justify-between mb-3">
-                              <span className={`px-2.5 py-1 rounded-md text-[11px] font-black uppercase tracking-wider ${
-                                item.grade === 'ALL'
-                                  ? 'bg-blue-700 text-white border border-blue-800'
-                                  : 'bg-blue-100 text-blue-800 border border-blue-200'
-                              }`}>
-                                {item.grade === 'ALL' ? '📐 Mục Lục' : `Toán ${item.grade}`}
-                              </span>
-                              <span className="text-[11px] text-slate-500 font-semibold flex items-center gap-1">
-                                <i data-lucide="triangle" className="w-3.5 h-3.5 text-blue-500"></i>
-                                {item.category}
-                              </span>
+                      .map((item, idx) => {
+                        // Icon SVG mini theo nội dung bài (Gợi Ý 2)
+                        const getSvgIcon = (title) => {
+                          const t = title.toLowerCase();
+                          if (t.includes('tam giác') || t.includes('tam giac'))
+                            return (<svg viewBox="0 0 44 40" width="44" height="40"><path d="M22 4 L40 36 L4 36 Z" fill="#dbeafe" stroke="#2563eb" strokeWidth="2"/><path d="M22 4 L22 36" stroke="#60a5fa" strokeWidth="1.5" strokeDasharray="3 2"/></svg>);
+                          if (t.includes('tứ giác') || t.includes('tu giac') || t.includes('hình thang') || t.includes('hinh thang') || t.includes('bình hành') || t.includes('binh hanh') || t.includes('chữ nhật') || t.includes('chu nhat') || t.includes('hình thoi') || t.includes('hinh thoi'))
+                            return (<svg viewBox="0 0 44 40" width="44" height="40"><path d="M6 34 L14 8 L38 8 L30 34 Z" fill="#dbeafe" stroke="#2563eb" strokeWidth="2"/><path d="M6 34 L38 8 M14 8 L30 34" stroke="#60a5fa" strokeWidth="1.5" strokeDasharray="3 2"/></svg>);
+                          if (t.includes('đường tròn') || t.includes('duong tron') || t.includes('cung') || t.includes('đa giác') || t.includes('da giac'))
+                            return (<svg viewBox="0 0 44 40" width="44" height="40"><circle cx="22" cy="20" r="16" fill="#fef3c7" stroke="#d97706" strokeWidth="2"/><path d="M22 20 L36 14" stroke="#f59e0b" strokeWidth="2"/><circle cx="22" cy="20" r="2" fill="#1e3a5f"/></svg>);
+                          if (t.includes('hình hộp') || t.includes('hinh hop') || t.includes('lăng trụ') || t.includes('lang tru') || t.includes('hình chóp') || t.includes('hinh chop') || t.includes('hình trụ') || t.includes('hinh tru') || t.includes('hình nón') || t.includes('hinh non') || t.includes('hình cầu') || t.includes('hinh cau'))
+                            return (<svg viewBox="0 0 44 40" width="44" height="40"><path d="M8 12 L22 6 L36 12 L36 32 L22 38 L8 32 Z" fill="#c7d2fe" stroke="#4f46e5" strokeWidth="2"/><path d="M8 12 L22 18 L36 12 M22 18 L22 38" stroke="#818cf8" strokeWidth="1.5"/></svg>);
+                          if (t.includes('đoạn thẳng') || t.includes('doan thang') || t.includes('đường thẳng') || t.includes('duong thang') || t.includes('điểm') || t.includes('diem') || t.includes('tia') || t.includes('góc') || t.includes('goc'))
+                            return (<svg viewBox="0 0 44 40" width="44" height="40"><path d="M6 34 L38 34 M6 34 L30 8" stroke="#1d2b53" strokeWidth="2.5" fill="none"/><path d="M18 34 A12 12 0 0 0 15 26" stroke="#e0532f" strokeWidth="2" fill="none"/></svg>);
+                          // Mục lục
+                          return (<svg viewBox="0 0 44 40" width="44" height="40"><rect x="4" y="6" width="36" height="28" rx="4" fill="#dbeafe" stroke="#2563eb" strokeWidth="2"/><path d="M10 14 L34 14 M10 20 L28 20 M10 26 L22 26" stroke="#2563eb" strokeWidth="1.8"/></svg>);
+                        };
+                        return (
+                          <div key={idx} className={`bg-white rounded-xl border p-5 shadow-sm hover:shadow-md transition-all flex flex-col justify-between group ${
+                            item.grade === 'ALL' ? 'border-blue-300 hover:border-blue-500 col-span-1 md:col-span-2 lg:col-span-3' : 'border-slate-200 hover:border-blue-400'
+                          }`}>
+                            <div>
+                              <div className="flex items-start gap-3 mb-3">
+                                {/* Gợi Ý 2: Icon SVG mini theo từng loại bài */}
+                                <div className="shrink-0 group-hover:scale-110 transition-transform duration-200">
+                                  {getSvgIcon(item.title)}
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex items-center justify-between gap-2 mb-1">
+                                    <span className={`px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider ${
+                                      item.grade === 'ALL'
+                                        ? 'bg-blue-700 text-white'
+                                        : 'bg-blue-100 text-blue-800 border border-blue-200'
+                                    }`}>
+                                      {item.grade === 'ALL' ? '📐 Mục Lục' : `Toán ${item.grade}`}
+                                    </span>
+                                    <span className="text-[10px] text-slate-400 font-medium">{item.category}</span>
+                                  </div>
+                                  <h3 className="font-bold text-slate-800 text-sm group-hover:text-blue-700 transition-colors leading-snug">
+                                    {item.title}
+                                  </h3>
+                                </div>
+                              </div>
+                              <p className="text-xs text-slate-500 line-clamp-2 mb-4">
+                                {item.desc || 'Bài giảng 3D tương tác: vẽ hình, nhận biết, chứng minh — chạy ngay trên trình duyệt, không cần cài đặt.'}
+                              </p>
                             </div>
-                            <h3 className="font-bold text-slate-800 text-sm group-hover:text-blue-700 transition-colors leading-snug mb-2">
-                              {item.title}
-                            </h3>
-                            <p className="text-xs text-slate-500 line-clamp-2 mb-4">
-                              {item.desc || 'Bài giảng 3D tương tác: vẽ hình, nhận biết, chứng minh — chạy ngay trên trình duyệt, không cần cài đặt.'}
-                            </p>
+                            <div className="pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
+                              <button
+                                onClick={() => setPreviewItem(item)}
+                                className="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold py-2 px-3 rounded-lg flex items-center justify-center gap-1.5 shadow-sm transition-colors"
+                              >
+                                <i data-lucide="play" className="w-3.5 h-3.5"></i>
+                                <span>Mở Trải Nghiệm</span>
+                              </button>
+                              <a
+                                href={item.url}
+                                target="_blank" rel="noopener noreferrer"
+                                className="p-2 border border-slate-200 hover:border-blue-400 hover:bg-blue-50 text-slate-600 hover:text-blue-700 rounded-lg transition-colors"
+                                title="Mở tab mới toàn màn hình"
+                              >
+                                <i data-lucide="external-link" className="w-4 h-4"></i>
+                              </a>
+                            </div>
                           </div>
-                          <div className="pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
-                            <button
-                              onClick={() => setPreviewItem(item)}
-                              className="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold py-2 px-3 rounded-lg flex items-center justify-center gap-1.5 shadow-sm transition-colors"
-                            >
-                              <i data-lucide="play" className="w-3.5 h-3.5"></i>
-                              <span>Mở Trải Nghiệm</span>
-                            </button>
-                            <a
-                              href={item.url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="p-2 border border-slate-200 hover:border-blue-400 hover:bg-blue-50 text-slate-600 hover:text-blue-700 rounded-lg text-xs font-semibold transition-colors"
-                              title="Mở tab mới toàn màn hình"
-                            >
-                              <i data-lucide="external-link" className="w-4 h-4"></i>
-                            </a>
-                          </div>
-                        </div>
-                    ))}
+                        );
+                      })}
                   </div>
                 </div>
               )}
@@ -6811,8 +7810,30 @@
                       </h4>
                     </div>
                     <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          handleOpenAiGameModal({ title: previewItem.title, name: previewItem.title, grade: previewItem.grade });
+                        }}
+                        className="px-3 py-1.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all shadow-sm"
+                        title="Tạo bộ câu hỏi trắc nghiệm bằng AI cho bài học này"
+                      >
+                        <i data-lucide="sparkles" className="w-3.5 h-3.5 text-amber-300"></i>
+                        <span>Tạo Câu Hỏi AI</span>
+                      </button>
+                      {previewItem.download_url && (
+                        <button
+                          type="button"
+                          onClick={() => handleDownloadMaterial(previewItem.matId, previewItem.download_url)}
+                          className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors shadow-sm"
+                          title="Tải học liệu / game này về máy"
+                        >
+                          <i data-lucide="download-cloud" className="w-3.5 h-3.5"></i>
+                          <span>Tải File Này</span>
+                        </button>
+                      )}
                       <a
-                        href={previewItem.url}
+                        href={previewItem.raw_url || previewItem.url}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-cyan-300 rounded-lg text-xs font-semibold flex items-center gap-1.5 border border-slate-700 transition-colors"
@@ -6849,8 +7870,8 @@
                     <div className="flex items-center gap-2.5">
                       <i data-lucide="briefcase" className="w-5 h-5 text-violet-600"></i>
                       <div>
-                        <h3 className="font-bold text-slate-800 text-base">Tổ Trưởng Số — 8 công cụ cho tổ trưởng, giáo viên</h3>
-                        <p className="text-xs text-slate-500">Lịch việc tổ · Phân công tiết · Biên bản họp tổ · Tiến độ chương trình · Kết quả kiểm tra · Kiểm ma trận đề · Tích hợp NLS – NLAI vào giáo án · Song ngữ Việt – Anh cho giáo án — dữ liệu chỉ lưu trên trình duyệt máy này</p>
+                        <h3 className="font-bold text-slate-800 text-base">Tổ Trưởng Số — 9 công cụ cho tổ trưởng, giáo viên</h3>
+                        <p className="text-xs text-slate-500">Soạn đề kiểm tra CV 7991 · Lịch việc tổ · Phân công tiết · Biên bản họp tổ · Tiến độ chương trình · Kết quả kiểm tra · Kiểm ma trận đề · Tích hợp NLS – NLAI vào giáo án · Song ngữ Việt – Anh cho giáo án — dữ liệu chỉ lưu trên trình duyệt máy này</p>
                       </div>
                     </div>
                     <a href="to-truong/index.html" target="_blank" rel="noopener noreferrer"
@@ -6868,80 +7889,199 @@
                 </div>
               )}
 
-              {activeTab === 'MATERIALS' && (
-                <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6 space-y-6">
-                  <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-100 pb-4">
-                    <div>
-                      <h2 className="font-bold text-slate-800 text-base flex items-center gap-2">
-                        <i data-lucide="folder-open" className="w-5 h-5 text-amber-600"></i>
-                        <span>Material Controller - Quản Lý Thư Viện Học Liệu</span>
-                      </h2>
-                      <p className="text-xs text-slate-500">Lưu trữ Slide trình chiếu, Bản vẽ CAD kỹ thuật, Đề thi trên Supabase Storage</p>
+              {activeTab === 'MATERIALS' && (() => {
+                const gameCount = materials.filter(m => m.category === 'GAME_PPTX').length;
+                const filteredMaterials = materials.filter(m => {
+                  let matchCategory = true;
+                  if (filterCategory === 'GAME_PPTX') {
+                    matchCategory = m.category === 'GAME_PPTX';
+                  } else if (filterCategory === 'SLIDE') {
+                    matchCategory = m.category === 'SLIDE' || m.category === 'GAME_PPTX';
+                  } else if (filterCategory !== 'ALL') {
+                    matchCategory = m.category === filterCategory;
+                  }
+
+                  if (materialSearchQuery && materialSearchQuery.trim()) {
+                    const q = materialSearchQuery.toLowerCase().trim();
+                    const matchText = (m.title || '').toLowerCase().includes(q) ||
+                                      (m.description || '').toLowerCase().includes(q) ||
+                                      (m.grade || '').toLowerCase().includes(q);
+                    return matchCategory && matchText;
+                  }
+                  return matchCategory;
+                });
+
+                const categories = [
+                  { key: 'ALL', label: 'Tất cả (' + materials.length + ')' },
+                  { key: 'GAME_PPTX', label: '🎮 Trò chơi PPTX (' + gameCount + ')' },
+                  { key: 'SLIDE', label: 'Slide bài giảng' },
+                  { key: 'EXAM', label: 'Đề thi' },
+                  { key: 'CAD_DRAWING', label: 'Bản vẽ CAD' },
+                  { key: 'VIDEO', label: 'Video' }
+                ];
+
+                return (
+                  <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6 space-y-6">
+                    {/* Header */}
+                    <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-100 pb-4">
+                      <div>
+                        <h2 className="font-bold text-slate-800 text-base flex items-center gap-2">
+                          <i data-lucide="folder-open" className="w-5 h-5 text-amber-600"></i>
+                          <span>Material Controller - Quản Lý Thư Viện Học Liệu</span>
+                        </h2>
+                        <p className="text-xs text-slate-500">Lưu trữ Slide trình chiếu, Bản vẽ CAD kỹ thuật, Đề thi & 47+ Trò chơi PPTX tương tác trên Supabase & Google Drive</p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <a
+                          href="https://drive.google.com/drive/folders/1-6yM3aPmX79gGYfoy3secyJAPNoTYLc1?usp=sharing"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-300 text-xs font-semibold px-3.5 py-2 rounded-lg flex items-center gap-1.5 transition-colors shadow-sm"
+                          title="Mở toàn bộ thư mục Google Drive chứa 47+ file trò chơi gốc"
+                        >
+                          <i data-lucide="external-link" className="w-4 h-4 text-amber-600"></i>
+                          <span>Mở Drive Gốc (47+ Game)</span>
+                        </a>
+                        <button
+                          onClick={() => setShowUploadModal(true)}
+                          className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold px-4 py-2 rounded-lg flex items-center gap-2 shadow-sm transition-colors"
+                        >
+                          <i data-lucide="upload" className="w-4 h-4"></i>
+                          <span>Upload Học Liệu Mới</span>
+                        </button>
+                      </div>
                     </div>
-                    <button
-                      onClick={() => setShowUploadModal(true)}
-                      className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold px-4 py-2 rounded-lg flex items-center gap-2"
-                    >
-                      <i data-lucide="upload" className="w-4 h-4"></i>
-                      <span>Upload Học Liệu Mới</span>
-                    </button>
-                  </div>
 
-                  {/* Category Filters */}
-                  <div className="flex space-x-2">
-                    {['ALL', 'SLIDE', 'EXAM', 'CAD_DRAWING', 'VIDEO'].map(cat => (
-                      <button
-                        key={cat}
-                        onClick={() => setFilterCategory(cat)}
-                        className={`text-xs font-semibold px-3 py-1.5 rounded-lg border transition-colors ${
-                          filterCategory === cat ? 'bg-slate-900 text-white border-slate-900' : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'
-                        }`}
-                      >
-                        {cat === 'ALL' ? 'Tất cả' : cat}
-                      </button>
-                    ))}
-                  </div>
+                    {/* Filter and Search Bar */}
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+                      {/* Category Filters */}
+                      <div className="flex flex-wrap gap-2">
+                        {categories.map(cat => (
+                          <button
+                            key={cat.key}
+                            onClick={() => setFilterCategory(cat.key)}
+                            className={`text-xs font-semibold px-3 py-1.5 rounded-lg border transition-colors ${
+                              filterCategory === cat.key
+                                ? 'bg-slate-900 text-white border-slate-900'
+                                : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'
+                            }`}
+                          >
+                            {cat.label}
+                          </button>
+                        ))}
+                      </div>
 
-                  {/* Materials Grid or Empty State */}
-                  {materials.filter(m => filterCategory === 'ALL' || m.category === filterCategory).length > 0 ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {materials
-                        .filter(m => filterCategory === 'ALL' || m.category === filterCategory)
-                        .map(mat => (
-                          <div key={mat.id} className="p-4 rounded-xl border border-slate-200 bg-slate-50/50 hover:bg-slate-50 transition-all flex items-start space-x-3">
-                            <div className="bg-amber-100 text-amber-700 p-2.5 rounded-lg">
-                              <i data-lucide="file-text" className="w-6 h-6"></i>
+                      {/* Quick Search */}
+                      <div className="relative w-full md:w-72">
+                        <i data-lucide="search" className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-2.5"></i>
+                        <input
+                          type="text"
+                          placeholder="Tìm nhanh trò chơi, bài giảng..."
+                          value={materialSearchQuery}
+                          onChange={(e) => setMaterialSearchQuery(e.target.value)}
+                          className="w-full pl-8 pr-7 py-1.5 text-xs border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-slate-50 focus:bg-white transition-all"
+                        />
+                        {materialSearchQuery && (
+                          <button
+                            onClick={() => setMaterialSearchQuery('')}
+                            className="absolute right-2.5 top-2 text-slate-400 hover:text-slate-600"
+                          >
+                            <i data-lucide="x" className="w-3.5 h-3.5"></i>
+                          </button>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Materials Grid or Empty State */}
+                    {filteredMaterials.length > 0 ? (
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {filteredMaterials.map(mat => (
+                          <div
+                            key={mat.id}
+                            className="p-4 rounded-xl border border-slate-200 bg-slate-50/50 hover:bg-slate-50 hover:border-slate-300 hover:shadow-sm transition-all flex items-start space-x-3 group"
+                          >
+                            <div className="bg-amber-100 text-amber-700 p-2.5 rounded-lg shrink-0 group-hover:scale-105 transition-transform">
+                              <i
+                                data-lucide={mat.category === 'GAME_PPTX' ? 'presentation' : (mat.category === 'VIDEO' ? 'video' : 'file-text')}
+                                className="w-6 h-6"
+                              ></i>
                             </div>
                             <div className="flex-1 min-w-0">
-                              <div className="flex items-center justify-between">
-                                <span className="text-[10px] font-bold bg-slate-200 text-slate-700 px-2 py-0.5 rounded">Lớp {mat.grade}</span>
-                                <span className="text-[11px] text-slate-400">{mat.size}</span>
+                              <div className="flex items-center justify-between gap-2">
+                                <span className="text-[10px] font-bold bg-slate-200 text-slate-700 px-2 py-0.5 rounded shrink-0">
+                                  Lớp {mat.grade || 'Toàn cấp'}
+                                </span>
+                                <span className="text-[11px] text-slate-400 font-mono truncate">
+                                  {mat.size || mat.file_size}
+                                </span>
                               </div>
-                              <h4 className="font-semibold text-xs text-slate-900 mt-1 truncate">{mat.title}</h4>
-                              <div className="flex items-center justify-between text-xs text-slate-500 mt-3">
-                                <span>Lượt tải: <strong>{mat.downloads}</strong></span>
-                                <button className="text-emerald-600 hover:text-emerald-700 font-semibold text-xs flex items-center gap-1">
-                                  <i data-lucide="download-cloud" className="w-3.5 h-3.5"></i>
-                                  <span>Tải Xuống</span>
-                                </button>
+                              <h4 className="font-semibold text-xs text-slate-900 mt-1 truncate" title={mat.title}>
+                                {mat.title}
+                              </h4>
+                              {mat.description && (
+                                <p className="text-[11px] text-slate-500 mt-0.5 line-clamp-1 truncate" title={mat.description}>
+                                  {mat.description}
+                                </p>
+                              )}
+                              <div className="flex items-center justify-between text-xs text-slate-500 mt-3 pt-1 border-t border-slate-100/80">
+                                <span>Lượt tải: <strong>{mat.downloads || 150}</strong></span>
+                                <div className="flex flex-wrap items-center gap-2">
+                                  {(mat.category === 'GAME_PPTX' || mat.file_type === 'PPTX') && (
+                                    <button
+                                      type="button"
+                                      onClick={() => handleOpenAiGameModal(mat)}
+                                      className="text-purple-600 hover:text-purple-800 font-bold text-xs flex items-center gap-1 transition-colors hover:underline bg-purple-50 hover:bg-purple-100 px-2 py-0.5 rounded border border-purple-200"
+                                      title="Dùng AI sinh bộ câu hỏi trắc nghiệm cho trò chơi này"
+                                    >
+                                      <i data-lucide="sparkles" className="w-3.5 h-3.5 text-purple-600"></i>
+                                      <span>Tạo Câu Hỏi AI</span>
+                                    </button>
+                                  )}
+                                  {(mat.view_url || mat.file_path) && (
+                                    <button
+                                      type="button"
+                                      onClick={() => handlePreviewMaterial(mat)}
+                                      className="text-indigo-600 hover:text-indigo-800 font-bold text-xs flex items-center gap-1 transition-colors hover:underline"
+                                      title="Xem trước Slide bài giảng trực tiếp trong web"
+                                    >
+                                      <i data-lucide="eye" className="w-3.5 h-3.5"></i>
+                                      <span>Xem Trước</span>
+                                    </button>
+                                  )}
+                                  <button
+                                    onClick={() => handleDownloadMaterial(mat.id, mat.download_url || mat.file_path)}
+                                    className="text-emerald-600 hover:text-emerald-700 font-semibold text-xs flex items-center gap-1 hover:underline transition-colors"
+                                    title="Tải học liệu về máy"
+                                  >
+                                    <i data-lucide="download-cloud" className="w-3.5 h-3.5"></i>
+                                    <span>Tải Xuống</span>
+                                  </button>
+                                </div>
                               </div>
                             </div>
                           </div>
                         ))}
-                    </div>
-                  ) : (
-                    <div className="p-12 text-center border-2 border-dashed border-slate-200 rounded-xl bg-slate-50/50 space-y-3">
-                      <div className="bg-amber-100 text-amber-600 p-3 rounded-full w-12 h-12 flex items-center justify-center mx-auto">
-                        <i data-lucide="folder-open" className="w-6 h-6"></i>
                       </div>
-                      <h3 className="font-bold text-slate-800 text-sm">Thư viện hiện chưa có học liệu</h3>
-                      <p className="text-xs text-slate-500 max-w-sm mx-auto">
-                        Tạm thời chưa tải lên các học liệu. Thầy/Cô có thể nhấp vào nút <strong>"Upload Học Liệu Mới"</strong> bên trên để tải tài liệu bài giảng lên hệ thống.
-                      </p>
-                    </div>
-                  )}
-                </div>
-              )}
+                    ) : (
+                      <div className="p-12 text-center border-2 border-dashed border-slate-200 rounded-xl bg-slate-50/50 space-y-3">
+                        <div className="bg-amber-100 text-amber-600 p-3 rounded-full w-12 h-12 flex items-center justify-center mx-auto">
+                          <i data-lucide="folder-open" className="w-6 h-6"></i>
+                        </div>
+                        <h3 className="font-bold text-slate-800 text-sm">Không tìm thấy học liệu phù hợp</h3>
+                        <p className="text-xs text-slate-500 max-w-sm mx-auto">
+                          Không có học liệu nào khớp với từ khóa "<strong>{materialSearchQuery}</strong>". Thầy/Cô hãy thử tìm từ khóa khác hoặc bấm nút "Tất cả".
+                        </p>
+                        <button
+                          onClick={() => { setFilterCategory('ALL'); setMaterialSearchQuery(''); }}
+                          className="mt-2 text-xs font-semibold text-emerald-600 hover:text-emerald-700 underline"
+                        >
+                          Hiển thị lại toàn bộ học liệu
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                );
+              })()}
 
               {/* TAB 4: STATS & ANALYTICS WORKER - QUẢN LÝ SỐ LƯỢNG SỬ DỤNG WEB & XUẤT BÁO CÁO */}
               {activeTab === 'STATS' && (
@@ -7680,6 +8820,383 @@ CREATE TABLE IF NOT EXISTS public.materials (
                     Đóng Bảng Tra Cứu
                   </button>
                 </div>
+              </div>
+            </div>
+          )}
+
+          
+          
+          {/* MODAL SINH CÂU HỎI TRÒ CHƠI BẰNG AI */}
+          {showAiGameModal && (
+            <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-3 sm:p-5 overflow-y-auto animate-in fade-in zoom-in duration-200">
+              <div className="bg-white rounded-2xl border border-slate-200 shadow-2xl w-full max-w-3xl overflow-hidden my-auto max-h-[92vh] flex flex-col">
+                {/* Header */}
+                <div className="p-5 border-b border-slate-100 flex items-center justify-between bg-gradient-to-r from-purple-900 via-indigo-900 to-slate-900 text-white shrink-0">
+                  <div className="flex items-center space-x-3">
+                    <div className="bg-purple-500/20 border border-purple-400/30 text-purple-300 p-2.5 rounded-xl shadow-inner">
+                      <i data-lucide="sparkles" className="w-5 h-5 text-amber-300"></i>
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <h3 className="font-bold text-base text-white">Trợ Lý AI — Sinh Bộ Câu Hỏi Trò Chơi</h3>
+                        <span className="bg-purple-500/30 text-purple-200 text-[10px] font-bold px-2 py-0.5 rounded-full border border-purple-400/30 truncate max-w-xs">
+                          {aiSelectedGame ? (aiSelectedGame.title || aiSelectedGame.name) : 'Game PowerPoint'}
+                        </span>
+                      </div>
+                      <p className="text-xs text-slate-300 mt-0.5">Tự động sinh bộ câu hỏi 4 lựa chọn (A, B, C, D) chuẩn hóa để sao chép vào Slide</p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setShowAiGameModal(false)}
+                    className="text-slate-400 hover:text-white p-1.5 rounded-lg hover:bg-white/10 transition-colors"
+                  >
+                    <i data-lucide="x" className="w-5 h-5"></i>
+                  </button>
+                </div>
+
+                {/* Body - Scrollable */}
+                <div className="p-6 overflow-y-auto space-y-5 flex-1">
+                  {/* Cấu hình câu hỏi */}
+                  <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                      <div>
+                        <label className="block text-xs font-bold text-slate-700 mb-1">Môn học</label>
+                        <select
+                          value={aiSubjectSelect}
+                          onChange={(e) => setAiSubjectSelect(e.target.value)}
+                          className="w-full text-xs border border-slate-300 rounded-lg p-2.5 bg-white focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                        >
+                          <option value="Công nghệ">Môn Công nghệ</option>
+                          <option value="HĐTN - HN">Hoạt động trải nghiệm</option>
+                          <option value="Khoa học tự nhiên">Khoa học tự nhiên</option>
+                          <option value="Toán học">Toán học</option>
+                          <option value="Tin học">Tin học</option>
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-bold text-slate-700 mb-1">Khối lớp</label>
+                        <select
+                          value={aiGradeSelect}
+                          onChange={(e) => setAiGradeSelect(e.target.value)}
+                          className="w-full text-xs border border-slate-300 rounded-lg p-2.5 bg-white focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                        >
+                          <option value="6">Lớp 6</option>
+                          <option value="7">Lớp 7</option>
+                          <option value="8">Lớp 8</option>
+                          <option value="9">Lớp 9</option>
+                          <option value="10">Lớp 10</option>
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-bold text-slate-700 mb-1">Số lượng câu hỏi</label>
+                        <select
+                          value={aiNumQuestions}
+                          onChange={(e) => setAiNumQuestions(Number(e.target.value))}
+                          className="w-full text-xs border border-slate-300 rounded-lg p-2.5 bg-white focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                        >
+                          <option value="5">5 câu hỏi</option>
+                          <option value="10">10 câu hỏi (Chuẩn)</option>
+                          <option value="15">15 câu hỏi (Ai Là Triệu Phú)</option>
+                          <option value="20">20 câu hỏi (Ôn tập toàn diện)</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 mb-1">
+                        Chủ đề bài dạy / Tên bài học cần tạo câu hỏi *
+                      </label>
+                      <div className="relative">
+                        <input
+                          type="text"
+                          required
+                          placeholder="VD: Trồng trọt công nghệ cao, Bản vẽ cơ khí, Mạch điện điều khiển..."
+                          value={aiTopicInput}
+                          onChange={(e) => setAiTopicInput(e.target.value)}
+                          className="w-full text-xs border border-slate-300 rounded-lg p-2.5 pr-24 bg-white focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setAiTopicInput('Trồng trọt công nghệ cao & Mô hình nhà kính thông minh')}
+                          className="absolute right-2 top-2 text-[10px] bg-purple-50 hover:bg-purple-100 text-purple-700 px-2 py-0.5 rounded font-semibold border border-purple-200"
+                        >
+                          Gợi ý mẫu
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Gemini API Key Box (Optional) */}
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-2 border-t border-slate-200/80 text-[11px] text-slate-500">
+                      <div className="flex items-center gap-1.5">
+                        <i data-lucide="key" className="w-3.5 h-3.5 text-amber-500"></i>
+                        <span>Gemini API Key (Tùy chọn):</span>
+                        <input
+                          type="password"
+                          placeholder="Dán API Key nếu có..."
+                          value={aiApiKeyInput}
+                          onChange={(e) => handleSaveApiKey(e.target.value)}
+                          className="text-xs border border-slate-200 rounded px-2 py-0.5 bg-white w-40 focus:outline-none focus:ring-1 focus:ring-purple-500"
+                        />
+                      </div>
+                      <span className="text-[10px] text-emerald-600 font-medium flex items-center gap-1">
+                        <i data-lucide="check-circle" className="w-3 h-3"></i>
+                        Sẵn sàng tạo câu hỏi thông minh (Có hỗ trợ Offline)
+                      </span>
+                    </div>
+
+                    {/* Submit Button */}
+                    <button
+                      type="button"
+                      disabled={isGeneratingAiQuestions}
+                      onClick={handleGenerateAiQuestions}
+                      className="w-full bg-gradient-to-r from-purple-600 via-indigo-600 to-blue-600 hover:from-purple-700 hover:to-indigo-700 text-white font-bold py-2.5 px-4 rounded-xl shadow-md flex items-center justify-center gap-2 text-xs transition-all disabled:opacity-50"
+                    >
+                      {isGeneratingAiQuestions ? (
+                        <>
+                          <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                          <span>AI Đang Soạn Câu Hỏi Trắc Nghiệm...</span>
+                        </>
+                      ) : (
+                        <>
+                          <i data-lucide="sparkles" className="w-4 h-4 text-amber-300"></i>
+                          <span>Sinh Bộ Câu Hỏi Bằng AI Ngay</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+
+                  {/* Hiển thị kết quả sinh câu hỏi */}
+                  {generatedQuestionsList.length > 0 && (
+                    <div className="space-y-4 pt-2">
+                      <div className="flex flex-wrap items-center justify-between gap-3 bg-purple-50 border border-purple-200 p-3.5 rounded-xl">
+                        <div>
+                          <p className="font-bold text-xs text-purple-900">
+                            Đã tạo thành công {generatedQuestionsList.length} câu hỏi trắc nghiệm!
+                          </p>
+                          <p className="text-[11px] text-purple-700">
+                            Định dạng 4 lựa chọn chuẩn môn {aiSubjectSelect} lớp {aiGradeSelect}
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => handleCopyQuestionsToClipboard('TABLE')}
+                            className="bg-white hover:bg-slate-50 text-purple-700 border border-purple-300 text-xs font-bold px-3 py-1.5 rounded-lg flex items-center gap-1.5 shadow-sm transition-all"
+                            title="Sao chép dạng bảng phân tách tab để dán vào Excel hoặc PowerPoint Table"
+                          >
+                            <i data-lucide="copy" className="w-3.5 h-3.5"></i>
+                            <span>Sao Chép Dạng Bảng</span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleCopyQuestionsToClipboard('NUMBERED')}
+                            className="bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg flex items-center gap-1.5 shadow-sm transition-all"
+                            title="Sao chép toàn bộ nội dung câu hỏi dạng văn bản có đáp án"
+                          >
+                            <i data-lucide="file-text" className="w-3.5 h-3.5"></i>
+                            <span>Sao Chép Dạng Văn Bản</span>
+                          </button>
+                        </div>
+                      </div>
+
+                      {copyStatus && (
+                        <div className="bg-emerald-50 text-emerald-800 border border-emerald-200 p-2.5 rounded-lg text-xs font-bold flex items-center gap-2 animate-in fade-in">
+                          <i data-lucide="check-circle" className="w-4 h-4 text-emerald-600"></i>
+                          <span>{copyStatus}</span>
+                        </div>
+                      )}
+
+                      {/* Danh sách câu hỏi render */}
+                      <div className="space-y-3">
+                        {generatedQuestionsList.map((q, idx) => (
+                          <div key={q.id || idx} className="p-3.5 rounded-xl border border-slate-200 bg-white hover:border-purple-200 transition-colors space-y-2">
+                            <div className="flex items-start justify-between gap-2">
+                              <h5 className="font-bold text-xs text-slate-800">
+                                Câu {idx + 1}: {q.question}
+                              </h5>
+                              <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-slate-100 text-slate-600 shrink-0">
+                                {q.level || 'Nhận biết'}
+                              </span>
+                            </div>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 pt-1">
+                              {q.options && q.options.map((opt, oIdx) => {
+                                const isCorrect = q.answer === oIdx || (q.answerLetter && opt.startsWith(q.answerLetter));
+                                return (
+                                  <div
+                                    key={oIdx}
+                                    className={`text-xs px-2.5 py-1.5 rounded-lg border transition-colors ${
+                                      isCorrect
+                                        ? 'bg-emerald-50 border-emerald-300 text-emerald-800 font-bold'
+                                        : 'bg-slate-50 border-slate-200 text-slate-700'
+                                    }`}
+                                  >
+                                    {opt}
+                                  </div>
+                                );
+                              })}
+                            </div>
+                            {q.explain && (
+                              <p className="text-[11px] text-slate-500 italic pt-1 border-t border-slate-100">
+                                <span className="font-semibold text-slate-600">Giải thích:</span> {q.explain}
+                              </p>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Footer */}
+                <div className="p-4 border-t border-slate-100 bg-slate-50 flex items-center justify-between shrink-0">
+                  <span className="text-xs text-slate-500">
+                    💡 Thầy/Cô chỉ cần bấm <strong>"Sao Chép"</strong> rồi mở PowerPoint dán thẳng vào các slide câu hỏi!
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setShowAiGameModal(false)}
+                    className="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold text-xs rounded-lg transition-colors"
+                  >
+                    Đóng
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* UPLOAD MATERIAL MODAL */}
+          {showUploadModal && (
+            <div className="fixed inset-0 bg-slate-950/75 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+              <div className="bg-white rounded-2xl border border-slate-200 shadow-2xl w-full max-w-lg overflow-hidden animate-in fade-in zoom-in duration-200">
+                <div className="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50">
+                  <div className="flex items-center space-x-2.5">
+                    <div className="bg-emerald-100 text-emerald-700 p-2 rounded-xl">
+                      <i data-lucide="upload-cloud" className="w-5 h-5"></i>
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-slate-800 text-base">Thêm Học Liệu / Trò Chơi Mới</h3>
+                      <p className="text-xs text-slate-500">Đăng tải slide, đề thi hoặc link Google Drive vào thư viện</p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setShowUploadModal(false)}
+                    className="text-slate-400 hover:text-slate-600 p-1 rounded-lg hover:bg-slate-100"
+                  >
+                    <i data-lucide="x" className="w-5 h-5"></i>
+                  </button>
+                </div>
+
+                <form onSubmit={handleAddMaterialSubmit} className="p-6 space-y-4">
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1">Tiêu đề học liệu / Trò chơi *</label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="VD: Trò chơi Ô Chữ Bí Mật - Công nghệ 8"
+                      value={uploadMaterialForm.title}
+                      onChange={(e) => setUploadMaterialForm({ ...uploadMaterialForm, title: e.target.value })}
+                      className="w-full text-xs border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-xs font-semibold text-slate-700 mb-1">Phân loại</label>
+                      <select
+                        value={uploadMaterialForm.category}
+                        onChange={(e) => setUploadMaterialForm({ ...uploadMaterialForm, category: e.target.value })}
+                        className="w-full text-xs border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                      >
+                        <option value="GAME_PPTX">🎮 Trò chơi PPTX</option>
+                        <option value="SLIDE">Slide bài giảng</option>
+                        <option value="EXAM">Đề thi / Kiểm tra</option>
+                        <option value="CAD_DRAWING">Bản vẽ CAD kỹ thuật</option>
+                        <option value="VIDEO">Video hướng dẫn</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold text-slate-700 mb-1">Khối lớp áp dụng</label>
+                      <select
+                        value={uploadMaterialForm.grade}
+                        onChange={(e) => setUploadMaterialForm({ ...uploadMaterialForm, grade: e.target.value })}
+                        className="w-full text-xs border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                      >
+                        <option value="6">Lớp 6</option>
+                        <option value="7">Lớp 7</option>
+                        <option value="8">Lớp 8</option>
+                        <option value="9">Lớp 9</option>
+                        <option value="6-9">Lớp 6 - 9</option>
+                        <option value="Toàn cấp">Toàn cấp THCS</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-xs font-semibold text-slate-700 mb-1">Định dạng file</label>
+                      <input
+                        type="text"
+                        placeholder="VD: PPTX, RAR, PDF, DOCX"
+                        value={uploadMaterialForm.file_type}
+                        onChange={(e) => setUploadMaterialForm({ ...uploadMaterialForm, file_type: e.target.value })}
+                        className="w-full text-xs border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                      >
+                      </input>
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold text-slate-700 mb-1">Dung lượng ước tính</label>
+                      <input
+                        type="text"
+                        placeholder="VD: 15.2 MB"
+                        value={uploadMaterialForm.file_size}
+                        onChange={(e) => setUploadMaterialForm({ ...uploadMaterialForm, file_size: e.target.value })}
+                        className="w-full text-xs border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1">Đường dẫn tải / Link Google Drive</label>
+                    <input
+                      type="url"
+                      placeholder="https://drive.google.com/file/d/..."
+                      value={uploadMaterialForm.file_path}
+                      onChange={(e) => setUploadMaterialForm({ ...uploadMaterialForm, file_path: e.target.value })}
+                      className="w-full text-xs border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                    />
+                    <p className="text-[10px] text-slate-400 mt-1">Dán link Google Drive chia sẻ ở chế độ "Bất kỳ ai có liên kết đều xem được"</p>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1">Mô tả ngắn về học liệu</label>
+                    <textarea
+                      rows="2"
+                      placeholder="Mô tả nội dung, hướng dẫn sử dụng hoặc ghi chú giáo viên..."
+                      value={uploadMaterialForm.description}
+                      onChange={(e) => setUploadMaterialForm({ ...uploadMaterialForm, description: e.target.value })}
+                      className="w-full text-xs border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                    ></textarea>
+                  </div>
+
+                  <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-100">
+                    <button
+                      type="button"
+                      onClick={() => setShowUploadModal(false)}
+                      className="px-4 py-2 rounded-lg border border-slate-200 text-xs font-semibold text-slate-600 hover:bg-slate-50"
+                    >
+                      Hủy Bỏ
+                    </button>
+                    <button
+                      type="submit"
+                      className="px-5 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold flex items-center gap-1.5 shadow-sm"
+                    >
+                      <i data-lucide="check" className="w-4 h-4"></i>
+                      <span>Lưu Vào Thư Viện</span>
+                    </button>
+                  </div>
+                </form>
               </div>
             </div>
           )}

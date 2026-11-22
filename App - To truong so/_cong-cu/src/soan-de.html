@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Trợ lý soạn đề kiểm tra theo CV 7991 — Tổ trưởng số</title>
+<!--CSS-->
+<style>
+.mo{color:var(--mo)} .nho2{font-size:13px} .do{color:#dc2626}
+.buoc{display:flex;gap:10px;align-items:center;margin:0 0 12px;flex-wrap:wrap}
+.buoc .so{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:800;flex:none;background:linear-gradient(135deg,var(--chinh),var(--chinh2));box-shadow:0 6px 12px -6px rgba(79,70,229,.7)}
+.buoc b{font-size:18px} .buoc .phai{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
+section.the{margin-bottom:18px;scroll-margin-top:84px}
+/* thanh bước */
+#thanhBuoc{position:sticky;top:0;z-index:20;display:flex;gap:6px;flex-wrap:wrap;background:rgba(248,250,252,.88);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);padding:8px;border-radius:16px;border:1px solid var(--vien);margin-bottom:16px;box-shadow:var(--bong)}
+#thanhBuoc a{flex:1 1 150px;display:flex;gap:8px;align-items:center;text-decoration:none;color:var(--chu2);font-weight:600;font-size:14px;padding:7px 10px;border-radius:12px;background:#fff;border:1.5px solid #e2e8f0;transition:.15s}
+#thanhBuoc a:hover{border-color:var(--chinh);transform:translateY(-1px)}
+#thanhBuoc a i{font-style:normal;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;background:#e2e8f0;color:#475569;font-size:13px;flex:none}
+#thanhBuoc a.xong{border-color:#86efac;background:#f0fdf4;color:#166534}
+#thanhBuoc a.xong i{background:#16a34a;color:#fff}
+#thanhBuoc .tien{position:absolute;left:12px;right:12px;bottom:3px;height:3px;border-radius:3px;background:#e2e8f0;overflow:hidden}
+#tienDo{display:block;height:100%;background:linear-gradient(90deg,#16a34a,#0d9488);transition:width .4s;width:0}
+/* nạp */
+#oTha{border:2.5px dashed #a5b4fc;border-radius:16px;padding:22px 16px;text-align:center;cursor:pointer;background:rgba(238,242,255,.7);transition:.15s}
+#oTha:hover,#oTha.keo{background:#e0e7ff;border-color:var(--chinh);transform:scale(1.01)}
+#trangThai{margin-top:10px;font-size:14.5px}
+#trangThai .canh{background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;border-radius:10px;padding:6px 10px}
+.ok-dong{background:#f0fdf4;border:1px solid #bbf7d0;color:#166534;border-radius:10px;padding:6px 10px}
+.xoay{display:inline-block;width:14px;height:14px;border:2.5px solid #c7d2fe;border-top-color:var(--chinh);border-radius:50%;animation:xoay .8s linear infinite;vertical-align:-2px}
+@keyframes xoay{to{transform:rotate(360deg)}}
+.trong{display:flex;gap:14px;align-items:center;justify-content:center;flex-wrap:wrap;color:var(--chu2);padding:18px;text-align:center;font-size:14.5px;background:#f8fafc;border-radius:14px;border:1px dashed #cbd5e1}
+.cd{border:1.5px solid #e2e8f0;border-left:5px solid var(--m);border-radius:14px;padding:8px 10px;margin-bottom:8px;background:#fff}
+.cd-dau{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.cd-so{width:28px;height:28px;border-radius:50%;background:var(--m);color:#fff;display:grid;place-items:center;font-weight:800;flex:none}
+.cd-ch{flex:1 1 160px;min-height:38px;padding:6px 9px}.cd-ten{flex:3 1 240px;min-height:38px;padding:6px 9px;font-weight:600}
+.cd-tiet{display:flex;align-items:center;gap:4px;font-size:13px;font-weight:600;color:var(--chu2)}.cd-tiet input{width:58px;min-height:38px;padding:6px;text-align:center}
+.cd-nut{display:flex;gap:4px;margin-left:auto}
+.thanh{width:70px;height:8px;border-radius:8px;background:#e2e8f0;overflow:hidden}.thanh i{display:block;height:100%;background:var(--m)}
+.cd-ct summary{cursor:pointer;font-size:13.5px;color:var(--chinh);font-weight:600;margin-top:6px}
+.yc textarea{font-size:13.5px} .yB{color:#15803d}.yH{color:#0369a1}.yV{color:#c2410c}
+.yB textarea{border-color:#bbf7d0}.yH textarea{border-color:#bae6fd}.yV textarea{border-color:#fed7aa}
+/* dạng câu */
+#dsDang{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px;margin-bottom:12px}
+.dang{border:2px solid #e2e8f0;border-radius:16px;padding:10px 12px;background:#fff;opacity:.6;transition:.2s}
+.dang.bat{opacity:1;border-color:var(--m);box-shadow:0 8px 18px -12px var(--m)}
+.dang-dau{display:flex;gap:10px;align-items:center;cursor:pointer}
+.dang-dau input{width:20px;height:20px;min-height:0;accent-color:var(--m);flex:none}
+.dang-dau small{display:block;color:var(--chu2);font-size:12.5px}
+.dang-o{margin-top:8px}.dang-o label.o{font-size:12.5px}.dang-o input,.dang-o select{min-height:36px;padding:5px 8px}
+table.mt{border-collapse:separate;border-spacing:0;width:100%;font-size:14px;background:#fff;border-radius:12px;overflow:hidden}
+table.mt th{background:#eef2ff;color:var(--chinh);padding:6px 4px;font-size:13px;text-align:center;border-bottom:1px solid #e2e8f0}
+table.mt th.td{color:var(--m);border-bottom:3px solid var(--m)}
+table.mt th.thB{color:#15803d}.mt th.thH{color:#0369a1}.mt th.thV{color:#c2410c}
+table.mt td{border-top:1px solid #eef2f7;padding:4px 3px;text-align:center}
+table.mt td.tc,table.mt th.tc{text-align:left;min-width:180px;padding-left:8px}
+.o-mt input{width:44px;min-height:34px;padding:4px;text-align:center;font-weight:700;border-radius:9px;border:1.5px solid #e2e8f0;background:#f8fafc}
+.o-mt.co.mB input{background:#dcfce7;border-color:#86efac;color:#166534}.o-mt.co.mH input{background:#e0f2fe;border-color:#7dd3fc;color:#075985}.o-mt.co.mV input{background:#ffedd5;border-color:#fdba74;color:#9a3412}
+.mt td.so{font-size:15px}
+.mt tfoot td{background:#f8fafc;font-weight:600;font-size:13.5px}
+.mt .tongd{font-size:20px;font-weight:800}.tongd.dat{color:#16a34a}.tongd.chua{color:#dc2626}
+.ss{position:relative;width:110px;height:14px;margin:0 auto 2px;background:#f1f5f9;border-radius:8px;overflow:hidden}
+.ss span{position:absolute;left:0;height:7px;border-radius:7px}.ss .a{top:0;background:#6366f1}.ss .b{bottom:0;background:#94a3b8}
+.ss.lech .a{background:#f59e0b}
+.vanh-o{display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center}
+.chu-giai{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;font-size:13px}
+.chu-giai span::before{content:"";display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:4px;vertical-align:-1px;background:var(--m)}
+.tl-o{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:14px;padding:5px 0;border-bottom:1px dashed #e2e8f0}
+.tl-o input{width:70px;min-height:34px;padding:4px 6px;text-align:center}
+.chipm{display:inline-block;font-size:11.5px;font-weight:700;padding:1px 8px;border-radius:99px;color:#fff}
+.chipm.mB{background:#16a34a}.chipm.mH{background:#0284c7}.chipm.mV{background:#ea580c}
+/* soạn câu */
+details.hop{background:#f8fafc;border-radius:12px;padding:8px 12px;margin-top:8px}
+details.hop summary{cursor:pointer;font-weight:700;font-size:14.5px}
+.nhom-cau{margin-top:14px}
+.nhom-dau{display:flex;gap:10px;align-items:center;margin-bottom:8px;color:var(--m);font-size:16px}
+.cau-o{border:1.5px solid #e2e8f0;border-left:5px solid #f59e0b;border-radius:14px;padding:10px 12px;margin-bottom:10px;background:#fff;transition:.2s}
+.cau-o.xong{border-left-color:#16a34a}
+.cau-dau{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:6px}
+.cau-so{background:var(--m);color:#fff;font-weight:800;border-radius:9px;padding:2px 9px;font-size:13.5px}
+.cau-tt{margin-left:auto;font-size:12.5px;font-weight:700;color:#b45309}.cau-o.xong .cau-tt{color:#16a34a}
+.cau-o textarea{min-height:52px;font-size:14.5px}
+.pa{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:6px;margin-top:6px}
+.pa-o{display:flex;gap:6px;align-items:center;border:1.5px solid #e2e8f0;border-radius:11px;padding:3px 6px;cursor:pointer}
+.pa-o.dung{border-color:#16a34a;background:#f0fdf4}
+.pa-o.dung.dai{border-color:#f59e0b;background:#fffbeb;box-shadow:0 0 0 3px rgba(245,158,11,.18)}
+.canh-dai{font-size:12px;font-weight:700;color:#92400e;background:#fef3c7;border:1px solid #fcd34d;border-radius:99px;padding:1px 9px}
+.canh-dai[hidden]{display:none}
+.pa-o input[type=radio]{width:18px;height:18px;min-height:0;accent-color:#16a34a;flex:none}
+.pa-o input:not([type]){min-height:34px;padding:4px 8px;border:0;background:transparent}
+.ds-o{display:flex;gap:6px;align-items:center;margin-top:5px}
+.ds-o input{min-height:36px;padding:5px 8px;flex:1}
+.ds-ds{display:flex;gap:3px;flex:none}
+.ds-ds button{border:1.5px solid #cbd5e1;background:#fff;border-radius:9px;padding:4px 9px;font:600 13px var(--font);cursor:pointer;min-height:34px}
+.ds-ds button.chon.d{background:#16a34a;border-color:#16a34a;color:#fff}.ds-ds button.chon.s{background:#dc2626;border-color:#dc2626;color:#fff}
+.tln{margin-top:6px;max-width:220px}
+.hdc-o{display:flex;gap:6px;margin-top:5px}.hdc-o input{min-height:36px;padding:5px 8px}.hdc-o .hdc-d{width:80px;flex:none;text-align:center}
+.loc{display:flex;flex-wrap:wrap;gap:6px}
+.loc button{border:1.5px solid #c7d2fe;background:#fff;border-radius:99px;padding:4px 12px;font:600 13px var(--font);color:var(--chinh);cursor:pointer;min-height:32px}
+.loc button.chon{background:var(--chinh);border-color:var(--chinh);color:#fff}
+#dayDa{display:flex;flex-wrap:wrap;gap:4px;margin:6px 0}
+.o-da{width:28px;height:28px;border-radius:8px;display:grid;place-items:center;background:var(--m);color:#fff;font-weight:800;font-size:13.5px}
+.kq{display:flex;gap:8px;padding:6px 10px;border-radius:10px;margin-bottom:5px;font-size:14px}
+.kq span{font-weight:800;flex:none}
+.kq.ok{background:#f0fdf4;color:#166534}.kq.canh{background:#fffbeb;color:#92400e}.kq.loi{background:#fef2f2;color:#991b1b}
+/* xem trước */
+#tabXem{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+#tabXem button{border:1.5px solid #c7d2fe;background:#fff;border-radius:12px;padding:7px 14px;font:700 14px var(--font);color:var(--chinh);cursor:pointer}
+#tabXem button.chon{background:linear-gradient(135deg,var(--chinh),var(--chinh2));color:#fff;border-color:transparent}
+#a4{background:#e5e7eb;border-radius:14px;padding:16px;max-height:820px;overflow:auto}
+.trang{background:#fff;color:#000;font-family:"Times New Roman",Times,serif;font-size:13pt;line-height:1.3;width:21cm;min-height:12cm;padding:2cm 1.5cm 2cm 3cm;margin:0 auto 16px;box-shadow:0 10px 30px -12px rgba(0,0,0,.4)}
+.trang.ngang{width:29.7cm;padding:2cm 1.5cm 1.8cm 2cm}
+.trang p{margin:0}
+.trang table{border-collapse:collapse;margin:0 auto 4px;table-layout:fixed}
+.trang table.cv td{border:1px solid #000;padding:1px 3px}
+.trang table.kv td{border:0;padding:0 2px}
+.trang p.cot{display:grid;gap:4px}.trang p.c2{grid-template-columns:1fr 1fr}.trang p.c4{grid-template-columns:repeat(4,1fr)}
+.goiy{margin-top:10px}
+@media (max-width:640px){#thanhBuoc a{flex:1 1 44%;font-size:13px}.cd-nut{margin-left:0}.o-mt input{width:38px}}
+@media print{#thanhBuoc{display:none}}
+</style>
+</head>
+<body>
+<div class="khung">
+<header class="dau">
+  <svg class="logo noi" viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6366f1"/><stop offset="1" stop-color="#ec4899"/></linearGradient></defs>
+    <rect x="8" y="4" width="40" height="52" rx="7" fill="url(#lg)"/><rect x="14" y="12" width="28" height="4" rx="2" fill="#fff"/>
+    <g fill="#fff" opacity=".9"><rect x="14" y="21" width="8" height="7" rx="1.5"/><rect x="24" y="21" width="8" height="7" rx="1.5" opacity=".6"/><rect x="34" y="21" width="8" height="7" rx="1.5"/><rect x="14" y="30" width="8" height="7" rx="1.5" opacity=".6"/><rect x="24" y="30" width="8" height="7" rx="1.5"/><rect x="34" y="30" width="8" height="7" rx="1.5" opacity=".6"/></g>
+    <rect x="14" y="41" width="18" height="3" rx="1.5" fill="#fff"/><circle cx="48" cy="48" r="12" fill="#16a34a"/><path d="M42 48l4 4 8-8" stroke="#fff" stroke-width="3.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  <div><h1>TRỢ LÝ SOẠN ĐỀ KIỂM TRA THEO CV 7991</h1><p>Nạp giáo án, SGK → chọn dạng câu → ra đủ <b>ma trận · bản đặc tả · đề · hướng dẫn chấm</b> trong một file Word, Times New Roman 13</p></div>
+  <div class="phai"><button class="nut phu nho" id="bSaoLuu">💾 Sao lưu</button><button class="nut phu nho" id="bNhap">📂 Nhập lại</button><button class="nut phu nho" id="bMoi">✨ Đề mới</button><button class="nut xanh" id="bXuat">📝 Xuất Word</button></div>
+</header>
+
+<nav id="thanhBuoc" aria-label="Các bước">
+  <a href="#b1"><i>1</i>Thông tin đề</a><a href="#b2"><i>2</i>Nạp nội dung</a><a href="#b3"><i>3</i>Dạng câu &amp; ma trận</a><a href="#b4"><i>4</i>Soạn câu hỏi</a><a href="#b5"><i>5</i>Xem &amp; xuất Word</a>
+  <span class="tien"><span id="tienDo"></span></span>
+</nav>
+
+<section class="the" id="b1">
+  <div class="buoc"><span class="so">1</span><b>Thông tin đề</b><span class="mo nho2">— in ở đầu ma trận, đặc tả, đề và hướng dẫn chấm</span></div>
+  <div class="luoi l4">
+    <label class="o">Cơ quan chủ quản<input data-tt="so" placeholder="UBND PHƯỜNG … / SỞ GD&ĐT …"></label>
+    <label class="o">Trường<input data-tt="truong" placeholder="TRƯỜNG THCS …"></label>
+    <label class="o">Tổ chuyên môn<input data-tt="to" placeholder="TỔ: …"></label>
+    <label class="o">Cấp<select data-tt="cap"><option value="THCS">THCS</option><option value="THPT">THPT</option></select></label>
+    <label class="o">Môn<input data-tt="mon" placeholder="VD: Công nghệ"></label>
+    <label class="o">Lớp<input data-tt="lop" placeholder="VD: 9"></label>
+    <label class="o">Bài kiểm tra<select data-tt="ky"><option>GIỮA HỌC KÌ I</option><option>CUỐI HỌC KÌ I</option><option>GIỮA HỌC KÌ II</option><option>CUỐI HỌC KÌ II</option></select></label>
+    <label class="o">Năm học<input data-tt="nam" placeholder="2026 – 2027"></label>
+    <label class="o">Thời gian (phút)<select data-tt="phut"><option value="45">45 phút</option><option value="60">60 phút</option><option value="90">90 phút</option></select></label>
+    <label class="o">Mã đề (nếu có)<input data-tt="maDe" placeholder="VD: 101"></label>
+    <label class="o">Người ra đề (kí tên)<input data-tt="nguoiSoan" placeholder="Họ tên GV"></label>
+    <label class="o">Tổ trưởng chuyên môn<input data-tt="toTruong" placeholder="Họ tên"></label>
+  </div>
+  <div class="goiy"><svg width="30" height="30" viewBox="0 0 40 40"><circle cx="20" cy="20" r="18" fill="#6366f1"/><text x="20" y="27" text-anchor="middle" font-size="20" font-weight="800" fill="#fff" font-family="Segoe UI,Arial">i</text></svg>
+    <div class="nho2">Thời gian theo TT 22/2021 Điều 7: môn ≤ 70 tiết/năm <b>45 phút</b>, trên 70 tiết <b>60–90 phút</b>. Khung 4 dạng câu, 3 mức Biết – Hiểu – Vận dụng theo phụ lục <b>CV 7991/BGDĐT-GDTrH</b>: THPT làm theo hướng dẫn của Sở; THCS theo hướng dẫn của Sở và quy chế kiểm tra, đánh giá của trường (phụ lục để tham khảo).</div></div>
+</section>
+
+<section class="the" id="b2">
+  <div class="buoc"><span class="so">2</span><b>Nạp nội dung bài cần ra đề</b><span class="nhan n-tt"><span id="soCd">0</span> bài/chủ đề</span></div>
+  <div class="luoi l2">
+    <div>
+      <div id="oTha" tabindex="0" role="button" aria-label="Chọn file giáo án, SGK">
+        <svg width="74" height="58" viewBox="0 0 74 58" aria-hidden="true"><rect x="4" y="6" width="30" height="40" rx="5" fill="#2563eb"/><text x="19" y="32" text-anchor="middle" font-size="13" font-weight="800" fill="#fff" font-family="Segoe UI,Arial">W</text><rect x="40" y="6" width="30" height="40" rx="5" fill="#dc2626"/><text x="55" y="31" text-anchor="middle" font-size="10" font-weight="800" fill="#fff" font-family="Segoe UI,Arial">PDF</text><path d="M37 40v14M31 48l6 6 6-6" stroke="#6366f1" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <div style="font-weight:700;margin-top:4px">Kéo thả giáo án, trang SGK vào đây, hoặc bấm để chọn</div>
+        <div class="mo nho2">Word (.docx) hoặc PDF — chọn được nhiều file một lúc · app tự tách từng <b>bài / chủ đề</b> và nhận <b>yêu cầu cần đạt</b></div>
+      </div>
+      <input type="file" id="chonFile" multiple accept=".docx,.pdf,.txt,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document" class="an" hidden>
+      <div id="trangThai"></div>
+      <details class="hop"><summary>Không có file? Dán chữ vào đây</summary>
+        <textarea id="oDanChu" rows="5" style="margin-top:6px" placeholder="Bài 1. …&#10;I. MỤC TIÊU&#10;- Nêu được …&#10;…&#10;Bài 2. …"></textarea>
+        <button class="nut phu nho" id="bDanChu" style="margin-top:6px">⬇ Thêm nội dung đã dán</button></details>
+      <div class="goiy"><svg width="28" height="28" viewBox="0 0 40 40"><circle cx="20" cy="20" r="18" fill="#16a34a"/><path d="M20 9l9 4v7c0 6-4 10-9 12-5-2-9-6-9-12v-7z" fill="#fff"/></svg>
+        <div class="nho2">File chỉ được đọc <b>ngay trong trình duyệt máy này</b>, không tải lên mạng (PDF cần mạng một lần để nạp bộ đọc). File có tên học sinh: thay bằng mã trước khi đưa vào.</div></div>
+    </div>
+    <div>
+      <div id="dsCd"></div>
+      <button class="nut phu nho" id="bThemCd">＋ Thêm chủ đề gõ tay</button>
+    </div>
+  </div>
+</section>
+
+<section class="the" id="b3">
+  <div class="buoc"><span class="so">3</span><b>Chọn hình thức câu hỏi &amp; ma trận</b><span class="phai"><button class="nut cam" id="bKhung">⚡ Chia theo khung CV 7991</button></span></div>
+  <div id="dsDang"></div>
+  <div class="luoi" style="grid-template-columns:minmax(0,1fr) 230px;align-items:start" id="luoiMt">
+    <div class="cuon" id="maTran"></div>
+    <div class="luoi" style="gap:12px">
+      <div class="vanh-o"><b class="nho2">Điểm theo dạng câu</b><div id="vanhDang"></div></div>
+      <div class="vanh-o"><b class="nho2">Điểm theo mức độ</b><div id="vanhMuc"></div></div>
+    </div>
+  </div>
+  <div class="mo nho2" style="margin-top:6px">Gõ số câu vào từng ô (Đúng – Sai: số <b>ý</b>, mỗi câu 4 ý) · phím mũi tên để di chuyển · thanh tím = % điểm, thanh xám = % số tiết.</div>
+  <div class="luoi l2" style="margin-top:12px">
+    <details class="hop" id="hopTl" open><summary>Điểm từng câu tự luận</summary><div id="dsTl"></div></details>
+    <details class="hop"><summary>Tỉ lệ mức độ mục tiêu &amp; ghi chú dưới ma trận</summary>
+      <div class="hang" style="margin-top:6px"><label class="o">Biết (%)<input id="mucB" inputmode="numeric"></label><label class="o">Hiểu (%)<input id="mucH" inputmode="numeric"></label><label class="o">Vận dụng (%)<input id="mucV" inputmode="numeric"></label></div>
+      <label class="o" style="margin-top:6px">Ghi chú (VD lí do lệch thời lượng, tỉ lệ riêng của trường)<input id="ghiChu" placeholder="VD: Tổ thống nhất tỉ lệ 40 – 30 – 30 theo quy chế trường."></label></details>
+  </div>
+</section>
+
+<section class="the" id="b4">
+  <div class="buoc"><span class="so">4</span><b>Soạn câu hỏi</b><span id="vanhSoan"></span><span class="phai"><button class="nut" id="bLenh">📋 Chép câu lệnh cho AI</button><button class="nut phu nho" id="bLenhTrong">📋 Câu lệnh cho câu còn trống</button></span></div>
+  <div class="luoi l2">
+    <div>
+      <div class="goiy"><svg width="30" height="30" viewBox="0 0 40 40"><rect x="4" y="8" width="32" height="24" rx="8" fill="#8b5cf6"/><circle cx="14" cy="20" r="3" fill="#fff"/><circle cx="26" cy="20" r="3" fill="#fff"/><path d="M20 4v4" stroke="#8b5cf6" stroke-width="3"/><circle cx="20" cy="4" r="2.5" fill="#f59e0b"/></svg>
+        <div class="nho2"><b>Cách dùng:</b> bấm <b>Chép câu lệnh cho AI</b> (gồm nội dung đã nạp + ma trận + yêu cầu cần đạt + khuôn trả lời) → dán vào ChatGPT, Gemini hoặc Copilot → chép toàn bộ câu trả lời dán vào ô dưới → bấm <b>Đọc vào đề</b>. Thầy cô soát, sửa từng câu ở khung bên dưới. AI có thể sai — <b>thầy cô duyệt kiến thức</b>.</div></div>
+      <details class="hop" id="hopLenh"><summary>Câu lệnh đã chép</summary><textarea id="oLenh" rows="6" style="margin-top:6px;font-size:13px" readonly></textarea></details>
+      <label class="o" style="margin-top:8px">Dán câu trả lời của AI<textarea id="oDan" rows="6" placeholder="[I.1] …&#10;A. …&#10;B. …&#10;C. …&#10;D. …&#10;Đáp án: B"></textarea></label>
+      <div class="hang" style="margin-top:6px"><button class="nut xanh" id="bDoc">⬇ Đọc vào đề</button><span id="ketQuaDoc" class="nho2"></span></div>
+    </div>
+    <div>
+      <div class="hang" style="align-items:center"><b class="nho2" style="flex:0 0 auto">Đáp án phần nhiều lựa chọn</b><button class="nut phu nho" id="bCan">🔀 Cân đáp án A–B–C–D</button><button class="nut phu nho" id="bLenhDai" title="Chép câu lệnh nhờ AI viết lại phương án cho các câu có đáp án đúng dài nhất">📋 Câu lệnh sửa phương án</button></div>
+      <div id="dayDa"></div>
+      <canvas id="bdDa" style="width:100%;height:150px"></canvas>
+      <div class="hang" style="align-items:center;margin-top:6px"><b class="nho2" style="flex:0 0 auto">Máy soát</b><span id="tomKiem" style="flex:0 0 auto"></span></div>
+      <div id="dsKiem"></div>
+    </div>
+  </div>
+  <div class="hang" style="margin-top:10px;align-items:center"><span class="nho2 mo" style="flex:0 0 auto">Hiện:</span><div class="loc" id="locCau"><button data-loc="" class="chon">Tất cả câu</button><button data-loc="trong">Câu chưa đủ</button></div></div>
+  <div id="dsCau"></div>
+</section>
+
+<section class="the" id="b5">
+  <div class="buoc"><span class="so">5</span><b>Xem trước &amp; xuất Word</b><span class="phai"><button class="nut xanh" id="bXuat2">📝 Xuất Word (.docx)</button></span></div>
+  <div class="luoi l2" style="grid-template-columns:minmax(0,1fr) 300px;align-items:start">
+    <div>
+      <div id="tabXem"><button data-tab="mt">🧩 Ma trận</button><button data-tab="dt">📋 Bản đặc tả</button><button data-tab="de" class="chon">📄 Đề</button><button data-tab="hd">✅ Hướng dẫn chấm</button></div>
+      <div id="a4"></div>
+    </div>
+    <div>
+      <b class="nho2">Đưa vào file Word</b>
+      <div class="luoi" style="gap:6px;margin:6px 0 10px">
+        <label class="tl-o"><input type="checkbox" data-p="mt" checked style="width:18px;min-height:0"> 🧩 Ma trận (khổ ngang)</label>
+        <label class="tl-o"><input type="checkbox" data-p="dt" checked style="width:18px;min-height:0"> 📋 Bản đặc tả (khổ ngang)</label>
+        <label class="tl-o"><input type="checkbox" data-p="de" checked style="width:18px;min-height:0"> 📄 Đề kiểm tra (khổ dọc)</label>
+        <label class="tl-o"><input type="checkbox" data-p="hd" checked style="width:18px;min-height:0"> ✅ Hướng dẫn chấm (khổ dọc)</label>
+      </div>
+      <div class="mo nho2">Mỗi phần sang trang mới · toàn bộ <b>Times New Roman cỡ 13</b> · lề 2 – 1,5 – 2 – 3 cm · bảng kẻ viền, đầu bảng tô nhạt.</div>
+      <div id="dsKiem2" style="margin-top:8px"></div>
+    </div>
+  </div>
+</section>
+<!--CHAN-->
+</div>
+<script>
+<!--NHUNG:tich-hop/jszip.min.js-->
+</script>
+<!--JS-->
+<script>
+const MAU_DE = <!--NHUNG:soan-de/mau.json-->;
+<!--NHUNG:soan-de/docx_viet.js-->
+<!--NHUNG:soan-de/doc_file.js-->
+<!--NHUNG:soan-de/soan_de.js-->
+<!--NHUNG:soan-de/giao_dien.js-->
+</script>
+</body>
+</html>
