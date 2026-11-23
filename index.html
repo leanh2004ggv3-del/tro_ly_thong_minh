@@ -11,6 +11,31 @@
 
   <title>trolyThaySach_THCSTinhBien</title>
 
+  <!-- Tự động làm sạch bộ nhớ đệm Cache cũ & Hủy đăng ký Service Worker lỗi (Self-Healing Cache Cleaner) -->
+  <script>
+    (function() {
+      // 1. Tự động dọn dẹp Cache Storage cũ của phiên bản trước
+      if (typeof caches !== 'undefined') {
+        caches.keys().then(function(names) {
+          names.forEach(function(name) {
+            if (name !== 'troly-thaysach-cache-v3') {
+              caches.delete(name);
+              console.log('🧹 [Cache Cleaner] Đã dọn sạch cache cũ:', name);
+            }
+          });
+        });
+      }
+      // 2. Ép cập nhật Service Worker mới nhất từ máy chủ
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(function(registrations) {
+          for (var registration of registrations) {
+            registration.update();
+          }
+        });
+      }
+    })();
+  </script>
+
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Tailwind Configuration for Scientific Theme -->
@@ -4880,11 +4905,11 @@
             <body>
               <h1>KẾ HOẠCH BÀI DẠY (CÔNG VĂN 5512)</h1>
               <pre>${plan.contentMarkdown}</pre>
-              <script>window.onload = function() { window.print(); }<\/script>
             </body>
           </html>
         `);
         win.document.close();
+        win.onload = function() { win.print(); };
         trackActivity('Xuất file PDF KHBD 5512', `In / Tải PDF: ${plan.title}`);
       };
 
@@ -9526,16 +9551,71 @@ CREATE TABLE IF NOT EXISTS public.materials (
       );
     }
 
-    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+    // Bộ chống sập giao diện thông minh (React Error Boundary)
+    class ErrorBoundary extends React.Component {
+      constructor(props) {
+        super(props);
+        this.state = { hasError: false, error: null };
+      }
+      static getDerivedStateFromError(error) {
+        return { hasError: true, error };
+      }
+      componentDidCatch(error, errorInfo) {
+        console.error('Lỗi giao diện React:', error, errorInfo);
+      }
+      handleReset = () => {
+        try {
+          if ('serviceWorker' in navigator && typeof caches !== 'undefined') {
+            caches.keys().then((names) => {
+              names.forEach((name) => caches.delete(name));
+            });
+          }
+        } catch (e) {}
+        window.location.reload(true);
+      };
+      render() {
+        if (this.state.hasError) {
+          return (
+            <div className="min-h-screen flex items-center justify-center p-4 bg-slate-900 text-white font-sans">
+              <div className="max-w-lg w-full bg-slate-800 border border-slate-700 rounded-2xl p-6 shadow-2xl text-center space-y-4">
+                <div className="w-16 h-16 bg-emerald-500/20 text-emerald-400 rounded-full flex items-center justify-center mx-auto text-3xl">
+                  ✨
+                </div>
+                <h2 className="text-xl font-bold text-white">Đã Cập Nhật Phiên Bản Mới!</h2>
+                <p className="text-sm text-slate-300">
+                  Hệ thống vừa được nâng cấp các tính năng và giao diện mới. Vui lòng bấm nút bên dưới để tự động làm mới ứng dụng.
+                </p>
+                <div className="pt-2 flex justify-center gap-3">
+                  <button
+                    onClick={this.handleReset}
+                    className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded-xl shadow-lg transition-all"
+                  >
+                    🚀 Tải lại phiên bản mới nhất
+                  </button>
+                </div>
+              </div>
+            </div>
+          );
+        }
+        return this.props.children;
+      }
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(
+      <ErrorBoundary>
+        <App />
+      </ErrorBoundary>
+    );
   </script>
 
   <!-- Đăng ký Service Worker lưu đệm ngoại tuyến (Offline & Fast Cache Storage) -->
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js')
+        navigator.serviceWorker.register('./sw.js?v=20261123v3')
           .then((reg) => {
-            console.log('✅ Service Worker đã kích hoạt lưu đệm tài nguyên thành công:', reg.scope);
+            console.log('✅ Service Worker v3 đã kích hoạt:', reg.scope);
+            reg.update();
           })
           .catch((err) => {
             console.warn('Lỗi đăng ký Service Worker:', err);

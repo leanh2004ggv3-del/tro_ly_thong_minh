@@ -1,11 +1,11 @@
 // Service Worker - Lưu đệm thông minh (Smart Cache Storage) cho Classroom App
-const CACHE_NAME = 'troly-thaysach-cache-v1';
+// CẬP NHẬT PHIÊN BẢN V3: Dọn sạch mọi cache cũ, loại bỏ data_games.js và ưu tiên Network 100% cho HTML
+const CACHE_NAME = 'troly-thaysach-cache-v3';
 
-// Danh sách các tài nguyên tĩnh quan trọng cần lưu đệm để tải tức thì
+// Danh sách các tài nguyên tĩnh quan trọng cần lưu đệm (ĐÃ BỎ HOÀN TOÀN data_games.js)
 const PRE_CACHE_ASSETS = [
   './',
   './index.html',
-  './data_games.js',
   './Anhtruong.png',
   './Anhtruong.jpg',
   './logo.png',
@@ -14,33 +14,34 @@ const PRE_CACHE_ASSETS = [
 
 // 1. Cài đặt Service Worker và lưu trước tài nguyên tĩnh
 self.addEventListener('install', (event) => {
+  self.skipWaiting(); // Ép kích hoạt ngay lập tức không cần chờ tab cũ đóng
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      console.log('[Service Worker] Đang nạp bộ nhớ đệm cho tài nguyên tĩnh...');
+      console.log('[Service Worker v3] Đang nạp bộ nhớ đệm cho tài nguyên tĩnh...');
       return cache.addAll(PRE_CACHE_ASSETS).catch((err) => {
-        console.warn('[Service Worker] Một số tài nguyên không thể pre-cache:', err);
+        console.warn('[Service Worker v3] Một số tài nguyên không thể pre-cache:', err);
       });
-    }).then(() => self.skipWaiting())
+    })
   );
 });
 
-// 2. Kích hoạt và dọn dẹp các phiên bản cache cũ
+// 2. Kích hoạt và dọn dẹp triệt để TẤT CẢ các phiên bản cache cũ
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((cacheNames) => {
       return Promise.all(
         cacheNames.map((cacheName) => {
           if (cacheName !== CACHE_NAME) {
-            console.log('[Service Worker] Xóa bộ nhớ đệm cũ:', cacheName);
+            console.log('[Service Worker v3] Xóa sạch bộ nhớ đệm cũ:', cacheName);
             return caches.delete(cacheName);
           }
         })
       );
-    }).then(() => self.clients.claim())
+    }).then(() => self.clients.claim()) // Chiếm quyền điều khiển trang ngay lập tức
   );
 });
 
-// 3. Xử lý yêu cầu dữ liệu (Network-first cho HTML, Stale-while-revalidate cho CDN & Assets)
+// 3. Xử lý yêu cầu dữ liệu (Network-first 100% cho trang HTML chính)
 self.addEventListener('fetch', (event) => {
   const request = event.request;
   const url = new URL(request.url);
@@ -50,8 +51,8 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Đối với trang HTML chính: Dùng chiến lược Network-first (Ưu tiên mạng để lấy bản mới nhất, mất mạng thì lấy Cache)
-  if (request.headers.get('accept') && request.headers.get('accept').includes('text/html')) {
+  // Đối với trang HTML chính: Dùng chiến lược Network-first (Ưu tiên mạng 100% để luôn nhận phiên bản mới nhất từ server)
+  if (request.headers.get('accept') && request.headers.get('accept').includes('text/html') || url.pathname.endsWith('index.html') || url.pathname.endsWith('/')) {
     event.respondWith(
       fetch(request)
         .then((response) => {
@@ -64,6 +65,7 @@ self.addEventListener('fetch', (event) => {
           return response;
         })
         .catch(() => {
+          // Chỉ khi mất mạng hoàn toàn mới dùng cache
           return caches.match(request).then((cachedResponse) => {
             if (cachedResponse) return cachedResponse;
             return caches.match('./index.html');
@@ -73,7 +75,7 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Đối với file tĩnh (JS, CSS, Ảnh, Font, PPTX): Dùng Stale-while-revalidate
+  // Đối với file tĩnh (JS, CSS, Ảnh, Font): Dùng Stale-while-revalidate
   event.respondWith(
     caches.match(request).then((cachedResponse) => {
       const fetchPromise = fetch(request)
@@ -86,12 +88,10 @@ self.addEventListener('fetch', (event) => {
           }
           return networkResponse;
         })
-        .catch((err) => {
-          // Lỗi mạng, vẫn dùng cache nếu có
+        .catch(() => {
           return cachedResponse;
         });
 
-      // Nếu đã có cache thì trả về ngay lập tức (siêu nhanh), đồng thời chạy fetch ngầm để cập nhật
       return cachedResponse || fetchPromise;
     })
   );
