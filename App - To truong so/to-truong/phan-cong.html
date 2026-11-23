@@ -407,7 +407,13 @@ bCsv.onclick = () => {
 };
 bLuu.onclick = () => TT.saoLuu(["phancong"], "phan-cong");
 bNhap.onclick = () => TT.nhapLai(["phancong"], () => { S = TT.load("phancong", S); dm.value = S.dm ?? ""; chon = S.gv[0] ? S.gv[0].id : null; veTat(true); });
-addEventListener("resize", veNgang);
+let oldW = window.innerWidth, henResize = null;
+addEventListener("resize", () => {
+  if (Math.abs(window.innerWidth - oldW) < 20) return;
+  oldW = window.innerWidth;
+  clearTimeout(henResize);
+  henResize = setTimeout(veNgang, 200);
+});
 veTat(true);
 </script>
 </body>

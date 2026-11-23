@@ -2022,7 +2022,13 @@ document.addEventListener("DOMContentLoaded", () => {
   $("bNhap").addEventListener("click", () => TT.nhapLai(["soande"], () => { S = chuan(TT.load("soande", moi())); xuatChon.clear(); S.bo.forEach((b, i) => xuatChon.add(i)); ve(); }));
   $("bMoi").addEventListener("click", () => { if (!confirm("Làm đề mới? Đề đang làm sẽ bị xoá khỏi máy này (thầy cô Sao lưu trước nếu cần).")) return; const giu = S.tt; S = chuan(moi()); xuatChon.clear(); xuatChon.add(0); ["so", "truong", "to", "mon", "nguoiSoan", "toTruong", "nam", "cap"].forEach(k => S.tt[k] = giu[k]); luu(); ve(); });
   document.querySelectorAll("#thanhBuoc a").forEach(a => a.addEventListener("click", e => { e.preventDefault(); $(a.getAttribute("href").slice(1)).scrollIntoView({ behavior: "smooth", block: "start" }); }));
-  window.addEventListener("resize", () => veDapAn(khe()));
+  let oldW = window.innerWidth, henResize = null;
+  window.addEventListener("resize", () => {
+    if (Math.abs(window.innerWidth - oldW) < 20) return;
+    oldW = window.innerWidth;
+    clearTimeout(henResize);
+    henResize = setTimeout(() => veDapAn(khe()), 200);
+  });
   ve();
   // chế độ chụp: #mau&b3, #mau&b5&xem=mt
   const h = location.hash, mb = h.match(/[#&]b([1-5])\b/), mx = h.match(/xem=(mt|dt|de|hd)/);

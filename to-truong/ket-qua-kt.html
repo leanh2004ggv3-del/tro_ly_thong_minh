@@ -349,7 +349,13 @@ bCsv.onclick = () => {
 };
 bLuu.onclick = () => { luu(); TT.saoLuu(["ketqua"], "ket-qua-kiem-tra"); };
 bNhap.onclick = () => TT.nhapLai(["ketqua"], () => { S = TT.load("ketqua", S); tenBai.value = S.ten; thang.value = S.thang; oDan.value = S.dan; phanTich(); });
-addEventListener("resize", () => KQ && ve());
+let oldW = window.innerWidth, henResize = null;
+addEventListener("resize", () => {
+  if (Math.abs(window.innerWidth - oldW) < 20) return;
+  oldW = window.innerWidth;
+  clearTimeout(henResize);
+  henResize = setTimeout(() => { if (KQ) ve(); }, 200);
+});
 if (oDan.value.trim()) phanTich();
 </script>
 </body>

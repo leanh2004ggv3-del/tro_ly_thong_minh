@@ -18,19 +18,11 @@
       if (typeof caches !== 'undefined') {
         caches.keys().then(function(names) {
           names.forEach(function(name) {
-            if (name !== 'troly-thaysach-cache-v3') {
+            if (name !== 'troly-thaysach-cache-v4') {
               caches.delete(name);
               console.log('🧹 [Cache Cleaner] Đã dọn sạch cache cũ:', name);
             }
           });
-        });
-      }
-      // 2. Ép cập nhật Service Worker mới nhất từ máy chủ
-      if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.getRegistrations().then(function(registrations) {
-          for (var registration of registrations) {
-            registration.update();
-          }
         });
       }
     })();
@@ -9612,9 +9604,9 @@ CREATE TABLE IF NOT EXISTS public.materials (
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js?v=20261123v3')
+        navigator.serviceWorker.register('./sw.js?v=20261123v4')
           .then((reg) => {
-            console.log('✅ Service Worker v3 đã kích hoạt:', reg.scope);
+            console.log('✅ Service Worker v4 đã kích hoạt:', reg.scope);
             reg.update();
           })
           .catch((err) => {

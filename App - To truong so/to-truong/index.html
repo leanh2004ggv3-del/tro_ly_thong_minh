@@ -300,7 +300,11 @@ function ve() {
     return `<div class="the ud hien" style="--vet:${mau}">
       ${tt ? `<span class="nhan n-dung dl">${tt}</span>` : ""}
       <svg class="bt" viewBox="0 0 64 64">${icon}</svg><h3>${ten}</h3><p>${mota}</p>
-      <div class="hang" style="gap:8px"><a class="nut nho" href="${f}.html" style="background:linear-gradient(135deg,${mau},#4f46e5)">Mở công cụ →</a><a class="nut phu nho" href="${f}.html#mau">Dữ liệu thử</a></div></div>`;
+      <div class="hang" style="gap:8px">
+        <a class="nut nho" href="${f}.html" target="_top" style="background:linear-gradient(135deg,${mau},#4f46e5)">Mở công cụ →</a>
+        <a class="nut phu nho" href="${f}.html#mau" target="_top">Dữ liệu thử</a>
+        <a class="nut phu nho" href="${f}.html" target="_blank" title="Mở trong tab mới độc lập">↗ Tab mới</a>
+      </div></div>`;
   }).join("");
 }
 const KHOA = UD.map(u => u[3]);

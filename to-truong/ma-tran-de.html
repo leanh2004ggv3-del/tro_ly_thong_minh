@@ -383,7 +383,13 @@ bCsv.onclick = () => {
 };
 bLuu.onclick = () => TT.saoLuu(["matran"], "ma-tran-de");
 bNhap.onclick = () => TT.nhapLai(["matran"], () => { S = TT.load("matran", S); tenDe.value = S.ten; thangDiem.value = S.thang; tB.value = S.muc.B; tH.value = S.muc.H; tV.value = S.muc.V; tLech.value = S.lech; veTat(); });
-addEventListener("resize", () => veNhiet());
+let oldW = window.innerWidth, henResize = null;
+addEventListener("resize", () => {
+  if (Math.abs(window.innerWidth - oldW) < 20) return;
+  oldW = window.innerWidth;
+  clearTimeout(henResize);
+  henResize = setTimeout(() => veNhiet(), 200);
+});
 veTat();
 </script>
 </body>

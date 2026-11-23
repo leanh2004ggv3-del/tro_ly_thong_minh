@@ -2539,7 +2539,13 @@ Hướng dẫn về nhà
       for (const a of S.anh) if (!a.tao) { const v = await IDB.lay(a.id); if (v) BYTE[a.id] = v; }
       veHet();
     }
-    window.addEventListener("resize", () => { clearTimeout(henT); henT = setTimeout(() => { veXemSua(); veXem(); }, 200); });
+    let oldW = window.innerWidth;
+    window.addEventListener("resize", () => {
+      if (Math.abs(window.innerWidth - oldW) < 20) return;
+      oldW = window.innerWidth;
+      clearTimeout(henT);
+      henT = setTimeout(() => { veXemSua(); veXem(); }, 250);
+    });
   })();
 })();
 
