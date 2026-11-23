@@ -215,6 +215,7 @@ details.hop summary{cursor:pointer;font-weight:700;font-size:14.5px}
       </div>
       <input type="file" id="chonFile" multiple accept=".docx,.pdf,.txt,image/*,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document" hidden>
       <label class="nho2" style="display:flex;gap:6px;align-items:center;margin-top:8px"><input type="checkbox" id="ocrAnh" style="width:18px;min-height:0"> Ảnh là <b>trang sách chụp</b>: nhận cả chữ trong ảnh (PDF dạng ảnh luôn được nhận chữ)</label>
+      <div id="tienDoDan" hidden role="status" aria-live="polite" style="position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:9999;width:min(460px,92vw);background:#fff;border:1px solid #c7d2fe;border-radius:14px;padding:12px 14px;font-size:15px;box-shadow:0 10px 30px rgba(15,23,42,.25)"><b>⏳ Đang dàn slide</b> <span>…</span><div style="height:10px;background:#e0e7ff;border-radius:6px;margin-top:8px;overflow:hidden"><i style="display:block;height:100%;width:0;background:linear-gradient(90deg,#4f46e5,#db2777);transition:width .2s"></i></div></div>
       <div id="tienDoDoc" hidden style="margin-top:8px;background:#fff7ed;border:1px solid #fed7aa;border-radius:12px;padding:8px 10px;font-size:14px"><span>…</span><div style="height:8px;background:#fde68a;border-radius:6px;margin-top:6px;overflow:hidden"><i style="display:block;height:100%;width:0;background:linear-gradient(90deg,#ea580c,#db2777);transition:width .3s"></i></div></div>
       <div id="dsTep"></div>
       <details class="hop"><summary>Không có file? Dán chữ vào đây</summary>
@@ -1093,12 +1094,17 @@ const BC = (() => {
   const CHU = "1E293B";
 
   /* ---------- đo chữ ---------- */
-  let cv = null;
+  let cv = null, fontCu = "";
+  const NHO_RONG = new Map();            // nhớ bề rộng đã đo — đo lại hàng triệu lần làm treo trang
   function rong(s, sz, b, i) {           // bề rộng (pt) của chuỗi ở cỡ sz pt
     if (typeof document !== "undefined") {
+      const font = `${i ? "italic " : ""}${b ? "bold " : ""}${sz}px "Times New Roman", Times, serif`, k = font + "|" + s;
+      const co = NHO_RONG.get(k); if (co !== undefined) return co;
       cv = cv || document.createElement("canvas").getContext("2d");
-      cv.font = `${i ? "italic " : ""}${b ? "bold " : ""}${sz}px "Times New Roman", Times, serif`;
-      return cv.measureText(s).width;
+      if (font !== fontCu) { cv.font = font; fontCu = font; }
+      const w = cv.measureText(s).width;
+      if (NHO_RONG.size > 200000) NHO_RONG.clear();
+      NHO_RONG.set(k, w); return w;
     }
     return [...s].length * sz * (b ? 0.55 : 0.5);
   }
@@ -1120,7 +1126,15 @@ const BC = (() => {
   }
   const LUI = { 0: 0, 1: 27, 2: 54, 3: 27 };
   // chiều cao (pt) một đoạn trong khung rộng wPt
+  const NHO_CAO = new Map();
   function caoDoan(d, wPt) {
+    const kh = [d.s, d.sz, d.b ? 1 : 0, d.cap || 0, d.dong || 100, d.kc, d.kcTruoc || 0, Math.round(wPt * 10)].join("|");
+    const da = NHO_CAO.get(kh); if (da) return da;
+    const kq = caoDoanTinh(d, wPt);
+    if (NHO_CAO.size > 100000) NHO_CAO.clear();
+    NHO_CAO.set(kh, kq); return kq;
+  }
+  function caoDoanTinh(d, wPt) {
     const sz = d.sz, w = wPt - (LUI[d.cap || 0] || 0);
     let dong = [{ w: 0, cao: 1 }];
     manh(d.s, sz, d.b).forEach(m => {
@@ -1262,9 +1276,13 @@ const BC = (() => {
     }
     // tách đoạn sang nhiều trang khi không vừa
     let conLai = dsGoc.slice(), lan = 0;
-    while (lan++ < 12) {
-      let n = conLai.length, kq = null;
-      for (; n >= 1; n--) { kq = thu(conLai.slice(0, n)); if (kq) break; }
+    while (lan++ < 40) {
+      let n = conLai.length, kq = thu(conLai);
+      if (!kq) {            // tìm nhị phân số đoạn lớn nhất còn vừa một trang
+        let lo = 0, hi = conLai.length;
+        while (hi - lo > 1) { const g = (lo + hi) >> 1, k = thu(conLai.slice(0, g)); if (k) { lo = g; kq = k; } else hi = g; }
+        n = lo;
+      }
       if (!kq) {   // một đoạn quá dài: cắt đôi theo câu
         const d = conLai[0], cau = d.s.split(/(?<=[.;!?])\s+/);
         if (cau.length > 1) { const g = Math.ceil(cau.length / 2); conLai.splice(0, 1, Object.assign({}, d, { s: cau.slice(0, g).join(" ") }), Object.assign({}, d, { s: cau.slice(g).join(" "), cap: d.cap ? d.cap : 0 })); continue; }
@@ -1274,6 +1292,7 @@ const BC = (() => {
       ra.push(kq); conLai = conLai.slice(n);
       if (!conLai.length) break;
     }
+    if (conLai.length && lan > 40) canhBao.push({ slide: soThu, loi: "nội dung quá dài, phần cuối chưa đưa lên slide — nên tách thành nhiều slide" });
     if (!ra.length) ra.push({ c: cach()[0], dd: [], co: coGoc, cao: 0 });
     // trang cuối chỉ còn 1 ý ngắn → chuyển bớt ý của trang trước sang cho cân
     for (let lan2 = 0; lan2 < 3 && ra.length > 1; lan2++) {
@@ -1353,10 +1372,26 @@ const BC = (() => {
   }
 
   /* ---------- cả bài ---------- */
+  const NHO_SL = new Map();
+  function danSlideNho(sl, kho, tc, i) {
+    const k = JSON.stringify([sl.loai, sl.tieuDe, sl.phu, sl.noiDung, sl.nhan, sl.ghiChu, (sl.anh || []).map(id => kho[id] ? [id, kho[id].w, kho[id].h] : 0), tc.mau, tc.co]);
+    let v = NHO_SL.get(k);
+    if (!v) { const cb = []; v = { trang: danSlide(sl, kho, tc, cb, 0), cb }; if (NHO_SL.size > 400) NHO_SL.clear(); NHO_SL.set(k, v); }
+    return { trang: v.trang.map(t => Object.assign({}, t, { goc: i })), cb: v.cb.map(c => Object.assign({}, c, { slide: i + 1 })) };
+  }
   function danBai(ds, kho, tc) {
     const canhBao = [], trang = [];
-    ds.forEach((sl, i) => danSlide(sl, kho, tc, canhBao, i + 1).forEach(t => { t.goc = i; trang.push(t); }));
+    ds.forEach((sl, i) => { const r = danSlideNho(sl, kho, tc, i); trang.push(...r.trang); canhBao.push(...r.cb); });
     return { trang, canhBao };
+  }
+  // dàn trước từng slide, nhường trình duyệt giữa các slide để trang không bị «không phản hồi»
+  async function danBaiDan(ds, kho, tc, bao) {
+    const t0 = Date.now();
+    for (let i = 0; i < ds.length; i++) {
+      danSlideNho(ds[i], kho, tc, i);
+      if (bao) bao(i + 1, ds.length, Date.now() - t0);
+      await new Promise(r => setTimeout(r, 0));
+    }
   }
 
   /* ---------- xem trước HTML (đúng toạ độ file PPT) ---------- */
@@ -1383,7 +1418,7 @@ const BC = (() => {
     });
     return s + "</div>";
   }
-  return { danBai, htmlTrang, BANG_MAU, CO_MIN, docLuaChon, W, H, IN };
+  return { danBai, danBaiDan, htmlTrang, BANG_MAU, CO_MIN, docLuaChon, W, H, IN };
 })();
 if (typeof module !== "undefined") module.exports = BC;
 
@@ -2236,17 +2271,34 @@ Hướng dẫn về nhà
   /* ---------- BƯỚC 2: dàn slide ---------- */
   const nguon = () => ({ dong: S.chu ? S.chu.split("\n") : [], trangDong: S.trangDong, ocr: S.tep.some(t => t.ocr) });
   const khoAnhFile = () => S.anh.filter(a => !a.tao && a.dong != null);
-  function datSlides(ds, them) {
+  /* thanh tiến độ khi dàn nhiều slide (thay cho cảnh trình duyệt báo «Trang không phản hồi») */
+  function hienTienDan(i, n, ms) {
+    const o = $("tienDoDan"); o.hidden = false;
+    const conLai = i ? Math.max(0, Math.round(ms / i * (n - i) / 1000)) : 0;
+    o.querySelector("span").textContent = `${i}/${n} slide · ${Math.round(i / n * 100)}%` + (i && i < n ? (conLai > 1 ? ` · còn khoảng ${conLai} giây` : " · sắp xong") : "");
+    o.querySelector("i").style.width = Math.round(i / n * 100) + "%";
+  }
+  let dangDan = false;
+  async function danTruoc() {
+    const n = S.slides.length; if (!n) return;
+    dangDan = true; hienTienDan(0, n, 0);
+    await new Promise(r => setTimeout(r, 30));
+    try { await BC.danBaiDan(S.slides, kho(), { mau: S.tc.mau, co: +S.tc.co }, hienTienDan); }
+    finally { dangDan = false; setTimeout(() => { $("tienDoDan").hidden = true; }, 400); }
+  }
+  async function datSlides(ds, them) {
+    if (dangDan) return;
     if (them && S.slides.length) S.slides = S.slides.concat(ds.filter(s => s.loai !== "bia")); else { S.slides = ds; S.chon = 0; }
     SS.ganAnh(S.slides, khoAnhFile(), S.tt, taoAnh);
+    await danTruoc();
     luu(); veHet();
   }
-  $("bTuDan").onclick = () => {
+  $("bTuDan").onclick = async () => {
     if (!S.chu.trim()) { TT.toast("Thầy cô nạp file hoặc dán nội dung ở bước 1 trước ạ", "loi"); TT.buzz(); return; }
     const tenFile = S.tep[0] ? S.tep[0].ten.replace(/\.[^.]+$/, "").replace(/[_]+/g, " ").trim() : "";
     const ds = SS.tuDan(nguon(), Object.assign({}, S.tt, { tenFile }));
     if (!S.tt.bai) TT.toast("Thầy cô gõ «Tên bài» ở bước 1 để bìa ghi đúng tên bài ạ", "loi");
-    datSlides(ds, $("cheDo").value === "them");
+    await datSlides(ds, $("cheDo").value === "them");
     TT.toast(`Đã dàn ${ds.length} slide — mỗi slide đã có ảnh minh hoạ`, "ok"); TT.ting();
     $("b3").scrollIntoView({ behavior: "smooth" });
   };
@@ -2342,14 +2394,15 @@ Hướng dẫn về nhà
     nut.disabled = false;
   };
 
-  $("bDocAI").onclick = () => {
+  $("bDocAI").onclick = async () => {
     if (SS.laCauLenh($("oDanAI").value)) {
       $("kqAI").innerHTML = `<span class="do">Ô này đang là <b>câu lệnh</b> gửi AI, chưa phải câu trả lời của AI. Thầy cô bấm <b>✨ Gemini soạn ngay</b>, hoặc dán câu lệnh vào ChatGPT / Gemini rồi chép <b>câu trả lời</b> của AI vào đây.</span>`;
       TT.buzz(); return;
     }
     const ds = SS.docAI($("oDanAI").value, khoAnhFile());
     if (!ds.length) { $("kqAI").innerHTML = `<span class="do">Không thấy dòng «=== SLIDE | … | …». Thầy cô chép <b>toàn bộ</b> câu trả lời của AI giúp em ạ.</span>`; TT.buzz(); return; }
-    datSlides(ds, $("cheDo").value === "them");
+    $("kqAI").textContent = `Đọc được ${ds.length} slide — đang dàn trang…`;
+    await datSlides(ds, $("cheDo").value === "them");
     const loi = S.slides.reduce((t, s) => t + CT.kiem(s.noiDung).length + CT.kiem(s.tieuDe).length, 0);
     $("kqAI").innerHTML = `✔ Đọc được <b>${ds.length}</b> slide${loi ? ` · <span class="do">${loi} lỗi công thức — xem ở bước 3</span>` : " · công thức đọc tốt"}`;
     TT.ting(); $("b3").scrollIntoView({ behavior: "smooth" });
@@ -2541,8 +2594,8 @@ Hướng dẫn về nhà
 
   /* ---------- BƯỚC 4: màu, soát, xuất ---------- */
   $("dsMau").innerHTML = Object.entries(BC.BANG_MAU).map(([k, m]) => `<button data-mau="${k}"><i style="background:linear-gradient(135deg,#${m.c1},#${m.c2})"></i>${esc(m.ten)}</button>`).join("");
-  $("dsMau").onclick = e => { const b = e.target.closest("[data-mau]"); if (!b) return; S.tc.mau = b.dataset.mau; luu(); veHet(); };
-  ["coChu", "hieuUng", "coGhiChu"].forEach(id => { const k = { coChu: "co", hieuUng: "hieuUng", coGhiChu: "ghiChu" }[id]; $(id).value = String(S.tc[k]); $(id).onchange = () => { S.tc[k] = +$(id).value; luu(); veHet(); }; });
+  $("dsMau").onclick = async e => { const b = e.target.closest("[data-mau]"); if (!b) return; S.tc.mau = b.dataset.mau; luu(); await danTruoc(); veHet(); };
+  ["coChu", "hieuUng", "coGhiChu"].forEach(id => { const k = { coChu: "co", hieuUng: "hieuUng", coGhiChu: "ghiChu" }[id]; $(id).value = String(S.tc[k]); $(id).onchange = async () => { S.tc[k] = +$(id).value; luu(); if (k === "co") await danTruoc(); veHet(); }; });
   function kiemTra() {
     const ra = [];
     ra.push({ ok: true, s: "Mọi chữ dùng phông <b>Times New Roman</b>" });
@@ -2637,6 +2690,7 @@ Hướng dẫn về nhà
     if (TT.MAU) { const m = location.hash.match(/mau=(\w+)/); napMau(m && MAU_PPT[m[1]] ? m[1] : "toan"); const c = location.hash.match(/chon=(\d+)/); if (c) { S.chon = +c[1] - 1; veHet(); } }
     else {
       for (const a of S.anh) if (!a.tao) { const v = await IDB.lay(a.id); if (v) BYTE[a.id] = v; }
+      if (S.slides.length > 6) await danTruoc();
       veHet();
     }
     let oldW = window.innerWidth;
