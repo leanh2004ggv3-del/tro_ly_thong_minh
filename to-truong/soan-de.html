@@ -2198,6 +2198,11 @@ const AIG = (() => {
     let daLuu = ""; try { daLuu = localStorage.getItem(MO_HINH) || ""; } catch (e) {}
     const ds = daLuu ? [daLuu, ...DS.filter(m => m !== daLuu)] : DS;
     let loiCuoi = "", quaTai = false;
+    for (let vong = 1; vong <= 2; vong++) {
+    if (vong === 2) {
+      if (!quaTai) break;
+      for (let g = 20; g > 0; g--) { onBao && onBao(`Mọi mô hình Gemini đang quá tải — đợi ${g} giây rồi thử vòng nữa…`); await ngu(1000); }
+    }
     for (const model of ds) {
       const gen = { temperature: json ? 0.2 : 0.6, maxOutputTokens: 32768 };
       if (json) gen.responseMimeType = "application/json";
@@ -2237,11 +2242,14 @@ const AIG = (() => {
             const dong = dem.split("\n"); dem = dong.pop();
             for (const d of dong) {
               if (!d.startsWith("data:")) continue;
-              try { const c = (JSON.parse(d.slice(5)).candidates || [])[0]; if (c && c.content && c.content.parts) chu += c.content.parts.map(p => p.text || "").join(""); } catch (e) {}
+              let j = null; try { j = JSON.parse(d.slice(5)); } catch (e) {}
+              if (j && j.error) { dut = true; if (/overloaded|high demand|unavailable/i.test(j.error.message || "") || [500, 503].includes(j.error.code)) quaTai = true; continue; }
+              const c = j && (j.candidates || [])[0]; if (c && c.content && c.content.parts) chu += c.content.parts.map(p => p.text || "").join("");
             }
             if (onChu) onChu(chu);
           }
         } catch (e) { dut = true; }
+        if (dut && json !== true && /^\s*\[?\s*(IV|I{1,3})\s*[.\-]\s*\d+\s*\]/m.test(chu)) return chu;   // giữ phần đã soạn, câu còn thiếu soạn tiếp ở lượt sau
         if (dut || !chu.trim()) {
           loiCuoi = dut ? "Kết nối với Gemini bị ngắt giữa chừng" : "Gemini không trả về nội dung";
           if (lan < 3) { onBao && onBao(`${loiCuoi} — thử lại (lần ${lan + 1}/3)…`); await ngu(lan * 3000); continue; }
@@ -2250,6 +2258,7 @@ const AIG = (() => {
         try { localStorage.setItem(MO_HINH, model); } catch (e) {}
         return chu;
       }
+    }
     }
     if (quaTai) throw new Error("Máy chủ Gemini đang quá tải (lỗi 503) — app đã tự thử lại nhiều lần với " + ds.length + " mô hình. Thầy cô đợi 1–2 phút rồi bấm lại; câu đã soạn vẫn giữ nguyên.");
     throw new Error((loiCuoi || "Không gọi được Gemini") + " — thầy cô bấm thử lại.");
@@ -2270,16 +2279,32 @@ async function chayAI(lenh, xong) {
   dangAI = true; document.querySelectorAll(".nut-ai, .nut-sua").forEach(b => b.disabled = true);
   $("b4").scrollIntoView({ behavior: "smooth", block: "start" });
   const kq = $("ketQuaDoc"); kq.innerHTML = `<span class="xoay"></span> ✨ Đang gửi tới Gemini…`;
+  $("oDan").value = "";   // không để câu trả lời cũ (của đề khác) bị đọc nhầm khi lần gọi này lỗi
+  let ok = false;
   try {
     const chu = await AIG.goi(lenh, c => { $("oDan").value = c; kq.innerHTML = `<span class="xoay"></span> ✨ Gemini đang soạn${S.bo.length > 1 ? " " + esc(tenDe(S.deHien)) : ""}… đã có <b>${(c.match(/^\s*\[?\s*(IV|I{1,3})\s*[.\-]\s*\d+\s*\]/gm) || []).length}</b> câu`; }, false, t => { kq.innerHTML = `<span class="xoay"></span> ⏳ ${esc(t)}`; });
-    $("oDan").value = chu; veKhoa(); dangAI = false; xong && xong();
-  } catch (e) { kq.innerHTML = `<span class="do">✖ ${esc(e.message || String(e))}</span>`; TT.buzz(); }
+    $("oDan").value = chu; veKhoa(); dangAI = false; xong && xong(); ok = true;
+  } catch (e) {
+    dangAI = false;
+    const co = ($("oDan").value.match(/^\s*\[?\s*(IV|I{1,3})\s*[.\-]\s*\d+\s*\]/gm) || []).length;
+    if (co && xong) xong();
+    kq.innerHTML = `<span class="do">✖ ${esc(e.message || String(e))}</span>${co ? " · đã giữ các câu Gemini kịp soạn, bấm lại để soạn tiếp câu còn trống" : ""}`; TT.buzz();
+  }
   dangAI = false; document.querySelectorAll(".nut-ai, .nut-sua").forEach(b => b.disabled = false);
+  return ok;
 }
-function aiSoan(chiK) {
-  const l = lenhAI(true, chiK);
+const demTrong = chiK => { const P = khe(); return P.phan.flatMap(d => P[d]).filter(s => !daXong(s) && (!chiK || chiK.has(s.k))).length; };
+async function aiSoan(chiK) {
+  let l = lenhAI(true, chiK);
   if (!l) { TT.toast("Không còn câu nào trống 👍 — muốn đổi câu nào thì bấm 🧹 xoá câu đó rồi bấm lại", "ok"); return; }
-  return chayAI(l, () => $("bDoc").click());
+  for (let luot = 1; luot <= 3; luot++) {
+    const truoc = demTrong(chiK);
+    const ok = await chayAI(l, () => $("bDoc").click());
+    const con = demTrong(chiK);
+    if (!con || !ok || con >= truoc) return;
+    l = lenhAI(true, chiK); if (!l) return;
+    TT.toast(`Còn ${con} câu chưa soạn — Gemini soạn tiếp…`, "");
+  }
 }
 function aiSuaDai() {
   const l = lenhSuaDai();
