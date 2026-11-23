@@ -255,7 +255,7 @@ details.hop summary{cursor:pointer;font-weight:700;font-size:14.5px}
 </section>
 
 <section class="the" id="b3">
-  <div class="buoc"><span class="so">3</span><b>Sửa từng slide &amp; ảnh minh hoạ</b><span class="nhan" style="background:#ffedd5;color:#9a3412" id="demSl">0 slide</span><span class="phai"><button class="nut phu nho" id="bThemSl">＋ Thêm slide</button><button class="nut phu nho" id="bAnhTuDong" title="Slide nào chưa có ảnh thì app tự chọn ảnh">🪄 Tự gắn ảnh còn thiếu</button></span></div>
+  <div class="buoc"><span class="so">3</span><b>Sửa từng slide &amp; ảnh minh hoạ</b><span class="nhan" style="background:#ffedd5;color:#9a3412" id="demSl">0 slide</span><span class="phai"><button class="nut phu nho" id="bThemSl">＋ Thêm slide</button><button class="nut phu nho" id="bAnhAI" title="Gemini lấy hình trong SGK hợp nội dung từng slide; slide nào SGK không có hình thì Gemini vẽ ảnh theo nội dung">✨ Gemini chọn ảnh hợp từng slide</button><button class="nut phu nho" id="bAnhTuDong" title="Slide nào chưa có ảnh thì app tự chọn ảnh">🪄 Tự gắn ảnh còn thiếu</button></span></div>
   <div id="viec">
     <div id="dsSlide" aria-label="Danh sách slide"></div>
     <div id="soSlide"></div>
@@ -2272,10 +2272,11 @@ Hướng dẫn về nhà
   const nguon = () => ({ dong: S.chu ? S.chu.split("\n") : [], trangDong: S.trangDong, ocr: S.tep.some(t => t.ocr) });
   const khoAnhFile = () => S.anh.filter(a => !a.tao && a.dong != null);
   /* thanh tiến độ khi dàn nhiều slide (thay cho cảnh trình duyệt báo «Trang không phản hồi») */
-  function hienTienDan(i, n, ms) {
+  function hienTienDan(i, n, ms, nhan, donVi) {
     const o = $("tienDoDan"); o.hidden = false;
+    o.querySelector("b").textContent = nhan || "⏳ Đang dàn slide";
     const conLai = i ? Math.max(0, Math.round(ms / i * (n - i) / 1000)) : 0;
-    o.querySelector("span").textContent = `${i}/${n} slide · ${Math.round(i / n * 100)}%` + (i && i < n ? (conLai > 1 ? ` · còn khoảng ${conLai} giây` : " · sắp xong") : "");
+    o.querySelector("span").textContent = `${i}/${n} ${donVi || "slide"} · ${Math.round(i / n * 100)}%` + (i && i < n ? (conLai > 1 ? ` · còn khoảng ${conLai} giây` : " · sắp xong") : "");
     o.querySelector("i").style.width = Math.round(i / n * 100) + "%";
   }
   let dangDan = false;
@@ -2329,13 +2330,14 @@ Hướng dẫn về nhà
   }
   veKhoa();
   const docBase64 = (f) => new Promise((ok, loi) => { const r = new FileReader(); r.onload = () => ok(String(r.result).split(",")[1]); r.onerror = loi; r.readAsDataURL(f); });
-  async function goiGemini(prompt, parts, onChu) {
+  async function goiGemini(prompt, parts, onChu, json) {
     const key = layKhoa();
     let daLuu = ""; try { daLuu = localStorage.getItem(MO_HINH) || ""; } catch (e) {}
     const ds = daLuu ? [daLuu, ...DS_MO_HINH.filter(m => m !== daLuu)] : DS_MO_HINH;
     let loiCuoi = "";
     for (const model of ds) {
-      const gen = { temperature: 0.6, maxOutputTokens: 32768 };
+      const gen = { temperature: json ? 0.3 : 0.6, maxOutputTokens: 32768 };
+      if (json) gen.responseMimeType = "application/json";
       if (/^gemini-2\.5-flash/.test(model)) gen.thinkingConfig = { thinkingBudget: 0 };
       let r;
       try {
@@ -2362,7 +2364,7 @@ Hướng dẫn về nhà
           if (!d.startsWith("data:")) continue;
           try { const c = (JSON.parse(d.slice(5)).candidates || [])[0]; if (c && c.content && c.content.parts) chu += c.content.parts.map(p => p.text || "").join(""); } catch (e) {}
         }
-        onChu(chu);
+        if (onChu) onChu(chu);
       }
       try { localStorage.setItem(MO_HINH, model); } catch (e) {}
       if (!chu.trim()) throw new Error("Gemini không trả về nội dung — thầy cô bấm thử lại.");
@@ -2392,6 +2394,109 @@ Hướng dẫn về nhà
       $("kqAI").innerHTML = `<span class="do">${esc(e.message || String(e))}</span>`; TT.buzz();
     }
     nut.disabled = false;
+  };
+
+  /* ---------- Gemini chọn ảnh hợp từng slide: lấy hình trong SGK, không có thì vẽ ---------- */
+  const docJSON = t => {
+    t = String(t).replace(/```json|```/g, "").trim();
+    try { return JSON.parse(t); } catch (e) {
+      const a = t.indexOf("["), b = t.lastIndexOf("]");
+      if (a >= 0 && b > a) return JSON.parse(t.slice(a, b + 1));
+      throw new Error("Kết quả AI không đúng định dạng — thầy cô bấm thử lại.");
+    }
+  };
+  const tomTat = (sl, i) => `Slide ${i + 1} (${LOAI[sl.loai] || sl.loai}): «${(sl.tieuDe || "").replace(/\*\*/g, "")}» — ${String(sl.noiDung || "").replace(/\*\*/g, "").replace(/\s+/g, " ").slice(0, 260)}`;
+  function svgSach(svg) {   // chỉ nhận SVG thuần hình vẽ: bỏ script, chữ, sự kiện, liên kết ngoài
+    const m = String(svg || "").match(/<svg[\s\S]*<\/svg>/i); if (!m) return null;
+    const d = new DOMParser().parseFromString(m[0], "image/svg+xml"), goc = d.documentElement;
+    if (!goc || goc.nodeName.toLowerCase() !== "svg" || d.getElementsByTagName("parsererror").length) return null;
+    goc.querySelectorAll("script,foreignObject,image,a,use,text,style").forEach(x => x.remove());
+    goc.querySelectorAll("*").forEach(x => [...x.attributes].forEach(at => { if (/^on|href/i.test(at.name)) x.removeAttribute(at.name); }));
+    goc.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+    if (!goc.getAttribute("viewBox")) goc.setAttribute("viewBox", "0 0 800 600");
+    goc.setAttribute("width", "800"); goc.setAttribute("height", "600");
+    return new XMLSerializer().serializeToString(goc);
+  }
+  const b64 = u8 => { let s = ""; for (let i = 0; i < u8.length; i += 0x8000) s += String.fromCharCode.apply(null, u8.subarray(i, i + 0x8000)); return btoa(s); };
+  // slide còn dùng ảnh app tự vẽ (tranh chung chung) → được thay; ảnh thầy cô tự chọn thì giữ
+  const canLamAnh = sl => sl.loai !== "bia" && (!sl.anh || !sl.anh.length || sl.anh.every(id => { const a = S.anh.find(x => x.id === id); return !a || a.tao; }));
+  $("bAnhAI").onclick = async () => {
+    if (!S.slides.length) { TT.toast("Chưa có slide — thầy cô làm bước 2 trước ạ", "loi"); return; }
+    if (!layKhoa()) { $("aDoiKhoa").click(); if (!layKhoa()) return; }
+    if (dangDan) return;
+    const ds = S.slides.map((sl, i) => ({ sl, i })).filter(x => canLamAnh(x.sl));
+    if (!ds.length) { TT.toast("Slide nào cũng đã có ảnh thầy cô chọn — bỏ ảnh ở slide cần đổi rồi bấm lại", "loi"); return; }
+    const nut = $("bAnhAI"); nut.disabled = true; dangDan = true;
+    const t0 = Date.now(), tong = ds.length;
+    let xong = 0, layTuSach = 0, veMoi = 0;
+    const bao = nhan => hienTienDan(Math.min(xong, tong), tong, Date.now() - t0, nhan, "slide");
+    try {
+      // 1) tìm hình trong SGK: vẽ các trang PDF ra ảnh, nhờ Gemini khoanh vùng hình hợp mỗi slide rồi cắt
+      const tenPdf = S.tep.map(t => t.pdf).find(p => p && DN.coPdf(p));
+      const daCo = new Set();
+      if (tenPdf) {
+        bao("📖 Đang đọc các trang SGK");
+        const n = Math.min(DN.soTrang(tenPdf), 24), parts = [];
+        for (let p = 1; p <= n; p++) {
+          const c = await DN.veTrang(tenPdf, p, 1000);
+          parts.push({ text: "TRANG " + p }, { inlineData: { mimeType: "image/jpeg", data: c.toDataURL("image/jpeg", 0.72).split(",")[1] } });
+        }
+        bao("🔎 Gemini đang tìm hình trong SGK cho từng slide");
+        const lenh = `Đây là ${n} trang sách giáo khoa (mỗi ảnh có nhãn TRANG n ngay trước). Dưới đây là các slide bài giảng.
+Với MỖI slide, tìm trong các trang một HÌNH MINH HOẠ hợp nội dung slide nhất: tranh vẽ, ảnh chụp, hình học, đồ thị, sơ đồ, nhân vật minh hoạ. KHÔNG chọn vùng chỉ toàn chữ, không chọn cả trang, không chọn tiêu đề hay số trang. Một hình có thể dùng cho nhiều slide nếu thật sự hợp.
+Trả về JSON mảng, mỗi phần tử: {"slide": số slide, "trang": số trang (0 nếu không có hình hợp), "box": [ymin, xmin, ymax, xmax] toạ độ 0–1000 trên trang đó, ôm trọn hình, "moTa": mô tả hình ngắn}.
+${ds.map(x => tomTat(x.sl, x.i)).join("\n")}`;
+        let kq = [];
+        try { kq = docJSON(await goiGemini(lenh, parts, null, true)); } catch (e) { if (/khoá|mạng|hết lượt/i.test(e.message)) throw e; }
+        const nhoTrang = {};
+        for (const r of (Array.isArray(kq) ? kq : [])) {
+          const x = ds.find(d => d.i + 1 === +r.slide), p = +r.trang, b = r.box || r.box_2d;
+          if (!x || daCo.has(x.i) || !p || p > n || !Array.isArray(b) || b.length !== 4) continue;
+          const [y0, x0, y1, x1] = b.map(Number), dt = (y1 - y0) * (x1 - x0);
+          if (!(y1 > y0 && x1 > x0) || dt < 4000 || dt > 700000) continue;
+          const c = nhoTrang[p] || (nhoTrang[p] = await DN.veTrang(tenPdf, p, 1800)), le = 12;
+          const X = Math.max(0, x0 / 1000 * c.width - le), Y = Math.max(0, y0 / 1000 * c.height - le);
+          const W = Math.min(c.width - X, (x1 - x0) / 1000 * c.width + 2 * le), H = Math.min(c.height - Y, (y1 - y0) / 1000 * c.height + 2 * le);
+          const cc = document.createElement("canvas"); cc.width = Math.round(W); cc.height = Math.round(H);
+          cc.getContext("2d").drawImage(c, X, Y, W, H, 0, 0, cc.width, cc.height);
+          const url = cc.toDataURL("image/jpeg", 0.9), data = Uint8Array.from(atob(url.split(",")[1]), ch => ch.charCodeAt(0));
+          const id = themAnhByte({ data, ext: "jpeg", url, w: cc.width, h: cc.height, ten: "SGK tr." + p + ": " + String(r.moTa || "").slice(0, 60), trang: p }, "sgk", null);
+          x.sl.anh = [id]; daCo.add(x.i); layTuSach++; xong++;
+          bao("🔎 Đang cắt hình trong SGK");
+        }
+      }
+      // 2) slide SGK không có hình hợp: Gemini vẽ ảnh minh hoạ đúng nội dung (SVG tranh phẳng, không chữ)
+      const conLai = ds.filter(x => !daCo.has(x.i)), m = bang();
+      for (let k = 0; k < conLai.length; k += 4) {
+        const nhom = conLai.slice(k, k + 4);
+        bao("🎨 Gemini đang vẽ ảnh theo nội dung slide");
+        const lenh = `Vẽ ảnh minh hoạ cho từng slide bài giảng ${S.tt.mon || ""}${S.tt.lop ? " lớp " + S.tt.lop : ""} dưới đây, dạng mã SVG.
+Yêu cầu mỗi ảnh: <svg viewBox="0 0 800 600">; tranh phẳng (flat illustration), nền sáng, nét rõ, bố cục cân đối, chiếm kín khung; vẽ ĐÚNG đồ vật, nhân vật, tình huống, hình học có trong nội dung slide (VD: bao gạo và gói mì; hai bạn học sinh đang tranh luận; tam giác vuông; cân đĩa; cây xanh…); màu chủ đạo #${m.c1}, #${m.c2}, điểm nhấn #${m.nhan}; KHÔNG dùng thẻ text, KHÔNG vẽ chữ hay chữ số; không dùng ảnh ngoài, không script; mỗi ảnh tối đa 6000 kí tự.
+Trả về JSON mảng: [{"slide": số slide, "svg": "<svg …>…</svg>"}].
+${nhom.map(x => tomTat(x.sl, x.i)).join("\n")}`;
+        let kq = [];
+        try { kq = docJSON(await goiGemini(lenh, [], null, true)); } catch (e) { if (/khoá|mạng|hết lượt/i.test(e.message)) throw e; }
+        for (const r of (Array.isArray(kq) ? kq : [])) {
+          const x = nhom.find(d => d.i + 1 === +r.slide), svg = x && svgSach(r.svg);
+          if (!svg) continue;
+          try {
+            const a = await AT.png(svg, 1200);
+            a.url = "data:image/jpeg;base64," + b64(a.data);
+            a.ten = "AI vẽ: " + (x.sl.tieuDe || "").replace(/\*\*/g, "").slice(0, 50);
+            x.sl.anh = [themAnhByte(a, "ai", null)];
+            veMoi++;
+          } catch (e) {}
+        }
+        xong = layTuSach + Math.min(conLai.length, k + nhom.length);
+        bao("🎨 Gemini đang vẽ ảnh theo nội dung slide");
+      }
+      xong = tong; bao("✅ Xong — đang dàn lại slide");
+      dangDan = false; luu(); await danTruoc(); veHet();
+      const giu = tong - layTuSach - veMoi;
+      TT.toast(`Đã gắn ${layTuSach} hình lấy từ SGK, ${veMoi} ảnh Gemini vẽ theo nội dung` + (giu > 0 ? ` · ${giu} slide giữ ảnh cũ` : ""), "ok"); TT.ting();
+    } catch (e) {
+      TT.toast(e.message || String(e), "loi"); TT.buzz();
+    } finally { dangDan = false; nut.disabled = false; setTimeout(() => { $("tienDoDan").hidden = true; }, 600); }
   };
 
   $("bDocAI").onclick = async () => {
