@@ -1054,9 +1054,16 @@ const DF = (() => {
         s = gon(s); if (s) { dong.push(s); trangDong.push(n); }
       });
     }
-    // PDF quét / in từ ảnh: không có lớp chữ → nhận chữ trong ảnh từng trang (OCR tiếng Việt)
+    // bỏ chữ mờ / đầu trang lặp: dòng là địa chỉ web, hoặc cùng một dòng lặp ở ≥ 40 % số trang
+    const laWeb = s => /^(https?:\/\/)?(www\.)?[\w\-]+(\.[\w\-]+)*\.(com|net|org|vn|edu|info|io|site|xyz|me)(\.vn)?(\/\S*)?$/i.test(s.replace(/\s+/g, ""));
+    const soTrangCo = {}; dong.forEach((s, i) => { (soTrangCo[s] = soTrangCo[s] || new Set()).add(trangDong[i]); });
+    const nguong = Math.max(3, Math.ceil(pdf.numPages * .4));
+    let boMo = 0;
+    for (let i = dong.length - 1; i >= 0; i--) if (laWeb(dong[i]) || (soTrangCo[dong[i]].size >= nguong && dong[i].length > 3)) { dong.splice(i, 1); trangDong.splice(i, 1); boMo++; }
+    // PDF quét / in từ ảnh: không có lớp chữ (hoặc chỉ có chữ mờ) → nhận chữ trong ảnh từng trang (OCR tiếng Việt)
     let ocr = null;
-    if (!dong.length) {
+    if (dong.join("").length < 60 * pdf.numPages * .5) {
+      dong.length = 0; trangDong.length = 0;
       const n = Math.min(pdf.numPages, TRANG_OCR_TOI_DA);
       for (let t = 1; t <= n; t++) {
         const ghi = `Đang nhận chữ trang ${t}/${n} (PDF dạng ảnh)…`;
@@ -1064,7 +1071,7 @@ const DF = (() => {
         const pg = await pdf.getPage(t), vp0 = pg.getViewport({ scale: 1 }), vp = pg.getViewport({ scale: 2200 / vp0.width });
         const c = document.createElement("canvas"); c.width = Math.round(vp.width); c.height = Math.round(vp.height);
         await pg.render({ canvasContext: c.getContext("2d"), viewport: vp }).promise;
-        (await nhanChu(c, p => bao && bao(ghi, (t - 1 + p) / n))).forEach(s => { dong.push(s); trangDong.push(t); });
+        (await nhanChu(c, p => bao && bao(ghi, (t - 1 + p) / n))).forEach(s => { if (!laWeb(s)) { dong.push(s); trangDong.push(t); } });
       }
       bao && bao("", 1);
       ocr = { soTrang: n, conLai: pdf.numPages - n };
@@ -1491,21 +1498,53 @@ function docCau(d, than, s) {
   }
   return null;
 }
+/* Thầy cô lỡ dán lại CÂU LỆNH (hoặc AI chép lại câu lệnh) → bỏ khuôn mẫu, danh sách câu, nội dung bài; chỉ giữ câu AI soạn */
+const RE_NHAN_DONG = /^\s*\[?\s*(IV|I{1,3})\s*[.\-]\s*\d+\s*\]?/;
+const RE_MOTA = /^\s*\[?\s*(IV|I{1,3})\s*[.\-]\s*\d+\s*\]?\s*[:.)]?\s*Chủ đề\s*:.*\|/i;
+function boLenh(txt) {
+  const coLenh = /KHUÔN TRẢ LỜI|DANH SÁCH \d+ CÂU CẦN SOẠN|NỘI DUNG BÀI HỌC \(giáo viên cung cấp\)|CÁC CÂU CẦN SỬA/.test(txt);
+  if (!coLenh) return { txt, coLenh };
+  const ra = []; let bo = null;
+  txt.split("\n").forEach(x => {
+    const t = x.trim();
+    if (/^Bạn là giáo viên\b/.test(t) || /^Dưới đây là \d+ câu trắc nghiệm/.test(t)) { bo = "dau"; return; }
+    if (/^KHUÔN TRẢ LỜI/.test(t)) { bo = "khuon"; return; }
+    if (/^DANH SÁCH \d+ CÂU CẦN SOẠN/.test(t)) { bo = "ds"; return; }
+    if (/^NỘI DUNG BÀI HỌC \(giáo viên cung cấp\)/.test(t)) { bo = "nd"; return; }
+    if (/^CÁC CÂU CẦN SỬA/.test(t)) { bo = null; return; }
+    if (RE_MOTA.test(t)) return;                                   // dòng mô tả câu trong danh sách
+    if (bo === "ds" && !t) { bo = null; return; }
+    if (bo === "nd" && RE_NHAN_DONG.test(t)) bo = null;            // AI trả lời sau phần nội dung
+    if (bo === "dau" && RE_NHAN_DONG.test(t)) bo = "khuon";        // khuôn mẫu của câu lệnh sửa phương án
+    if (bo === "khuon" && RE_NHAN_DONG.test(t) && !/…/.test(t)) bo = null;
+    if (!bo) ra.push(x);
+  });
+  return { txt: ra.join("\n"), coLenh };
+}
+const rongChu = x => !String(x || "").replace(/Câu hỏi|Câu dẫn|[….\s]/gi, "").trim();
+function laKhuonRong(d, q) {
+  if (!q) return true;
+  if (d === "NLC") return rongChu(q.de) || q.pa.every(rongChu);
+  if (d === "DS") return rongChu(q.de) && q.y.every(y => rongChu(y.t));
+  if (d === "TL") return rongChu(q.de) || /^Chủ đề\s*:.*\|\s*Mức\s*:/i.test(q.de);
+  return rongChu(q.de);
+}
 function docTraLoi(txt) {
   const P = khe(), map = {};
   P.phan.forEach(d => P[d].forEach(s => map[s.la + "." + s.so] = s));
-  txt = String(txt || "").replace(/\r/g, "").replace(/\*\*|__|`/g, "").replace(/^#+\s*/gm, "").replace(/\\\(|\\\)/g, "$").replace(/\$\$|\\\[|\\\]/g, "$").replace(/\$[^$]*\$/g, m => m.replace(/\s*\n\s*/g, " "));
+  const bl = boLenh(String(txt || "").replace(/\r/g, ""));
+  txt = bl.txt.replace(/\r/g, "").replace(/\*\*|__|`/g, "").replace(/^#+\s*/gm, "").replace(/\\\(|\\\)/g, "$").replace(/\$\$|\\\[|\\\]/g, "$").replace(/\$[^$]*\$/g, m => m.replace(/\s*\n\s*/g, " "));
   const re = /^\s*\[?\s*(IV|I{1,3})\s*[.\-]\s*(\d+)\s*\]?\s*[:.)]?/gm, moc = []; let m;
   while ((m = re.exec(txt))) moc.push({ k: m[1] + "." + m[2], i: m.index, j: re.lastIndex });
   let duoc = 0, loi = [];
   moc.forEach((x, i) => {
     const s = map[x.k]; if (!s) { loi.push(x.k + " (không có trong ma trận)"); return; }
     const q = docCau(s.d, txt.slice(x.j, i + 1 < moc.length ? moc[i + 1].i : undefined), s);
-    if (!q) { loi.push(x.k); return; }
+    if (!q || laKhuonRong(s.d, q)) { loi.push(x.k); return; }
     S.cau[s.k] = q; duoc++;
   });
   luu();
-  return { duoc, loi, tong: moc.length };
+  return { duoc, loi, tong: moc.length, coLenh: bl.coLenh };
 }
 
 /* ================= DỰNG WORD ================= */
@@ -1994,6 +2033,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const r = docTraLoi(v);
     giuFocus(veSoan); veKiem(); veBuoc(); veXem();
     if (r.duoc) { TT.ting(); TT.phaoGiay(); TT.toast(`Đã đọc ${r.duoc} câu vào đề${r.loi.length ? " · chưa đọc được: " + r.loi.slice(0, 5).join(", ") : ""}`, r.loi.length ? "" : "ok"); }
+    else if (r.coLenh) { TT.buzz(); TT.toast("Đây là CÂU LỆNH, chưa phải câu trả lời — thầy cô dán câu lệnh vào ChatGPT/Gemini/Copilot, chờ AI soạn xong rồi chép câu AI trả lời dán vào đây ạ", "loi"); }
     else { TT.buzz(); TT.toast("Chưa đọc được câu nào — câu trả lời cần giữ nhãn [I.1], [II.1]… như câu lệnh", "loi"); }
     $("ketQuaDoc").innerHTML = `Đọc được <b>${r.duoc}</b>/${r.tong} khối${r.loi.length ? ` · <span class="do">chưa đọc được: ${esc(r.loi.join(", "))}</span> — sửa tay ở khung bên dưới hoặc bấm «Câu lệnh cho câu còn trống»` : ""}.`;
   });
@@ -2054,6 +2094,10 @@ async function xuatWord() {
   const ph = dungPhan(c);
   if (!ph.length) { TT.toast("Ma trận chưa có câu nào", "loi"); TT.buzz(); return; }
   const k = veKiem();
+  if (c.de || c.hd) {
+    const tr = c.ds.map(i => { const t = tienDoDe(i); return t.tong - t.xong ? `${tenDe(i)}: ${t.tong - t.xong}/${t.tong} câu` : ""; }).filter(Boolean);
+    if (tr.length && !confirm(`Còn câu CHƯA SOẠN (${tr.join(" · ")}) — trong Word các câu này chỉ có dấu «…».\n\nBấm «Hủy» để quay lại bước ④ soạn tiếp; bấm «OK» nếu vẫn muốn xuất bản khung.`)) return;
+  }
   try {
     const blob = await DX.taoDocx(ph);
     const ten = ("De KT " + (S.tt.ky || "") + " " + (S.tt.mon || "") + " " + (S.tt.lop || "")).trim().replace(/[\\/:*?"<>|]+/g, "").replace(/\s+/g, "_") + (c.ds.length > 1 && (c.de || c.hd) ? "_" + c.ds.length + "-de" : S.bo.length > 1 && (c.de || c.hd) ? "_" + tenDe(c.ds[0]).replace(/\s+/g, "-") : "") + ".docx";
