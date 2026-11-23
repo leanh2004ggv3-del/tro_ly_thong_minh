@@ -1,6 +1,6 @@
 // Service Worker - Lưu đệm thông minh (Smart Cache Storage) cho Classroom App
-// CẬP NHẬT PHIÊN BẢN V4: Loại trừ hoàn toàn /to-truong/, dọn sạch cache cũ, ưu tiên Network 100%
-const CACHE_NAME = 'troly-thaysach-cache-v4';
+// CẬP NHẬT PHIÊN BẢN V5: Loại trừ hoàn toàn /to-truong/, dọn sạch cache cũ, ưu tiên Network 100%
+const CACHE_NAME = 'troly-thaysach-cache-v5';
 
 // Danh sách các tài nguyên tĩnh quan trọng cần lưu đệm
 const PRE_CACHE_ASSETS = [

@@ -113,6 +113,7 @@ footer.cuoi .nhap{display:inline-block;background:#fef9c3;color:#713f12;border:1
     <h1>TỔ TRƯỞNG SỐ</h1>
     <p>Các công cụ nhỏ giúp tổ trưởng, tổ phó và giáo viên THCS – THPT làm việc nhanh và gọn: song ngữ giáo án, tích hợp NLS – NLAI, lịch việc, phân công, biên bản, tiến độ, kết quả kiểm tra, ma trận đề. <b>Không cần đăng nhập, không cần cài đặt</b>, dữ liệu không gửi đi đâu.</p>
     <div class="hang" style="gap:8px">
+      <a href="../index.html" class="nut phu" style="text-decoration:none">🔙 Về Trang Chủ Trợ Lý</a>
       <button class="nut" id="bLuuHet">💾 Sao lưu tất cả</button>
       <button class="nut phu" id="bNhapHet">📂 Nhập lại bản sao lưu</button>
     </div>
@@ -301,9 +302,8 @@ function ve() {
       ${tt ? `<span class="nhan n-dung dl">${tt}</span>` : ""}
       <svg class="bt" viewBox="0 0 64 64">${icon}</svg><h3>${ten}</h3><p>${mota}</p>
       <div class="hang" style="gap:8px">
-        <a class="nut nho" href="${f}.html" target="_top" style="background:linear-gradient(135deg,${mau},#4f46e5)">Mở công cụ →</a>
-        <a class="nut phu nho" href="${f}.html#mau" target="_top">Dữ liệu thử</a>
-        <a class="nut phu nho" href="${f}.html" target="_blank" title="Mở trong tab mới độc lập">↗ Tab mới</a>
+        <a class="nut nho" href="${f}.html" target="_blank" rel="noopener noreferrer" style="background:linear-gradient(135deg,${mau},#4f46e5)">Mở toàn màn hình ↗</a>
+        <a class="nut phu nho" href="${f}.html#mau" target="_blank" rel="noopener noreferrer">Dữ liệu thử</a>
       </div></div>`;
   }).join("");
 }

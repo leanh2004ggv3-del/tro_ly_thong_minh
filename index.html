@@ -18,7 +18,7 @@
       if (typeof caches !== 'undefined') {
         caches.keys().then(function(names) {
           names.forEach(function(name) {
-            if (name !== 'troly-thaysach-cache-v4') {
+            if (name !== 'troly-thaysach-cache-v5') {
               caches.delete(name);
               console.log('🧹 [Cache Cleaner] Đã dọn sạch cache cũ:', name);
             }
@@ -2777,6 +2777,8 @@
       });
 
       const [activeTab, setActiveTab] = useState('HDTN_TEMPLATE_GENERATOR');
+      // Chế độ xem Tổ Trưởng Số: 'GRID' (Lưới 10 công cụ mở toàn màn hình mượt mà, chống treo) hoặc 'IFRAME'
+      const [toTruongViewMode, setToTruongViewMode] = useState('GRID');
 
       // STATE CHO APP THỰC HÀNH 3D & KHO E-LEARNING
       
@@ -3470,8 +3472,7 @@
         if (!currentHdtnPlan) return;
         const p = currentHdtnPlan;
         
-        let htmlDoc = `
-<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
+        let htmlDoc = '<!DOCTYPE html>\n<' + `html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
 <head>
 <meta charset="utf-8">
 <title>${p.lessonTitle}</title>
@@ -3705,12 +3706,7 @@
     </table>
   </div>
   ` : ''}
-
-
-
-</body>
-</html>
-`;
+` + '<' + '/body>\n<' + '/html>';
         const blob = new Blob([htmlDoc], { type: 'application/msword;charset=utf-8' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
@@ -4175,8 +4171,7 @@
           `;
         });
 
-        const wordHtml = `
-<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+        const wordHtml = '<!DOCTYPE html>\n<' + `html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
 <head>
   <meta charset='utf-8'>
   <title>Báo cáo tình hình sử dụng hệ thống web</title>
@@ -4313,9 +4308,7 @@
       </td>
     </tr>
   </table>
-</body>
-</html>
-        `;
+` + '<' + '/body>\n<' + '/html>';
 
         const blob = new Blob([wordHtml], { type: 'application/msword;charset=utf-8' });
         const url = URL.createObjectURL(blob);
@@ -4580,7 +4573,7 @@
         if (window.lucide) {
           window.lucide.createIcons();
         }
-      }, [activeTab, lessons, isGenerating, generatedStreamText, showUploadModal, showAiGameModal, generatedQuestionsList, materialSearchQuery, showAuthModal, currentUser, showProfileMenu, authTab, hdtnActiveSubTab, hdtnActivePeriodTab, currentHdtnPlan, isHdtnFullscreen, previewItem, app3dGradeFilter, elearningGradeFilter, registeredUsers, usageLogs, userSearchQuery, userRoleFilter]);
+      }, [activeTab, toTruongViewMode, lessons, isGenerating, generatedStreamText, showUploadModal, showAiGameModal, generatedQuestionsList, materialSearchQuery, showAuthModal, currentUser, showProfileMenu, authTab, hdtnActiveSubTab, hdtnActivePeriodTab, currentHdtnPlan, isHdtnFullscreen, previewItem, app3dGradeFilter, elearningGradeFilter, registeredUsers, usageLogs, userSearchQuery, userRoleFilter]);
 
       // AI Lesson Plan Streaming Generator Handler
       
@@ -4883,8 +4876,7 @@
           return;
         }
         const win = window.open('', '_blank');
-        win.document.write(`
-          <html>
+        win.document.write('<!DOCTYPE html>\n<' + `html>
             <head>
               <title>${plan.title}</title>
               <style>
@@ -4894,12 +4886,10 @@
                 pre { font-family: 'Times New Roman', serif; white-space: pre-wrap; font-size: 13pt; }
               </style>
             </head>
-            <body>
+            ` + '<' + `body>
               <h1>KẾ HOẠCH BÀI DẠY (CÔNG VĂN 5512)</h1>
               <pre>${plan.contentMarkdown}</pre>
-            </body>
-          </html>
-        `);
+            ` + '<' + '/body>\n<' + '/html>');
         win.document.close();
         win.onload = function() { win.print(); };
         trackActivity('Xuất file PDF KHBD 5512', `In / Tải PDF: ${plan.title}`);
@@ -7881,30 +7871,219 @@
 
               
 
-              {activeTab === 'TO_TRUONG' && (
-                <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-                  <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3 border-b border-slate-100 bg-gradient-to-r from-violet-50 to-cyan-50">
-                    <div className="flex items-center gap-2.5">
-                      <i data-lucide="briefcase" className="w-5 h-5 text-violet-600"></i>
-                      <div>
-                        <h3 className="font-bold text-slate-800 text-base">Tổ Trưởng Số — 10 công cụ cho tổ trưởng, giáo viên</h3>
-                        <p className="text-xs text-slate-500">Soạn bài giảng PowerPoint · Soạn đề kiểm tra CV 7991 · Lịch việc tổ · Phân công tiết · Biên bản họp tổ · Tiến độ chương trình · Kết quả kiểm tra · Kiểm ma trận đề · Tích hợp NLS – NLAI vào giáo án · Song ngữ Việt – Anh cho giáo án — dữ liệu chỉ lưu trên trình duyệt máy này</p>
+              {activeTab === 'TO_TRUONG' && (() => {
+                const toTruongApps = [
+                  {
+                    id: "soan-ppt",
+                    title: "1. Soạn bài giảng PowerPoint",
+                    desc: "Nạp giáo án, SGK (Word/PDF/ảnh) → tự dàn slide hoặc nhờ AI → mỗi slide có ảnh minh hoạ → tải PowerPoint chuẩn Times New Roman cỡ ≥ 24.",
+                    color: "#ea580c",
+                    badge: "Mới nâng cấp",
+                    icon: "presentation"
+                  },
+                  {
+                    id: "soan-de",
+                    title: "2. Soạn đề kiểm tra CV 7991",
+                    desc: "Nạp giáo án, SGK → tự động tạo câu trắc nghiệm nhiều lựa chọn, đúng - sai, trả lời ngắn, tự luận kèm ma trận, bảng đặc tả và đáp án Word.",
+                    color: "#6366f1",
+                    badge: "Chuẩn Bộ",
+                    icon: "file-check"
+                  },
+                  {
+                    id: "song-ngu",
+                    title: "3. Song ngữ cho giáo án",
+                    desc: "Đưa giáo án Word lên → chèn thêm tiếng Anh chữ xanh (đề mục, lời GV, từ vựng, câu dịch), giữ nguyên giáo án cũ; có audio đọc mẫu phát âm.",
+                    color: "#0284c7",
+                    badge: "Thực hành",
+                    icon: "languages"
+                  },
+                  {
+                    id: "tich-hop",
+                    title: "4. Tích hợp NLS – NLAI",
+                    desc: "Đưa giáo án Word/PDF lên, chọn mã năng lực số & trí tuệ nhân tạo → tự động chèn vào hoạt động, xuất Word chuẩn NLS đỏ, NLAI xanh.",
+                    color: "#ef4444",
+                    badge: "Đặc sắc",
+                    icon: "cpu"
+                  },
+                  {
+                    id: "lich-nam",
+                    title: "5. Lịch việc tổ",
+                    desc: "Vòng 12 tháng công việc của tổ chuyên môn; tích đánh dấu việc đã hoàn thành; hỗ trợ xuất lịch nhắc sang Google Calendar.",
+                    color: "#4f46e5",
+                    badge: "Tổ trưởng",
+                    icon: "calendar"
+                  },
+                  {
+                    id: "phan-cong",
+                    title: "6. Phân công tiết",
+                    desc: "Tính toán tiết dạy, tiết giảm định mức từng giáo viên trong tổ; thấy ngay ai thừa, ai thiếu giờ dạy; xuất bảng đề xuất phân công.",
+                    color: "#d97706",
+                    badge: "Tổ trưởng",
+                    icon: "users"
+                  },
+                  {
+                    id: "bien-ban",
+                    title: "7. Biên bản họp tổ",
+                    desc: "Soạn thảo theo khung chuẩn sổ biên bản họp tổ chuyên môn, xem trước khổ A4, kiểm đủ các mục quy định và xuất file Word.",
+                    color: "#0d9488",
+                    badge: "Hành chính",
+                    icon: "file-text"
+                  },
+                  {
+                    id: "tien-do",
+                    title: "8. Tiến độ chương trình",
+                    desc: "So sánh số tiết đã dạy với số tiết quy định theo tuần; tự động phát hiện lớp chạy chậm; nút bấm +1 cập nhật nhanh tiến độ.",
+                    color: "#0284c7",
+                    badge: "Quản lý",
+                    icon: "trending-up"
+                  },
+                  {
+                    id: "ket-qua-kt",
+                    title: "9. Kết quả kiểm tra",
+                    desc: "Dán bảng điểm học sinh (mã hoá) → tự vẽ biểu đồ phổ điểm, so sánh phổ điểm giữa các lớp, phát hiện câu nhiều học sinh làm sai.",
+                    color: "#db2777",
+                    badge: "Thống kê",
+                    icon: "bar-chart-2"
+                  },
+                  {
+                    id: "ma-tran-de",
+                    title: "10. Kiểm ma trận đề",
+                    desc: "Nhập thông tin câu hỏi → tự kiểm tra tỉ lệ Biết - Hiểu - Vận dụng, tổng điểm 10 và độ bao phủ chủ đề kiến thức theo quy định.",
+                    color: "#7c3aed",
+                    badge: "Khảo thí",
+                    icon: "grid"
+                  }
+                ];
+
+                return (
+                  <div className="space-y-6">
+                    {/* BANNER ĐIỀU HƯỚNG TỔ TRƯỞNG SỐ */}
+                    <div className="bg-gradient-to-r from-violet-900 via-indigo-900 to-slate-900 rounded-2xl p-6 text-white shadow-xl relative overflow-hidden border border-violet-700/40">
+                      <div className="absolute top-0 right-0 -mt-8 -mr-8 w-48 h-48 bg-violet-500/10 rounded-full blur-3xl pointer-events-none"></div>
+                      <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-5">
+                        <div className="space-y-2 max-w-2xl">
+                          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-violet-500/20 text-violet-300 text-xs font-semibold border border-violet-400/30">
+                            <i data-lucide="shield-check" className="w-3.5 h-3.5 text-violet-300"></i>
+                            Bộ 10 Ứng Dụng Chuyên Biệt Cho Tổ Chuyên Môn
+                          </div>
+                          <h2 className="text-2xl font-black tracking-tight text-white flex items-center gap-2.5">
+                            <i data-lucide="briefcase" className="w-7 h-7 text-violet-400"></i>
+                            Tổ Trưởng Số — Trợ Lý Chuyên Môn THCS Tịnh Biên
+                          </h2>
+                          <p className="text-sm text-slate-300 leading-relaxed">
+                            Mỗi công cụ được thiết kế để mở sang <strong>Tab Mới Toàn Màn Hình</strong>, giúp Thầy/Cô tận dụng 100% không gian soạn thảo, xử lý mượt mà, độc lập bộ nhớ và không bao giờ bị đơ trình duyệt. Dữ liệu được bảo mật lưu trên máy cá nhân.
+                          </p>
+                        </div>
+                        <div className="flex flex-wrap items-center gap-3 shrink-0">
+                          <button
+                            onClick={() => setToTruongViewMode(toTruongViewMode === 'GRID' ? 'IFRAME' : 'GRID')}
+                            className="px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 border shadow-sm bg-white/10 hover:bg-white/20 text-white border-white/20 backdrop-blur-sm"
+                            title="Chuyển đổi giữa chế độ xem Lưới Thẻ Toàn Màn Hình và Nhúng Trực Tiếp"
+                          >
+                            <i data-lucide={toTruongViewMode === 'GRID' ? "layout" : "grid"} className="w-4 h-4 text-violet-300"></i>
+                            <span>{toTruongViewMode === 'GRID' ? "Xem Dạng Nhúng Iframe" : "Xem Dạng Lưới Thẻ (Khuyên dùng)"}</span>
+                          </button>
+                          <a
+                            href="to-truong/index.html"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="px-4 py-2.5 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white font-bold rounded-xl text-xs transition-all flex items-center gap-2 shadow-lg shadow-violet-900/40 hover:scale-105"
+                          >
+                            <i data-lucide="external-link" className="w-4 h-4"></i>
+                            <span>Mở Bảng Tổng Hợp ↗</span>
+                          </a>
+                        </div>
                       </div>
                     </div>
-                    <a href="to-truong/index.html" target="_blank" rel="noopener noreferrer"
-                      className="px-3 py-1.5 bg-violet-600 hover:bg-violet-700 text-white rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors">
-                      <i data-lucide="external-link" className="w-3.5 h-3.5"></i>
-                      <span>Mở Tab Riêng</span>
-                    </a>
+
+                    {/* NỘI DUNG HIỂN THỊ THEO CHẾ ĐỘ VIEW */}
+                    {toTruongViewMode === 'GRID' ? (
+                      <div>
+                        <div className="flex items-center justify-between mb-4">
+                          <h3 className="text-sm font-bold uppercase tracking-wider text-slate-700 flex items-center gap-2">
+                            <span className="w-2.5 h-2.5 rounded-full bg-violet-600"></span>
+                            Danh Sách 10 Ứng Dụng (Bấm Để Mở Toàn Màn Hình Mượt Mà)
+                          </h3>
+                          <span className="text-xs text-slate-500">Chống treo máy · Tối ưu hiệu năng 100%</span>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                          {toTruongApps.map((app) => (
+                            <div
+                              key={app.id}
+                              className="group bg-white rounded-2xl border border-slate-200/90 hover:border-violet-400 p-5 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between relative overflow-hidden"
+                            >
+                              <div className="absolute top-0 left-0 right-0 h-1.5" style={{ backgroundColor: app.color }}></div>
+                              <div>
+                                <div className="flex items-start justify-between gap-3 mb-3">
+                                  <div
+                                    className="w-10 h-10 rounded-xl flex items-center justify-center text-white shrink-0 shadow-md group-hover:scale-110 transition-transform"
+                                    style={{ backgroundColor: app.color }}
+                                  >
+                                    <i data-lucide={app.icon} className="w-5 h-5"></i>
+                                  </div>
+                                  <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-slate-100 text-slate-700 border border-slate-200">
+                                    {app.badge}
+                                  </span>
+                                </div>
+                                <h4 className="font-bold text-slate-800 text-base mb-2 group-hover:text-violet-700 transition-colors">
+                                  {app.title}
+                                </h4>
+                                <p className="text-xs text-slate-500 leading-relaxed mb-5">
+                                  {app.desc}
+                                </p>
+                              </div>
+
+                              <div className="pt-3 border-t border-slate-100 flex items-center gap-2">
+                                <a
+                                  href={`to-truong/${app.id}.html`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="flex-1 py-2 px-3 text-center text-white font-bold text-xs rounded-xl transition-all shadow-sm hover:shadow flex items-center justify-center gap-1.5"
+                                  style={{ backgroundColor: app.color }}
+                                >
+                                  <span>Mở toàn màn hình</span>
+                                  <i data-lucide="external-link" className="w-3.5 h-3.5"></i>
+                                </a>
+                                <a
+                                  href={`to-truong/${app.id}.html#mau`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="py-2 px-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs rounded-xl transition-colors shrink-0"
+                                  title="Thử nhanh với dữ liệu mẫu có sẵn"
+                                >
+                                  Dữ liệu thử
+                                </a>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                        <div className="p-3 bg-amber-50 border-b border-amber-100 text-amber-800 text-xs flex items-center justify-between">
+                          <span className="flex items-center gap-1.5 font-medium">
+                            <i data-lucide="alert-circle" className="w-4 h-4 text-amber-600"></i>
+                            Đang xem chế độ nhúng. Nếu màn hình hẹp, Thầy/Cô nên chọn «Mở Toàn Màn Hình» để thao tác thoải mái nhất.
+                          </span>
+                          <button
+                            onClick={() => setToTruongViewMode('GRID')}
+                            className="font-bold underline text-amber-900 hover:text-amber-700"
+                          >
+                            Chuyển sang dạng Lưới Thẻ
+                          </button>
+                        </div>
+                        <iframe
+                          src="to-truong/index.html"
+                          className="w-full border-0 block"
+                          style={{ height: 'calc(100vh - 200px)', minHeight: '650px' }}
+                          title="Tổ Trưởng Số"
+                        ></iframe>
+                      </div>
+                    )}
                   </div>
-                  <iframe
-                    src="to-truong/index.html"
-                    className="w-full border-0 block"
-                    style={{ height: 'calc(100vh - 170px)', minHeight: '640px' }}
-                    title="Tổ Trưởng Số"
-                  ></iframe>
-                </div>
-              )}
+                );
+              })()}
 
               {activeTab === 'MATERIALS' && (() => {
                 const gameCount = materials.filter(m => m.category === 'GAME_PPTX').length;
@@ -9604,9 +9783,9 @@ CREATE TABLE IF NOT EXISTS public.materials (
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js?v=20261123v4')
+        navigator.serviceWorker.register('./sw.js?v=20261123v5')
           .then((reg) => {
-            console.log('✅ Service Worker v4 đã kích hoạt:', reg.scope);
+            console.log('✅ Service Worker v5 đã kích hoạt:', reg.scope);
             reg.update();
           })
           .catch((err) => {
