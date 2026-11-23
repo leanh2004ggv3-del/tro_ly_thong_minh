@@ -1412,6 +1412,16 @@ function moTaO(s) {
   if (s.d === "DS") return `[${s.la}.${s.so}] Chủ đề: ${c.ten}${nd} | ${s.ys.map((m, i) => "abcd"[i] + ") " + TENM[m]).join(", ")} | YCCĐ: ${[...new Set(s.ys)].map(m => TENM[m] + ": " + ycm(m)).join(" ; ")}`;
   return `[${s.la}.${s.so}] Chủ đề: ${c.ten}${nd} | Mức: ${TENM[s.m]}${s.d === "TL" ? " | " + f2(s.diem) + " điểm" : ""} | YCCĐ ${TENM[s.m]}: ${ycm(s.m)}`;
 }
+/* tóm tắt một câu đã soạn thành 1 dòng để làm mẫu cho đề tương đương */
+function tomCau(q, d) {
+  const g = x => DF.gon(String(x || ""));
+  let t = g(q.de);
+  if (d === "NLC" && q.pa) t += " | " + q.pa.map((p, i) => "ABCD"[i] + ". " + g(p)).join(" | ") + (q.dung != null ? " | Đáp án: " + "ABCD"[q.dung] : "");
+  if (d === "DS" && q.y) t += " | " + q.y.map((y, i) => "abcd"[i] + ") " + g(y && y.t) + (y && typeof y.d === "boolean" ? (y.d ? " (Đ)" : " (S)") : "")).join(" | ");
+  if (d === "TLN" && q.da) t += " | Đáp án: " + g(q.da);
+  if (d === "TL" && q.hdc) t += " | HDC: " + q.hdc.map(h => g(h.nd) + " (" + (h.d || "") + "đ)").join("; ");
+  return t.length > 700 ? t.slice(0, 700) + "…" : t;
+}
 function lenhAI(chiTrong, chiK) {
   const P = khe(), tt = S.tt;
   const ds = P.phan.flatMap(d => P[d]).filter(s => (!chiTrong || !daXong(s)) && (!chiK || chiK.has(s.k)));
@@ -1437,7 +1447,7 @@ YÊU CẦU CHUNG
 `;
   if (co("TL")) s += `- Phần ${la("TL")} (tự luận): ghi đúng số điểm của câu; có thể chia ý a), b). Sau câu hỏi viết dòng «Hướng dẫn chấm:» rồi từng ý một dòng, cuối mỗi dòng ghi điểm trong ngoặc, ví dụ «- Nêu đúng …(0,5 điểm)»; tổng điểm các ý bằng điểm của câu.
 `;
-  if (S.bo.length > 1) s += `- ĐÂY LÀ ${tenDe(S.deHien).toUpperCase()} trong bộ ${S.bo.length} đề TƯƠNG ĐƯƠNG trên cùng một ma trận: giữ đúng chủ đề, YCCĐ, mức độ, dạng câu và độ khó của từng câu; nhưng đổi ngữ liệu, số liệu, tình huống, cách hỏi — KHÔNG lặp lại câu hỏi ở các đề khác (ghi kèm từng câu bên dưới nếu đã có).
+  if (S.bo.length > 1) s += `- ĐÂY LÀ ${tenDe(S.deHien).toUpperCase()} trong bộ ${S.bo.length} đề TƯƠNG ĐƯƠNG trên cùng một ma trận: giữ đúng chủ đề, YCCĐ, mức độ, dạng câu và độ khó của từng câu; nhưng đổi ngữ liệu, số liệu, tình huống, cách hỏi — KHÔNG lặp lại câu hỏi ở các đề khác. Câu nào có «CÂU MẪU» thì soạn câu TƯƠNG ĐƯƠNG với câu mẫu đó: cùng kiến thức, cùng kiểu hỏi, cùng độ dài và độ khó, cùng số ý — chỉ đổi ngữ liệu, số liệu, tình huống.
 `;
   s += `
 KHUÔN TRẢ LỜI (làm đúng như mẫu)
@@ -1468,7 +1478,7 @@ Hướng dẫn chấm:
 `;
   s += `
 DANH SÁCH ${ds.length} CÂU CẦN SOẠN
-${ds.map(s => { let m = moTaO(s); if (S.bo.length > 1) { const cu = S.bo.map((b, i) => i !== S.deHien && b.cau[s.k] && b.cau[s.k].de ? tenDe(i) + " đã hỏi: «" + DF.gon(b.cau[s.k].de).slice(0, 160) + "»" : "").filter(Boolean); if (cu.length) m += " | " + cu.join(" ; "); } return m; }).join("\n")}
+${ds.map(s => { let m = moTaO(s); if (S.bo.length > 1) { const g = S.bo.findIndex((b, i) => i !== S.deHien && b.cau[s.k] && b.cau[s.k].de); if (g >= 0) m += `\n   ↳ CÂU MẪU (${tenDe(g)}): ${tomCau(S.bo[g].cau[s.k], s.d)}`; const cu = S.bo.map((b, i) => i !== S.deHien && i !== g && b.cau[s.k] && b.cau[s.k].de ? tenDe(i) + " đã hỏi: «" + DF.gon(b.cau[s.k].de).slice(0, 160) + "»" : "").filter(Boolean); if (cu.length) m += "\n   ↳ Không lặp lại: " + cu.join(" ; "); } return m; }).join("\n")}
 
 NỘI DUNG BÀI HỌC (giáo viên cung cấp)
 ${noiDung}
@@ -1982,7 +1992,8 @@ function veDe() {
   $("soDeIcon").textContent = n;
   $("dsMaDe").innerHTML = S.bo.map((b, i) => `<label>Đề ${i + 1} · mã đề <input data-f="ma-${i}" data-ma="${i}" value="${esc(b.ma)}" placeholder="${n > 1 ? "VD: " + (101 + i) : "(nếu có)"}"></label>`).join("");
   const nut = S.bo.map((b, i) => { const p = tienDoDe(i), du = p.tong && p.xong === p.tong; return `<button data-de="${i}" class="${i === S.deHien ? "chon" : ""}${du ? " du" : ""}">${du ? "✔ " : ""}${esc(tenDe(i))}<small>${p.xong}/${p.tong} câu</small><i><b style="width:${p.tong ? p.xong / p.tong * 100 : 0}%"></b></i></button>`; }).join("");
-  $("chonDe4").innerHTML = n > 1 ? `<span class="nho2 mo" style="align-self:center">Đang soạn:</span>` + nut : "";
+  const mau = n > 1 ? deMauSo() : -1, conDe = n > 1 ? S.bo.filter((b, i) => !deDu(i)).length : 0;
+  $("chonDe4").innerHTML = n > 1 ? `<span class="nho2 mo" style="align-self:center">Đang soạn:</span>` + nut + (conDe ? `<button class="nut xanh nho nut-ai" data-soancacde="1" ${mau < 0 ? "disabled" : ""} title="${mau < 0 ? "Soạn xong một đề trước, app lấy làm mẫu" : "Gemini soạn các đề còn lại theo mẫu " + esc(tenDe(mau)) + ", cùng ma trận"}">✨ Soạn tiếp ${conDe} đề còn lại${mau < 0 ? "" : " theo " + esc(tenDe(mau))}</button>` : "") : "";
   $("chonDe5").innerHTML = n > 1 ? `<span class="nho2 mo" style="align-self:center">Xem trước:</span>` + nut : "";
   for (const i of [...xuatChon]) if (i >= n) xuatChon.delete(i);
   $("hopXuatDe").classList.toggle("an", n < 2);
@@ -2071,6 +2082,40 @@ function suaLoi(a, k) {
   }
 }
 
+/* ---------- nhiều đề: soạn tiếp các đề còn lại theo đề mẫu (cùng một ma trận) ---------- */
+const deDu = i => { const t = tienDoDe(i); return t.tong > 0 && t.xong === t.tong; };
+const deMauSo = () => { const i = S.bo.findIndex((b, j) => deDu(j)); return i; };
+/* làm sạch đề đang soạn không cần thầy cô: sửa phương án dài nhất, khớp điểm HDC, cân đáp án */
+async function lamSachDe() {
+  let P = khe();
+  if (AIG.layKhoa() && P.NLC.some(s => daiNhat(S.cau[s.k]))) await aiSuaDai();
+  P = khe();
+  soat(P, tinh(P)).filter(x => x.sua && x.sua.startsWith("hdc:")).forEach(x => khopHdc(x.sua.slice(4), true));
+  P = khe();
+  if (soat(P, tinh(P)).some(x => x.sua === "can")) canDapAn();
+  luu();
+}
+async function soanCacDe(daHoi) {
+  if (S.bo.length < 2) { TT.toast("Bộ chỉ có 1 đề — tăng số đề ở bước ③ trước ạ", "loi"); return; }
+  const mau = deMauSo();
+  if (mau < 0) { TT.toast("Thầy cô soạn xong và duyệt một đề trước (VD Đề 1) — app lấy đề đó làm mẫu cho các đề còn lại", "loi"); return; }
+  const can = S.bo.map((b, i) => i).filter(i => !deDu(i));
+  if (!can.length) { TT.toast("Các đề đều đã đủ câu 👍", "ok"); return; }
+  if (!AIG.layKhoa()) { if (!canKhoa()) return; }
+  if (!daHoi && !confirm(`Gemini soạn tiếp ${can.map(tenDe).join(", ")} theo mẫu ${tenDe(mau)}:\n• cùng ma trận, bản đặc tả (chủ đề, YCCĐ, mức độ, dạng câu, điểm từng câu)\n• mỗi câu tương đương câu cùng vị trí ở ${tenDe(mau)}, đổi ngữ liệu, số liệu\n• tự sửa phương án dài nhất, khớp điểm hướng dẫn chấm, cân đáp án\n\nTiếp tục?`)) return;
+  const goc = S.deHien, xong = [];
+  for (const i of can) {
+    S.deHien = i; luu(); ve();
+    TT.toast(`✨ Đang soạn ${tenDe(i)} (${xong.length + 1}/${can.length}) theo mẫu ${tenDe(mau)}…`, "");
+    await aiSoan(null);
+    if (!deDu(i)) { const t = tienDoDe(i); TT.buzz(); TT.toast(`Dừng ở ${tenDe(i)}: còn ${t.tong - t.xong}/${t.tong} câu chưa soạn được — xem thông báo dưới nút «Đọc vào đề», đợi chút rồi bấm lại «Soạn tiếp các đề» (đề đã xong vẫn giữ)`, "loi"); ve(); return; }
+    await lamSachDe();
+    xong.push(tenDe(i));
+  }
+  S.deHien = goc; luu(); ve(); TT.ting(); TT.phaoGiay();
+  TT.toast(`Đã soạn xong ${xong.join(", ")} theo mẫu ${tenDe(mau)} — cùng một ma trận. Thầy cô bấm từng đề để xem lại trước khi xuất Word`, "ok");
+}
+
 /* ---------- số câu từng phần ---------- */
 const coCauSoan = () => S.bo.some(b => Object.keys(b.cau).length);
 function ghiSoCauThuc() { const P = khe(); DANG.forEach(d => { S.dang[d].n = S.dang[d].bat && P[d].length ? P[d].length : ""; }); }
@@ -2107,6 +2152,8 @@ async function tuSua() {
   if (co.includes("trong") || co.includes("lam")) viec.push(coKhoa ? "Gemini soạn các câu còn trống" : "Chép câu lệnh cho câu còn trống (máy này chưa có khoá Gemini)");
   if (co.includes("dai")) viec.push(coKhoa ? "Gemini viết lại phương án cho câu có đáp án đúng dài nhất" : "(Cần khoá Gemini để sửa phương án tự động)");
   if (co.includes("can") || co.includes("trong") || co.includes("dai")) viec.push("Cân đáp án A–B–C–D");
+  const conDe = S.bo.length > 1 && coKhoa ? S.bo.map((b, i) => i).filter(i => i !== S.deHien && !deDu(i)) : [];
+  if (conDe.length) viec.push(`Soạn tiếp ${conDe.map(tenDe).join(", ")} theo mẫu đề đã đủ câu (cùng ma trận), tự sửa lỗi từng đề`);
   if (!viec.length) { TT.toast("Không có lỗi nào máy tự sửa được — lỗi công thức thầy cô bấm «Đến câu» để sửa tay", ""); return; }
   if (!confirm("Máy sẽ làm lần lượt:\n• " + viec.join("\n• ") + "\n\nTiếp tục?")) return;
   const daLam = [];
@@ -2127,6 +2174,7 @@ async function tuSua() {
   P = khe(); kq = soat(P, tinh(P));
   if (kq.some(x => x.sua === "can")) { canDapAn(); daLam.push("cân đáp án"); }
   luu(); ve();
+  if (conDe.length && deDu(S.deHien)) { await soanCacDe(true); daLam.push("soạn tiếp các đề còn lại"); }
   const k2 = veKiem();
   TT.ting();
   TT.toast("🔧 Đã " + (daLam.join(" · ") || "soát") + (k2.nLoi ? ` — còn ${k2.nLoi} lỗi thầy cô xem ở Máy soát` : k2.nCanh ? ` — còn ${k2.nCanh} điểm cần xem` : " — sạch lỗi 👍"), k2.nLoi ? "" : "ok");
@@ -2143,47 +2191,68 @@ const AIG = (() => {
     try { if (v.trim()) localStorage.setItem(KHOA, v.trim()); else { localStorage.removeItem(KHOA); localStorage.removeItem(MO_HINH); } } catch (e) {}
     veKhoa();
   }
-  async function goi(lenh, onChu, json) {
+  // gặp quá tải (500/502/503/504) hoặc rớt mạng giữa chừng: đợi rồi thử lại 3 lần, vẫn không được thì đổi sang mô hình khác
+  const ngu = ms => new Promise(r => setTimeout(r, ms));
+  async function goi(lenh, onChu, json, onBao) {
     const key = layKhoa();
     let daLuu = ""; try { daLuu = localStorage.getItem(MO_HINH) || ""; } catch (e) {}
     const ds = daLuu ? [daLuu, ...DS.filter(m => m !== daLuu)] : DS;
-    let loiCuoi = "";
+    let loiCuoi = "", quaTai = false;
     for (const model of ds) {
       const gen = { temperature: json ? 0.2 : 0.6, maxOutputTokens: 32768 };
       if (json) gen.responseMimeType = "application/json";
       if (/^gemini-2\.5-flash/.test(model)) gen.thinkingConfig = { thinkingBudget: 0 };
-      let r;
-      try {
-        r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:streamGenerateContent?alt=sse`, {
-          method: "POST", headers: { "Content-Type": "application/json", "x-goog-api-key": key },
-          body: JSON.stringify({ contents: [{ role: "user", parts: [{ text: lenh }] }], generationConfig: gen })
-        });
-      } catch (e) { throw new Error("Không kết nối được tới Gemini — thầy cô kiểm tra mạng Internet."); }
-      if (!r.ok) {
-        let msg = ""; try { msg = ((await r.json()).error || {}).message || ""; } catch (e) {}
-        if (r.status === 400 && /API key/i.test(msg)) throw new Error("Khoá Gemini không đúng — bấm «Đổi khoá» để dán lại.");
-        if (r.status === 403) throw new Error("Khoá Gemini bị từ chối — tạo khoá mới ở aistudio.google.com/apikey.");
-        loiCuoi = r.status === 429 ? "Khoá đã hết lượt miễn phí trong phút/ngày — đợi ít phút rồi thử lại." : "Gemini báo lỗi " + r.status + (msg ? ": " + msg : "");
-        if (r.status === 404 || r.status === 429 || /not found|not supported/i.test(msg)) continue;
-        throw new Error(loiCuoi);
-      }
-      const rd = r.body.getReader(), dec = new TextDecoder();
-      let dem = "", chu = "";
-      while (true) {
-        const { value, done } = await rd.read(); if (done) break;
-        dem += dec.decode(value, { stream: true });
-        const dong = dem.split("\n"); dem = dong.pop();
-        for (const d of dong) {
-          if (!d.startsWith("data:")) continue;
-          try { const c = (JSON.parse(d.slice(5)).candidates || [])[0]; if (c && c.content && c.content.parts) chu += c.content.parts.map(p => p.text || "").join(""); } catch (e) {}
+      for (let lan = 1; lan <= 3; lan++) {
+        let r;
+        try {
+          r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:streamGenerateContent?alt=sse`, {
+            method: "POST", headers: { "Content-Type": "application/json", "x-goog-api-key": key },
+            body: JSON.stringify({ contents: [{ role: "user", parts: [{ text: lenh }] }], generationConfig: gen })
+          });
+        } catch (e) {
+          loiCuoi = "Không kết nối được tới Gemini — thầy cô kiểm tra mạng Internet.";
+          if (lan < 3) { onBao && onBao(`Mạng chập chờn — thử lại sau ${lan * 3} giây (lần ${lan + 1}/3)…`); await ngu(lan * 3000); continue; }
+          throw new Error(loiCuoi);
         }
-        if (onChu) onChu(chu);
+        if (!r.ok) {
+          let msg = ""; try { msg = ((await r.json()).error || {}).message || ""; } catch (e) {}
+          if (r.status === 400 && /API key/i.test(msg)) throw new Error("Khoá Gemini không đúng — bấm «Đổi khoá» để dán lại.");
+          if (r.status === 403) throw new Error("Khoá Gemini bị từ chối — tạo khoá mới ở aistudio.google.com/apikey.");
+          if ([500, 502, 503, 504].includes(r.status) || /overloaded|high demand|unavailable/i.test(msg)) {
+            quaTai = true; loiCuoi = "Gemini đang quá tải";
+            if (lan < 3) { onBao && onBao(`Gemini (${model}) đang quá tải — tự thử lại sau ${lan * 4} giây (lần ${lan + 1}/3)…`); await ngu(lan * 4000); continue; }
+            onBao && onBao(`${model} vẫn quá tải — chuyển sang mô hình khác…`);
+            break;
+          }
+          loiCuoi = r.status === 429 ? "Khoá đã hết lượt miễn phí trong phút/ngày — đợi ít phút rồi thử lại." : "Gemini báo lỗi " + r.status + (msg ? ": " + msg : "");
+          if (r.status === 404 || r.status === 429 || /not found|not supported/i.test(msg)) break;
+          throw new Error(loiCuoi);
+        }
+        const rd = r.body.getReader(), dec = new TextDecoder();
+        let dem = "", chu = "", dut = false;
+        try {
+          while (true) {
+            const { value, done } = await rd.read(); if (done) break;
+            dem += dec.decode(value, { stream: true });
+            const dong = dem.split("\n"); dem = dong.pop();
+            for (const d of dong) {
+              if (!d.startsWith("data:")) continue;
+              try { const c = (JSON.parse(d.slice(5)).candidates || [])[0]; if (c && c.content && c.content.parts) chu += c.content.parts.map(p => p.text || "").join(""); } catch (e) {}
+            }
+            if (onChu) onChu(chu);
+          }
+        } catch (e) { dut = true; }
+        if (dut || !chu.trim()) {
+          loiCuoi = dut ? "Kết nối với Gemini bị ngắt giữa chừng" : "Gemini không trả về nội dung";
+          if (lan < 3) { onBao && onBao(`${loiCuoi} — thử lại (lần ${lan + 1}/3)…`); await ngu(lan * 3000); continue; }
+          break;
+        }
+        try { localStorage.setItem(MO_HINH, model); } catch (e) {}
+        return chu;
       }
-      try { localStorage.setItem(MO_HINH, model); } catch (e) {}
-      if (!chu.trim()) throw new Error("Gemini không trả về nội dung — thầy cô bấm thử lại.");
-      return chu;
     }
-    throw new Error(loiCuoi || "Không gọi được Gemini.");
+    if (quaTai) throw new Error("Máy chủ Gemini đang quá tải (lỗi 503) — app đã tự thử lại nhiều lần với " + ds.length + " mô hình. Thầy cô đợi 1–2 phút rồi bấm lại; câu đã soạn vẫn giữ nguyên.");
+    throw new Error((loiCuoi || "Không gọi được Gemini") + " — thầy cô bấm thử lại.");
   }
   return { layKhoa, doiKhoa, goi };
 })();
@@ -2202,7 +2271,7 @@ async function chayAI(lenh, xong) {
   $("b4").scrollIntoView({ behavior: "smooth", block: "start" });
   const kq = $("ketQuaDoc"); kq.innerHTML = `<span class="xoay"></span> ✨ Đang gửi tới Gemini…`;
   try {
-    const chu = await AIG.goi(lenh, c => { $("oDan").value = c; kq.innerHTML = `<span class="xoay"></span> ✨ Gemini đang soạn… đã có <b>${(c.match(/^\s*\[?\s*(IV|I{1,3})\s*[.\-]\s*\d+\s*\]/gm) || []).length}</b> câu`; });
+    const chu = await AIG.goi(lenh, c => { $("oDan").value = c; kq.innerHTML = `<span class="xoay"></span> ✨ Gemini đang soạn${S.bo.length > 1 ? " " + esc(tenDe(S.deHien)) : ""}… đã có <b>${(c.match(/^\s*\[?\s*(IV|I{1,3})\s*[.\-]\s*\d+\s*\]/gm) || []).length}</b> câu`; }, false, t => { kq.innerHTML = `<span class="xoay"></span> ⏳ ${esc(t)}`; });
     $("oDan").value = chu; veKhoa(); dangAI = false; xong && xong();
   } catch (e) { kq.innerHTML = `<span class="do">✖ ${esc(e.message || String(e))}</span>`; TT.buzz(); }
   dangAI = false; document.querySelectorAll(".nut-ai, .nut-sua").forEach(b => b.disabled = false);
@@ -2340,6 +2409,7 @@ document.addEventListener("DOMContentLoaded", () => {
   document.addEventListener("click", e => {
     const d = e.target.closest("[data-doikhoa]"); if (d) { e.preventDefault(); AIG.doiKhoa(); return; }
     const b = e.target.closest(".nut-sua"); if (b && !b.disabled) suaLoi(b.dataset.sua, b.dataset.k);
+    const c = e.target.closest("[data-soancacde]"); if (c && !c.disabled) soanCacDe();
   });
   veKhoa();
   $("bLenhTrong").addEventListener("click", () => chepLenh(true));
