@@ -74,13 +74,14 @@ const DN = (() => {
 
   /* ---------- PDF ---------- */
   const pdfMo = {};   // tên file → pdf.js document (để vẽ trang, cắt hình)
-  async function docPdf(buf, tenFile) {
-    const r = await DF.docPdf(buf.slice(0));
+  async function docPdf(buf, tenFile, bao) {
+    const r = await DF.docPdf(buf.slice(0), bao);
+    const quet = !!r.ocr, ocr = r.ocr || null;
     const pdf = await pdfjsLib.getDocument({ data: buf.slice(0) }).promise;
     pdfMo[tenFile] = pdf;
     const anh = [];
-    // ảnh nhúng trong trang (hình vẽ, ảnh chụp của SGK)
-    for (let n = 1; n <= pdf.numPages && anh.length < 80; n++) {
+    // ảnh nhúng trong trang (hình vẽ, ảnh chụp của SGK) — PDF quét thì mỗi ảnh là cả trang, bỏ qua (cắt tay)
+    for (let n = 1; !quet && n <= pdf.numPages && anh.length < 80; n++) {
       try {
         const pg = await pdf.getPage(n), ops = await pg.getOperatorList();
         const dongDau = r.trangDong.indexOf(n);
@@ -103,8 +104,9 @@ const DN = (() => {
         }
       } catch (e) { /* trang lỗi: bỏ qua, vẫn cắt tay được */ }
     }
-    return { dong: r.dong, trangDong: r.trangDong, anh, soTrang: pdf.numPages, kieu: "PDF " + pdf.numPages + " trang", tenPdf: tenFile };
+    return { dong: r.dong, trangDong: r.trangDong, anh, soTrang: pdf.numPages, kieu: "PDF " + pdf.numPages + " trang" + (quet ? " (dạng ảnh)" : ""), tenPdf: tenFile, ocr };
   }
+
   /* vẽ một trang PDF ra canvas (để xem nhỏ hoặc cắt hình) */
   async function veTrang(tenPdf, n, rongPx) {
     const pdf = pdfMo[tenPdf]; if (!pdf) throw new Error("PDF đã đóng — thầy cô nạp lại file giúp ạ.");
@@ -117,11 +119,22 @@ const DN = (() => {
   const soTrang = ten => pdfMo[ten] ? pdfMo[ten].numPages : 0;
 
   /* ---------- một file bất kì ---------- */
-  async function doc(file) {
+  async function doc(file, bao, ocrAnh) {
     const ten = file.name.replace(/\.[^.]+$/, ""), buf = await file.arrayBuffer();
     if (/\.pdf$/i.test(file.name) || file.type === "application/pdf") {
       if (!window.pdfjsLib) await DF.docPdf(new Uint8Array(0)).catch(() => {});   // nạp bộ đọc PDF
-      return docPdf(buf, ten);
+      if (!window.pdfjsLib) throw new Error("Không tải được bộ đọc PDF (cần có mạng). Thầy cô dùng file Word giúp ạ.");
+      return docPdf(buf, ten, bao);
+    }
+    if (ocrAnh && /^image\//.test(file.type)) {   // ảnh chụp trang sách: lấy cả chữ lẫn ảnh
+      const a = await chuanAnh(buf, file.type); if (!a) throw new Error("Không đọc được ảnh " + file.name);
+      bao && bao("Đang nhận chữ trong ảnh " + file.name + "…", 0);
+      const bm = await createImageBitmap(new Blob([buf], { type: file.type }));
+      const c = document.createElement("canvas"), k = bm.width < 1600 ? 2 : 1; c.width = bm.width * k; c.height = bm.height * k; c.getContext("2d").drawImage(bm, 0, 0, c.width, c.height);
+      const dong = await DF.nhanChu(c, p => bao && bao("Đang nhận chữ trong ảnh " + file.name + "…", p));
+      bao && bao("", 1);
+      a.ten = ten; a.nguon = "tai";
+      return { dong, anh: [a], kieu: "ảnh", ocr: { soTrang: 1, conLai: 0 } };
     }
     if (/\.docx$/i.test(file.name)) return docWord(buf, ten);
     if (/\.(txt|md)$/i.test(file.name)) return { dong: new TextDecoder().decode(buf).split(/\r?\n/).map(gon).filter(Boolean), anh: [], kieu: "chữ" };

@@ -112,7 +112,11 @@ ${noi}</svg>`;
   function chonTranh(chu, loai, mon) {
     if (loai === "ket") return "cup";
     if (loai === "cau") return "cauhoi";
-    for (const [k, re] of TU_KHOA) if (re.test(chu)) return k === "sach" && /toán/i.test(mon || "") ? "bangden" : k;
+    const toan = /toán/i.test(mon || "");
+    for (const [k, re] of TU_KHOA) {
+      if (toan && /^(hoahoc|nguyentu|dien|luc|sinhhoc|traidat|van|maytinh)$/.test(k)) continue;   // «tính chất», «lực»… trong bài Toán
+      if (re.test(chu)) return k === "sach" && toan ? "bangden" : k;
+    }
     return /toán/i.test(mon || "") ? "bangden" : "sach";
   }
   // tranh thay thế khi trùng slide trước (theo môn)

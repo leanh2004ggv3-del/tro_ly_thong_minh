@@ -50,10 +50,10 @@ async function napFile(files) {
   for (const f of files) {
     tt.innerHTML = `<span class="xoay"></span> Đang đọc <b>${esc(f.name)}</b>…`;
     try {
-      const r = await DF.doc(f);
+      const r = await DF.doc(f, (chu, ti) => { if (chu) tt.innerHTML = `<span class="xoay"></span> ${esc(chu)} <b>${Math.round((ti || 0) * 100)}%</b> <span class="mo nho2">— lần đầu cần mạng để tải bộ nhận chữ tiếng Việt</span>`; });
       themCd(r.cd, f.name);
       const nYc = tong(r.cd.map(c => MUC.filter(m => c.yc[m]).length));
-      tt.innerHTML = `<div class="ok-dong">✔ ${esc(f.name)} (${r.kieu}): nhận ra <b>${r.cd.length}</b> bài/chủ đề, ${nYc} nhóm yêu cầu cần đạt. Thầy cô nhập <b>số tiết</b> từng bài.</div>` + (r.ct && r.ct.nCT ? `<div class="ok-dong" style="margin-top:6px">∑ Giữ được <b>${r.ct.nCT}</b> công thức Equation (phân số, căn, mũ…) để AI đọc đúng.</div>` : "") + (r.ct && r.ct.nOle ? `<div class="canh" style="margin-top:6px">⚠ File có <b>${r.ct.nOle}</b> công thức MathType/đối tượng nhúng — app không đọc được chữ bên trong. Thầy cô gõ lại công thức quan trọng vào ô «Nội dung» của bài, hoặc trong Word chọn MathType → Convert Equations sang Word Equation rồi nạp lại.</div>` : "");
+      tt.innerHTML = `<div class="ok-dong">✔ ${esc(f.name)} (${r.kieu}): nhận ra <b>${r.cd.length}</b> bài/chủ đề, ${nYc} nhóm yêu cầu cần đạt. Thầy cô nhập <b>số tiết</b> từng bài.</div>` + (r.ct && r.ct.nCT ? `<div class="ok-dong" style="margin-top:6px">∑ Giữ được <b>${r.ct.nCT}</b> công thức Equation (phân số, căn, mũ…) để AI đọc đúng.</div>` : "") + (r.ct && r.ct.nOle ? `<div class="canh" style="margin-top:6px">⚠ File có <b>${r.ct.nOle}</b> công thức MathType/đối tượng nhúng — app không đọc được chữ bên trong. Thầy cô gõ lại công thức quan trọng vào ô «Nội dung» của bài, hoặc trong Word chọn MathType → Convert Equations sang Word Equation rồi nạp lại.</div>` : "") + (r.ocr ? `<div class="canh" style="margin-top:6px">📷 File PDF dạng ảnh: app đã <b>nhận chữ từ ảnh</b> ${r.ocr.soTrang} trang${r.ocr.conLai ? ` (còn ${r.ocr.conLai} trang chưa đọc — tách file nhỏ hơn)` : ""}. Chữ nhận từ ảnh có thể sai chính tả, <b>công thức, số mũ thường bị mất hoặc sai</b>: thầy cô xem lại ô «Nội dung» của từng bài, gõ lại công thức kiểu $…$. Khi chép câu lệnh cho AI, nên <b>đính kèm luôn file PDF</b> để AI đọc trực tiếp trang sách.</div>` : "");
       TT.ting();
     } catch (e) { tt.innerHTML = `<div class="canh">✖ ${esc(f.name)}: ${esc(e.message || e)}</div>`; TT.buzz(); }
   }

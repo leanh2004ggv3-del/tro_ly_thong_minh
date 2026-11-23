@@ -8,6 +8,7 @@ Sau khi tải lên, bộ app sẽ ở: **`https://leanh2004ggv3-del.github.io/tr
 2. Bấm **Add file → Upload files**.
 3. **Kéo nguyên thư mục `to-truong`** (trong thư mục này) thả vào trang. GitHub giữ đúng tên thư mục, gồm 9 file:
    `index.html` · `lich-nam.html` · `phan-cong.html` · `bien-ban.html` · `tien-do.html` · `ket-qua-kt.html` · `ma-tran-de.html` · `tich-hop.html` *(20/11: Tích hợp NLS – NLAI)* · `song-ngu.html` *(21/11: Song ngữ Việt – Anh cho giáo án)* · `soan-de.html` *(mới 22/11: Trợ lý soạn đề kiểm tra theo CV 7991)*
+   > **Cập nhật 23/11 chiều (đọc PDF dạng ảnh):** tải lại `to-truong/soan-ppt.html` và `to-truong/soan-de.html` (ghi đè) — cả hai app tự nhận chữ tiếng Việt từ PDF quét/in từ ảnh.
    > **Cập nhật 23/11 (app 10 Soạn giáo án PowerPoint):** tải thêm `to-truong/soan-ppt.html` + `to-truong/index.html` (ghi đè) và `trang-chinh/index.html` (nhãn menu đổi thành 10).
    > **Cập nhật 22/11 (app 9 Soạn đề):** chỉ cần tải thêm `to-truong/soan-de.html` + `to-truong/index.html` (ghi đè) và `trang-chinh/index.html` (nhãn menu đổi 8 → 9). Không tải thư mục `_cong-cu/`, `_phieu-kiem/`.
 > Nếu sếp **đã tải** bộ trước đó: chỉ cần tải thêm `to-truong/song-ngu.html` + `to-truong/index.html` (ghi đè) và `trang-chinh/index.html` (nhãn menu đổi 7 → 8). Chưa tải `tich-hop.html` thì tải luôn.
@@ -60,6 +61,7 @@ Em đã thêm mục **«Tổ Trưởng Số»** (biểu tượng cặp tài li�
 2. **Bước 2 — Dàn slide:** ⚡ *App tự dàn* (nhận Hoạt động, a/b/c/d của KHBD hoặc mục 1., 2., Ví dụ, Luyện tập của SGK; câu trắc nghiệm → slide ô A-B-C-D; phần Tổ chức thực hiện → ghi chú lời giảng) hoặc 🤖 *Nhờ AI* (chép câu lệnh → dán trả lời có dòng `=== SLIDE | loại | tiêu đề`).
 3. **Bước 3 — Sửa slide & ảnh:** xem trước đúng như PowerPoint; mỗi slide **ít nhất 1 ảnh** — app tự gắn; muốn đổi bấm 🖼: ảnh tài liệu · ✂️ cắt vùng trên trang PDF · tải lên / Ctrl+V dán · 🎨 tự tạo (21 tranh chủ đề, đồ thị y = f(x), 14 hình học) · 🤖 câu lệnh nhờ AI vẽ.
 4. **Bước 4 — Tải:** 6 bảng màu; máy soát phông, cỡ chữ, ảnh, công thức → **Tải PowerPoint (.pptx)** 16:9.
+- **PDF dạng ảnh** (quét, chụp, in bằng «Microsoft Print to PDF» từ ảnh): app **tự nhận chữ tiếng Việt (OCR)**, tối đa 30 trang, lần đầu cần mạng để tải bộ nhận chữ (vài MB). Lời văn đọc khá đúng; **công thức, số mũ trong ảnh thì máy bỏ qua hoặc đọc sai** → nên dùng Cách 2: chép câu lệnh + đính kèm file PDF cho ChatGPT/Gemini. Ảnh chụp trang sách: tích ô «Ảnh là trang sách chụp».
 - **Times New Roman** mọi chữ; nội dung **≥ 24** (mặc định 28, nội dung ngắn tự phóng 30–32); dài quá thì **tự tách slide «(tiếp)»**, không thu chữ dưới 24.
 - **Công thức:** mũ, chỉ số, hoá học in bằng chữ Times New Roman; phân số, căn, hệ… thành **Equation thật** của PowerPoint (Office luôn vẽ Equation bằng phông Cambria Math — không đổi được). App đếm lại số Equation trong file, lệch là dừng.
 - Đã kiểm bằng PowerPoint trên máy: bài thử Toán 9 (16 slide) và KHTN 8 (16 slide) không tràn chữ, đủ Equation — file mẫu ở `_phieu-kiem/soan-ppt-MAU-*.pptx` (không tải lên web).

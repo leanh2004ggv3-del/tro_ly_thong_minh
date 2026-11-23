@@ -214,6 +214,8 @@ details.hop summary{cursor:pointer;font-weight:700;font-size:14.5px}
         <div class="mo nho2">Word (.docx), PDF, ảnh (PNG, JPG) · chọn nhiều file một lúc · app lấy <b>chữ, công thức và hình</b> trong file</div>
       </div>
       <input type="file" id="chonFile" multiple accept=".docx,.pdf,.txt,image/*,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document" hidden>
+      <label class="nho2" style="display:flex;gap:6px;align-items:center;margin-top:8px"><input type="checkbox" id="ocrAnh" style="width:18px;min-height:0"> Ảnh là <b>trang sách chụp</b>: nhận cả chữ trong ảnh (PDF dạng ảnh luôn được nhận chữ)</label>
+      <div id="tienDoDoc" hidden style="margin-top:8px;background:#fff7ed;border:1px solid #fed7aa;border-radius:12px;padding:8px 10px;font-size:14px"><span>…</span><div style="height:8px;background:#fde68a;border-radius:6px;margin-top:6px;overflow:hidden"><i style="display:block;height:100%;width:0;background:linear-gradient(90deg,#ea580c,#db2777);transition:width .3s"></i></div></div>
       <div id="dsTep"></div>
       <details class="hop"><summary>Không có file? Dán chữ vào đây</summary>
         <textarea id="oDanChu" rows="6" style="margin-top:6px" placeholder="Dán giáo án hoặc nội dung bài học…&#10;Công thức viết giữa hai dấu $, VD $x^2$, $\frac{a}{b}$, $H_2O$"></textarea>
@@ -738,7 +740,49 @@ const DF = (() => {
     return di(e);
   }
   function napThuVien(url) { return new Promise((ok, loi) => { const s = document.createElement("script"); s.src = url; s.onload = ok; s.onerror = () => loi(new Error("Không tải được bộ đọc PDF (cần có mạng). Thầy cô dùng file Word giúp ạ.")); document.head.appendChild(s); }); }
-  async function docPdf(buf) {
+  /* ---------- nhận chữ trong ảnh (OCR) — Tesseract.js, chạy trong trình duyệt, cần mạng lần đầu ---------- */
+  const TRANG_OCR_TOI_DA = 30;
+  const TESS = "https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js";
+  let may = null, baoOcr = null;
+  function napJs(url) { return new Promise((ok, loi) => { const s = document.createElement("script"); s.src = url; s.onload = ok; s.onerror = () => loi(new Error("Không tải được bộ nhận chữ trong ảnh (cần có mạng). Thầy cô dùng file Word, hoặc dán chữ vào ô bên dưới ạ.")); document.head.appendChild(s); }); }
+  async function layMay() {
+    if (may) return may;
+    if (!window.Tesseract) await napJs(TESS);
+    may = await Tesseract.createWorker(["vie", "eng"], 1, { logger: m => { if (baoOcr && m.status === "recognizing text") baoOcr(m.progress || 0); } });
+    await may.setParameters({ preserve_interword_spaces: "1" });
+    return may;
+  }
+  // canvas / ảnh → các dòng chữ đã làm sạch
+  async function nhanChu(hinh, bao) {
+    const w = await layMay();
+    baoOcr = bao;
+    const { data } = await w.recognize(hinh, {}, { text: true, blocks: true });
+    baoOcr = null;
+    const ra = [];
+    // dòng kèm độ tin cậy: bỏ dòng rác (chữ trong tranh vẽ), bỏ từ nhận quá kém
+    let dsDong = data.lines;
+    if (!dsDong && data.blocks) { dsDong = []; data.blocks.forEach(b => (b.paragraphs || []).forEach(p => (p.lines || []).forEach(l => dsDong.push(l)))); }
+    // rác từ tranh vẽ nằm ở đầu/cuối dòng với độ tin cậy thấp → cắt hai đầu; giữa dòng chỉ bỏ kí hiệu vụn
+    const lamSach = l => {
+      let w = (l.words || []).slice();
+      if (!w.length) return l.confidence >= 60 ? l.text : "";
+      while (w.length && w[0].confidence < 65) w.shift();
+      while (w.length && w[w.length - 1].confidence < 65) w.pop();
+      w = w.filter(x => x.confidence >= 20 || /[A-Za-zÀ-ỹ0-9]{2,}/.test(x.text));
+      if (!w.length || w.reduce((t, x) => t + x.confidence, 0) / w.length < 60) return "";
+      return w.map(x => x.text).join(" ");
+    };
+    const chuSach = dsDong && dsDong.length ? dsDong.map(lamSach).filter(Boolean).join("\n") : data.text;
+    String(chuSach || "").normalize("NFC").split(/\n/).forEach(l => {
+      const s = gon(l.replace(/[|_~`$\\]+/g, " ").replace(/^[:;.,¢©®«»@]+\s*/, "").replace(/\bVi ?dụ ?[lI](?![A-Za-z])/g, "Ví dụ 1").replace(/\bVi ?dụ(?![A-Za-zÀ-ỹ])/g, "Ví dụ").replace(/\bvi dụ(?![A-Za-zÀ-ỹ])/g, "ví dụ").replace(/\s+([.,;:!?)])/g, "$1"));
+      if (!s || /^\d{1,3}$/.test(s)) return;                          // số trang
+      const chu = (s.match(/[A-Za-zÀ-ỹ0-9]/g) || []).length;
+      if (s.length < 3 || chu / s.length < 0.5) return;              // vụn, nhiễu
+      ra.push(s);
+    });
+    return ra;
+  }
+  async function docPdf(buf, bao) {
     if (!window.pdfjsLib) {
       await napThuVien("https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js");
       pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
@@ -756,8 +800,23 @@ const DF = (() => {
         s = gon(s); if (s) { dong.push(s); trangDong.push(n); }
       });
     }
-    if (!dong.length) throw new Error("File PDF này là bản quét (ảnh), app chưa đọc được chữ. Thầy cô dùng file Word, hoặc dán chữ vào ô bên dưới ạ.");
-    return { dong, trang: pdf.numPages, trangDong };
+    // PDF quét / in từ ảnh: không có lớp chữ → nhận chữ trong ảnh từng trang (OCR tiếng Việt)
+    let ocr = null;
+    if (!dong.length) {
+      const n = Math.min(pdf.numPages, TRANG_OCR_TOI_DA);
+      for (let t = 1; t <= n; t++) {
+        const ghi = `Đang nhận chữ trang ${t}/${n} (PDF dạng ảnh)…`;
+        bao && bao(ghi, (t - 1) / n);
+        const pg = await pdf.getPage(t), vp0 = pg.getViewport({ scale: 1 }), vp = pg.getViewport({ scale: 2200 / vp0.width });
+        const c = document.createElement("canvas"); c.width = Math.round(vp.width); c.height = Math.round(vp.height);
+        await pg.render({ canvasContext: c.getContext("2d"), viewport: vp }).promise;
+        (await nhanChu(c, p => bao && bao(ghi, (t - 1 + p) / n))).forEach(s => { dong.push(s); trangDong.push(t); });
+      }
+      bao && bao("", 1);
+      ocr = { soTrang: n, conLai: pdf.numPages - n };
+      if (!dong.length) throw new Error("File PDF này là ảnh và máy không nhận được chữ nào (ảnh mờ hoặc nghiêng). Thầy cô dùng file Word, hoặc dán chữ vào ô bên dưới ạ.");
+    }
+    return { dong, trang: pdf.numPages, trangDong, ocr };
   }
 
   /* ---- nhận ra bài / chủ đề ---- */
@@ -802,14 +861,14 @@ const DF = (() => {
       yc: { B: [...new Set(c.yc.B)].join("\n"), H: [...new Set(c.yc.H)].join("\n"), V: [...new Set(c.yc.V)].join("\n") }
     }));
   }
-  async function doc(file) {
+  async function doc(file, bao) {
     const ten = file.name.replace(/\.[^.]+$/, ""), buf = await file.arrayBuffer();
-    if (/\.pdf$/i.test(file.name) || file.type === "application/pdf") { const r = await docPdf(buf); return { cd: tach(r.dong, ten), dong: r.dong.length, kieu: "PDF " + r.trang + " trang" }; }
+    if (/\.pdf$/i.test(file.name) || file.type === "application/pdf") { const r = await docPdf(buf, bao); return { cd: tach(r.dong, ten), dong: r.dong.length, kieu: "PDF " + r.trang + " trang" + (r.ocr ? " dạng ảnh, đã nhận chữ" : ""), ocr: r.ocr }; }
     if (/\.docx$/i.test(file.name)) { const d = await docDocx(buf); return { cd: tach(d, ten), dong: d.length, kieu: "Word", ct: d.thongTin }; }
     if (/\.(txt|md)$/i.test(file.name)) { const d = new TextDecoder().decode(buf).split(/\r?\n/).map(gon).filter(Boolean); return { cd: tach(d, ten), dong: d.length, kieu: "chữ" }; }
     throw new Error("App nhận file Word (.docx) hoặc PDF. File .doc cũ: mở bằng Word → Lưu thành .docx.");
   }
-  return { doc, tach, loaiYc, gon, docDocx, docPdf, tex, napThuVien };
+  return { doc, tach, loaiYc, gon, docDocx, docPdf, tex, napThuVien, nhanChu };
 })();
 
 /* Ghi file PowerPoint (.pptx) ngay trong trình duyệt — không cần thư viện ngoài, chỉ cần JSZip.
@@ -1190,7 +1249,7 @@ const BC = (() => {
         const phong = co > coGoc;
         for (const c of cach()) {
           const dd = dung(ds, co), wPt = (c.wChu - 0.5 * IN) / PT;
-          const cao = caoKhoi(dd, wPt) * PT + 0.42 * IN;
+          const cao = caoKhoi(dd, wPt) * PT * 1.07 + 0.42 * IN;
           if (c.kieu === "duoi") {
             if (cao <= hB * (phong ? 0.4 : 0.48)) return { c, dd, co, cao };
           } else if (cao <= hB * (phong ? 0.72 : 1)) return { c, dd, co, cao };
@@ -1213,6 +1272,14 @@ const BC = (() => {
       if (!conLai.length) break;
     }
     if (!ra.length) ra.push({ c: cach()[0], dd: [], co: coGoc, cao: 0 });
+    // trang cuối chỉ còn 1 ý ngắn → chuyển bớt ý của trang trước sang cho cân
+    for (let lan2 = 0; lan2 < 3 && ra.length > 1; lan2++) {
+      const cuoi = ra[ra.length - 1], truoc = ra[ra.length - 2];
+      if (cuoi.dd.length > 1 || truoc.dd.length < 3 || String(cuoi.dd[0] && cuoi.dd[0].s).length > 80) break;
+      const a = thu(truoc.dd.slice(0, -1)), b = thu([truoc.dd[truoc.dd.length - 1], ...cuoi.dd]);
+      if (!a || !b) break;
+      ra[ra.length - 2] = a; ra[ra.length - 1] = b;
+    }
     if (ra.length > 1) canhBao.push({ slide: soThu, loi: `nội dung dài → tự tách thành ${ra.length} slide`, nhe: true });
 
     return ra.map((kq, k) => {
@@ -1431,7 +1498,11 @@ ${noi}</svg>`;
   function chonTranh(chu, loai, mon) {
     if (loai === "ket") return "cup";
     if (loai === "cau") return "cauhoi";
-    for (const [k, re] of TU_KHOA) if (re.test(chu)) return k === "sach" && /toán/i.test(mon || "") ? "bangden" : k;
+    const toan = /toán/i.test(mon || "");
+    for (const [k, re] of TU_KHOA) {
+      if (toan && /^(hoahoc|nguyentu|dien|luc|sinhhoc|traidat|van|maytinh)$/.test(k)) continue;   // «tính chất», «lực»… trong bài Toán
+      if (re.test(chu)) return k === "sach" && toan ? "bangden" : k;
+    }
     return /toán/i.test(mon || "") ? "bangden" : "sach";
   }
   // tranh thay thế khi trùng slide trước (theo môn)
@@ -1609,13 +1680,14 @@ const DN = (() => {
 
   /* ---------- PDF ---------- */
   const pdfMo = {};   // tên file → pdf.js document (để vẽ trang, cắt hình)
-  async function docPdf(buf, tenFile) {
-    const r = await DF.docPdf(buf.slice(0));
+  async function docPdf(buf, tenFile, bao) {
+    const r = await DF.docPdf(buf.slice(0), bao);
+    const quet = !!r.ocr, ocr = r.ocr || null;
     const pdf = await pdfjsLib.getDocument({ data: buf.slice(0) }).promise;
     pdfMo[tenFile] = pdf;
     const anh = [];
-    // ảnh nhúng trong trang (hình vẽ, ảnh chụp của SGK)
-    for (let n = 1; n <= pdf.numPages && anh.length < 80; n++) {
+    // ảnh nhúng trong trang (hình vẽ, ảnh chụp của SGK) — PDF quét thì mỗi ảnh là cả trang, bỏ qua (cắt tay)
+    for (let n = 1; !quet && n <= pdf.numPages && anh.length < 80; n++) {
       try {
         const pg = await pdf.getPage(n), ops = await pg.getOperatorList();
         const dongDau = r.trangDong.indexOf(n);
@@ -1638,8 +1710,9 @@ const DN = (() => {
         }
       } catch (e) { /* trang lỗi: bỏ qua, vẫn cắt tay được */ }
     }
-    return { dong: r.dong, trangDong: r.trangDong, anh, soTrang: pdf.numPages, kieu: "PDF " + pdf.numPages + " trang", tenPdf: tenFile };
+    return { dong: r.dong, trangDong: r.trangDong, anh, soTrang: pdf.numPages, kieu: "PDF " + pdf.numPages + " trang" + (quet ? " (dạng ảnh)" : ""), tenPdf: tenFile, ocr };
   }
+
   /* vẽ một trang PDF ra canvas (để xem nhỏ hoặc cắt hình) */
   async function veTrang(tenPdf, n, rongPx) {
     const pdf = pdfMo[tenPdf]; if (!pdf) throw new Error("PDF đã đóng — thầy cô nạp lại file giúp ạ.");
@@ -1652,11 +1725,22 @@ const DN = (() => {
   const soTrang = ten => pdfMo[ten] ? pdfMo[ten].numPages : 0;
 
   /* ---------- một file bất kì ---------- */
-  async function doc(file) {
+  async function doc(file, bao, ocrAnh) {
     const ten = file.name.replace(/\.[^.]+$/, ""), buf = await file.arrayBuffer();
     if (/\.pdf$/i.test(file.name) || file.type === "application/pdf") {
       if (!window.pdfjsLib) await DF.docPdf(new Uint8Array(0)).catch(() => {});   // nạp bộ đọc PDF
-      return docPdf(buf, ten);
+      if (!window.pdfjsLib) throw new Error("Không tải được bộ đọc PDF (cần có mạng). Thầy cô dùng file Word giúp ạ.");
+      return docPdf(buf, ten, bao);
+    }
+    if (ocrAnh && /^image\//.test(file.type)) {   // ảnh chụp trang sách: lấy cả chữ lẫn ảnh
+      const a = await chuanAnh(buf, file.type); if (!a) throw new Error("Không đọc được ảnh " + file.name);
+      bao && bao("Đang nhận chữ trong ảnh " + file.name + "…", 0);
+      const bm = await createImageBitmap(new Blob([buf], { type: file.type }));
+      const c = document.createElement("canvas"), k = bm.width < 1600 ? 2 : 1; c.width = bm.width * k; c.height = bm.height * k; c.getContext("2d").drawImage(bm, 0, 0, c.width, c.height);
+      const dong = await DF.nhanChu(c, p => bao && bao("Đang nhận chữ trong ảnh " + file.name + "…", p));
+      bao && bao("", 1);
+      a.ten = ten; a.nguon = "tai";
+      return { dong, anh: [a], kieu: "ảnh", ocr: { soTrang: 1, conLai: 0 } };
     }
     if (/\.docx$/i.test(file.name)) return docWord(buf, ten);
     if (/\.(txt|md)$/i.test(file.name)) return { dong: new TextDecoder().decode(buf).split(/\r?\n/).map(gon).filter(Boolean), anh: [], kieu: "chữ" };
@@ -1682,13 +1766,21 @@ const SS = (() => {
   const RE_CAU = /^(Câu|Bài)\s*(\d+)\s*[.:)]\s*(.*)$/i;
   const RE_LC = /^\s*([A-D])\s*[.)]\s*\S/;
   const laTieuDeSGK = s => s.length < 95 && RE_TD_SGK.test(s) && !/[;,]$/.test(s) && !RE_LC.test(s);
+  // đề mục «yếu» (PDF, chữ nhận từ ảnh mất số thứ tự ①②): dòng ngắn, chữ đầu viết hoa, không dấu câu cuối,
+  // đứng sau một câu đã kết thúc và trước một dòng dài hơn
+  const hoa = c => !!c && c !== c.toLowerCase() && c === c.toUpperCase();
+  function laTieuDeYeu(s, truoc, sau) {
+    if (s.length < 8 || s.length > 60 || !hoa(s[0]) || /[.,;:!?)\-–—]$/.test(s) || s.split(" ").length > 10 || /\d.*[=+]/.test(s)) return false;
+    if (truoc && !/[.?!:]$/.test(truoc)) return false;
+    return !!sau && sau.length > s.length * 1.15;
+  }
 
   /* nối dòng PDF bị ngắt giữa câu */
   function noiDong(dong, trang) {
     const ra = [], tr = [];
     dong.forEach((s, i) => {
       const t = ra.length - 1;
-      if (t >= 0 && trang && !/[.:;!?)"]$/.test(ra[t]) && /^[a-zà-ỹđ(]/.test(s) && !laTieuDeSGK(s) && ra[t].length > 40) { ra[t] += " " + s; return; }
+      if (t >= 0 && trang && !/[.:;!?)"]$/.test(ra[t]) && /^[a-zà-ỹđ(]/.test(s) && !laTieuDeSGK(s) && ra[t].length > 15) { ra[t] += " " + s; return; }
       ra.push(s); tr.push(trang ? trang[i] : 0);
     });
     return { dong: ra, trang: tr };
@@ -1716,7 +1808,8 @@ const SS = (() => {
   function tuDan(nguon, tt) {
     const { dong, trang } = noiDong(nguon.dong || [], nguon.trangDong);
     const slides = [];
-    const tenBai = tt.bai || (DF.tach(dong, "")[0] || {}).ten || "Bài học";
+    const cd0 = DF.tach(dong, "")[0];
+    const tenBai = tt.bai || (cd0 && /^(Bài|BÀI|Chủ đề|CHỦ ĐỀ|Chương|CHƯƠNG)\s/.test(cd0.ten) ? cd0.ten : "") || tt.tenFile || "Bài học";
     const laKHBD = dong.filter(s => RE_HD.test(s)).length >= 2 || dong.filter(s => RE_ABCD.test(s)).length >= 3;
     const phu = [[tt.mon, tt.lop ? "Lớp " + tt.lop : ""].filter(Boolean).join(" – "), tt.boSach ? "Bộ sách: " + tt.boSach : "", tt.gv ? "Giáo viên: " + tt.gv : "", tt.truong || ""].filter(Boolean).join("\n");
     slides.push({ id: uid(), loai: "bia", tieuDe: tenBai.replace(/^(bài|BÀI)\s*/, m => m), nhan: tt.mon ? (tt.mon + (tt.lop ? " " + tt.lop : "")).toUpperCase() : "", phu, anh: [], nguon: [0, 0] });
@@ -1768,7 +1861,7 @@ const SS = (() => {
       dong.forEach((s, i) => {
         if (i <= iMt + mt.length && iMt >= 0) return;
         if ((/^(BÀI|Bài|CHỦ ĐỀ|Chủ đề)\s+\d/.test(s) && i < 4) || gon(s).toLowerCase() === gon(tenBai).toLowerCase() || /^(KẾ HOẠCH BÀI DẠY|GIÁO ÁN)$/i.test(s)) return;
-        if (laTieuDeSGK(s)) { cu = { ten: s.replace(/[:.]\s*$/, ""), ds: [], i }; nhom.push(cu); return; }
+        if (laTieuDeSGK(s) || ((nguon.ocr || nguon.trangDong) && laTieuDeYeu(s, dong[i - 1], dong[i + 1]))) { cu = { ten: s.replace(/[:.]\s*$/, ""), ds: [], i }; nhom.push(cu); return; }
         if (!cu) { cu = { ten: tenBai, ds: [], i }; nhom.push(cu); }
         cu.ds.push(s);
       });
@@ -1863,7 +1956,7 @@ GHI CHÚ: Đáp án: <…>
 ẢNH: <…>
 (loại slide: bia = bìa, muc = chuyển hoạt động, nd = nội dung, cau = câu hỏi trắc nghiệm, ket = kết thúc)
 ${dsAnh ? "\nẢNH CÓ TRONG TÀI LIỆU:\n" + dsAnh + "\n" : ""}
-NỘI DUNG (giáo án / SGK thầy cô đưa vào):
+${nguon.ocr ? "LƯU Ý: nội dung dưới đây do máy NHẬN CHỮ TỪ ẢNH (OCR) nên có chỗ sai chính tả, sai số mũ, sai công thức và có chữ rác từ tranh vẽ. Hãy hiểu đúng ý theo kiến thức chuẩn của bài, sửa lại công thức cho đúng (VD «x2» là $x^2$), bỏ phần rác. Nếu thầy cô gửi kèm file PDF/ảnh trang sách, hãy đọc trực tiếp từ đó.\n\n" : ""}NỘI DUNG (giáo án / SGK thầy cô đưa vào):
 """
 ${cat}
 """`;
@@ -2093,23 +2186,31 @@ Hướng dẫn về nhà
   }
   $("dsTep").onclick = e => { const b = e.target.closest("[data-xoatep]"); if (!b) return; S.tep.splice(+b.dataset.xoatep, 1); luu(); veTep(); };
   $("oChu").oninput = () => { S.chu = $("oChu").value; S.trangDong = null; $("soDong").textContent = S.chu.split("\n").length; luu(); };
+  function baoTienDo(chu, ti) {
+    const o = $("tienDoDoc");
+    if (!chu) { o.hidden = true; return; }
+    o.hidden = false; o.querySelector("span").textContent = chu; o.querySelector("i").style.width = Math.round((ti || 0) * 100) + "%";
+  }
   async function napFile(files) {
     for (const f of files) {
       const dongCu = S.chu ? S.chu.split("\n").length : 0;
       TT.toast("Đang đọc " + f.name + "…");
       try {
-        const r = await DN.doc(f);
+        const r = await DN.doc(f, baoTienDo, $("ocrAnh").checked);
         if (r.dong.length) { S.chu = (S.chu ? S.chu + "\n" : "") + r.dong.join("\n"); S.trangDong = r.trangDong && !dongCu ? r.trangDong : null; }
         r.anh.forEach(a => themAnhByte(a, a.nguon || "file", a.dong != null ? a.dong + dongCu : null));
         let ghi = "";
         if (r.thongTin && r.thongTin.nOle) ghi += `⚠ Có ${r.thongTin.nOle} công thức MathType (dạng ảnh) — app không đọc được chữ bên trong; thầy cô gõ lại công thức kiểu $…$ ở bước 3. `;
         if (r.thongTin && r.thongTin.nCT) ghi += `✔ Đọc được ${r.thongTin.nCT} công thức Equation. `;
         if (r.thongTin && r.thongTin.boQua) ghi += `${r.thongTin.boQua} ảnh dạng EMF/WMF bỏ qua. `;
-        if (r.tenPdf) ghi += "Hình vẽ nét trong PDF: dùng «Cắt từ trang PDF» ở bước 3.";
-        S.tep.push({ ten: f.name, kieu: r.kieu, soDong: r.dong.length, soAnh: r.anh.length, pdf: r.tenPdf || "", ghi });
+        if (r.ocr) ghi += `📷 File dạng ảnh: app đã <b>nhận chữ (OCR)</b> ${r.ocr.soTrang} trang${r.ocr.conLai ? ` (còn ${r.ocr.conLai} trang chưa đọc — tách file nhỏ hơn)` : ""}. Chữ nhận từ ảnh có thể sai, <b>nhất là công thức</b>: thầy cô xem lại ở «Xem chữ app đọc được», gõ công thức kiểu $…$. <b>Nên dùng Cách 2:</b> chép câu lệnh rồi <b>đính kèm luôn file PDF này</b> vào ChatGPT / Gemini (AI đọc được ảnh trang sách) — slide và công thức sẽ chuẩn hơn. Hình trong trang: «Cắt từ trang PDF» ở bước 3. `;
+        else if (r.tenPdf) ghi += "Hình vẽ nét trong PDF: dùng «Cắt từ trang PDF» ở bước 3.";
+        if (r.ocr && !r.dong.length) ghi += `<span class="do">Không nhận được chữ nào — ảnh mờ hoặc nghiêng.</span>`;
+        S.tep.push({ ten: f.name, kieu: r.kieu, soDong: r.dong.length, soAnh: r.anh.length, pdf: r.tenPdf || "", ghi, ocr: !!r.ocr });
+        baoTienDo("");
         if (!S.tt.bai && r.dong.length) { const cd = DF.tach(r.dong, "")[0]; if (cd && /^(Bài|BÀI|Chủ đề|CHỦ ĐỀ)/.test(cd.ten)) { S.tt.bai = cd.ten; document.querySelector('[data-tt="bai"]').value = cd.ten; } }
         TT.toast(`Đã đọc ${f.name}: ${r.dong.length} dòng, ${r.anh.length} ảnh`, "ok");
-      } catch (e) { TT.toast(e.message || String(e), "loi"); TT.buzz(); }
+      } catch (e) { baoTienDo(""); TT.toast(e.message || String(e), "loi"); TT.buzz(); }
     }
     luu(); veTep(); veBuoc();
   }
@@ -2123,7 +2224,7 @@ Hướng dẫn về nhà
   $("bDanChu").onclick = () => { const t = $("oDanChu").value.trim(); if (!t) return; S.chu = (S.chu ? S.chu + "\n" : "") + t.split(/\r?\n/).map(s => s.trim()).filter(Boolean).join("\n"); S.trangDong = null; $("oDanChu").value = ""; luu(); veTep(); TT.toast("Đã thêm nội dung", "ok"); };
 
   /* ---------- BƯỚC 2: dàn slide ---------- */
-  const nguon = () => ({ dong: S.chu ? S.chu.split("\n") : [], trangDong: S.trangDong });
+  const nguon = () => ({ dong: S.chu ? S.chu.split("\n") : [], trangDong: S.trangDong, ocr: S.tep.some(t => t.ocr) });
   const khoAnhFile = () => S.anh.filter(a => !a.tao && a.dong != null);
   function datSlides(ds, them) {
     if (them && S.slides.length) S.slides = S.slides.concat(ds.filter(s => s.loai !== "bia")); else { S.slides = ds; S.chon = 0; }
@@ -2132,7 +2233,9 @@ Hướng dẫn về nhà
   }
   $("bTuDan").onclick = () => {
     if (!S.chu.trim()) { TT.toast("Thầy cô nạp file hoặc dán nội dung ở bước 1 trước ạ", "loi"); TT.buzz(); return; }
-    const ds = SS.tuDan(nguon(), S.tt);
+    const tenFile = S.tep[0] ? S.tep[0].ten.replace(/\.[^.]+$/, "").replace(/[_]+/g, " ").trim() : "";
+    const ds = SS.tuDan(nguon(), Object.assign({}, S.tt, { tenFile }));
+    if (!S.tt.bai) TT.toast("Thầy cô gõ «Tên bài» ở bước 1 để bìa ghi đúng tên bài ạ", "loi");
     datSlides(ds, $("cheDo").value === "them");
     TT.toast(`Đã dàn ${ds.length} slide — mỗi slide đã có ảnh minh hoạ`, "ok"); TT.ting();
     $("b3").scrollIntoView({ behavior: "smooth" });

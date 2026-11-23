@@ -13,13 +13,21 @@ const SS = (() => {
   const RE_CAU = /^(Câu|Bài)\s*(\d+)\s*[.:)]\s*(.*)$/i;
   const RE_LC = /^\s*([A-D])\s*[.)]\s*\S/;
   const laTieuDeSGK = s => s.length < 95 && RE_TD_SGK.test(s) && !/[;,]$/.test(s) && !RE_LC.test(s);
+  // đề mục «yếu» (PDF, chữ nhận từ ảnh mất số thứ tự ①②): dòng ngắn, chữ đầu viết hoa, không dấu câu cuối,
+  // đứng sau một câu đã kết thúc và trước một dòng dài hơn
+  const hoa = c => !!c && c !== c.toLowerCase() && c === c.toUpperCase();
+  function laTieuDeYeu(s, truoc, sau) {
+    if (s.length < 8 || s.length > 60 || !hoa(s[0]) || /[.,;:!?)\-–—]$/.test(s) || s.split(" ").length > 10 || /\d.*[=+]/.test(s)) return false;
+    if (truoc && !/[.?!:]$/.test(truoc)) return false;
+    return !!sau && sau.length > s.length * 1.15;
+  }
 
   /* nối dòng PDF bị ngắt giữa câu */
   function noiDong(dong, trang) {
     const ra = [], tr = [];
     dong.forEach((s, i) => {
       const t = ra.length - 1;
-      if (t >= 0 && trang && !/[.:;!?)"]$/.test(ra[t]) && /^[a-zà-ỹđ(]/.test(s) && !laTieuDeSGK(s) && ra[t].length > 40) { ra[t] += " " + s; return; }
+      if (t >= 0 && trang && !/[.:;!?)"]$/.test(ra[t]) && /^[a-zà-ỹđ(]/.test(s) && !laTieuDeSGK(s) && ra[t].length > 15) { ra[t] += " " + s; return; }
       ra.push(s); tr.push(trang ? trang[i] : 0);
     });
     return { dong: ra, trang: tr };
@@ -47,7 +55,8 @@ const SS = (() => {
   function tuDan(nguon, tt) {
     const { dong, trang } = noiDong(nguon.dong || [], nguon.trangDong);
     const slides = [];
-    const tenBai = tt.bai || (DF.tach(dong, "")[0] || {}).ten || "Bài học";
+    const cd0 = DF.tach(dong, "")[0];
+    const tenBai = tt.bai || (cd0 && /^(Bài|BÀI|Chủ đề|CHỦ ĐỀ|Chương|CHƯƠNG)\s/.test(cd0.ten) ? cd0.ten : "") || tt.tenFile || "Bài học";
     const laKHBD = dong.filter(s => RE_HD.test(s)).length >= 2 || dong.filter(s => RE_ABCD.test(s)).length >= 3;
     const phu = [[tt.mon, tt.lop ? "Lớp " + tt.lop : ""].filter(Boolean).join(" – "), tt.boSach ? "Bộ sách: " + tt.boSach : "", tt.gv ? "Giáo viên: " + tt.gv : "", tt.truong || ""].filter(Boolean).join("\n");
     slides.push({ id: uid(), loai: "bia", tieuDe: tenBai.replace(/^(bài|BÀI)\s*/, m => m), nhan: tt.mon ? (tt.mon + (tt.lop ? " " + tt.lop : "")).toUpperCase() : "", phu, anh: [], nguon: [0, 0] });
@@ -99,7 +108,7 @@ const SS = (() => {
       dong.forEach((s, i) => {
         if (i <= iMt + mt.length && iMt >= 0) return;
         if ((/^(BÀI|Bài|CHỦ ĐỀ|Chủ đề)\s+\d/.test(s) && i < 4) || gon(s).toLowerCase() === gon(tenBai).toLowerCase() || /^(KẾ HOẠCH BÀI DẠY|GIÁO ÁN)$/i.test(s)) return;
-        if (laTieuDeSGK(s)) { cu = { ten: s.replace(/[:.]\s*$/, ""), ds: [], i }; nhom.push(cu); return; }
+        if (laTieuDeSGK(s) || ((nguon.ocr || nguon.trangDong) && laTieuDeYeu(s, dong[i - 1], dong[i + 1]))) { cu = { ten: s.replace(/[:.]\s*$/, ""), ds: [], i }; nhom.push(cu); return; }
         if (!cu) { cu = { ten: tenBai, ds: [], i }; nhom.push(cu); }
         cu.ds.push(s);
       });
@@ -194,7 +203,7 @@ GHI CHÚ: Đáp án: <…>
 ẢNH: <…>
 (loại slide: bia = bìa, muc = chuyển hoạt động, nd = nội dung, cau = câu hỏi trắc nghiệm, ket = kết thúc)
 ${dsAnh ? "\nẢNH CÓ TRONG TÀI LIỆU:\n" + dsAnh + "\n" : ""}
-NỘI DUNG (giáo án / SGK thầy cô đưa vào):
+${nguon.ocr ? "LƯU Ý: nội dung dưới đây do máy NHẬN CHỮ TỪ ẢNH (OCR) nên có chỗ sai chính tả, sai số mũ, sai công thức và có chữ rác từ tranh vẽ. Hãy hiểu đúng ý theo kiến thức chuẩn của bài, sửa lại công thức cho đúng (VD «x2» là $x^2$), bỏ phần rác. Nếu thầy cô gửi kèm file PDF/ảnh trang sách, hãy đọc trực tiếp từ đó.\n\n" : ""}NỘI DUNG (giáo án / SGK thầy cô đưa vào):
 """
 ${cat}
 """`;

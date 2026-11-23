@@ -74,7 +74,49 @@ const DF = (() => {
     return di(e);
   }
   function napThuVien(url) { return new Promise((ok, loi) => { const s = document.createElement("script"); s.src = url; s.onload = ok; s.onerror = () => loi(new Error("Không tải được bộ đọc PDF (cần có mạng). Thầy cô dùng file Word giúp ạ.")); document.head.appendChild(s); }); }
-  async function docPdf(buf) {
+  /* ---------- nhận chữ trong ảnh (OCR) — Tesseract.js, chạy trong trình duyệt, cần mạng lần đầu ---------- */
+  const TRANG_OCR_TOI_DA = 30;
+  const TESS = "https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js";
+  let may = null, baoOcr = null;
+  function napJs(url) { return new Promise((ok, loi) => { const s = document.createElement("script"); s.src = url; s.onload = ok; s.onerror = () => loi(new Error("Không tải được bộ nhận chữ trong ảnh (cần có mạng). Thầy cô dùng file Word, hoặc dán chữ vào ô bên dưới ạ.")); document.head.appendChild(s); }); }
+  async function layMay() {
+    if (may) return may;
+    if (!window.Tesseract) await napJs(TESS);
+    may = await Tesseract.createWorker(["vie", "eng"], 1, { logger: m => { if (baoOcr && m.status === "recognizing text") baoOcr(m.progress || 0); } });
+    await may.setParameters({ preserve_interword_spaces: "1" });
+    return may;
+  }
+  // canvas / ảnh → các dòng chữ đã làm sạch
+  async function nhanChu(hinh, bao) {
+    const w = await layMay();
+    baoOcr = bao;
+    const { data } = await w.recognize(hinh, {}, { text: true, blocks: true });
+    baoOcr = null;
+    const ra = [];
+    // dòng kèm độ tin cậy: bỏ dòng rác (chữ trong tranh vẽ), bỏ từ nhận quá kém
+    let dsDong = data.lines;
+    if (!dsDong && data.blocks) { dsDong = []; data.blocks.forEach(b => (b.paragraphs || []).forEach(p => (p.lines || []).forEach(l => dsDong.push(l)))); }
+    // rác từ tranh vẽ nằm ở đầu/cuối dòng với độ tin cậy thấp → cắt hai đầu; giữa dòng chỉ bỏ kí hiệu vụn
+    const lamSach = l => {
+      let w = (l.words || []).slice();
+      if (!w.length) return l.confidence >= 60 ? l.text : "";
+      while (w.length && w[0].confidence < 65) w.shift();
+      while (w.length && w[w.length - 1].confidence < 65) w.pop();
+      w = w.filter(x => x.confidence >= 20 || /[A-Za-zÀ-ỹ0-9]{2,}/.test(x.text));
+      if (!w.length || w.reduce((t, x) => t + x.confidence, 0) / w.length < 60) return "";
+      return w.map(x => x.text).join(" ");
+    };
+    const chuSach = dsDong && dsDong.length ? dsDong.map(lamSach).filter(Boolean).join("\n") : data.text;
+    String(chuSach || "").normalize("NFC").split(/\n/).forEach(l => {
+      const s = gon(l.replace(/[|_~`$\\]+/g, " ").replace(/^[:;.,¢©®«»@]+\s*/, "").replace(/\bVi ?dụ ?[lI](?![A-Za-z])/g, "Ví dụ 1").replace(/\bVi ?dụ(?![A-Za-zÀ-ỹ])/g, "Ví dụ").replace(/\bvi dụ(?![A-Za-zÀ-ỹ])/g, "ví dụ").replace(/\s+([.,;:!?)])/g, "$1"));
+      if (!s || /^\d{1,3}$/.test(s)) return;                          // số trang
+      const chu = (s.match(/[A-Za-zÀ-ỹ0-9]/g) || []).length;
+      if (s.length < 3 || chu / s.length < 0.5) return;              // vụn, nhiễu
+      ra.push(s);
+    });
+    return ra;
+  }
+  async function docPdf(buf, bao) {
     if (!window.pdfjsLib) {
       await napThuVien("https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js");
       pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
@@ -92,8 +134,23 @@ const DF = (() => {
         s = gon(s); if (s) { dong.push(s); trangDong.push(n); }
       });
     }
-    if (!dong.length) throw new Error("File PDF này là bản quét (ảnh), app chưa đọc được chữ. Thầy cô dùng file Word, hoặc dán chữ vào ô bên dưới ạ.");
-    return { dong, trang: pdf.numPages, trangDong };
+    // PDF quét / in từ ảnh: không có lớp chữ → nhận chữ trong ảnh từng trang (OCR tiếng Việt)
+    let ocr = null;
+    if (!dong.length) {
+      const n = Math.min(pdf.numPages, TRANG_OCR_TOI_DA);
+      for (let t = 1; t <= n; t++) {
+        const ghi = `Đang nhận chữ trang ${t}/${n} (PDF dạng ảnh)…`;
+        bao && bao(ghi, (t - 1) / n);
+        const pg = await pdf.getPage(t), vp0 = pg.getViewport({ scale: 1 }), vp = pg.getViewport({ scale: 2200 / vp0.width });
+        const c = document.createElement("canvas"); c.width = Math.round(vp.width); c.height = Math.round(vp.height);
+        await pg.render({ canvasContext: c.getContext("2d"), viewport: vp }).promise;
+        (await nhanChu(c, p => bao && bao(ghi, (t - 1 + p) / n))).forEach(s => { dong.push(s); trangDong.push(t); });
+      }
+      bao && bao("", 1);
+      ocr = { soTrang: n, conLai: pdf.numPages - n };
+      if (!dong.length) throw new Error("File PDF này là ảnh và máy không nhận được chữ nào (ảnh mờ hoặc nghiêng). Thầy cô dùng file Word, hoặc dán chữ vào ô bên dưới ạ.");
+    }
+    return { dong, trang: pdf.numPages, trangDong, ocr };
   }
 
   /* ---- nhận ra bài / chủ đề ---- */
@@ -138,12 +195,12 @@ const DF = (() => {
       yc: { B: [...new Set(c.yc.B)].join("\n"), H: [...new Set(c.yc.H)].join("\n"), V: [...new Set(c.yc.V)].join("\n") }
     }));
   }
-  async function doc(file) {
+  async function doc(file, bao) {
     const ten = file.name.replace(/\.[^.]+$/, ""), buf = await file.arrayBuffer();
-    if (/\.pdf$/i.test(file.name) || file.type === "application/pdf") { const r = await docPdf(buf); return { cd: tach(r.dong, ten), dong: r.dong.length, kieu: "PDF " + r.trang + " trang" }; }
+    if (/\.pdf$/i.test(file.name) || file.type === "application/pdf") { const r = await docPdf(buf, bao); return { cd: tach(r.dong, ten), dong: r.dong.length, kieu: "PDF " + r.trang + " trang" + (r.ocr ? " dạng ảnh, đã nhận chữ" : ""), ocr: r.ocr }; }
     if (/\.docx$/i.test(file.name)) { const d = await docDocx(buf); return { cd: tach(d, ten), dong: d.length, kieu: "Word", ct: d.thongTin }; }
     if (/\.(txt|md)$/i.test(file.name)) { const d = new TextDecoder().decode(buf).split(/\r?\n/).map(gon).filter(Boolean); return { cd: tach(d, ten), dong: d.length, kieu: "chữ" }; }
     throw new Error("App nhận file Word (.docx) hoặc PDF. File .doc cũ: mở bằng Word → Lưu thành .docx.");
   }
-  return { doc, tach, loaiYc, gon, docDocx, docPdf, tex, napThuVien };
+  return { doc, tach, loaiYc, gon, docDocx, docPdf, tex, napThuVien, nhanChu };
 })();

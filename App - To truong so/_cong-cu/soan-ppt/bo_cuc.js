@@ -173,7 +173,7 @@ const BC = (() => {
         const phong = co > coGoc;
         for (const c of cach()) {
           const dd = dung(ds, co), wPt = (c.wChu - 0.5 * IN) / PT;
-          const cao = caoKhoi(dd, wPt) * PT + 0.42 * IN;
+          const cao = caoKhoi(dd, wPt) * PT * 1.07 + 0.42 * IN;
           if (c.kieu === "duoi") {
             if (cao <= hB * (phong ? 0.4 : 0.48)) return { c, dd, co, cao };
           } else if (cao <= hB * (phong ? 0.72 : 1)) return { c, dd, co, cao };
@@ -196,6 +196,14 @@ const BC = (() => {
       if (!conLai.length) break;
     }
     if (!ra.length) ra.push({ c: cach()[0], dd: [], co: coGoc, cao: 0 });
+    // trang cuối chỉ còn 1 ý ngắn → chuyển bớt ý của trang trước sang cho cân
+    for (let lan2 = 0; lan2 < 3 && ra.length > 1; lan2++) {
+      const cuoi = ra[ra.length - 1], truoc = ra[ra.length - 2];
+      if (cuoi.dd.length > 1 || truoc.dd.length < 3 || String(cuoi.dd[0] && cuoi.dd[0].s).length > 80) break;
+      const a = thu(truoc.dd.slice(0, -1)), b = thu([truoc.dd[truoc.dd.length - 1], ...cuoi.dd]);
+      if (!a || !b) break;
+      ra[ra.length - 2] = a; ra[ra.length - 1] = b;
+    }
     if (ra.length > 1) canhBao.push({ slide: soThu, loi: `nội dung dài → tự tách thành ${ra.length} slide`, nhe: true });
 
     return ra.map((kq, k) => {

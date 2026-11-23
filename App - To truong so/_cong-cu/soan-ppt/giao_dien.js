@@ -61,23 +61,31 @@
   }
   $("dsTep").onclick = e => { const b = e.target.closest("[data-xoatep]"); if (!b) return; S.tep.splice(+b.dataset.xoatep, 1); luu(); veTep(); };
   $("oChu").oninput = () => { S.chu = $("oChu").value; S.trangDong = null; $("soDong").textContent = S.chu.split("\n").length; luu(); };
+  function baoTienDo(chu, ti) {
+    const o = $("tienDoDoc");
+    if (!chu) { o.hidden = true; return; }
+    o.hidden = false; o.querySelector("span").textContent = chu; o.querySelector("i").style.width = Math.round((ti || 0) * 100) + "%";
+  }
   async function napFile(files) {
     for (const f of files) {
       const dongCu = S.chu ? S.chu.split("\n").length : 0;
       TT.toast("Đang đọc " + f.name + "…");
       try {
-        const r = await DN.doc(f);
+        const r = await DN.doc(f, baoTienDo, $("ocrAnh").checked);
         if (r.dong.length) { S.chu = (S.chu ? S.chu + "\n" : "") + r.dong.join("\n"); S.trangDong = r.trangDong && !dongCu ? r.trangDong : null; }
         r.anh.forEach(a => themAnhByte(a, a.nguon || "file", a.dong != null ? a.dong + dongCu : null));
         let ghi = "";
         if (r.thongTin && r.thongTin.nOle) ghi += `⚠ Có ${r.thongTin.nOle} công thức MathType (dạng ảnh) — app không đọc được chữ bên trong; thầy cô gõ lại công thức kiểu $…$ ở bước 3. `;
         if (r.thongTin && r.thongTin.nCT) ghi += `✔ Đọc được ${r.thongTin.nCT} công thức Equation. `;
         if (r.thongTin && r.thongTin.boQua) ghi += `${r.thongTin.boQua} ảnh dạng EMF/WMF bỏ qua. `;
-        if (r.tenPdf) ghi += "Hình vẽ nét trong PDF: dùng «Cắt từ trang PDF» ở bước 3.";
-        S.tep.push({ ten: f.name, kieu: r.kieu, soDong: r.dong.length, soAnh: r.anh.length, pdf: r.tenPdf || "", ghi });
+        if (r.ocr) ghi += `📷 File dạng ảnh: app đã <b>nhận chữ (OCR)</b> ${r.ocr.soTrang} trang${r.ocr.conLai ? ` (còn ${r.ocr.conLai} trang chưa đọc — tách file nhỏ hơn)` : ""}. Chữ nhận từ ảnh có thể sai, <b>nhất là công thức</b>: thầy cô xem lại ở «Xem chữ app đọc được», gõ công thức kiểu $…$. <b>Nên dùng Cách 2:</b> chép câu lệnh rồi <b>đính kèm luôn file PDF này</b> vào ChatGPT / Gemini (AI đọc được ảnh trang sách) — slide và công thức sẽ chuẩn hơn. Hình trong trang: «Cắt từ trang PDF» ở bước 3. `;
+        else if (r.tenPdf) ghi += "Hình vẽ nét trong PDF: dùng «Cắt từ trang PDF» ở bước 3.";
+        if (r.ocr && !r.dong.length) ghi += `<span class="do">Không nhận được chữ nào — ảnh mờ hoặc nghiêng.</span>`;
+        S.tep.push({ ten: f.name, kieu: r.kieu, soDong: r.dong.length, soAnh: r.anh.length, pdf: r.tenPdf || "", ghi, ocr: !!r.ocr });
+        baoTienDo("");
         if (!S.tt.bai && r.dong.length) { const cd = DF.tach(r.dong, "")[0]; if (cd && /^(Bài|BÀI|Chủ đề|CHỦ ĐỀ)/.test(cd.ten)) { S.tt.bai = cd.ten; document.querySelector('[data-tt="bai"]').value = cd.ten; } }
         TT.toast(`Đã đọc ${f.name}: ${r.dong.length} dòng, ${r.anh.length} ảnh`, "ok");
-      } catch (e) { TT.toast(e.message || String(e), "loi"); TT.buzz(); }
+      } catch (e) { baoTienDo(""); TT.toast(e.message || String(e), "loi"); TT.buzz(); }
     }
     luu(); veTep(); veBuoc();
   }
@@ -91,7 +99,7 @@
   $("bDanChu").onclick = () => { const t = $("oDanChu").value.trim(); if (!t) return; S.chu = (S.chu ? S.chu + "\n" : "") + t.split(/\r?\n/).map(s => s.trim()).filter(Boolean).join("\n"); S.trangDong = null; $("oDanChu").value = ""; luu(); veTep(); TT.toast("Đã thêm nội dung", "ok"); };
 
   /* ---------- BƯỚC 2: dàn slide ---------- */
-  const nguon = () => ({ dong: S.chu ? S.chu.split("\n") : [], trangDong: S.trangDong });
+  const nguon = () => ({ dong: S.chu ? S.chu.split("\n") : [], trangDong: S.trangDong, ocr: S.tep.some(t => t.ocr) });
   const khoAnhFile = () => S.anh.filter(a => !a.tao && a.dong != null);
   function datSlides(ds, them) {
     if (them && S.slides.length) S.slides = S.slides.concat(ds.filter(s => s.loai !== "bia")); else { S.slides = ds; S.chon = 0; }
@@ -100,7 +108,9 @@
   }
   $("bTuDan").onclick = () => {
     if (!S.chu.trim()) { TT.toast("Thầy cô nạp file hoặc dán nội dung ở bước 1 trước ạ", "loi"); TT.buzz(); return; }
-    const ds = SS.tuDan(nguon(), S.tt);
+    const tenFile = S.tep[0] ? S.tep[0].ten.replace(/\.[^.]+$/, "").replace(/[_]+/g, " ").trim() : "";
+    const ds = SS.tuDan(nguon(), Object.assign({}, S.tt, { tenFile }));
+    if (!S.tt.bai) TT.toast("Thầy cô gõ «Tên bài» ở bước 1 để bìa ghi đúng tên bài ạ", "loi");
     datSlides(ds, $("cheDo").value === "them");
     TT.toast(`Đã dàn ${ds.length} slide — mỗi slide đã có ảnh minh hoạ`, "ok"); TT.ting();
     $("b3").scrollIntoView({ behavior: "smooth" });

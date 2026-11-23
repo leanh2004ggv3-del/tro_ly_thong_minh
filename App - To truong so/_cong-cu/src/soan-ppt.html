@@ -131,6 +131,8 @@ details.hop summary{cursor:pointer;font-weight:700;font-size:14.5px}
         <div class="mo nho2">Word (.docx), PDF, ảnh (PNG, JPG) · chọn nhiều file một lúc · app lấy <b>chữ, công thức và hình</b> trong file</div>
       </div>
       <input type="file" id="chonFile" multiple accept=".docx,.pdf,.txt,image/*,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document" hidden>
+      <label class="nho2" style="display:flex;gap:6px;align-items:center;margin-top:8px"><input type="checkbox" id="ocrAnh" style="width:18px;min-height:0"> Ảnh là <b>trang sách chụp</b>: nhận cả chữ trong ảnh (PDF dạng ảnh luôn được nhận chữ)</label>
+      <div id="tienDoDoc" hidden style="margin-top:8px;background:#fff7ed;border:1px solid #fed7aa;border-radius:12px;padding:8px 10px;font-size:14px"><span>…</span><div style="height:8px;background:#fde68a;border-radius:6px;margin-top:6px;overflow:hidden"><i style="display:block;height:100%;width:0;background:linear-gradient(90deg,#ea580c,#db2777);transition:width .3s"></i></div></div>
       <div id="dsTep"></div>
       <details class="hop"><summary>Không có file? Dán chữ vào đây</summary>
         <textarea id="oDanChu" rows="6" style="margin-top:6px" placeholder="Dán giáo án hoặc nội dung bài học…&#10;Công thức viết giữa hai dấu $, VD $x^2$, $\frac{a}{b}$, $H_2O$"></textarea>
