@@ -128,7 +128,7 @@ section.the{margin-bottom:18px;scroll-margin-top:84px}
 .dang-dau{display:flex;gap:10px;align-items:center;cursor:pointer}
 .dang-dau input{width:20px;height:20px;min-height:0;accent-color:var(--m);flex:none}
 .dang-dau small{display:block;color:var(--chu2);font-size:12.5px}
-.dang-o{margin-top:8px}.dang-o label.o{font-size:12.5px}.dang-o input,.dang-o select{min-height:36px;padding:5px 8px}
+.dang-o{margin-top:8px}.dang-o .so-cau input{font-weight:800;color:var(--m)}.dang-o .so-cau small{display:block;font-size:11.5px;color:var(--m);font-weight:700;margin-top:2px}.dang-o label.o{font-size:12.5px}.dang-o input,.dang-o select{min-height:36px;padding:5px 8px}
 table.mt{border-collapse:separate;border-spacing:0;width:100%;font-size:14px;background:#fff;border-radius:12px;overflow:hidden}
 table.mt th{background:#eef2ff;color:var(--chinh);padding:6px 4px;font-size:13px;text-align:center;border-bottom:1px solid #e2e8f0}
 table.mt th.td{color:var(--m);border-bottom:3px solid var(--m)}
@@ -345,7 +345,7 @@ details.hop summary{cursor:pointer;font-weight:700;font-size:14.5px}
       <div class="hang" style="align-items:center"><b class="nho2" style="flex:0 0 auto">Đáp án phần nhiều lựa chọn</b><button class="nut phu nho" id="bCan">🔀 Cân đáp án A–B–C–D</button><button class="nut phu nho" id="bLenhDai" title="Chép câu lệnh nhờ AI viết lại phương án cho các câu có đáp án đúng dài nhất">📋 Câu lệnh sửa phương án</button></div>
       <div id="dayDa"></div>
       <canvas id="bdDa" style="width:100%;height:150px"></canvas>
-      <div class="hang" style="align-items:center;margin-top:6px"><b class="nho2" style="flex:0 0 auto">Máy soát</b><span id="tomKiem" style="flex:0 0 auto"></span></div>
+      <div class="hang" style="align-items:center;margin-top:6px"><b class="nho2" style="flex:0 0 auto">Máy soát</b><span id="tomKiem" style="flex:0 0 auto"></span><button class="nut xanh nho b-tu-sua" hidden title="Máy tự sửa các lỗi sửa được: chia lại ma trận, khớp điểm, soạn câu trống bằng Gemini, sửa phương án, cân đáp án">🔧 Tự sửa lỗi</button></div>
       <div id="dsKiem"></div>
     </div>
   </div>
@@ -372,6 +372,7 @@ details.hop summary{cursor:pointer;font-weight:700;font-size:14.5px}
       </div>
       <div id="hopXuatDe"><b class="nho2">Xuất những đề nào</b><div class="luoi" id="xuatDe" style="gap:4px;margin:6px 0 10px"></div></div>
       <div class="mo nho2">Mỗi phần sang trang mới · toàn bộ <b>Times New Roman cỡ 13</b> · lề 2 – 1,5 – 2 – 3 cm · bảng kẻ viền, đầu bảng tô nhạt.</div>
+      <button class="nut xanh nho b-tu-sua" hidden style="margin-top:8px">🔧 Tự sửa lỗi</button>
       <div id="dsKiem2" style="margin-top:8px"></div>
     </div>
   </div>
@@ -1265,9 +1266,11 @@ function chia2(hang, cot) {
   for (let vong = 0; vong < 6; vong++) ung.forEach(u => { if (dh[u.i] > 0 && dc[u.j] > 0) { f[u.i][u.j]++; dh[u.i]--; dc[u.j]--; } });
   return f;
 }
-function apKhung() {
+/* dungSoCau: giữ số câu từng phần thầy cô nhập (S.dang[d].n), tự luận nhận phần điểm còn lại cho đủ 10 */
+function apKhung(dungSoCau, imLang) {
   if (!S.cd.length) { TT.toast("Thầy cô nạp nội dung hoặc thêm chủ đề ở bước ② trước ạ", "loi"); TT.buzz(); return; }
   const D = S.dang, goc = { NLC: 3, DS: 2, TLN: 2, TL: 3 };
+  const soN = d => dungSoCau === true ? Math.max(0, parseInt(D[d].n, 10) || 0) : 0;
   if (!D.TLN.bat && D.DS.bat) goc.DS += 2;
   const bat = DANG.filter(d => D[d].bat);
   if (!bat.length) { TT.toast("Thầy cô bật ít nhất một dạng câu ạ", "loi"); return; }
@@ -1285,14 +1288,22 @@ function apKhung() {
   const cau = [];   // {d, m | ys, p}
   bat.forEach(d => {
     if (d === "TL") {
-      MUC.forEach(m => { const p = Math.round(diem.TL * FR.TL[m] * 4) / 4; if (p <= 0) return; if (p > 2) { const a = Math.round(p / 2 * 4) / 4; cau.push({ d, m, p: a }, { d, m, p: p - a }); } else cau.push({ d, m, p }); });
+      const tlTong = Math.round(Math.max(0, 10 - tong(cau.map(c => c.p))) * 4) / 4;   // phần điểm còn lại cho đủ 10
+      if (tlTong <= 0) return;
+      if (soN("TL")) {
+        const n = soN("TL"), k = chia(n, MUC.map(m => FR.TL[m])), w = MUC.map((m, j) => k[j] ? FR.TL[m] : 0), tw = tong(w) || 1, ds = [];
+        MUC.forEach((m, j) => { for (let i = 0; i < k[j]; i++) ds.push({ d, m, p: Math.max(.25, Math.round(tlTong * w[j] / tw / k[j] * 4) / 4) }); });
+        let du = Math.round((tlTong - tong(ds.map(c => c.p))) * 4);
+        for (let i = ds.length - 1, vong = 0; du !== 0 && vong < ds.length * 40; i--, vong++) { const c = ds[((i % ds.length) + ds.length) % ds.length]; if (du > 0) { c.p += .25; du--; } else if (c.p > .25) { c.p -= .25; du++; } }
+        cau.push(...ds);
+      } else MUC.forEach(m => { const p = Math.round(tlTong * FR.TL[m] * 4) / 4; if (p <= 0) return; if (p > 2) { const a = Math.round(p / 2 * 4) / 4; cau.push({ d, m, p: a }, { d, m, p: p - a }); } else cau.push({ d, m, p }); });
     } else if (d === "DS") {
-      const nCau = Math.max(1, Math.round(diem.DS / D.DS.d)), nY = chia(nCau * 4, MUC.map(m => FR.DS[m]));
+      const nCau = soN("DS") || Math.max(1, Math.round(diem.DS / D.DS.d)), nY = chia(nCau * 4, MUC.map(m => FR.DS[m]));
       const ys = []; MUC.forEach((m, j) => { for (let i = 0; i < nY[j]; i++) ys.push(m); });
       const ds = Array.from({ length: nCau }, () => []); ys.forEach((m, i) => ds[i % nCau].push(m));
       ds.forEach(y => cau.push({ d, ys: y, p: D.DS.d }));
     } else {
-      const n = Math.max(1, Math.round(diem[d] / D[d].d)), c = chia(n, MUC.map(m => FR[d][m]));
+      const n = soN(d) || Math.max(1, Math.round(diem[d] / D[d].d)), c = chia(n, MUC.map(m => FR[d][m]));
       MUC.forEach((m, j) => { for (let i = 0; i < c[j]; i++) cau.push({ d, m, p: D[d].d }); });
     }
   });
@@ -1307,7 +1318,8 @@ function apKhung() {
     if (c.d === "DS") c.ys.forEach(m => o.DS[m]++);
     else { const q = o[c.d][c.m]; o[c.d][c.m]++; if (c.d === "TL") S.tlDiem[`TL|${c.cd}|${c.m}|${q}`] = c.p; }
   });
-  luu(); ve(); TT.ting(); TT.toast("Đã chia theo khung CV 7991 — thầy cô chỉnh từng ô nếu cần", "ok");
+  luu(); ve();
+  if (!imLang) { TT.ting(); TT.toast(dungSoCau === true ? "Đã chia ma trận theo số câu thầy cô nhập — tự luận nhận phần điểm còn lại cho đủ 10" : "Đã chia theo khung CV 7991 — thầy cô chỉnh từng ô nếu cần", "ok"); }
 }
 
 /* ================= SOÁT ================= */
@@ -1869,11 +1881,13 @@ async function napFile(files) {
 }
 /* ---------- bước 3 ---------- */
 function veDang() {
+  const P = khe(), t = tinh(P);
   $("dsDang").innerHTML = DANG.map(d => {
+    const nThuc = S.dang[d].bat ? P[d].length : 0;
     const D = S.dang[d], nhan = d === "DS" ? "Điểm mỗi câu (4 ý)" : d === "TL" ? "Điểm mặc định mỗi câu" : "Điểm mỗi câu";
     return `<div class="dang ${D.bat ? "bat" : ""}" style="--m:${MAU_D[d]}">
       <label class="dang-dau"><input type="checkbox" data-dang="${d}" ${D.bat ? "checked" : ""}>${ICON[d]}<span><b>${TEN[d]}</b><small>${{ NLC: "4 phương án A, B, C, D", DS: "câu dẫn + 4 ý a, b, c, d", TLN: "đáp án là một số", TL: "chia ý, có điểm từng ý" }[d]}</small></span></label>
-      <div class="hang dang-o"><label class="o">${nhan}<input data-f="dd-${d}" data-dd="${d}" value="${f2(D.d)}" inputmode="decimal"></label>
+      <div class="hang dang-o"><label class="o so-cau">Số câu${d === "DS" ? " (mỗi câu 4 ý)" : ""}<input data-f="dn-${d}" data-n="${d}" value="${nThuc || ""}" inputmode="numeric" placeholder="${D.bat ? "tự chia" : "—"}" ${D.bat ? "" : "disabled"}><small>${D.bat && nThuc ? "= " + f2(t.dang[d]) + " điểm" : "&nbsp;"}</small></label><label class="o">${nhan}<input data-f="dd-${d}" data-dd="${d}" value="${f2(D.d)}" inputmode="decimal"></label>
       ${d === "DS" ? `<label class="o">Cách chấm<select data-cham="1"><option value="764" ${D.cham === "764" ? "selected" : ""}>QĐ 764: 0,1·0,25·0,5·1</option><option value="deu" ${D.cham === "deu" ? "selected" : ""}>Đều nhau từng ý</option></select></label>` : ""}</div>
     </div>`;
   }).join("");
@@ -1955,6 +1969,8 @@ function veKiem() {
   $("dsKiem").innerHTML = kq.map(x => `<div class="kq ${x.m}"><span>${x.m === "ok" ? "✔" : x.m === "canh" ? "⚠" : "✖"}</span><div>${esc(x.t)}${nutSua(x)}</div></div>`).join("");
   $("tomKiem").innerHTML = nLoi ? `<span class="nhan n-sai">${nLoi} lỗi</span>` : nCanh ? `<span class="nhan n-canh">${nCanh} cần xem</span>` : `<span class="nhan n-dung">Sạch</span>`;
   $("dsKiem2").innerHTML = $("dsKiem").innerHTML;
+  const nSua = kq.filter(x => x.sua && x.sua.split(":")[0] !== "den" && !(x.m === "canh" && x.sua === "khung")).length;   // cảnh báo tỉ lệ: thầy cô tự quyết, không tính
+  document.querySelectorAll(".b-tu-sua").forEach(b => { b.hidden = !nSua; b.textContent = `🔧 Tự sửa lỗi (${nSua})`; });
   return { nLoi, nCanh };
 }
 /* ---------- nhiều đề ---------- */
@@ -2005,7 +2021,7 @@ function veBuoc() {
 }
 /* ---------- nút sửa cạnh từng dòng của máy soát ---------- */
 const NUT_SUA = {
-  khung: [["⚡ Chia lại theo khung CV 7991", "khung"]],
+  khung: [["⚡ Chia lại ma trận (giữ số câu từng phần)", "khung"]],
   trong: [["✨ Gemini soạn câu còn trống", "ai-trong"], ["📋 Chép câu lệnh", "lenh-trong"], ["👁 Xem câu trống", "xem-trong"]],
   can: [["🔀 Cân đáp án", "can"]],
   dai: [["✨ Gemini sửa phương án", "ai-dai"], ["📋 Chép câu lệnh", "lenh-dai"]],
@@ -2026,18 +2042,18 @@ function denCau(k) {
   el.classList.remove("nhay"); void el.offsetWidth; el.classList.add("nhay");
 }
 /* chỉnh điểm từng ý hướng dẫn chấm (bước 0,25) cho cộng đúng điểm của câu */
-function khopHdc(k) {
+function khopHdc(k, imLang) {
   const s = timKhe(k), q = S.cau[k]; if (!s || !q || !q.hdc || !q.hdc.length) return;
   const h = q.hdc, c = tong(h.map(x => so(x.d))), n = h.length, buoc = .25;
   const v = h.map(x => c ? Math.max(buoc, Math.round(so(x.d) * s.diem / c / buoc) * buoc) : Math.max(buoc, Math.floor(s.diem / n / buoc) * buoc));
   let du = Math.round((s.diem - tong(v)) / buoc);
   for (let i = n - 1, vong = 0; du !== 0 && vong < n * 40; i--, vong++) { const j = ((i % n) + n) % n; if (du > 0) { v[j] += buoc; du--; } else if (v[j] > buoc) { v[j] -= buoc; du++; } }
   h.forEach((x, i) => x.d = f2(v[i]));
-  luu(); giuFocus(veSoan); veKiem(); veXem(); TT.ting();
+  luu(); if (imLang) return; giuFocus(veSoan); veKiem(); veXem(); TT.ting();
   TT.toast(`Câu ${s.la}.${s.so}: hướng dẫn chấm đã cộng đúng ${f2(s.diem)} điểm — thầy cô xem lại điểm từng ý`, "ok");
 }
 function suaLoi(a, k) {
-  if (a === "khung") { const co = Object.keys(S.cau).length; if (co && !confirm("Chia lại ma trận theo khung CV 7991?\n\nSố câu ở từng ô sẽ đổi — câu đã soạn có thể bị lệch chỗ hoặc thừa ra, thầy cô soát lại ở bước ④.")) return; apKhung(); return; }
+  if (a === "khung") { const co = Object.keys(S.cau).length; if (co && !confirm("Chia lại ma trận (giữ số câu từng phần)?\n\nSố câu ở từng ô sẽ đổi — câu đã soạn có thể bị lệch chỗ hoặc thừa ra, thầy cô soát lại ở bước ④.")) return; chiaGiuSoCau(); return; }
   if (a === "ai-trong") return aiSoan(null);
   if (a === "lenh-trong") return chepLenh(true);
   if (a === "xem-trong") { S.loc = "trong"; document.querySelectorAll("#locCau button").forEach(x => x.classList.toggle("chon", x.dataset.loc === "trong")); veSoan(); $("dsCau").scrollIntoView({ behavior: "smooth", block: "start" }); return; }
@@ -2053,6 +2069,67 @@ function suaLoi(a, k) {
     if (AIG.layKhoa()) aiSoan(new Set([k]));
     else { chepLenh(true, new Set([k])); TT.toast(`Đã chép câu lệnh cho riêng câu ${s.la}.${s.so} — dán vào ChatGPT/Gemini, rồi dán câu trả lời vào ô «Dán câu trả lời của AI»`, "ok"); }
   }
+}
+
+/* ---------- số câu từng phần ---------- */
+const coCauSoan = () => S.bo.some(b => Object.keys(b.cau).length);
+function ghiSoCauThuc() { const P = khe(); DANG.forEach(d => { S.dang[d].n = S.dang[d].bat && P[d].length ? P[d].length : ""; }); }
+function datSoCau(d, v) {
+  const n = parseInt(String(v).trim(), 10);
+  if (!S.cd.length) { TT.toast("Thầy cô nạp nội dung hoặc thêm chủ đề ở bước ② trước ạ", "loi"); veB3(); return; }
+  if (!(n > 0) || n > 60) { TT.toast("Số câu cần từ 1 đến 60", "loi"); giuFocus(veB3); return; }
+  if (coCauSoan() && !confirm(`Đổi số câu ${TEN[d]} thành ${n}?\n\nMa trận sẽ chia lại — câu đã soạn có thể lệch chỗ hoặc thừa ra, thầy cô soát lại ở bước ④.`)) { giuFocus(veB3); return; }
+  ghiSoCauThuc(); S.dang[d].n = n;
+  apKhung(true, true);
+  const P = khe(), t = tinh(P);
+  TT.ting();
+  Math.abs(t.tong - 10) < .001
+    ? TT.toast(`${TEN[d]}: ${n} câu = ${f2(t.dang[d])} điểm · ma trận đã chia lại, tổng 10,0`, "ok")
+    : TT.toast(`${TEN[d]}: ${n} câu = ${f2(t.dang[d])} điểm · tổng đang ${f2(t.tong)} — bớt số câu hoặc bật Tự luận để nhận phần điểm còn lại`, "loi");
+}
+/* chia lại ma trận giữ số câu đang có; không đủ 10 điểm thì chia chuẩn khung CV 7991 */
+function chiaGiuSoCau(imLang) {
+  ghiSoCauThuc(); apKhung(true, true);
+  let P = khe();
+  if (Math.abs(tinh(P).tong - 10) > .001) { apKhung(false, true); P = khe(); }
+  if (!imLang) { TT.ting(); TT.toast("Đã chia lại ma trận — tổng " + f2(tinh(P).tong) + " điểm", "ok"); }
+}
+
+/* ---------- 🔧 Tự sửa lỗi: làm lần lượt mọi việc máy sửa được ---------- */
+async function tuSua() {
+  if (dangAI) { TT.toast("Gemini đang làm việc — đợi chút ạ", ""); return; }
+  const loai = kq => [...new Set(kq.filter(x => x.sua && !(x.m === "canh" && x.sua === "khung")).map(x => x.sua.split(":")[0]))];   // chỉ chia lại ma trận khi có LỖI, không vì cảnh báo
+  let P = khe(), kq = soat(P, tinh(P)), co = loai(kq);
+  const coKhoa = !!AIG.layKhoa(), viec = [];
+  if (co.includes("khung")) viec.push("Chia lại ma trận cho đủ 10 điểm, đúng tỉ lệ (giữ số câu từng phần)");
+  if (co.includes("hdc")) viec.push("Khớp điểm hướng dẫn chấm với điểm câu");
+  if (co.includes("lam")) viec.push("Xoá câu trùng/sai dạng để soạn lại");
+  if (co.includes("trong") || co.includes("lam")) viec.push(coKhoa ? "Gemini soạn các câu còn trống" : "Chép câu lệnh cho câu còn trống (máy này chưa có khoá Gemini)");
+  if (co.includes("dai")) viec.push(coKhoa ? "Gemini viết lại phương án cho câu có đáp án đúng dài nhất" : "(Cần khoá Gemini để sửa phương án tự động)");
+  if (co.includes("can") || co.includes("trong") || co.includes("dai")) viec.push("Cân đáp án A–B–C–D");
+  if (!viec.length) { TT.toast("Không có lỗi nào máy tự sửa được — lỗi công thức thầy cô bấm «Đến câu» để sửa tay", ""); return; }
+  if (!confirm("Máy sẽ làm lần lượt:\n• " + viec.join("\n• ") + "\n\nTiếp tục?")) return;
+  const daLam = [];
+  if (co.includes("khung")) { chiaGiuSoCau(true); daLam.push("chia lại ma trận"); }
+  P = khe(); kq = soat(P, tinh(P));
+  const hdc = kq.filter(x => x.sua && x.sua.startsWith("hdc:")).map(x => x.sua.slice(4));
+  hdc.forEach(k => khopHdc(k, true)); if (hdc.length) daLam.push(`khớp điểm HDC ${hdc.length} câu`);
+  const lam = [...new Set(kq.filter(x => x.sua && x.sua.startsWith("lam:")).map(x => x.sua.slice(4)))];
+  lam.forEach(k => delete S.cau[k]); if (lam.length) daLam.push(`xoá ${lam.length} câu để soạn lại`);
+  luu(); ve();
+  P = khe();
+  const trong = P.phan.flatMap(d => P[d]).filter(s => !daXong(s)).length;
+  if (trong) {
+    if (coKhoa) { await aiSoan(null); P = khe(); const con = P.phan.flatMap(d => P[d]).filter(s => !daXong(s)).length; daLam.push(`Gemini soạn ${trong - con}/${trong} câu trống`); }
+    else { chepLenh(true); daLam.push(`đã chép câu lệnh cho ${trong} câu trống — dán vào ChatGPT/Gemini rồi dán trả lời vào ô bước ④`); }
+  }
+  if (coKhoa && P.NLC.some(s => daiNhat(S.cau[s.k]))) { await aiSuaDai(); daLam.push("Gemini sửa phương án"); }
+  P = khe(); kq = soat(P, tinh(P));
+  if (kq.some(x => x.sua === "can")) { canDapAn(); daLam.push("cân đáp án"); }
+  luu(); ve();
+  const k2 = veKiem();
+  TT.ting();
+  TT.toast("🔧 Đã " + (daLam.join(" · ") || "soát") + (k2.nLoi ? ` — còn ${k2.nLoi} lỗi thầy cô xem ở Máy soát` : k2.nCanh ? ` — còn ${k2.nCanh} điểm cần xem` : " — sạch lỗi 👍"), k2.nLoi ? "" : "ok");
 }
 
 /* ---------- Gemini soạn thẳng trong app (khoá dùng chung với trang chủ) ---------- */
@@ -2227,9 +2304,11 @@ document.addEventListener("DOMContentLoaded", () => {
     if (i.dataset.dang) { S.dang[i.dataset.dang].bat = i.checked; if (i.dataset.dang === "TLN" && !i.checked) TT.toast("Tắt trả lời ngắn: bấm «Chia theo khung» để chuyển điểm sang Đúng – Sai", ""); }
     if (i.dataset.cham) S.dang.DS.cham = i.value;
     if (i.dataset.dd) { const v = so(i.value); if (v > 0) S.dang[i.dataset.dd].d = v; }
+    if (i.dataset.n) { datSoCau(i.dataset.n, i.value); return; }
     luu(); giuFocus(() => { veB3(); veSoan(); }); veKiem(); veBuoc(); veXem();
   });
-  $("bKhung").addEventListener("click", apKhung);
+  $("bKhung").addEventListener("click", () => apKhung());
+  document.querySelectorAll(".b-tu-sua").forEach(b => b.addEventListener("click", tuSua));
   $("maTran").addEventListener("input", e => {
     const i = e.target; if (!i.dataset.o) return;
     const [id, d, m] = i.dataset.o.split("|"), v = Math.max(0, Math.min(60, parseInt(i.value, 10) || 0));
