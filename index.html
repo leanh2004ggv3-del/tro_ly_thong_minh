@@ -49,6 +49,235 @@
     }
   </script>
 
+  <style>
+    .noi-dung-ai { font-size: 14px; line-height: 1.6; color: #1e293b; }
+    .noi-dung-ai .h-ai { font-weight: 700; margin: 14px 0 6px; color: #0f172a; }
+    .noi-dung-ai h2.h-ai { font-size: 18px; text-align: center; text-transform: uppercase; color: #047857; }
+    .noi-dung-ai h3.h-ai { font-size: 16px; color: #0e7490; border-bottom: 1px solid #cbd5e1; padding-bottom: 3px; }
+    .noi-dung-ai h4.h-ai, .noi-dung-ai h5.h-ai { font-size: 14.5px; }
+    .noi-dung-ai p { margin: 4px 0; }
+    .noi-dung-ai ul { list-style: disc; padding-left: 22px; margin: 4px 0; }
+    .noi-dung-ai table.bang-ai { border-collapse: collapse; width: 100%; margin: 8px 0; background: #fff; }
+    .noi-dung-ai table.bang-ai td, .noi-dung-ai table.bang-ai th { border: 1px solid #94a3b8; padding: 5px 7px; vertical-align: top; font-size: 13px; }
+    .noi-dung-ai table.bang-ai th { background: #f1f5f9; }
+  </style>
+  <!-- ===== KẾT NỐI AI GEMINI (thêm 23/11/2026) — mỗi thầy cô dùng khoá của mình, khoá chỉ lưu trong trình duyệt ===== -->
+  <script>
+  (function () {
+    const KHOA = 'user_gemini_api_key';
+    const MO_HINH = 'user_gemini_model';
+    const DS_MO_HINH = ['gemini-2.5-flash', 'gemini-flash-latest', 'gemini-2.0-flash', 'gemini-2.5-flash-lite'];
+    const HE_THONG = [
+      'Bạn là trợ lý chuyên môn cho giáo viên THCS – THPT ở Việt Nam.',
+      'Bám Chương trình GDPT 2018. Kế hoạch bài dạy theo Phụ lục IV Công văn 5512/BGDĐT-GDTrH; đề kiểm tra theo định hướng Công văn 7991/BGDĐT-GDTrH (ma trận, bản đặc tả, đề, hướng dẫn chấm; ba mức Biết – Hiểu – Vận dụng).',
+      'Viết tiếng Việt chuẩn, đúng văn phong văn bản sư phạm, cụ thể, dạy được ngay; không viết lời chào hay lời bình về chính mình.',
+      'KHÔNG bịa số hiệu văn bản, số liệu, trang sách. Khi giáo viên không gửi nội dung SGK, chỉ viết theo yêu cầu cần đạt của chương trình và đánh dấu [GV kiểm tra lại theo SGK] ở chỗ cần đối chiếu.',
+      'Không dùng tên thật học sinh; gọi chung "HS", "nhóm 1"…'
+    ].join('\n');
+
+    class LoiAI extends Error { constructor(ma, thongBao) { super(thongBao); this.ma = ma; } }
+
+    const layKhoa = () => (localStorage.getItem(KHOA) || '').trim();
+
+    function docLoi(status, data) {
+      const msg = (data && data.error && data.error.message) || '';
+      if (status === 400 && /API key|API_KEY/i.test(msg)) return new LoiAI('KHOA_SAI', 'Khoá Gemini không đúng. Thầy cô kiểm tra lại khoá trong mục 🔑 Kết nối AI.');
+      if (status === 403) return new LoiAI('KHOA_SAI', 'Khoá Gemini bị từ chối (403). Thầy cô tạo khoá mới ở aistudio.google.com/apikey.');
+      if (status === 429) return new LoiAI('HET_LUOT', 'Đã hết lượt miễn phí của khoá này trong phút/ngày. Thầy cô đợi ít phút rồi thử lại.');
+      if (status === 404 || /not found|not supported|is not available/i.test(msg)) return new LoiAI('MO_HINH', msg || 'Không có mô hình');
+      return new LoiAI('KHAC', 'Gemini báo lỗi ' + status + (msg ? ': ' + msg : ''));
+    }
+
+    // Gọi Gemini. onChunk(toanBoChuDaNhan) khi muốn hiện chữ chạy dần.
+    async function goi({ prompt, parts, system, json, schema, onChunk, temperature, maxTokens }) {
+      const key = layKhoa();
+      if (!key) throw new LoiAI('CHUA_CO_KHOA', 'Chưa có khoá Gemini. Bấm 🔑 Kết nối AI để dán khoá.');
+      const daLuu = localStorage.getItem(MO_HINH);
+      const dsThu = daLuu ? [daLuu, ...DS_MO_HINH.filter(m => m !== daLuu)] : DS_MO_HINH.slice();
+      let loiCuoi = null;
+      for (const model of dsThu) {
+        const gen = { temperature: temperature == null ? 0.7 : temperature, maxOutputTokens: maxTokens || 16384 };
+        if (json) gen.responseMimeType = 'application/json';
+        if (schema) gen.responseSchema = schema;
+        if (/^gemini-2\.5-flash/.test(model)) gen.thinkingConfig = { thinkingBudget: 0 };
+        const body = {
+          systemInstruction: { parts: [{ text: system || HE_THONG }] },
+          contents: [{ role: 'user', parts: [...(parts || []), { text: prompt }] }],
+          generationConfig: gen
+        };
+        const url = 'https://generativelanguage.googleapis.com/v1beta/models/' + model +
+          (onChunk ? ':streamGenerateContent?alt=sse' : ':generateContent');
+        let resp;
+        try {
+          resp = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-goog-api-key': key }, body: JSON.stringify(body) });
+        } catch (e) {
+          throw new LoiAI('MANG', 'Không kết nối được tới Gemini. Thầy cô kiểm tra mạng Internet.');
+        }
+        if (!resp.ok) {
+          let data = null; try { data = await resp.json(); } catch (e) {}
+          const loi = docLoi(resp.status, data);
+          loiCuoi = loi;
+          if (loi.ma === 'MO_HINH' || loi.ma === 'HET_LUOT') { if (daLuu === model) localStorage.removeItem(MO_HINH); continue; }
+          throw loi;
+        }
+        let text = '', lyDo = '';
+        if (onChunk) {
+          const reader = resp.body.getReader();
+          const dec = new TextDecoder();
+          let dem = '';
+          while (true) {
+            const { value, done } = await reader.read();
+            if (done) break;
+            dem += dec.decode(value, { stream: true });
+            const dong = dem.split('\n');
+            dem = dong.pop();
+            for (const d of dong) {
+              if (!d.startsWith('data:')) continue;
+              try {
+                const o = JSON.parse(d.slice(5));
+                const c = o.candidates && o.candidates[0];
+                if (c && c.content && c.content.parts) text += c.content.parts.map(p => p.text || '').join('');
+                if (c && c.finishReason) lyDo = c.finishReason;
+              } catch (e) {}
+            }
+            onChunk(text);
+          }
+        } else {
+          const o = await resp.json();
+          const c = o.candidates && o.candidates[0];
+          if (c && c.content && c.content.parts) text = c.content.parts.map(p => p.text || '').join('');
+          lyDo = (c && c.finishReason) || (o.promptFeedback && o.promptFeedback.blockReason) || '';
+        }
+        localStorage.setItem(MO_HINH, model);
+        if (!text.trim()) throw new LoiAI('RONG', lyDo === 'SAFETY' ? 'Gemini từ chối trả lời nội dung này. Thầy cô diễn đạt lại yêu cầu.' : 'Gemini không trả về nội dung (' + (lyDo || 'trống') + '). Thầy cô thử lại.');
+        return { text, model, cut: lyDo === 'MAX_TOKENS' };
+      }
+      throw loiCuoi || new LoiAI('KHAC', 'Không gọi được Gemini.');
+    }
+
+    function docJSON(text) {
+      let t = String(text).replace(/```json/gi, '').replace(/```/g, '').trim();
+      try { return JSON.parse(t); } catch (e) {}
+      const a = t.search(/[\[{]/);
+      const b = Math.max(t.lastIndexOf(']'), t.lastIndexOf('}'));
+      if (a >= 0 && b > a) return JSON.parse(t.slice(a, b + 1));
+      throw new LoiAI('JSON', 'Kết quả AI không đúng định dạng. Thầy cô bấm tạo lại.');
+    }
+
+    // ---------- Đọc tệp thầy cô gửi lên thành phần nội dung cho Gemini ----------
+    function taiThuVien(src, ten) {
+      if (window[ten]) return Promise.resolve(window[ten]);
+      return new Promise((ok, loi) => { const s = document.createElement('script'); s.src = src; s.onload = () => ok(window[ten]); s.onerror = () => loi(new Error('Không tải được ' + ten)); document.head.appendChild(s); });
+    }
+    const docBase64 = (file) => new Promise((ok, loi) => { const r = new FileReader(); r.onload = () => ok(String(r.result).split(',')[1]); r.onerror = loi; r.readAsDataURL(file); });
+    const giaiMa = (s) => s.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&apos;/g, "'").replace(/&amp;/g, '&');
+
+    async function docTep(file) {
+      if (!file) return [];
+      const ten = file.name.toLowerCase();
+      if (file.size > 18 * 1024 * 1024) throw new LoiAI('TEP_LON', 'Tệp ' + file.name + ' lớn hơn 18 MB. Thầy cô cắt bớt trang (chỉ giữ bài cần soạn) rồi gửi lại.');
+      if (/\.(pdf|png|jpe?g|webp)$/.test(ten)) {
+        const mime = ten.endsWith('.pdf') ? 'application/pdf' : ten.endsWith('.png') ? 'image/png' : ten.endsWith('.webp') ? 'image/webp' : 'image/jpeg';
+        return [{ text: 'Tài liệu thầy cô gửi kèm: ' + file.name }, { inlineData: { mimeType: mime, data: await docBase64(file) } }];
+      }
+      if (/\.(txt|md|csv)$/.test(ten)) return [{ text: 'Tài liệu thầy cô gửi kèm (' + file.name + '):\n' + await file.text() }];
+      if (/\.(docx|pptx)$/.test(ten)) {
+        const JSZip = await taiThuVien('https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js', 'JSZip');
+        const zip = await JSZip.loadAsync(file);
+        let chu = '';
+        if (ten.endsWith('.docx')) {
+          const xml = await zip.file('word/document.xml').async('string');
+          chu = xml.replace(/<w:tab\/>/g, '\t').replace(/<\/w:tc>/g, ' | ').replace(/<\/w:p>/g, '\n').replace(/<[^>]+>/g, '');
+        } else {
+          const ds = Object.keys(zip.files).filter(k => /^ppt\/slides\/slide\d+\.xml$/.test(k)).sort((a, b) => parseInt(a.match(/\d+/)[0]) - parseInt(b.match(/\d+/)[0]));
+          for (const k of ds) { const xml = await zip.file(k).async('string'); chu += '\n--- Slide ' + k.match(/\d+/)[0] + ' ---\n' + xml.replace(/<\/a:p>/g, '\n').replace(/<[^>]+>/g, ''); }
+        }
+        return [{ text: 'Tài liệu thầy cô gửi kèm (' + file.name + '):\n' + giaiMa(chu).replace(/\n{3,}/g, '\n\n').slice(0, 200000) }];
+      }
+      if (ten.endsWith('.doc') || ten.endsWith('.ppt')) throw new LoiAI('TEP_CU', 'Tệp ' + file.name + ' là định dạng Word/PowerPoint cũ. Thầy cô mở tệp, Lưu thành .docx (hoặc PDF) rồi gửi lại.');
+      throw new LoiAI('TEP_LA', 'Chưa đọc được loại tệp ' + file.name + '. Thầy cô gửi PDF, Word (.docx), PowerPoint (.pptx), ảnh hoặc .txt.');
+    }
+
+    // ---------- Markdown → HTML (hiển thị và xuất Word) ----------
+    const thoat = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    function dongNoi(s) {
+      return thoat(s)
+        .replace(/\*\*(.+?)\*\*/g, '<b>$1</b>')
+        .replace(/(^|[^*])\*(?!\s)(.+?)\*(?!\*)/g, '$1<i>$2</i>')
+        .replace(/\[NLS\]/g, '<b style="color:#dc2626">[NLS]</b>')
+        .replace(/\[NLAI\]/g, '<b style="color:#2563eb">[NLAI]</b>')
+        .replace(/&lt;br\s*\/?&gt;/gi, '<br>');
+    }
+    function md(mdText) {
+      const dong = String(mdText || '').replace(/\r/g, '').split('\n');
+      let html = '', i = 0, ds = null;
+      const dongDs = () => { if (ds) { html += '</' + ds + '>'; ds = null; } };
+      const mau = (s) => /^\s*\[NLS\]/.test(s) ? ' style="color:#dc2626"' : /^\s*\[NLAI\]/.test(s) ? ' style="color:#2563eb"' : '';
+      while (i < dong.length) {
+        const d = dong[i];
+        if (/^\s*\|.*\|\s*$/.test(d)) {
+          dongDs();
+          const hang = [];
+          while (i < dong.length && /^\s*\|.*\|\s*$/.test(dong[i])) { hang.push(dong[i]); i++; }
+          const o = hang.filter(h => !/^\s*\|[\s:|-]+\|\s*$/.test(h)).map(h => h.trim().slice(1, -1).split('|').map(c => c.trim()));
+          html += '<table class="bang-ai">' + o.map((r, ri) => '<tr>' + r.map(c => (ri === 0 ? '<th>' : '<td' + mau(c) + '>') + dongNoi(c) + (ri === 0 ? '</th>' : '</td>')).join('') + '</tr>').join('') + '</table>';
+          continue;
+        }
+        let m;
+        if ((m = d.match(/^(#{1,4})\s+(.*)$/))) { dongDs(); const c = m[1].length; html += '<h' + (c + 1) + ' class="h-ai">' + dongNoi(m[2]) + '</h' + (c + 1) + '>'; }
+        else if ((m = d.match(/^\s*[-*+]\s+(.*)$/))) { if (ds !== 'ul') { dongDs(); html += '<ul>'; ds = 'ul'; } html += '<li' + mau(m[1]) + '>' + dongNoi(m[1]) + '</li>'; }
+        else if (/^\s*$/.test(d)) { dongDs(); }
+        else if (/^---+\s*$/.test(d)) { dongDs(); html += '<hr>'; }
+        else { dongDs(); html += '<p' + mau(d) + '>' + dongNoi(d) + '</p>'; }
+        i++;
+      }
+      dongDs();
+      return html;
+    }
+
+    function xuatWord(tieuDe, htmlThan, tenTep, ngang) {
+      const doc = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="utf-8"><title>' + thoat(tieuDe) + '</title>' +
+        '<style>@page WordSection1{size:' + (ngang ? '29.7cm 21cm;mso-page-orientation:landscape' : '21cm 29.7cm') + ';margin:2cm 1.5cm 2cm 2.5cm}div.WordSection1{page:WordSection1}' +
+        'body{font-family:"Times New Roman";font-size:13pt;line-height:1.3}p{margin:3pt 0}h2{font-size:14pt;text-align:center;text-transform:uppercase}h3{font-size:13pt}h4,h5{font-size:13pt;font-style:italic}' +
+        'table{border-collapse:collapse;width:100%;margin:6pt 0}td,th{border:1px solid #000;padding:3pt 5pt;vertical-align:top;font-size:12pt}th{background:#f2f2f2;font-weight:bold;text-align:center}</style></head>' +
+        '<body><div class="WordSection1">' + htmlThan + '</div></body></html>';
+      const blob = new Blob(['﻿', doc], { type: 'application/msword' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = tenTep.replace(/[\\/:*?"<>|]+/g, '_') + '.doc';
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+    }
+
+    // ---------- Viết lại nội dung một khuôn giáo án có sẵn (giữ nguyên bố cục) ----------
+    const BO_QUA = new Set(['id', 'code', 'targets', 'nls', 'nlai', 'title', 'subTitle', 'stepTitle', 'note', 'createdAt', 'includeActivities']);
+    function gomChuoi(obj, duong, out) {
+      if (typeof obj === 'string') { if (obj.trim().length > 2) out.push({ duong, text: obj }); return out; }
+      if (Array.isArray(obj)) { obj.forEach((v, i) => gomChuoi(v, duong.concat(i), out)); return out; }
+      if (obj && typeof obj === 'object') { for (const k of Object.keys(obj)) if (!BO_QUA.has(k)) gomChuoi(obj[k], duong.concat(k), out); }
+      return out;
+    }
+    function ganChuoi(obj, duong, gt) { let o = obj; for (let i = 0; i < duong.length - 1; i++) o = o[duong[i]]; o[duong[duong.length - 1]] = gt; }
+
+    async function vietLaiKhuon(khuon, { boiCanh, yeuCau, parts }) {
+      const ds = gomChuoi(khuon, [], []);
+      if (!ds.length) return khuon;
+      const vao = {}; ds.forEach((x, i) => { vao['k' + i] = x.text; });
+      const prompt = boiCanh + '\n\n' + yeuCau + '\n\nDưới đây là các đoạn của một khuôn giáo án (dạng JSON, mỗi khoá là một ô trong giáo án). ' +
+        'Hãy VIẾT LẠI từng đoạn cho đúng bài học trên, cụ thể, dạy được ngay; giữ nguyên vai trò của từng ô (tên hoạt động, mục tiêu, phương pháp, cách tổ chức, sản phẩm…), giữ thời lượng hợp lý; ' +
+        'dòng nào bắt đầu bằng [NLS] hoặc [NLAI] thì giữ nguyên thẻ đó ở đầu dòng và giữ mã chuẩn, chỉ viết lại nội dung cho khớp bài. Xuống dòng bằng \\n như bản gốc.\n' +
+        'Trả về DUY NHẤT một đối tượng JSON có ĐÚNG các khoá như bản gốc (k0, k1, …), giá trị là đoạn đã viết lại.\n\n' + JSON.stringify(vao);
+      const { text } = await goi({ prompt, parts, json: true, temperature: 0.6, maxTokens: 32768 });
+      const ra = docJSON(text);
+      const ban = JSON.parse(JSON.stringify(khuon));
+      ds.forEach((x, i) => { const v = ra['k' + i]; if (typeof v === 'string' && v.trim()) ganChuoi(ban, x.duong, v); });
+      return ban;
+    }
+
+    window.AI = { goi, docJSON, docTep, md, xuatWord, vietLaiKhuon, layKhoa, KHOA, MO_HINH, LoiAI,
+      moHinhDangDung: () => localStorage.getItem(MO_HINH) || DS_MO_HINH[0] };
+  })();
+  </script>
   <!-- React & Babel CDN -->
   <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
@@ -56,6 +285,32 @@
 
   <!-- Lucide Icons CDN -->
   <script src="https://unpkg.com/lucide@latest"></script>
+  <script>
+  (function () {
+    var L = window.lucide;
+    if (!L || !L.icons || !L.createElement) return;
+    var ten = function (n) { return n.replace(/(^|-)([a-z0-9])/g, function (m, a, b) { return b.toUpperCase(); }); };
+    // Vẽ biểu tượng BÊN TRONG thẻ <i> (không thay thẻ) để React gỡ thẻ không bị lỗi removeChild
+    L.createIcons = function () {
+      document.querySelectorAll('i[data-lucide]').forEach(function (el) {
+        var n = el.getAttribute('data-lucide');
+        if (el.getAttribute('data-ve') === n) return;
+        var node = L.icons[ten(n)];
+        if (!node) return;
+        var svg = L.createElement(node);
+        svg.setAttribute('class', 'lucide lucide-' + n);
+        if (/(^|\s)(w|h|size)-/.test(el.className)) { svg.setAttribute('width', '100%'); svg.setAttribute('height', '100%'); }
+        svg.style.display = 'block';
+        el.textContent = '';
+        el.appendChild(svg);
+        el.setAttribute('data-ve', n);
+        el.style.display = 'inline-block';
+        el.style.flexShrink = '0';
+        el.style.fontStyle = 'normal';
+      });
+    };
+  })();
+  </script>
 
   <!-- Chart.js CDN for Analytics -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -2765,6 +3020,87 @@
       };
     }
 
+    // ===== KẾT NỐI AI (thêm 23/11/2026) =====
+    function AiKetNoiModal({ open, onClose, khoa, onLuu }) {
+      const [giaTri, setGiaTri] = React.useState(khoa || '');
+      const [hien, setHien] = React.useState(false);
+      const [dangThu, setDangThu] = React.useState(false);
+      const [ketQua, setKetQua] = React.useState(null);
+      React.useEffect(() => { if (open) { setGiaTri(khoa || ''); setKetQua(null); } }, [open]);
+      if (!open) return null;
+      const thu = async () => {
+        const k = giaTri.trim();
+        if (!k) { setKetQua({ ok: false, msg: 'Thầy cô dán khoá vào ô trên trước ạ.' }); return; }
+        const cu = localStorage.getItem(window.AI.KHOA);
+        localStorage.setItem(window.AI.KHOA, k);
+        setDangThu(true); setKetQua(null);
+        try {
+          const r = await window.AI.goi({ prompt: 'Trả lời đúng một từ: SẴN SÀNG', maxTokens: 20, temperature: 0 });
+          onLuu(k);
+          setKetQua({ ok: true, msg: 'Đã kết nối! Mô hình đang dùng: ' + r.model + '. Các trợ lý soạn bài đã chạy AI thật.' });
+        } catch (e) {
+          if (cu) localStorage.setItem(window.AI.KHOA, cu); else localStorage.removeItem(window.AI.KHOA);
+          setKetQua({ ok: false, msg: e.message });
+        }
+        setDangThu(false);
+      };
+      const xoa = () => { localStorage.removeItem(window.AI.KHOA); localStorage.removeItem(window.AI.MO_HINH); setGiaTri(''); onLuu(''); setKetQua({ ok: true, msg: 'Đã xoá khoá khỏi máy này. Các trợ lý quay về dùng khuôn mẫu có sẵn.' }); };
+      return (
+        <div className="fixed inset-0 z-[100] bg-slate-900/70 flex items-center justify-center p-4" onClick={onClose}>
+          <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6 space-y-4 text-slate-800" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-start justify-between">
+              <div>
+                <h3 className="font-bold text-lg">🔑 Kết nối AI Gemini</h3>
+                <p className="text-xs text-slate-500">Mỗi thầy cô dùng khoá miễn phí của mình — làm một lần, máy tự nhớ.</p>
+              </div>
+              <button onClick={onClose} className="text-slate-400 hover:text-slate-700 text-xl leading-none">×</button>
+            </div>
+            <ol className="text-sm space-y-1.5 list-decimal pl-5">
+              <li>Mở <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer" className="text-blue-600 font-semibold underline">aistudio.google.com/apikey</a>, đăng nhập Gmail.</li>
+              <li>Bấm <b>Create API key</b> (Tạo khoá API), rồi <b>Copy</b>.</li>
+              <li>Dán vào ô dưới, bấm <b>Kiểm tra &amp; lưu</b>.</li>
+            </ol>
+            <div className="flex gap-2">
+              <input type={hien ? 'text' : 'password'} value={giaTri} onChange={(e) => setGiaTri(e.target.value)} placeholder="AIza..." className="flex-1 px-3 py-2 text-sm border border-slate-300 rounded-lg font-mono focus:outline-none focus:ring-2 focus:ring-emerald-500" />
+              <button onClick={() => setHien(!hien)} className="px-3 text-xs border border-slate-300 rounded-lg hover:bg-slate-50">{hien ? 'Ẩn' : 'Hiện'}</button>
+            </div>
+            {ketQua && (
+              <div className={`text-sm p-3 rounded-lg border ${ketQua.ok ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 'bg-rose-50 border-rose-200 text-rose-800'}`}>{ketQua.msg}</div>
+            )}
+            <div className="flex flex-wrap gap-2 justify-end">
+              {khoa && <button onClick={xoa} className="px-4 py-2 text-sm rounded-lg border border-rose-200 text-rose-700 hover:bg-rose-50">Xoá khoá</button>}
+              <button onClick={thu} disabled={dangThu} className="px-5 py-2 text-sm rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-semibold disabled:opacity-50">{dangThu ? 'Đang kiểm tra…' : 'Kiểm tra & lưu'}</button>
+            </div>
+            <div className="text-[11px] text-slate-500 bg-slate-50 border border-slate-200 rounded-lg p-3 space-y-1">
+              <p>🔒 Khoá chỉ lưu trong trình duyệt của máy này, gửi thẳng tới Google, web không giữ.</p>
+              <p>⚠️ Bản miễn phí, Google có thể dùng nội dung gửi lên để cải thiện AI: <b>không nhập tên, ngày sinh, thông tin riêng của học sinh</b>.</p>
+              <p>✅ Sản phẩm AI là <b>bản nháp</b> — thầy cô đọc, sửa, duyệt trước khi dùng.</p>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    function AiTrangThai({ coAI, onMo, chuKhiChuaCo }) {
+      return coAI ? (
+        <div className="flex flex-wrap items-center gap-2 text-xs bg-emerald-50 border border-emerald-200 text-emerald-800 px-3 py-2 rounded-lg">
+          <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+          <span><b>AI thật đang bật</b> (Gemini · {window.AI.moHinhDangDung()}). Kết quả là bản nháp — thầy cô duyệt trước khi dùng.</span>
+          <button onClick={onMo} className="ml-auto underline font-semibold">Đổi khoá</button>
+        </div>
+      ) : (
+        <div className="flex flex-wrap items-center gap-2 text-xs bg-amber-50 border border-amber-200 text-amber-800 px-3 py-2 rounded-lg">
+          <span className="w-2 h-2 rounded-full bg-amber-500"></span>
+          <span><b>Chưa bật AI.</b> {chuKhiChuaCo || 'Bấm nút sẽ ra khuôn mẫu có sẵn, chưa theo đúng bài.'}</span>
+          <button onClick={onMo} className="ml-auto bg-amber-500 hover:bg-amber-600 text-white font-semibold px-3 py-1 rounded-md">🔑 Kết nối AI (miễn phí)</button>
+        </div>
+      );
+    }
+
+    function AiNoiDung({ text, className }) {
+      return <div className={'noi-dung-ai ' + (className || '')} dangerouslySetInnerHTML={{ __html: window.AI.md(text) }} />;
+    }
+
     function App() {
       // Nhận diện tham số ?fullscreenApplet=true từ URL để tự động kích hoạt chế độ Toàn Màn Hình Applet
       const [isHdtnFullscreen, setIsHdtnFullscreen] = useState(() => {
@@ -2794,6 +3130,35 @@
       const [isGeneratingAiQuestions, setIsGeneratingAiQuestions] = useState(false);
       const [generatedQuestionsList, setGeneratedQuestionsList] = useState([]);
       const [aiApiKeyInput, setAiApiKeyInput] = useState(() => localStorage.getItem('user_gemini_api_key') || '');
+      const coAI = !!(aiApiKeyInput || '').trim();
+      const [showAiKetNoi, setShowAiKetNoi] = useState(false);
+      const moAiKetNoi = () => setShowAiKetNoi(true);
+      // KHBD 5512
+      const [khbdYeuCau, setKhbdYeuCau] = useState('');
+      const [khbdTep, setKhbdTep] = useState(null);
+      const [khbdNls, setKhbdNls] = useState(true);
+      const [khbdLoi, setKhbdLoi] = useState('');
+      // HĐTN: tệp gửi kèm cho AI đọc
+      const hdtnTepRef = useRef({ sgk: null, cu: null });
+      // PPCT
+      const [ppctBoSach, setPpctBoSach] = useState('Kết nối tri thức với cuộc sống');
+      const [ppctGhiChu, setPpctGhiChu] = useState('');
+      const [ppctCanhBao, setPpctCanhBao] = useState('');
+      // Đề kiểm tra
+      const [deMon, setDeMon] = useState('Công nghệ');
+      const [deLop, setDeLop] = useState('9');
+      const [deKy, setDeKy] = useState('Giữa học kì I');
+      const [deThoiGian, setDeThoiGian] = useState(45);
+      const [deNoiDung, setDeNoiDung] = useState('');
+      const [deTN, setDeTN] = useState(12);
+      const [deDS, setDeDS] = useState(4);
+      const [deTLN, setDeTLN] = useState(0);
+      const [deTL, setDeTL] = useState(2);
+      const [deTiLe, setDeTiLe] = useState('40% Biết – 30% Hiểu – 30% Vận dụng');
+      const [deTep, setDeTep] = useState(null);
+      const [deKetQua, setDeKetQua] = useState(() => { try { return localStorage.getItem('ai_de_gan_nhat') || ''; } catch (e) { return ''; } });
+      const [dangTaoDe, setDangTaoDe] = useState(false);
+      const [deLoi, setDeLoi] = useState('');
       const [copyStatus, setCopyStatus] = useState('');
 
       const [app3dGradeFilter, setApp3dGradeFilter] = useState('ALL');
@@ -3189,6 +3554,7 @@
         if (e.target.files && e.target.files[0]) {
           const file = e.target.files[0];
           setHdtnUploadedFileName(file.name);
+          hdtnTepRef.current.sgk = file.name.endsWith('.txt') ? null : file;
           if (file.name.endsWith('.txt')) {
             const reader = new FileReader();
             reader.onload = (ev) => {
@@ -3207,6 +3573,7 @@
           const file = e.target.files[0];
           setHdtnUploadedFileName(file.name);
           setHdtnCreationMode('edit_old');
+          hdtnTepRef.current.cu = file.name.endsWith('.txt') ? null : file;
           if (file.name.endsWith('.txt')) {
             const reader = new FileReader();
             reader.onload = (ev) => {
@@ -3236,14 +3603,80 @@
       };
 
       // TẠO BÀI DẠY TỔNG HỢP THEO MẪU CHUẨN
-      const handleGenerateHdtnPlan = () => {
+      const handleGenerateHdtnPlan = async () => {
         if (!currentUser) {
           setAuthError('Kính mời Thầy/Cô (và Admin) vui lòng Đăng ký hoặc Đăng nhập để sử dụng tính năng Soạn Kế hoạch bài dạy HĐTN!');
           openLoginModal();
           return;
         }
+        if (!coAI) { handleGenerateHdtnPlanKhuon(); return; }
         setIsGeneratingHdtn(true);
-        showHdtnToast('AI đang phân tích và tổng hợp tiến trình 3 tiết chuẩn THCS Tịnh Biên...');
+        setHdtnToast('AI Gemini đang viết giáo án theo đúng bài (khoảng 30–90 giây), thầy cô chờ chút ạ...');
+        const khuon = synthesizeHdtnPlan(thamSoHdtn());
+        try {
+          const parts = [];
+          const tep = hdtnTepRef.current;
+          if (tep.sgk) parts.push(...await window.AI.docTep(tep.sgk));
+          if (tep.cu) parts.push(...await window.AI.docTep(tep.cu));
+          else if (hdtnCreationMode === 'edit_old' && hdtnOldPlanContent) parts.push({ text: 'Giáo án cũ của thầy cô:\n' + hdtnOldPlanContent });
+          const ghiChu = [
+            hdtnFlagSaluteNotes && ('Ghi chú Tiết 1 (SHDC): ' + hdtnFlagSaluteNotes),
+            hdtnTopicActivityNotes && ('Ghi chú Tiết 2 (HĐGD): ' + hdtnTopicActivityNotes),
+            hdtnClassMeetingNotes && ('Ghi chú Tiết 3 (SHL): ' + hdtnClassMeetingNotes)
+          ].filter(Boolean).join('\n');
+          const boiCanh = `Kế hoạch bài dạy Hoạt động trải nghiệm, hướng nghiệp lớp ${hdtnGrade} (CT GDPT 2018), ${hdtnSchoolName}. ${hdtnTopic}. ${hdtnWeek}. Tên bài: "${hdtnLessonTitle}". Thời lượng: ${hdtnDuration}.` +
+            (ghiChu ? '\nYêu cầu, ghi chú của thầy cô (ưu tiên làm theo):\n' + ghiChu : '') +
+            (parts.length ? '\nBám đúng các hoạt động, nhiệm vụ trong tài liệu SGK/giáo án thầy cô gửi kèm.' : '') +
+            (hdtnCreationMode === 'edit_old' ? '\nĐây là nâng cấp giáo án cũ: giữ cách dạy của thầy cô, chỉ sửa cho đúng bài, đủ ý và rõ hơn.' : '');
+          const TEN = { generalObjectives: 'Mục tiêu chung của chủ đề', flagSalute: 'Tiết 1 – Sinh hoạt dưới cờ tổ chức tại lớp, lớp chia 6 nhóm', topicActivity: 'Tiết 2 – Hoạt động giáo dục theo chủ đề (Khởi động – Khám phá – Luyện tập – Vận dụng)', classMeeting: 'Tiết 3 – Sinh hoạt lớp, có bản cam kết A0' };
+          const phan = ['generalObjectives', ...['flagSalute', 'topicActivity', 'classMeeting'].filter(k => hdtnIncludeActivities[k])];
+          const kq = await Promise.all(phan.map(k => window.AI.vietLaiKhuon(khuon[k], { boiCanh, yeuCau: 'Phần đang viết: ' + TEN[k] + '.', parts })));
+          const ban = JSON.parse(JSON.stringify(khuon));
+          phan.forEach((k, i) => { ban[k] = kq[i]; });
+          ban.nguonAI = window.AI.moHinhDangDung();
+          setCurrentHdtnPlan(ban);
+          setHdtnValidationReport(runHdtnValidation(ban));
+          setHdtnActiveSubTab('VIEWER');
+          showHdtnToast('✅ AI đã soạn xong theo đúng bài. Đây là bản nháp — thầy cô đọc, sửa rồi bấm Lưu.');
+          trackActivity('Soạn KHBD HĐTN bằng AI', `Lớp ${hdtnGrade}: ${hdtnLessonTitle}`);
+        } catch (e) {
+          setCurrentHdtnPlan(khuon);
+          setHdtnValidationReport(runHdtnValidation(khuon));
+          setHdtnActiveSubTab('VIEWER');
+          setHdtnToast('❌ ' + e.message + ' — đang hiện bản khuôn mẫu.');
+          setTimeout(() => setHdtnToast(''), 9000);
+        }
+        setIsGeneratingHdtn(false);
+      };
+
+      const thamSoHdtn = () => ({
+            grade: hdtnGrade,
+            schoolName: hdtnSchoolName,
+            teacherName: hdtnTeacherName,
+            departmentName: hdtnDepartment,
+            schoolYear: hdtnSchoolYear,
+            semester: hdtnSemester,
+            topic: hdtnTopic,
+            week: hdtnWeek,
+            lessonTitle: hdtnLessonTitle,
+            duration: hdtnDuration,
+            nlsActive: hdtnNlsActive,
+            nlsCode: hdtnNlsCode,
+            nlsDesc: hdtnNlsDesc,
+            nlsTargetActivities: hdtnNlsTargetActivities,
+            nlaiActive: hdtnNlaiActive,
+            nlaiCode: hdtnNlaiCode,
+            nlaiDesc: hdtnNlaiDesc,
+            nlaiTargetActivities: hdtnNlaiTargetActivities,
+            flagSaluteNotes: hdtnFlagSaluteNotes,
+            topicActivityNotes: hdtnTopicActivityNotes,
+            classMeetingNotes: hdtnClassMeetingNotes,
+            includeActivities: hdtnIncludeActivities
+      });
+
+      const handleGenerateHdtnPlanKhuon = () => {
+        setIsGeneratingHdtn(true);
+        showHdtnToast('Chưa bật AI — đang dựng giáo án theo khuôn mẫu có sẵn...');
         setTimeout(() => {
           setIsGeneratingHdtn(false);
           const synthesized = synthesizeHdtnPlan({
@@ -3274,7 +3707,7 @@
           const report = runHdtnValidation(synthesized);
           setHdtnValidationReport(report);
           setHdtnActiveSubTab('VIEWER');
-          showHdtnToast('Đã tạo thành công Kế hoạch bài dạy chuẩn GDPT 2018 (Tiết 1: SHDC 6 nhóm, Tiết 2: HĐGD 4 bước 5512, Tiết 3: SHL cam kết A0)!');
+          showHdtnToast('Đã dựng bản KHUÔN MẪU (chưa theo đúng bài). Bấm 🔑 Kết nối AI để AI viết theo bài của thầy cô.');
         }, 1000);
       };
 
@@ -3302,8 +3735,37 @@
       };
 
       // TINH CHỈNH SƯ PHẠM (REFINEMENT ACTIONS)
-      const handleHdtnRefine = (action) => {
+      const HDTN_TINH_CHINH = {
+        deepen: 'Tăng độ sâu sư phạm: câu lệnh của GV rõ ràng, có gợi mở theo mức tăng dần, có hỗ trợ HS còn rụt rè, có cách xử lý tình huống phát sinh.',
+        detail: 'Viết chi tiết hơn từng bước tổ chức: phân vai trong nhóm, thời gian từng việc, câu lệnh nguyên văn của GV, sản phẩm cụ thể của HS.',
+        shorten: 'Rút gọn cho vừa 45 phút: bỏ ý trùng lặp, giữ các bước chính, câu ngắn gọn.',
+        questions: 'Bổ sung hệ thống câu hỏi gợi mở (3–5 câu, từ dễ đến khó) vào các hoạt động khám phá, luyện tập; ghi cả ý trả lời mong đợi.',
+        add_game: 'Thay hoạt động khởi động bằng một trò chơi ngắn (5–7 phút) đúng chủ đề bài, có luật chơi rõ ràng và câu chốt dẫn vào bài.',
+        rubric: 'Bổ sung bảng tiêu chí đánh giá (rubric 3 mức Tốt – Đạt – Chưa đạt) cho sản phẩm của hoạt động luyện tập/vận dụng.',
+        roleplay: 'Bổ sung 1–2 tình huống sắm vai sát thực tế HS lớp này, có câu hỏi thảo luận sau sắm vai.'
+      };
+      const handleHdtnRefine = async (action) => {
         if (!currentHdtnPlan) return;
+        if (coAI && HDTN_TINH_CHINH[action]) {
+          const MAP = { SHDC: 'flagSalute', HDGD: 'topicActivity', SHL: 'classMeeting' };
+          const k = MAP[hdtnActivePeriodTab] || 'topicActivity';
+          if (!currentHdtnPlan[k]) return;
+          setHdtnToast('AI đang chỉnh ' + (k === 'flagSalute' ? 'Tiết 1' : k === 'classMeeting' ? 'Tiết 3' : 'Tiết 2') + ' theo yêu cầu...');
+          try {
+            const p = currentHdtnPlan;
+            const boiCanh = `Kế hoạch bài dạy HĐTN-HN lớp ${p.grade}, ${p.topic}, bài "${p.lessonTitle}".`;
+            const moi = await window.AI.vietLaiKhuon(p[k], { boiCanh, yeuCau: 'Đây là giáo án đã soạn. Yêu cầu chỉnh: ' + HDTN_TINH_CHINH[action] + ' Chỉ sửa những ô cần sửa, ô khác giữ nguyên.' });
+            const ban = JSON.parse(JSON.stringify(p));
+            ban[k] = moi;
+            setCurrentHdtnPlan(ban);
+            setHdtnValidationReport(runHdtnValidation(ban));
+            showHdtnToast('✅ AI đã chỉnh xong — thầy cô xem lại nhé.');
+          } catch (e) {
+            setHdtnToast('❌ ' + e.message);
+            setTimeout(() => setHdtnToast(''), 9000);
+          }
+          return;
+        }
         const updated = JSON.parse(JSON.stringify(currentHdtnPlan));
 
         if (action === 'deepen') {
@@ -3840,12 +4302,48 @@
         { tietPpct: "8", baiHoc: "Kiểm tra đánh giá giữa kỳ I môn Công nghệ", soTiet: 1, thoiDiem: "Tuần 4", thietBi: "Ma trận đề thi, giấy làm bài", diaDiem: "Lớp học", ghiChu: "Kiểm tra 45 phút" }
       ]);
 
-      const handleGeneratePpct = () => {
+      const handleGeneratePpct = async () => {
         if (!currentUser) {
           setAuthError('Kính mời Thầy/Cô (và Admin) vui lòng Đăng ký hoặc Đăng nhập để sử dụng tính năng Tạo PPCT 7 Cột!');
           openLoginModal();
           return;
         }
+        if (!coAI) { handleGeneratePpctKhuon(); setPpctCanhBao('Đây là bảng MẪU minh hoạ (chưa bật AI), chưa theo sách của thầy cô. Bấm 🔑 Kết nối AI để AI lập theo SGK.'); return; }
+        setIsGeneratingPpct(true);
+        setPpctCanhBao('');
+        try {
+          const parts = ppctFile ? await window.AI.docTep(ppctFile) : [];
+          const tong = Number(ppctTotalPeriods) || 35;
+          const prompt = `Lập bảng phân phối chương trình (kế hoạch dạy học theo tiết) môn ${ppctSubject}, ${ppctGrade}, bộ sách "${ppctBoSach || 'chưa rõ'}", tổng ${tong} tiết/năm học, 35 tuần (Học kì I: 18 tuần, Học kì II: 17 tuần), khoảng ${Math.round(tong / 35 * 10) / 10} tiết/tuần.
+${parts.length ? 'Lấy ĐÚNG tên chương, tên bài và thứ tự theo tài liệu SGK/mục lục thầy cô gửi kèm.' : 'Thầy cô chưa gửi SGK: dùng tên bài theo bộ sách đã nêu nếu chắc chắn; chỗ nào không chắc thì ghi "[GV đối chiếu SGK]" ở cột ghi chú.'}
+Yêu cầu riêng của thầy cô: ${ppctGhiChu || '(không có)'}
+Quy tắc:
+- Mỗi dòng là một bài/chủ đề, hoặc một tiết ôn tập, kiểm tra. Bố trí ôn tập và kiểm tra giữa kì I, cuối kì I, giữa kì II, cuối kì II đúng thời điểm trong năm.
+- tietPpct: số thứ tự tiết liên tục từ 1 đến ${tong}, viết "5" hoặc "6-7".
+- soTiet: số nguyên; TỔNG soTiet của cả bảng phải đúng bằng ${tong}.
+- thoiDiem: tuần dạy, viết "Tuần 1" hoặc "Tuần 2-3".
+- thietBi: thiết bị dạy học, học liệu cụ thể của bài. diaDiem: Lớp học / Phòng bộ môn / Phòng thực hành / Sân trường / Thực địa. ghiChu: ngắn gọn (hình thức, lưu ý).`;
+          const schema = { type: 'ARRAY', items: { type: 'OBJECT', properties: {
+            tietPpct: { type: 'STRING' }, baiHoc: { type: 'STRING' }, soTiet: { type: 'INTEGER' }, thoiDiem: { type: 'STRING' },
+            thietBi: { type: 'STRING' }, diaDiem: { type: 'STRING' }, ghiChu: { type: 'STRING' } },
+            required: ['tietPpct', 'baiHoc', 'soTiet', 'thoiDiem', 'thietBi', 'diaDiem', 'ghiChu'] } };
+          const { text } = await window.AI.goi({ prompt, parts, json: true, schema, temperature: 0.3, maxTokens: 32768 });
+          let ds = window.AI.docJSON(text);
+          if (!Array.isArray(ds)) ds = ds.rows || ds.data || [];
+          ds = ds.map(r => ({ ...r, soTiet: Number(r.soTiet) || 0 }));
+          setPpctData(ds);
+          const daXep = ds.reduce((s, r) => s + r.soTiet, 0);
+          setPpctCanhBao(daXep !== tong
+            ? `⚠️ AI xếp tổng ${daXep} tiết, khác ${tong} tiết thầy cô nhập — thầy cô chỉnh lại hoặc bấm tạo lại.`
+            : `✅ Tổng số tiết khớp ${daXep}/${tong}. Đây là bản nháp — thầy cô đối chiếu SGK và kế hoạch của tổ trước khi dùng.`);
+          trackActivity('Tạo PPCT bằng AI', `Môn: ${ppctSubject} - ${ppctGrade} (${tong} tiết)`);
+        } catch (e) {
+          setPpctCanhBao('❌ ' + e.message);
+        }
+        setIsGeneratingPpct(false);
+      };
+
+      const handleGeneratePpctKhuon = () => {
         setIsGeneratingPpct(true);
         setTimeout(() => {
           setIsGeneratingPpct(false);
@@ -3865,6 +4363,16 @@
 
       const handleExportPpctWord = () => {
         if (!ppctData) return;
+        if (window.AI) {
+          const e = (s) => String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;');
+          const than = `<h2>PHÂN PHỐI CHƯƠNG TRÌNH MÔN ${e(ppctSubject).toUpperCase()} – ${e(ppctGrade).toUpperCase()}</h2>` +
+            `<p style="text-align:center">Bộ sách: ${e(ppctBoSach)} · Tổng số: ${e(ppctTotalPeriods)} tiết</p>` +
+            '<table><tr><th>Tiết PPCT</th><th>Bài học / Chủ đề</th><th>Số tiết</th><th>Thời điểm</th><th>Thiết bị dạy học</th><th>Địa điểm</th><th>Ghi chú</th></tr>' +
+            ppctData.map(r => `<tr><td style="text-align:center">${e(r.tietPpct)}</td><td>${e(r.baiHoc)}</td><td style="text-align:center">${e(r.soTiet)}</td><td>${e(r.thoiDiem)}</td><td>${e(r.thietBi)}</td><td>${e(r.diaDiem)}</td><td>${e(r.ghiChu)}</td></tr>`).join('') + '</table>';
+          window.AI.xuatWord('PPCT', than, `PPCT_${ppctSubject}_${ppctGrade}`, true);
+          trackActivity('Xuất file Word PPCT', `Tải về file: PPCT_${ppctSubject}_${ppctGrade}.doc`);
+          return;
+        }
         let content = `BẢNG PHÂN PHỐI CHƯƠNG TRÌNH MÔN ${ppctSubject.toUpperCase()} - ${ppctGrade.toUpperCase()}\n`;
         content += `Tổng số tiết: ${ppctTotalPeriods} tiết / năm học\n\n`;
         content += `Tiết PPCT\tBài học / Chủ đề\tSố tiết\tThời điểm\tThiết bị dạy học\tĐịa điểm\tGhi chú\n`;
@@ -4738,39 +5246,19 @@
 
         if (aiApiKeyInput.trim()) {
           try {
-            const prompt = `Hãy đóng vai một chuyên gia sư phạm hàng đầu. Hãy tạo chính xác ${aiNumQuestions} câu hỏi trắc nghiệm 4 lựa chọn (A, B, C, D) cho môn ${aiSubjectSelect} lớp ${aiGradeSelect}, chủ đề: "${aiTopicInput.trim()}". Câu hỏi dùng cho trò chơi PowerPoint dạy học. Trả về đúng định dạng JSON (mảng các object), không kèm markdown:
-[
-  {
-    "id": 1,
-    "question": "Câu hỏi...",
-    "options": ["A. ...", "B. ...", "C. ...", "D. ..."],
-    "answer": 0,
-    "answerLetter": "A",
-    "level": "Nhận biết",
-    "explain": "Giải thích ngắn..."
-  }
-]`;
-
-            const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${aiApiKeyInput.trim()}`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                contents: [{ parts: [{ text: prompt }] }],
-                generationConfig: { temperature: 0.7, maxOutputTokens: 2500 }
-              })
-            });
-
-            const data = await resp.json();
-            if (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts[0] && data.candidates[0].content.parts[0].text) {
-              let raw = data.candidates[0].content.parts[0].text;
-              raw = raw.replace(/```json/g, '').replace(/```/g, '').trim();
-              const parsed = JSON.parse(raw);
-              setGeneratedQuestionsList(parsed);
-              setIsGeneratingAiQuestions(false);
-              return;
-            }
+            const prompt = `Tạo đúng ${aiNumQuestions} câu hỏi trắc nghiệm 4 lựa chọn cho môn ${aiSubjectSelect} lớp ${aiGradeSelect}, chủ đề: "${aiTopicInput.trim()}". Dùng cho trò chơi PowerPoint trên lớp nên câu hỏi ngắn, rõ, một đáp án đúng duy nhất, phương án nhiễu hợp lý; chia đều các mức Nhận biết, Thông hiểu, Vận dụng.
+Mỗi câu: question (câu hỏi), options (4 chuỗi, có tiền tố "A. ", "B. ", "C. ", "D. "), answer (chỉ số 0–3 của đáp án đúng), answerLetter, level, explain (giải thích 1 câu).`;
+            const schema = { type: 'ARRAY', items: { type: 'OBJECT', properties: {
+              question: { type: 'STRING' }, options: { type: 'ARRAY', items: { type: 'STRING' } }, answer: { type: 'INTEGER' },
+              answerLetter: { type: 'STRING' }, level: { type: 'STRING' }, explain: { type: 'STRING' } },
+              required: ['question', 'options', 'answer', 'answerLetter', 'level', 'explain'] } };
+            const { text } = await window.AI.goi({ prompt, json: true, schema, temperature: 0.7, maxTokens: 12000 });
+            const parsed = window.AI.docJSON(text).map((q, i) => ({ ...q, id: i + 1, answerLetter: ['A', 'B', 'C', 'D'][q.answer] || q.answerLetter }));
+            setGeneratedQuestionsList(parsed);
+            setIsGeneratingAiQuestions(false);
+            return;
           } catch (err) {
-            console.warn('Fallback sang Smart Offline:', err);
+            alert('AI chưa tạo được: ' + err.message + '\nEm tạm hiện bộ câu hỏi mẫu (chưa theo đúng bài).');
           }
         }
 
@@ -4808,12 +5296,60 @@
         });
       };
 
-      const handleGenerateLesson = () => {
+      const handleGenerateLesson = async () => {
         if (!currentUser) {
           setAuthError('Kính mời Thầy/Cô (và Admin) vui lòng Đăng ký hoặc Đăng nhập để sử dụng tính năng Soạn KHBD 5512!');
           openLoginModal();
           return;
         }
+        if (!coAI) { handleGenerateLessonKhuon(); return; }
+        setIsGenerating(true);
+        setGeneratedStreamText('');
+        setKhbdLoi('');
+        try {
+          const parts = khbdTep ? await window.AI.docTep(khbdTep) : [];
+          const phut = Number(periodsSelect) * 45;
+          const prompt = `Soạn KẾ HOẠCH BÀI DẠY theo Phụ lục IV Công văn 5512/BGDĐT-GDTrH.
+Môn: ${subjectSelect}. Lớp: ${gradeSelect}. Tên bài: "${topicInput}". Thời lượng: ${periodsSelect} tiết (${phut} phút).
+${parts.length ? 'Bám đúng nội dung, hoạt động, câu hỏi, bài tập trong tài liệu SGK/SGV thầy cô gửi kèm.' : 'Thầy cô chưa gửi SGK: viết theo yêu cầu cần đạt của CT GDPT 2018; ở chỗ cần đối chiếu (hình, số liệu, bài tập trong sách) ghi [GV kiểm tra lại theo SGK].'}
+${khbdNls ? 'Tích hợp năng lực số và năng lực AI vào 1–3 hoạt động phù hợp: mỗi chỗ tích hợp viết thành MỘT DÒNG RIÊNG bắt đầu bằng [NLS] (năng lực số) hoặc [NLAI] (năng lực trí tuệ nhân tạo), nêu rõ việc HS làm.' : 'Không cần tích hợp năng lực số.'}
+Yêu cầu riêng của thầy cô: ${khbdYeuCau || '(không có)'}
+
+Trình bày Markdown, đúng thứ tự:
+# KẾ HOẠCH BÀI DẠY — tên bài in hoa; dòng dưới: Môn, Lớp, Thời lượng.
+## I. MỤC TIÊU — 1. Kiến thức (động từ đo được, theo yêu cầu cần đạt); 2. Năng lực (a) Năng lực chung; b) Năng lực đặc thù của môn); 3. Phẩm chất.
+## II. THIẾT BỊ DẠY HỌC VÀ HỌC LIỆU — 1. Giáo viên; 2. Học sinh.
+## III. TIẾN TRÌNH DẠY HỌC
+### Hoạt động 1: Mở đầu (… phút)
+### Hoạt động 2: Hình thành kiến thức mới (… phút) — chia 2.1, 2.2… theo các mục của bài
+### Hoạt động 3: Luyện tập (… phút)
+### Hoạt động 4: Vận dụng (… phút)
+Mỗi hoạt động có: **a) Mục tiêu**, **b) Nội dung**, **c) Sản phẩm** (ghi rõ đáp án, kết quả mong đợi), **d) Tổ chức thực hiện** trình bày bằng bảng Markdown 2 cột | Hoạt động của GV và HS | Sản phẩm dự kiến | gồm 4 bước: Bước 1. Chuyển giao nhiệm vụ; Bước 2. Thực hiện nhiệm vụ; Bước 3. Báo cáo, thảo luận; Bước 4. Kết luận, nhận định. Trong ô bảng xuống dòng bằng <br>.
+Nếu nhiều tiết, ghi rõ **TIẾT 1**, **TIẾT 2**… trước các hoạt động của tiết đó. Tổng thời gian đúng ${phut} phút.
+## IV. PHỤ LỤC — phiếu học tập, câu hỏi luyện tập có đáp án, tiêu chí đánh giá (nếu có).`;
+          const { text, cut, model } = await window.AI.goi({ prompt, parts, onChunk: setGeneratedStreamText, temperature: 0.6, maxTokens: 32768 });
+          const noiDung = text + (cut ? '\n\n> AI dừng giữa chừng vì bài quá dài — thầy cô bấm tạo lại, hoặc giảm số tiết.' : '');
+          const newLesson = {
+            id: Date.now().toString(),
+            title: `KHBD: ${topicInput}`,
+            gradeLevel: Number(gradeSelect),
+            subjectModule: subjectSelect,
+            topicName: topicInput,
+            durationPeriods: Number(periodsSelect),
+            contentMarkdown: noiDung,
+            nguonAI: model,
+            createdAt: new Date().toISOString().slice(0, 16).replace('T', ' ')
+          };
+          setLessons(prev => [newLesson, ...prev]);
+          setSelectedLesson(newLesson);
+          trackActivity('Soạn KHBD 5512 bằng AI', `${subjectSelect} ${gradeSelect}: ${topicInput}`);
+        } catch (e) {
+          setKhbdLoi(e.message);
+        }
+        setIsGenerating(false);
+      };
+
+      const handleGenerateLessonKhuon = () => {
         setIsGenerating(true);
         setGeneratedStreamText('');
 
@@ -4849,11 +5385,57 @@
         }, 60);
       };
 
+      const handleTaoDe = async () => {
+        if (!currentUser) {
+          setAuthError('Kính mời Thầy/Cô vui lòng Đăng ký hoặc Đăng nhập để sử dụng tính năng Ra đề kiểm tra!');
+          openLoginModal();
+          return;
+        }
+        if (!coAI) { moAiKetNoi(); return; }
+        if (!deNoiDung.trim() && !deTep) { setDeLoi('Thầy cô ghi nội dung kiểm tra (các bài, chủ đề) hoặc gửi tệp SGK/đề cương trước ạ.'); return; }
+        setDangTaoDe(true); setDeLoi(''); setDeKetQua('');
+        try {
+          const parts = deTep ? await window.AI.docTep(deTep) : [];
+          const phanDe = [
+            deTN > 0 && `Phần I – Trắc nghiệm nhiều lựa chọn: ${deTN} câu (4 phương án A, B, C, D, một đáp án đúng)`,
+            deDS > 0 && `Phần II – Trắc nghiệm đúng/sai: ${deDS} câu, mỗi câu có 4 ý a), b), c), d)`,
+            deTLN > 0 && `Phần III – Trắc nghiệm trả lời ngắn: ${deTLN} câu`,
+            deTL > 0 && `Phần ${deTLN > 0 ? 'IV' : 'III'} – Tự luận: ${deTL} câu`
+          ].filter(Boolean).join('\n');
+          const prompt = `Soạn trọn bộ đề kiểm tra ${deKy}, môn ${deMon}, lớp ${deLop}, thời gian làm bài ${deThoiGian} phút, theo định hướng Công văn 7991/BGDĐT-GDTrH.
+Nội dung kiểm tra: ${deNoiDung || '(theo tài liệu gửi kèm)'}
+${parts.length ? 'Câu hỏi phải bám đúng kiến thức trong tài liệu thầy cô gửi kèm.' : ''}
+Cấu trúc đề:
+${phanDe}
+Tỉ lệ mức độ: ${deTiLe}. Tổng 10 điểm; phân bổ điểm hợp lý và ghi rõ điểm từng phần, từng câu.
+
+Trình bày Markdown, đủ 4 phần, đúng thứ tự:
+## 1. MA TRẬN ĐỀ KIỂM TRA — bảng: TT | Chủ đề/Bài | số câu từng phần theo mức Biết / Hiểu / Vận dụng | Tổng số câu | Tỉ lệ %; có dòng tổng.
+## 2. BẢN ĐẶC TẢ ĐỀ KIỂM TRA — bảng: TT | Chủ đề/Bài | Mức độ | Yêu cầu cần đạt | Số câu và số thứ tự câu ở từng phần.
+## 3. ĐỀ KIỂM TRA — dòng đầu: tên kì kiểm tra, môn, lớp, thời gian; rồi từng phần, từng câu; mỗi phương án A, B, C, D trên một dòng riêng.
+## 4. ĐÁP ÁN VÀ HƯỚNG DẪN CHẤM — bảng đáp án trắc nghiệm; bảng đúng/sai từng ý; tự luận có các ý chấm và điểm từng ý.
+Yêu cầu: đáp án chính xác, không trùng ý giữa các câu, phương án nhiễu hợp lý, mức Vận dụng gắn tình huống thực tế. Không dùng tên thật học sinh.`;
+          const { text, cut } = await window.AI.goi({ prompt, parts, onChunk: setDeKetQua, temperature: 0.5, maxTokens: 32768 });
+          const kq = text + (cut ? '\n\n> AI dừng giữa chừng vì đề quá dài — thầy cô giảm số câu rồi tạo lại.' : '');
+          setDeKetQua(kq);
+          try { localStorage.setItem('ai_de_gan_nhat', kq); } catch (e) {}
+          trackActivity('Ra đề kiểm tra bằng AI', `${deKy} ${deMon} ${deLop}`);
+        } catch (e) {
+          setDeLoi(e.message);
+        }
+        setDangTaoDe(false);
+      };
+
       // Export Word Function
       const exportToWord = (plan) => {
         if (!currentUser) {
           setAuthError('Kính mời Thầy/Cô (và Admin) vui lòng Đăng ký hoặc Đăng nhập để tải file Word giáo án!');
           openLoginModal();
+          return;
+        }
+        if (window.AI) {
+          window.AI.xuatWord(plan.title, window.AI.md(plan.contentMarkdown), plan.title.replace(/\s+/g, '_'));
+          trackActivity('Xuất file Word KHBD 5512', `Tải về file: ${plan.title}.doc`);
           return;
         }
         const textContent = `TRƯỜNG THCS / THPT CHUYÊN\nTỔ MÔN: CÔNG NGHỆ - HƯỚNG NGHIỆP\n\n${plan.contentMarkdown}`;
@@ -4884,11 +5466,11 @@
                 h1 { text-align: center; font-size: 18pt; text-transform: uppercase; color: #059669; }
                 h2 { font-size: 14pt; color: #0891b2; border-bottom: 2px solid #059669; padding-bottom: 4px; }
                 pre { font-family: 'Times New Roman', serif; white-space: pre-wrap; font-size: 13pt; }
+                table { border-collapse: collapse; width: 100%; } td, th { border: 1px solid #000; padding: 4px 6px; vertical-align: top; }
               </style>
             </head>
             ` + '<' + `body>
-              <h1>KẾ HOẠCH BÀI DẠY (CÔNG VĂN 5512)</h1>
-              <pre>${plan.contentMarkdown}</pre>
+              ${window.AI ? window.AI.md(plan.contentMarkdown) : '<pre>' + plan.contentMarkdown + '</pre>'}
             ` + '<' + '/body>\n<' + '/html>');
         win.document.close();
         win.onload = function() { win.print(); };
@@ -4897,6 +5479,7 @@
 
       return (
         <div className="flex flex-col min-h-screen">
+          <AiKetNoiModal open={showAiKetNoi} onClose={() => setShowAiKetNoi(false)} khoa={aiApiKeyInput} onLuu={(k) => setAiApiKeyInput(k)} />
           {/* TOP NAVBAR - SCIENTIFIC SLATE STYLE */}
           <header className={isHdtnFullscreen && activeTab === 'HDTN_TEMPLATE_GENERATOR' ? "hidden" : "bg-slate-900 text-white border-b border-slate-800 sticky top-0 z-50 shadow-md"}>
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
@@ -4922,10 +5505,10 @@
 
               {/* Status Indicators representing Architecture Diagram & User Profile */}
               <div className="hidden md:flex items-center space-x-4 text-xs text-slate-300">
-                <div className="flex items-center gap-1.5 bg-slate-800 px-3 py-1.5 rounded-md border border-slate-700">
-                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                  <span>Vercel Edge CDN</span>
-                </div>
+                <button type="button" onClick={moAiKetNoi} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md border ${coAI ? 'bg-emerald-900/60 border-emerald-600 text-emerald-200' : 'bg-amber-500 border-amber-400 text-white font-semibold'}`}>
+                  <span className={`w-2 h-2 rounded-full ${coAI ? 'bg-emerald-400 animate-pulse' : 'bg-white'}`}></span>
+                  <span>{coAI ? 'AI Gemini: đã bật' : '🔑 Kết nối AI'}</span>
+                </button>
                 <div className="flex items-center gap-1.5 bg-slate-800 px-3 py-1.5 rounded-md border border-slate-700">
                   <i data-lucide="shield-check" className="w-4 h-4 text-cyan-400"></i>
                   <span>Supabase Auth</span>
@@ -6182,7 +6765,9 @@
                         <div className="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-slate-100">
                           <div className="flex items-center gap-2 text-xs text-slate-500">
                             <i data-lucide="shield-check" className="w-4 h-4 text-emerald-600"></i>
-                            <span>Đạt chuẩn 100% Thông tư 02/2024 & Công văn 5512/BGDĐT-GDTrH.</span>
+                            {coAI
+                              ? <span className="text-emerald-700 font-semibold">AI Gemini viết theo đúng bài (đọc cả SGK, giáo án cũ nếu thầy cô tải lên) — bản nháp, thầy cô duyệt.</span>
+                              : <span className="text-amber-700">Chưa bật AI: nút này chỉ dựng khuôn mẫu. <button type="button" onClick={moAiKetNoi} className="underline font-bold">🔑 Kết nối AI</button></span>}
                           </div>
                           <div className="flex items-center gap-2">
                             <button
@@ -7085,8 +7670,8 @@
                           <p className="text-xs text-slate-500">Tự động hóa 100% cấu trúc 4 hoạt động dạy học chuẩn GDPT 2018</p>
                         </div>
                       </div>
-                      <span className="text-xs bg-cyan-50 text-cyan-700 font-medium px-2.5 py-1 rounded-full border border-cyan-200">
-                        Model: Gemini 1.5 Flash API
+                      <span className={`text-xs font-medium px-2.5 py-1 rounded-full border ${coAI ? 'bg-cyan-50 text-cyan-700 border-cyan-200' : 'bg-amber-50 text-amber-700 border-amber-200'}`}>
+                        {coAI ? 'AI thật: ' + window.AI.moHinhDangDung() : 'Chưa bật AI'}
                       </span>
                     </div>
 
@@ -7103,14 +7688,15 @@
                       </div>
                       <div>
                         <label className="block text-xs font-semibold text-slate-700 mb-1">Phân môn học</label>
-                        <select
+                        <input
                           value={subjectSelect}
                           onChange={(e) => setSubjectSelect(e.target.value)}
+                          list="ds-mon-hoc"
                           className="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white"
-                        >
-                          <option value="Công nghệ">Công nghệ</option>
-                          <option value="Hoạt động trải nghiệm, hướng nghiệp">HDTN, Hướng nghiệp</option>
-                        </select>
+                        />
+                        <datalist id="ds-mon-hoc">
+                          {['Công nghệ', 'Hoạt động trải nghiệm, hướng nghiệp', 'Toán', 'Ngữ văn', 'Tiếng Anh', 'Khoa học tự nhiên', 'Vật lí', 'Hoá học', 'Sinh học', 'Lịch sử và Địa lí', 'Lịch sử', 'Địa lí', 'Giáo dục công dân', 'Giáo dục kinh tế và pháp luật', 'Tin học', 'Giáo dục thể chất', 'Âm nhạc', 'Mĩ thuật', 'Giáo dục địa phương', 'Giáo dục quốc phòng và an ninh'].map(m => <option key={m} value={m} />)}
+                        </datalist>
                       </div>
                       <div className="grid grid-cols-2 gap-2">
                         <div>
@@ -7135,6 +7721,27 @@
                         </div>
                       </div>
                     </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                      <div className="md:col-span-2">
+                        <label className="block text-xs font-semibold text-slate-700 mb-1">Yêu cầu riêng (không bắt buộc)</label>
+                        <textarea value={khbdYeuCau} onChange={(e) => setKhbdYeuCau(e.target.value)} rows={2} placeholder="VD: lớp đông 42 HS, có tivi; dạy theo trạm; thêm trò chơi khởi động; HS yếu cần phiếu gợi ý..." className="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white" />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-semibold text-slate-700 mb-1">Trang SGK/SGV của bài (khuyên dùng)</label>
+                        <label className="w-full px-3 py-2 text-xs bg-slate-100 hover:bg-slate-200 border border-slate-300 rounded-lg flex items-center justify-between cursor-pointer">
+                          <span className="truncate">{khbdTep ? khbdTep.name : 'Chọn PDF, Word, ảnh chụp trang...'}</span><span>📎</span>
+                          <input type="file" className="hidden" accept=".pdf,.docx,.pptx,.txt,.png,.jpg,.jpeg" onChange={(e) => setKhbdTep(e.target.files && e.target.files[0] ? e.target.files[0] : null)} />
+                        </label>
+                        {khbdTep && <button type="button" onClick={() => setKhbdTep(null)} className="text-[11px] text-rose-600 underline mt-1">Bỏ tệp</button>}
+                      </div>
+                      <label className="flex items-center gap-2 text-xs font-semibold text-slate-700 cursor-pointer select-none md:pt-6">
+                        <input type="checkbox" checked={khbdNls} onChange={(e) => setKhbdNls(e.target.checked)} className="w-4 h-4 accent-emerald-600" />
+                        <span>Tích hợp <span className="text-rose-600">NLS (đỏ)</span> &amp; <span className="text-blue-600">NL AI (xanh)</span></span>
+                      </label>
+                    </div>
+                    <AiTrangThai coAI={coAI} onMo={moAiKetNoi} chuKhiChuaCo="Nút tạo chỉ ra một giáo án mẫu cố định (nhà kính), chưa theo bài của thầy cô." />
+                    {khbdLoi && <div className="text-sm px-3 py-2 rounded-lg border bg-rose-50 border-rose-200 text-rose-800">❌ {khbdLoi}</div>}
 
                     <div className="flex justify-end pt-2">
                       <button
@@ -7192,10 +7799,10 @@
                         <div className="space-y-4">
                           <div className="flex items-center gap-2 text-emerald-600 font-semibold text-sm">
                             <i data-lucide="sparkles" className="w-4 h-4 animate-spin"></i>
-                            <span>AI Assistants Controller đang khởi tạo luồng câu lệnh...</span>
+                            <span>{coAI ? 'AI Gemini đang viết giáo án (chữ hiện dần, 1–2 phút)...' : 'Đang dựng giáo án mẫu...'}</span>
                           </div>
-                          <div className="bg-slate-900 text-slate-200 p-4 rounded-lg font-mono text-xs max-h-[500px] overflow-y-auto custom-scrollbar whitespace-pre-wrap border border-slate-800">
-                            {generatedStreamText}
+                          <div className="bg-slate-50 p-4 rounded-lg max-h-[550px] overflow-y-auto custom-scrollbar border border-slate-200">
+                            {generatedStreamText ? <AiNoiDung text={generatedStreamText} /> : <p className="text-xs text-slate-500">Đang gửi yêu cầu{khbdTep ? ' và tệp ' + khbdTep.name : ''} tới Gemini...</p>}
                           </div>
                         </div>
                       ) : selectedLesson ? (
@@ -7226,7 +7833,8 @@
                           </div>
 
                           <div className="bg-slate-50 p-6 rounded-lg border border-slate-200 max-h-[550px] overflow-y-auto custom-scrollbar markdown-preview text-sm leading-relaxed">
-                            <pre className="font-sans text-slate-800 bg-transparent p-0 text-sm whitespace-pre-wrap">{selectedLesson.contentMarkdown}</pre>
+                            {selectedLesson.nguonAI && <p className="text-[11px] text-emerald-700 bg-emerald-50 border border-emerald-200 rounded px-2 py-1 mb-3">✅ BẢN NHÁP do AI ({selectedLesson.nguonAI}) soạn — thầy cô đọc, sửa, duyệt trước khi dùng.</p>}
+                            <AiNoiDung text={selectedLesson.contentMarkdown} />
                           </div>
                         </div>
                       ) : null}
@@ -7246,10 +7854,59 @@
                       </h2>
                       <p className="text-xs text-slate-500">Tự động phân loại 4 cấp độ tư duy: Nhận biết, Thông hiểu, Vận dụng, Vận dụng cao</p>
                     </div>
-                    <button className="bg-cyan-600 hover:bg-cyan-700 text-white text-xs font-semibold px-4 py-2 rounded-lg flex items-center gap-2">
+                    <button onClick={() => { const el = document.getElementById('khung-ra-de'); if (el) el.scrollIntoView({ behavior: 'smooth' }); }} className="bg-cyan-600 hover:bg-cyan-700 text-white text-xs font-semibold px-4 py-2 rounded-lg flex items-center gap-2">
                       <i data-lucide="plus" className="w-4 h-4"></i>
                       <span>Tạo Đề Kiểm Tra Mới</span>
                     </button>
+                  </div>
+
+                  {/* ====== RA ĐỀ BẰNG AI (thêm 23/11/2026) ====== */}
+                  <div id="khung-ra-de" className="border border-cyan-200 bg-cyan-50/40 rounded-xl p-5 space-y-4">
+                    <h3 className="font-bold text-sm text-cyan-900">🧩 Ra đề kiểm tra bằng AI — ma trận, bản đặc tả, đề, hướng dẫn chấm</h3>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                      <div><label className="block text-xs font-semibold text-slate-700 mb-1">Môn</label>
+                        <input value={deMon} onChange={(e) => setDeMon(e.target.value)} list="ds-mon-hoc" className="w-full px-3 py-2 text-sm bg-white border border-slate-200 rounded-lg" /></div>
+                      <div><label className="block text-xs font-semibold text-slate-700 mb-1">Lớp</label>
+                        <select value={deLop} onChange={(e) => setDeLop(e.target.value)} className="w-full px-3 py-2 text-sm bg-white border border-slate-200 rounded-lg">{['6','7','8','9','10','11','12'].map(g => <option key={g} value={g}>Lớp {g}</option>)}</select></div>
+                      <div><label className="block text-xs font-semibold text-slate-700 mb-1">Kì kiểm tra</label>
+                        <select value={deKy} onChange={(e) => setDeKy(e.target.value)} className="w-full px-3 py-2 text-sm bg-white border border-slate-200 rounded-lg">{['Giữa học kì I','Cuối học kì I','Giữa học kì II','Cuối học kì II','Kiểm tra thường xuyên (15 phút)'].map(k => <option key={k}>{k}</option>)}</select></div>
+                      <div><label className="block text-xs font-semibold text-slate-700 mb-1">Thời gian (phút)</label>
+                        <select value={deThoiGian} onChange={(e) => setDeThoiGian(Number(e.target.value))} className="w-full px-3 py-2 text-sm bg-white border border-slate-200 rounded-lg">{[15,45,60,90].map(t => <option key={t} value={t}>{t} phút</option>)}</select></div>
+                    </div>
+                    <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+                      {[['TN nhiều lựa chọn', deTN, setDeTN], ['TN đúng/sai', deDS, setDeDS], ['TN trả lời ngắn', deTLN, setDeTLN], ['Tự luận', deTL, setDeTL]].map(([ten, gt, dat]) => (
+                        <div key={ten}><label className="block text-xs font-semibold text-slate-700 mb-1">{ten} (câu)</label>
+                          <input type="number" min="0" max="40" value={gt} onChange={(e) => dat(Math.max(0, Number(e.target.value) || 0))} className="w-full px-3 py-2 text-sm bg-white border border-slate-200 rounded-lg" /></div>
+                      ))}
+                      <div><label className="block text-xs font-semibold text-slate-700 mb-1">Tỉ lệ mức độ</label>
+                        <input value={deTiLe} onChange={(e) => setDeTiLe(e.target.value)} className="w-full px-3 py-2 text-sm bg-white border border-slate-200 rounded-lg" /></div>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                      <div className="md:col-span-2"><label className="block text-xs font-semibold text-slate-700 mb-1">Nội dung kiểm tra *</label>
+                        <textarea value={deNoiDung} onChange={(e) => setDeNoiDung(e.target.value)} rows={3} placeholder="VD: Bài 1 Giới thiệu chung về cây ăn quả (2 tiết); Bài 2 Nhân giống vô tính cây ăn quả (4 tiết); ..." className="w-full px-3 py-2 text-sm bg-white border border-slate-200 rounded-lg" /></div>
+                      <div><label className="block text-xs font-semibold text-slate-700 mb-1">Tệp SGK / đề cương (không bắt buộc)</label>
+                        <label className="w-full px-3 py-2 text-xs bg-white hover:bg-slate-50 border border-slate-300 rounded-lg flex items-center justify-between cursor-pointer">
+                          <span className="truncate">{deTep ? deTep.name : 'Chọn PDF, Word, ảnh...'}</span><span>📎</span>
+                          <input type="file" className="hidden" accept=".pdf,.docx,.pptx,.txt,.png,.jpg,.jpeg" onChange={(e) => setDeTep(e.target.files && e.target.files[0] ? e.target.files[0] : null)} />
+                        </label>
+                        {deTep && <button type="button" onClick={() => setDeTep(null)} className="text-[11px] text-rose-600 underline mt-1">Bỏ tệp</button>}
+                      </div>
+                    </div>
+                    <AiTrangThai coAI={coAI} onMo={moAiKetNoi} chuKhiChuaCo="Phần ra đề cần AI mới chạy được." />
+                    {deLoi && <div className="text-sm px-3 py-2 rounded-lg border bg-rose-50 border-rose-200 text-rose-800">❌ {deLoi}</div>}
+                    <div className="flex flex-wrap justify-end gap-2">
+                      {deKetQua && !dangTaoDe && (<>
+                        <button onClick={() => navigator.clipboard.writeText(deKetQua)} className="bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 text-xs font-semibold px-4 py-2 rounded-lg">Sao chép</button>
+                        <button onClick={() => window.AI.xuatWord('De kiem tra', window.AI.md(deKetQua), `De_${deKy}_${deMon}_${deLop}`)} className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold px-4 py-2 rounded-lg">Xuất Word (.doc)</button>
+                      </>)}
+                      <button onClick={handleTaoDe} disabled={dangTaoDe} className="bg-cyan-600 hover:bg-cyan-700 text-white text-sm font-semibold px-5 py-2 rounded-lg disabled:opacity-50">{dangTaoDe ? 'AI đang ra đề (1–2 phút)...' : '✨ Ra đề bằng AI'}</button>
+                    </div>
+                    {deKetQua && (
+                      <div className="bg-white border border-slate-200 rounded-lg p-5 max-h-[700px] overflow-y-auto custom-scrollbar">
+                        {!dangTaoDe && <p className="text-[11px] text-emerald-700 bg-emerald-50 border border-emerald-200 rounded px-2 py-1 mb-3">✅ BẢN NHÁP do AI soạn — thầy cô kiểm tra đáp án, ma trận trước khi dùng.</p>}
+                        <AiNoiDung text={deKetQua} />
+                      </div>
+                    )}
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -8776,7 +9433,7 @@ CREATE TABLE IF NOT EXISTS public.materials (
                         <div className="relative">
                           <input
                             type="file"
-                            accept=".pdf,.doc,.docx"
+                            accept=".pdf,.docx,.pptx,.txt,.png,.jpg,.jpeg"
                             onChange={(e) => setPpctFile(e.target.files ? e.target.files[0] : null)}
                             className="hidden"
                             id="ppct-file-upload-input"
@@ -8792,10 +9449,24 @@ CREATE TABLE IF NOT EXISTS public.materials (
                       </div>
                     </div>
 
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div>
+                        <label className="block text-xs font-semibold text-slate-700 mb-1">Bộ sách</label>
+                        <input value={ppctBoSach} onChange={(e) => setPpctBoSach(e.target.value)} list="ds-bo-sach" className="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                        <datalist id="ds-bo-sach"><option value="Kết nối tri thức với cuộc sống" /><option value="Chân trời sáng tạo" /><option value="Cánh Diều" /></datalist>
+                      </div>
+                      <div className="md:col-span-2">
+                        <label className="block text-xs font-semibold text-slate-700 mb-1">Yêu cầu riêng / dán mục lục SGK (không bắt buộc)</label>
+                        <textarea value={ppctGhiChu} onChange={(e) => setPpctGhiChu(e.target.value)} rows={2} placeholder="VD: HK I 18 tiết, HK II 17 tiết; kiểm tra giữa kì tuần 9; dán mục lục các bài..." className="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                      </div>
+                    </div>
+                    <AiTrangThai coAI={coAI} onMo={moAiKetNoi} chuKhiChuaCo="Nút tạo chỉ ra bảng mẫu minh hoạ, chưa theo sách của thầy cô." />
+                    {ppctCanhBao && <div className={`text-sm px-3 py-2 rounded-lg border ${ppctCanhBao.startsWith('✅') ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 'bg-rose-50 border-rose-200 text-rose-800'}`}>{ppctCanhBao}</div>}
+
                     <div className="flex items-center justify-between pt-2 border-t border-slate-100">
                       <div className="text-xs text-blue-700 bg-blue-50 px-3 py-1.5 rounded-lg border border-blue-200 flex items-center gap-1.5">
                         <i data-lucide="info" className="w-4 h-4 shrink-0"></i>
-                        <span>AI sẽ tự động đọc file SGK và phân bổ số tiết khớp 100% với tổng {ppctTotalPeriods} tiết đã nhập.</span>
+                        <span>{coAI ? `AI đọc tệp SGK (PDF, Word .docx, ảnh mục lục) rồi chia ${ppctTotalPeriods} tiết; em tự cộng lại để báo nếu lệch.` : 'Chưa bật AI: nút này chỉ ra bảng mẫu minh hoạ.'}</span>
                       </div>
                       <button
                         onClick={handleGeneratePpct}
@@ -9127,18 +9798,11 @@ CREATE TABLE IF NOT EXISTS public.materials (
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-2 border-t border-slate-200/80 text-[11px] text-slate-500">
                       <div className="flex items-center gap-1.5">
                         <i data-lucide="key" className="w-3.5 h-3.5 text-amber-500"></i>
-                        <span>Gemini API Key (Tùy chọn):</span>
-                        <input
-                          type="password"
-                          placeholder="Dán API Key nếu có..."
-                          value={aiApiKeyInput}
-                          onChange={(e) => handleSaveApiKey(e.target.value)}
-                          className="text-xs border border-slate-200 rounded px-2 py-0.5 bg-white w-40 focus:outline-none focus:ring-1 focus:ring-purple-500"
-                        />
+                        <span>AI Gemini:</span>
+                        <button type="button" onClick={moAiKetNoi} className="text-xs border border-slate-300 rounded px-2 py-0.5 bg-white hover:bg-slate-50 font-semibold">{coAI ? 'Đã kết nối · Đổi khoá' : '🔑 Kết nối AI (miễn phí)'}</button>
                       </div>
-                      <span className="text-[10px] text-emerald-600 font-medium flex items-center gap-1">
-                        <i data-lucide="check-circle" className="w-3 h-3"></i>
-                        Sẵn sàng tạo câu hỏi thông minh (Có hỗ trợ Offline)
+                      <span className={`text-[10px] font-medium flex items-center gap-1 ${coAI ? 'text-emerald-600' : 'text-amber-600'}`}>
+                        {coAI ? 'AI thật sẽ soạn câu hỏi theo đúng chủ đề' : 'Chưa bật AI: chỉ ra 8 câu mẫu chung chung'}
                       </span>
                     </div>
 
