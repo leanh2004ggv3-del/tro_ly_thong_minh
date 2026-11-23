@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Trợ lý soạn giáo án PowerPoint — Tổ trưởng số</title>
+<!--CSS-->
+<style>
+.mo{color:var(--mo)} .nho2{font-size:13px} .do{color:#dc2626}
+.buoc{display:flex;gap:10px;align-items:center;margin:0 0 12px;flex-wrap:wrap}
+.buoc .so{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:800;flex:none;background:linear-gradient(135deg,#ea580c,#db2777);box-shadow:0 6px 12px -6px rgba(219,39,119,.7)}
+.buoc b{font-size:18px} .buoc .phai{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
+section.the{margin-bottom:18px;scroll-margin-top:84px}
+#thanhBuoc{position:sticky;top:0;z-index:20;display:flex;gap:6px;flex-wrap:wrap;background:rgba(248,250,252,.88);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);padding:8px;border-radius:16px;border:1px solid var(--vien);margin-bottom:16px;box-shadow:var(--bong)}
+#thanhBuoc a{flex:1 1 150px;display:flex;gap:8px;align-items:center;text-decoration:none;color:var(--chu2);font-weight:600;font-size:14px;padding:7px 10px;border-radius:12px;background:#fff;border:1.5px solid #e2e8f0;transition:.15s}
+#thanhBuoc a:hover{border-color:#ea580c;transform:translateY(-1px)}
+#thanhBuoc a i{font-style:normal;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;background:#e2e8f0;color:#475569;font-size:13px;flex:none}
+#thanhBuoc a.xong{border-color:#86efac;background:#f0fdf4;color:#166534}
+#thanhBuoc a.xong i{background:#16a34a;color:#fff}
+#oTha{border:2.5px dashed #fdba74;border-radius:16px;padding:20px 16px;text-align:center;cursor:pointer;background:rgba(255,247,237,.8);transition:.15s}
+#oTha:hover,#oTha.keo{background:#ffedd5;border-color:#ea580c;transform:scale(1.01)}
+details.hop{background:#f8fafc;border-radius:12px;padding:8px 12px;margin-top:8px}
+details.hop summary{cursor:pointer;font-weight:700;font-size:14.5px}
+.tep{display:flex;gap:8px;align-items:center;background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:7px 10px;margin-top:6px;font-size:14px}
+.tep b{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.kho-anh{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:8px;margin-top:8px}
+.kho-anh .o-a{position:relative;border:2px solid #e2e8f0;border-radius:10px;overflow:hidden;background:#fff;cursor:pointer;aspect-ratio:4/3;padding:0}
+.kho-anh .o-a img{width:100%;height:100%;object-fit:contain;display:block}
+.kho-anh .o-a span{position:absolute;left:4px;top:4px;background:rgba(15,23,42,.7);color:#fff;font-size:11px;border-radius:6px;padding:0 5px}
+.kho-anh .o-a.chon{border-color:#ea580c;box-shadow:0 0 0 3px #fed7aa}
+.kho-anh .o-a:hover{border-color:#fb923c}
+/* danh sách slide */
+#viec{display:grid;grid-template-columns:250px minmax(0,1fr);gap:16px;align-items:start}
+#dsSlide{display:flex;flex-direction:column;gap:8px;max-height:78vh;overflow:auto;padding:4px}
+.the-sl{display:flex;gap:8px;align-items:flex-start;border:2px solid transparent;border-radius:12px;padding:6px;background:#fff;cursor:pointer;box-shadow:0 2px 6px rgba(15,23,42,.06);text-align:left;font:inherit;color:inherit}
+.the-sl.chon{border-color:#ea580c;background:#fff7ed}
+.the-sl .stt{font-weight:800;color:#ea580c;width:22px;flex:none;font-size:14px}
+.the-sl .nho{flex:1;min-width:0}
+.the-sl .ten{font-size:12.5px;font-weight:600;color:var(--chu2);margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.the-sl .canh{font-size:11.5px;color:#b45309}
+.tr-sl{position:relative;overflow:hidden;font-family:"Times New Roman",Times,serif;color:#1e293b;flex:none;border-radius:4px;box-shadow:0 1px 4px rgba(15,23,42,.25)}
+.tr-k{position:absolute;display:flex;flex-direction:column;box-sizing:border-box;overflow:hidden}
+.tr-k p{margin:0;overflow-wrap:break-word}
+.tr-k b.dam{color:var(--dam)}
+.tr-a{position:absolute;box-sizing:border-box;background:#fff}
+.tr-dau{display:inline-block}
+.tr-k sup,.tr-k sub{line-height:0;font-size:.7em}
+#soSlide{display:grid;gap:12px}
+.sua{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px;align-items:start}
+.sua textarea{font-family:Consolas,"Cascadia Mono",monospace;font-size:14px}
+.chip-a{display:inline-flex;gap:6px;align-items:center;border:1.5px solid #fed7aa;background:#fff;border-radius:10px;padding:3px 6px 3px 3px;margin:4px 6px 0 0;font-size:12.5px}
+.chip-a img{width:54px;height:40px;object-fit:cover;border-radius:6px}
+.chip-a button{border:0;background:#fee2e2;color:#b91c1c;border-radius:6px;cursor:pointer;font-weight:700;width:22px;height:22px}
+.xem-lon{display:flex;flex-direction:column;gap:10px;align-items:flex-start}
+.loi-ct{background:#fef2f2;color:#991b1b;border-radius:10px;padding:6px 10px;font-size:13px;margin-top:6px}
+.nut-sl{display:flex;gap:6px;flex-wrap:wrap}
+.nut-sl .nut{min-height:36px;padding:6px 10px;font-size:13.5px}
+/* bảng màu */
+.mau-chon{display:flex;gap:10px;flex-wrap:wrap}
+.mau-chon button{border:2.5px solid #e2e8f0;border-radius:14px;padding:6px;background:#fff;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;font:600 12.5px var(--font);color:var(--chu2);width:96px}
+.mau-chon button i{display:block;width:80px;height:46px;border-radius:9px}
+.mau-chon button.chon{border-color:#ea580c;box-shadow:0 0 0 3px #fed7aa}
+#luoiXem{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
+#luoiXem .o{display:flex;flex-direction:column;gap:4px;font-size:12.5px;color:var(--chu2)}
+.kiem{display:flex;gap:8px;align-items:flex-start;padding:6px 10px;border-radius:10px;margin-top:6px;font-size:14px}
+.kiem.ok{background:#f0fdf4;color:#166534} .kiem.loi{background:#fef2f2;color:#991b1b} .kiem.nhe{background:#fffbeb;color:#92400e}
+/* hộp chọn ảnh */
+#hopAnh{position:fixed;inset:0;background:rgba(15,23,42,.5);z-index:50;display:none;align-items:center;justify-content:center;padding:14px}
+#hopAnh.mo{display:flex}
+#hopAnh .khung-hop{background:#fff;border-radius:20px;max-width:980px;width:100%;max-height:92vh;overflow:auto;padding:16px;box-shadow:0 30px 60px -20px rgba(0,0,0,.5)}
+.tab-a{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0 12px}
+.tab-a button{border:1.5px solid #fed7aa;background:#fff;border-radius:12px;padding:7px 12px;font:700 14px var(--font);color:#c2410c;cursor:pointer}
+.tab-a button.chon{background:linear-gradient(135deg,#ea580c,#db2777);color:#fff;border-color:transparent}
+#vungCat{position:relative;display:inline-block;cursor:crosshair;user-select:none;max-width:100%}
+#vungCat canvas{max-width:100%;display:block;border:1px solid #e2e8f0}
+#oCat{position:absolute;border:2.5px solid #ea580c;background:rgba(234,88,12,.12);display:none;pointer-events:none}
+.trang-pdf{display:flex;gap:8px;overflow-x:auto;padding:4px 0}
+.trang-pdf button{flex:none;border:2px solid #e2e8f0;border-radius:8px;background:#fff;cursor:pointer;padding:2px;font-size:12px}
+.trang-pdf button.chon{border-color:#ea580c}
+.trang-pdf img{display:block;height:110px}
+@media (max-width:900px){#viec{grid-template-columns:1fr}#dsSlide{flex-direction:row;overflow-x:auto;max-height:none}.the-sl{flex:0 0 200px}.sua{grid-template-columns:1fr}}
+@media (max-width:640px){#thanhBuoc a{flex:1 1 44%;font-size:13px}}
+.goiy code{background:#fff;border:1px solid #e2e8f0;border-radius:6px;padding:0 4px;font-size:12px;color:#9a3412}
+.ct{font-family:"Times New Roman",Times,serif;white-space:nowrap}
+.ct-f{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;margin:0 2px;line-height:1.15}
+.ct-f>span:first-child{border-bottom:1px solid currentColor;padding:0 2px}
+.ct-f>span{font-size:.92em}
+.ct-r{white-space:nowrap}.ct-r sup{font-size:.6em;margin-right:-4px;vertical-align:.9em}
+.ct-rr{border-top:1px solid currentColor;padding:0 1px}
+.ct-he{display:inline-flex;align-items:center;vertical-align:middle}
+.ct-ng{font-size:2.1em;line-height:1;margin-right:2px;font-weight:300}
+.ct-dong{display:inline-flex;flex-direction:column;line-height:1.3}
+.ct-acc{position:relative;display:inline-block}
+.ct-acc::before{content:attr(data-c);position:absolute;left:0;right:0;top:-.75em;text-align:center;font-size:.8em;line-height:1}
+.ct-mui{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;line-height:1;margin:0 3px}
+.ct-mui small{font-size:.7em}
+.ct-n{font-size:1.3em;vertical-align:-.1em}
+</style>
+</head>
+<body>
+<div class="khung">
+<header class="dau">
+  <svg class="logo noi" viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="lgp" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ea580c"/><stop offset="1" stop-color="#db2777"/></linearGradient></defs>
+    <rect x="4" y="8" width="50" height="36" rx="6" fill="url(#lgp)"/><rect x="10" y="14" width="20" height="4" rx="2" fill="#fff"/><rect x="10" y="22" width="16" height="3" rx="1.5" fill="#fff" opacity=".8"/><rect x="10" y="29" width="18" height="3" rx="1.5" fill="#fff" opacity=".8"/>
+    <rect x="33" y="14" width="15" height="18" rx="3" fill="#fff" opacity=".9"/><path d="M35 29l4-6 3 4 2-2 3 4z" fill="#f59e0b"/><path d="M29 44v8M21 56h16" stroke="#475569" stroke-width="3" stroke-linecap="round"/>
+    <circle cx="52" cy="48" r="11" fill="#16a34a"/><text x="52" y="53" text-anchor="middle" font-size="13" font-weight="800" fill="#fff" font-family="Times New Roman">∑</text></svg>
+  <div><h1>TRỢ LÝ SOẠN GIÁO ÁN POWERPOINT</h1><p>Nạp giáo án, SGK → dàn slide → mỗi slide có ảnh minh hoạ → tải <b>PowerPoint</b> Times New Roman, chữ từ <b>cỡ 24</b>, công thức Toán – KHTN không lỗi</p></div>
+  <div class="phai"><button class="nut phu nho" id="bSaoLuu">💾 Sao lưu</button><button class="nut phu nho" id="bNhap">📂 Nhập lại</button><button class="nut phu nho" id="bMoi">✨ Bài mới</button><button class="nut xanh" id="bXuat">📥 Tải PowerPoint</button></div>
+</header>
+
+<nav id="thanhBuoc" aria-label="Các bước">
+  <a href="#b1"><i>1</i>Nạp nội dung</a><a href="#b2"><i>2</i>Dàn slide</a><a href="#b3"><i>3</i>Sửa slide &amp; ảnh</a><a href="#b4"><i>4</i>Màu sắc &amp; tải về</a>
+</nav>
+
+<section class="the" id="b1">
+  <div class="buoc"><span class="so">1</span><b>Thông tin bài &amp; nội dung cần làm PowerPoint</b><span class="phai"><button class="nut phu nho" id="bMauToan">🧪 Thử bài Toán</button><button class="nut phu nho" id="bMauKhtn">🧪 Thử bài KHTN</button></span></div>
+  <div class="luoi l4">
+    <label class="o">Môn<input data-tt="mon" list="dsMon" placeholder="VD: Toán"></label>
+    <label class="o">Lớp<input data-tt="lop" placeholder="VD: 9"></label>
+    <label class="o" style="grid-column:span 2">Tên bài<input data-tt="bai" placeholder="VD: Bài 3. Công thức nghiệm của phương trình bậc hai"></label>
+    <label class="o">Bộ sách<input data-tt="boSach" list="dsSach" placeholder="VD: Kết nối tri thức"></label>
+    <label class="o">Giáo viên (in ở bìa, có thể bỏ trống)<input data-tt="gv" placeholder="Họ tên"></label>
+    <label class="o" style="grid-column:span 2">Trường (có thể bỏ trống)<input data-tt="truong" placeholder="TRƯỜNG THCS …"></label>
+  </div>
+  <datalist id="dsMon"><option>Toán</option><option>Khoa học tự nhiên</option><option>Vật lí</option><option>Hoá học</option><option>Sinh học</option><option>Công nghệ</option><option>Tin học</option><option>Ngữ văn</option><option>Lịch sử và Địa lí</option><option>Lịch sử</option><option>Địa lí</option><option>Giáo dục công dân</option><option>Tiếng Anh</option><option>Hoạt động trải nghiệm, hướng nghiệp</option></datalist>
+  <datalist id="dsSach"><option>Kết nối tri thức với cuộc sống</option><option>Chân trời sáng tạo</option><option>Cánh Diều</option></datalist>
+  <div class="luoi l2" style="margin-top:12px">
+    <div>
+      <div id="oTha" tabindex="0" role="button" aria-label="Chọn file giáo án, SGK">
+        <svg width="96" height="58" viewBox="0 0 96 58" aria-hidden="true"><rect x="2" y="6" width="28" height="38" rx="5" fill="#2563eb"/><text x="16" y="31" text-anchor="middle" font-size="13" font-weight="800" fill="#fff" font-family="Segoe UI,Arial">W</text><rect x="34" y="6" width="28" height="38" rx="5" fill="#dc2626"/><text x="48" y="30" text-anchor="middle" font-size="10" font-weight="800" fill="#fff" font-family="Segoe UI,Arial">PDF</text><rect x="66" y="6" width="28" height="38" rx="5" fill="#16a34a"/><path d="M70 36l7-10 5 6 4-4 6 8z" fill="#fff"/><circle cx="86" cy="15" r="3" fill="#fde68a"/><path d="M48 46v10M42 51l6 6 6-6" stroke="#ea580c" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <div style="font-weight:700;margin-top:4px">Kéo thả giáo án, trang SGK, ảnh vào đây — hoặc bấm để chọn</div>
+        <div class="mo nho2">Word (.docx), PDF, ảnh (PNG, JPG) · chọn nhiều file một lúc · app lấy <b>chữ, công thức và hình</b> trong file</div>
+      </div>
+      <input type="file" id="chonFile" multiple accept=".docx,.pdf,.txt,image/*,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document" hidden>
+      <div id="dsTep"></div>
+      <details class="hop"><summary>Không có file? Dán chữ vào đây</summary>
+        <textarea id="oDanChu" rows="6" style="margin-top:6px" placeholder="Dán giáo án hoặc nội dung bài học…&#10;Công thức viết giữa hai dấu $, VD $x^2$, $\frac{a}{b}$, $H_2O$"></textarea>
+        <button class="nut phu nho" id="bDanChu" style="margin-top:6px">⬇ Thêm nội dung đã dán</button></details>
+      <div class="goiy"><svg width="28" height="28" viewBox="0 0 40 40"><circle cx="20" cy="20" r="18" fill="#16a34a"/><path d="M20 9l9 4v7c0 6-4 10-9 12-5-2-9-6-9-12v-7z" fill="#fff"/></svg>
+        <div class="nho2">File chỉ được đọc <b>ngay trong trình duyệt máy này</b>, không tải lên mạng (PDF cần mạng một lần để nạp bộ đọc). Không đưa danh sách, ảnh có mặt học sinh khi chưa được phép.</div></div>
+    </div>
+    <div>
+      <div class="hang" style="align-items:center"><b style="flex:0 0 auto">🖼 Ảnh lấy được từ tài liệu</b><span class="nhan" style="flex:0 0 auto;background:#ffedd5;color:#9a3412" id="soAnh">0 ảnh</span></div>
+      <div class="kho-anh" id="khoAnh1"></div>
+      <div class="mo nho2" id="ghiAnh" style="margin-top:6px">Ảnh trong Word, PDF được lấy ra tự động và gắn vào đúng slide. Hình vẽ dạng nét trong PDF: ở bước 3 bấm <b>Cắt từ trang PDF</b> để khoanh vùng lấy hình.</div>
+      <details class="hop"><summary>Xem chữ app đọc được (<span id="soDong">0</span> dòng)</summary><textarea id="oChu" rows="8" style="margin-top:6px;font-size:13px"></textarea><div class="mo nho2">Sửa trực tiếp được; bấm «App tự dàn slide» để dàn lại.</div></details>
+    </div>
+  </div>
+</section>
+
+<section class="the" id="b2">
+  <div class="buoc"><span class="so">2</span><b>Dàn ý slide</b><span class="mo nho2">— chọn một trong hai cách</span></div>
+  <div class="luoi l2">
+    <div class="goiy" style="flex-direction:column">
+      <b>⚡ Cách 1 — App tự dàn (nhanh, không cần mạng)</b>
+      <div class="nho2">App nhận khung giáo án (Hoạt động, a) Mục tiêu, b) Nội dung, c) Sản phẩm, d) Tổ chức) hoặc mục SGK (1., 2., Ví dụ, Luyện tập…): mỗi hoạt động một slide chuyển, phần nội dung – kết luận thành slide, câu trắc nghiệm thành slide A-B-C-D, phần tổ chức thực hiện đưa vào <b>ghi chú lời giảng</b>.</div>
+      <div class="hang"><label class="o" style="flex:0 0 220px">Nếu đã có slide<select id="cheDo"><option value="thay">Thay toàn bộ</option><option value="them">Thêm vào cuối</option></select></label><button class="nut cam" id="bTuDan">⚡ App tự dàn slide</button></div>
+    </div>
+    <div class="goiy" style="flex-direction:column;background:linear-gradient(135deg,#f5f3ff,#fdf2f8)">
+      <b>🤖 Cách 2 — Nhờ AI soạn (hay hơn, cần ChatGPT / Gemini / Copilot)</b>
+      <div class="nho2">Bấm <b>Chép câu lệnh</b> → dán vào AI → chép toàn bộ câu trả lời dán vào ô dưới → <b>Đọc vào slide</b>. AI có thể sai: <b>thầy cô duyệt kiến thức</b>.</div>
+      <div class="hang"><label class="o" style="flex:0 0 130px">Số slide<input id="soSlideAI" value="12–18"></label><button class="nut" id="bLenh">📋 Chép câu lệnh cho AI</button></div>
+      <textarea id="oDanAI" rows="4" placeholder="=== SLIDE | nd | Tiêu đề&#10;- ý 1&#10;ẢNH: …&#10;GHI CHÚ: …"></textarea>
+      <div class="hang"><button class="nut xanh" id="bDocAI">⬇ Đọc vào slide</button><span id="kqAI" class="nho2" style="flex:1 1 200px"></span></div>
+    </div>
+  </div>
+</section>
+
+<section class="the" id="b3">
+  <div class="buoc"><span class="so">3</span><b>Sửa từng slide &amp; ảnh minh hoạ</b><span class="nhan" style="background:#ffedd5;color:#9a3412" id="demSl">0 slide</span><span class="phai"><button class="nut phu nho" id="bThemSl">＋ Thêm slide</button><button class="nut phu nho" id="bAnhTuDong" title="Slide nào chưa có ảnh thì app tự chọn ảnh">🪄 Tự gắn ảnh còn thiếu</button></span></div>
+  <div id="viec">
+    <div id="dsSlide" aria-label="Danh sách slide"></div>
+    <div id="soSlide"></div>
+  </div>
+  <div class="goiy" style="margin-top:12px"><svg width="30" height="30" viewBox="0 0 40 40"><circle cx="20" cy="20" r="18" fill="#ea580c"/><text x="20" y="27" text-anchor="middle" font-size="19" font-weight="800" fill="#fff" font-family="Times New Roman">∑</text></svg>
+    <div class="nho2"><b>Cách gõ nội dung:</b> mỗi dòng một ý · <code>- ý</code> gạch đầu dòng · <code>  - ý con</code> (2 dấu cách) · <code>**từ khoá**</code> chữ đậm màu · câu hỏi trắc nghiệm: dòng <code>A. …</code> <code>B. …</code> (chọn loại «Câu hỏi»).<br>
+    <b>Công thức</b> viết giữa hai dấu $: <code>$x^2$</code> <code>$\frac{a}{b}$</code> <code>$\sqrt{x+1}$</code> <code>$\Delta = b^2-4ac$</code> <code>$H_2SO_4$</code> <code>$Fe^{3+}$</code> <code>$2H_2+O_2 \xrightarrow{t^\circ} 2H_2O$</code> <code>$\widehat{ABC}=60^\circ$</code>. Công thức đơn giản (mũ, chỉ số, hoá học) in bằng chữ Times New Roman; phân số, căn, hệ… thành <b>Equation thật của PowerPoint</b> (Office luôn vẽ Equation bằng phông Cambria Math), sửa được bằng công cụ Equation.</div></div>
+</section>
+
+<section class="the" id="b4">
+  <div class="buoc"><span class="so">4</span><b>Màu sắc, kiểm tra &amp; tải PowerPoint</b><span class="phai"><button class="nut xanh" id="bXuat2">📥 Tải PowerPoint (.pptx)</button></span></div>
+  <div class="luoi l2" style="grid-template-columns:minmax(0,1fr) 340px;align-items:start">
+    <div>
+      <b class="nho2">Bảng màu</b>
+      <div class="mau-chon" id="dsMau" style="margin:6px 0 12px"></div>
+      <div class="hang">
+        <label class="o">Cỡ chữ nội dung<select id="coChu"><option value="32">32 (rất to)</option><option value="28">28 (nên dùng)</option><option value="26">26</option><option value="24">24 (nhỏ nhất)</option></select></label>
+        <label class="o">Chuyển slide<select id="hieuUng"><option value="1">Hiệu ứng mờ dần</option><option value="0">Không hiệu ứng</option></select></label>
+        <label class="o">Ghi chú lời giảng<select id="coGhiChu"><option value="1">Đưa vào phần Notes</option><option value="0">Không đưa</option></select></label>
+      </div>
+      <div style="margin-top:12px" id="luoiXem"></div>
+    </div>
+    <div>
+      <b class="nho2">Máy soát trước khi tải</b>
+      <div id="dsKiem"></div>
+      <div class="mo nho2" style="margin-top:8px">Khổ 16:9 · <b>Times New Roman</b> cho mọi chữ · chữ nội dung <b>từ 24 trở lên</b>, tiêu đề 28–48 · nội dung dài app <b>tự tách sang slide «(tiếp)»</b>, không thu nhỏ chữ dưới 24 · mỗi slide ít nhất 1 ảnh.</div>
+    </div>
+  </div>
+</section>
+
+<div id="hopAnh" role="dialog" aria-modal="true" aria-label="Chọn ảnh minh hoạ">
+  <div class="khung-hop">
+    <div class="hang" style="align-items:center"><b style="flex:1 1 auto;font-size:18px">🖼 Chọn ảnh cho slide <span id="hopSo"></span></b><button class="nut phu nho" id="bDongHop" style="flex:0 0 auto">✕ Đóng</button></div>
+    <div class="tab-a" id="tabAnh"><button data-t="tl" class="chon">📄 Ảnh từ tài liệu</button><button data-t="cat">✂️ Cắt từ trang PDF</button><button data-t="tai">⬆ Tải lên / dán ảnh</button><button data-t="tao">🎨 Tự tạo ảnh</button><button data-t="ai">🤖 Nhờ AI vẽ</button></div>
+    <div id="tabNoi"></div>
+  </div>
+</div>
+<!--CHAN-->
+</div>
+<script>
+<!--NHUNG:tich-hop/jszip.min.js-->
+</script>
+<!--JS-->
+<script>
+<!--NHUNG:soan-de/cong_thuc.js-->
+<!--NHUNG:soan-de/doc_file.js-->
+<!--NHUNG:soan-ppt/pptx_viet.js-->
+<!--NHUNG:soan-ppt/bo_cuc.js-->
+<!--NHUNG:soan-ppt/anh_tao.js-->
+<!--NHUNG:soan-ppt/doc_nguon.js-->
+<!--NHUNG:soan-ppt/soan_slide.js-->
+<!--NHUNG:soan-ppt/mau_ppt.js-->
+<!--NHUNG:soan-ppt/giao_dien.js-->
+</script>
+</body>
+</html>

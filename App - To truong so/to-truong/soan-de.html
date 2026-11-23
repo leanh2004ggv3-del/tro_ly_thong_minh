@@ -999,7 +999,7 @@ const DF = (() => {
       await napThuVien("https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js");
       pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
     }
-    const pdf = await pdfjsLib.getDocument({ data: buf }).promise, dong = [];
+    const pdf = await pdfjsLib.getDocument({ data: buf.slice ? buf.slice(0) : buf }).promise, dong = [], trangDong = [];
     for (let n = 1; n <= pdf.numPages; n++) {
       const pg = await pdf.getPage(n), tc = await pg.getTextContent();
       const it = tc.items.filter(v => v.str && v.str.trim()).map(v => ({ s: v.str, x: v.transform[4], y: v.transform[5], h: Math.abs(v.transform[3]) || 10, w: v.width }));
@@ -1009,11 +1009,11 @@ const DF = (() => {
       cum.forEach(c => {
         c.ds.sort((p, q) => p.x - q.x); let s = "", x2 = null;
         c.ds.forEach(v => { if (x2 != null && v.x - x2 > c.h * .15 && !/\s$/.test(s) && !/^\s/.test(v.s)) s += " "; s += v.s; x2 = v.x + v.w; });
-        s = gon(s); if (s) dong.push(s);
+        s = gon(s); if (s) { dong.push(s); trangDong.push(n); }
       });
     }
     if (!dong.length) throw new Error("File PDF này là bản quét (ảnh), app chưa đọc được chữ. Thầy cô dùng file Word, hoặc dán chữ vào ô bên dưới ạ.");
-    return { dong, trang: pdf.numPages };
+    return { dong, trang: pdf.numPages, trangDong };
   }
 
   /* ---- nhận ra bài / chủ đề ---- */
@@ -1065,7 +1065,7 @@ const DF = (() => {
     if (/\.(txt|md)$/i.test(file.name)) { const d = new TextDecoder().decode(buf).split(/\r?\n/).map(gon).filter(Boolean); return { cd: tach(d, ten), dong: d.length, kieu: "chữ" }; }
     throw new Error("App nhận file Word (.docx) hoặc PDF. File .doc cũ: mở bằng Word → Lưu thành .docx.");
   }
-  return { doc, tach, loaiYc, gon };
+  return { doc, tach, loaiYc, gon, docDocx, docPdf, tex, napThuVien };
 })();
 
 /* App «Trợ lý soạn đề kiểm tra theo CV 7991» — bộ Tổ trưởng số. Mọi thứ chạy trong trình duyệt. */
