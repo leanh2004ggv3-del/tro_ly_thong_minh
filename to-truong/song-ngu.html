@@ -156,6 +156,20 @@ details.hop summary{cursor:pointer;font-weight:700;font-size:14.5px}
 .w.sang{background:#fde68a}
 .w.dung{color:#15803d}.w.sai{color:#dc2626;text-decoration:underline wavy #fca5a5}
 #cauTuDo{margin-top:8px}
+.chedo{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:0 0 16px}
+.chedo button{display:flex;gap:12px;align-items:center;text-align:left;border:2px solid #bfdbfe;background:rgba(255,255,255,.8);border-radius:16px;padding:12px 14px;cursor:pointer;font:15px var(--font);color:var(--chu);transition:.15s;min-height:64px}
+.chedo button:hover{transform:translateY(-2px);border-color:#60a5fa}
+.chedo button.chon{border-color:var(--xanh);background:linear-gradient(135deg,#eff6ff,#ecfeff);box-shadow:0 8px 20px -10px rgba(0,112,192,.6)}
+.chedo .bt{font-size:28px;line-height:1;flex:none}
+.chedo b{display:block;font-size:16px}.chedo button.chon b{color:var(--xanh)}
+.chedo small{display:block;color:var(--chu2);font-size:13px}
+.che-doc .chi-soan{display:none!important}
+.che-doc .luoi.l2{grid-template-columns:1fr}
+.tu-bang td,.tu-bang th{padding:5px 8px}
+.tu-bang tr.thieu td{background:#fff7ed}
+button.chip{font:13.5px var(--font);min-height:32px;color:var(--chu)}
+button.chip:hover{border-color:#60a5fa;background:#eff6ff}
+@media (max-width:640px){.chedo{grid-template-columns:1fr}}
 @media (max-width:640px){.a4{padding:14px}.cau{flex-direction:column;align-items:stretch}.cau .nut-doc{justify-content:flex-start}.cau .en{font-size:17px}}
 </style>
 </head>
@@ -166,8 +180,13 @@ details.hop summary{cursor:pointer;font-weight:700;font-size:14.5px}
     <rect x="6" y="6" width="52" height="46" rx="10" fill="url(#lg)"/><text x="19" y="35" font-size="13" font-weight="800" fill="#fff" font-family="Segoe UI,Arial" text-anchor="middle">VN</text><text x="45" y="35" font-size="13" font-weight="800" fill="#fff" font-family="Segoe UI,Arial" text-anchor="middle">EN</text>
     <path d="M24 52l-6 9 12-9z" fill="#0070c0"/><circle cx="52" cy="50" r="10" fill="#16a34a"/><path d="M48 46v8l7-4z" fill="#fff"/></svg>
   <div><h1>SONG NGỮ VIỆT – ANH CHO GIÁO ÁN</h1><p>Mọi môn · giữ nguyên giáo án cũ, chỉ thêm <b style="color:#0070c0">tiếng Anh chữ xanh</b> · đọc mẫu chuẩn, lặp lại chậm dần để thầy cô nghe và đọc theo</p></div>
-  <div class="phai"><button class="nut xanh" id="bWord">📝 Xuất Word</button></div>
+  <div class="phai chi-soan"><button class="nut xanh" id="bWord">📝 Xuất Word</button></div>
 </header>
+
+<div class="chedo" role="tablist" aria-label="Chọn việc">
+  <button data-chedo="soan" role="tab"><span class="bt">✍️</span><span><b>Soạn song ngữ vào giáo án</b><small>Thêm tiếng Anh chữ xanh vào giáo án cũ, xuất Word</small></span></button>
+  <button data-chedo="doc" role="tab"><span class="bt">🔊</span><span><b>Chỉ đọc song ngữ</b><small>Giáo án đã có tiếng Anh — không soạn lại, chỉ nghe mẫu và luyện đọc</small></span></button>
+</div>
 
 <div class="luoi l2" style="margin-bottom:16px">
   <div class="the">
@@ -182,13 +201,13 @@ details.hop summary{cursor:pointer;font-weight:700;font-size:14.5px}
     <div class="hang" style="margin-top:10px">
       <label class="o" style="flex:1 1 170px">Môn<select id="chonMon"></select></label>
       <label class="o" style="flex:0 1 100px">Lớp<select id="chonLop"><option value="">—</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option></select></label>
-      <label class="o" style="flex:0 1 150px">Màu chữ tiếng Anh<select id="chonMau"><option value="xanh">Xanh dương</option><option value="la">Xanh lá cây</option></select></label>
+      <label class="o chi-soan" style="flex:0 1 150px">Màu chữ tiếng Anh<select id="chonMau"><option value="xanh">Xanh dương</option><option value="la">Xanh lá cây</option></select></label>
     </div>
-    <label class="o" style="margin-top:8px">Tên bài bằng tiếng Anh (không bắt buộc)<input id="tenEn" placeholder="VD: Adding fractions · Longan planting and care techniques"></label>
+    <label class="o chi-soan" style="margin-top:8px">Tên bài bằng tiếng Anh (không bắt buộc)<input id="tenEn" placeholder="VD: Adding fractions · Longan planting and care techniques"></label>
     <div class="goiy" style="margin-top:10px"><svg width="28" height="28" viewBox="0 0 40 40"><circle cx="20" cy="20" r="18" fill="#16a34a"/><path d="M20 9l9 4v7c0 6-4 10-9 12-5-2-9-6-9-12v-7z" fill="#fff"/></svg>
       <div class="nho2">File chỉ được đọc <b>ngay trong trình duyệt máy này</b>, không tải lên mạng. Giáo án có tên học sinh thì thay bằng mã trước khi đưa vào.</div></div>
   </div>
-  <div class="the">
+  <div class="the chi-soan">
     <div class="buoc"><span class="so">2</span><b>Khung giáo án app nhận ra · chọn phần song ngữ</b></div>
     <div id="khungGa"></div>
     <div class="hang" style="margin-top:8px">
@@ -199,7 +218,8 @@ details.hop summary{cursor:pointer;font-weight:700;font-size:14.5px}
       <label><input type="checkbox" data-che="ten"><span><b>Tên bài</b><small>Dòng tiếng Anh dưới tên bài: Lesson 4: …</small></span></label>
       <label><input type="checkbox" data-che="khung"><span><b>Đề mục khung</b><small>I. MỤC TIÊU (OBJECTIVES), Bước 1 (Step 1: Assigning tasks)…</small></span></label>
       <label><input type="checkbox" data-che="lenh"><span><b>Lời GV trên lớp</b><small>Classroom English cuối từng bước, chọn theo việc trong giáo án</small></span></label>
-      <label><input type="checkbox" data-che="tu"><span><b>Từ vựng trọng tâm</b><small>Cuối phần Mục tiêu: thuật ngữ môn học Anh – Việt</small></span></label>
+      <label><input type="checkbox" data-che="long"><span><b>Lồng ghép từ vào câu</b><small>Thêm (English) ngay sau từ thầy cô điền ở bước 3: phân số (fraction)</small></span></label>
+      <label><input type="checkbox" data-che="tu"><span><b>Từ vựng trọng tâm</b><small>Cuối phần Mục tiêu: bảng các từ ở bước 3</small></span></label>
       <label><input type="checkbox" data-che="dich"><span><b>Câu dịch</b><small>Dòng tiếng Anh dưới đoạn được chọn (bước 4)</small></span></label>
     </div>
   </div>
@@ -207,13 +227,15 @@ details.hop summary{cursor:pointer;font-weight:700;font-size:14.5px}
 
 <div class="luoi l2" style="margin-bottom:16px">
   <div class="the">
-    <div class="buoc"><span class="so">3</span><b>Từ vựng trọng tâm</b><span class="nhan n-tt">đã chọn <span id="soTu">0</span></span></div>
-    <div class="mo nho2">App dò trong giáo án các thuật ngữ có trong từ điển (13 nhóm môn, hơn 600 thuật ngữ). Tick để đưa vào giáo án; bấm 🔊 để nghe.</div>
-    <div id="dsTu"></div>
-    <div id="dsTuTay"></div>
-    <button class="nut phu nho" id="bThemTu">＋ Thêm từ của thầy cô</button>
+    <div class="buoc"><span class="so" id="soBuocTu">3</span><b id="tenBuocTu">Từ cần lồng ghép song ngữ</b><span class="nhan n-tt"><span id="soTu">0</span> từ có tiếng Anh</span></div>
+    <label class="o">Gõ hoặc dán các từ — mỗi dòng một từ: <span style="font-weight:500">tiếng Việt = English</span>
+      <textarea id="oTuNhap" rows="6" placeholder="phân số = fraction&#10;mẫu số = denominator&#10;tử số          ← bỏ trống English: app tự tra từ điển&#10;photosynthesis ← chỉ gõ tiếng Anh cũng được"></textarea></label>
+    <div class="mo nho2" style="margin:4px 0 6px">Dán được cả danh sách từ Excel/Word (cột Việt – cột Anh). Bấm 🔊 để nghe từng từ.</div>
+    <div id="dsTuNhap"></div>
+    <div class="hang chi-soan" style="margin-top:8px"><label class="o" style="flex:1 1 260px">Thêm (English) sau từ trong giáo án<select id="chonLong"><option value="dau">ở lần đầu từ xuất hiện</option><option value="moi">ở mọi chỗ từ xuất hiện</option></select></label></div>
+    <details class="hop" open><summary>💡 Gợi ý: thuật ngữ có trong giáo án (<span id="soGoiY">0</span>) — bấm để thêm</summary><div id="dsTu" style="margin-top:6px"></div></details>
   </div>
-  <div class="the">
+  <div class="the chi-soan">
     <div class="buoc"><span class="so">4</span><b>Câu dịch</b><span class="nhan n-tt">chọn <span id="soChon">0</span> · đã dịch <span id="soDich">0</span></span></div>
     <div id="locDich">
       <div class="loc"><button data-g="ten">＋ Tên bài, tên HĐ</button><button data-g="mt">＋ Mục tiêu</button><button data-g="abc">＋ a) b) c)</button><button data-g="giao">＋ Giao nhiệm vụ</button><button data-g="chot">＋ Kiến thức chốt</button><button data-g="hoi">＋ Câu hỏi</button><button data-g="tat">Chọn hết</button><button data-g="bo">Bỏ chọn</button></div>
@@ -230,7 +252,7 @@ details.hop summary{cursor:pointer;font-weight:700;font-size:14.5px}
   </div>
 </div>
 
-<div class="the" style="margin-bottom:16px">
+<div class="the chi-soan" style="margin-bottom:16px">
   <div class="buoc"><span class="so">5</span><b>Xem trước và xuất Word</b>
     <span style="margin-left:auto;display:flex;gap:10px;align-items:center;flex-wrap:wrap">
       <label class="tick nho2" style="display:flex;gap:6px;align-items:center"><input type="checkbox" id="chiQuanh" checked> Chỉ hiện quanh chỗ thêm</label>
@@ -243,7 +265,7 @@ details.hop summary{cursor:pointer;font-weight:700;font-size:14.5px}
 </div>
 
 <div class="the doc">
-  <div class="buoc"><span class="so">6</span><b>🔊 Luyện đọc song ngữ — nghe mẫu, đọc theo</b>
+  <div class="buoc"><span class="so" id="soBuocDoc">6</span><b>🔊 Luyện đọc song ngữ — nghe mẫu, đọc theo</b>
     <span style="margin-left:auto;display:flex;gap:8px;flex-wrap:wrap"><button class="nut" id="bDocHet">▶ Đọc cả danh sách</button><button class="nut do" id="bDung">⏹ Dừng</button></span></div>
   <div class="cai">
     <label class="o">Giọng chuẩn<select id="d_vung"><option value="en-US">Anh – Mỹ (en-US)</option><option value="en-GB">Anh – Anh (en-GB)</option></select></label>
@@ -912,9 +934,10 @@ const LENH_MO_HD = { kd: ["Let's start with a warm-up activity.", "Chúng ta b�
    Có bộ đọc mẫu: mỗi câu đọc lặp lại nhiều lần, lần sau chậm hơn lần trước, nghỉ để thầy cô đọc theo.
    Mọi xử lí chạy trong trình duyệt, không gửi file đi đâu. */
 const MAU_SN = { xanh: "0070C0", la: "00B050" };
-const MAC_DINH = { mon: "", lop: "", tenEn: "", mau: "xanh", che: { ten: true, khung: true, lenh: true, tu: true, dich: true }, dich: {}, tuTay: [], doc: { giong: "", vung: "en-US", lap: 3, toc: 0.95, giam: 0.2, nghi: "tu", cum: true } };
+const MAC_DINH = { cheDo: "soan", mon: "", lop: "", tenEn: "", mau: "xanh", che: { ten: true, khung: true, lenh: true, tu: true, long: true, dich: true }, dich: {}, tuNhap: "", longMoi: "dau", tuTay: [], doc: { giong: "", vung: "en-US", lap: 3, toc: 0.95, giam: 0.2, nghi: "tu", cum: true } };
 let SN = Object.assign({}, MAC_DINH, TT.load("songngu", {}));
 SN.che = Object.assign({}, MAC_DINH.che, SN.che); SN.doc = Object.assign({}, MAC_DINH.doc, SN.doc); SN.dich = SN.dich || {}; SN.tuTay = SN.tuTay || [];
+if (!SN.tuNhap && SN.tuTay.length) { SN.tuNhap = SN.tuTay.filter(x => norm(x.vi) || norm(x.en)).map(x => norm(x.vi) + (norm(x.en) ? " = " + norm(x.en) : "")).join("\n"); SN.tuTay = []; }
 let GA = null;        // {ten, nguon, zip, xml, ps, cau, tim:[từ tìm thấy], tuChon:Set, chon:Set, phien:[]}
 let MUC = [];         // các câu tiếng Anh để luyện đọc (từ lần áp gần nhất)
 const luu = () => TT.save("songngu", SN);
@@ -1108,7 +1131,7 @@ function apSongNgu(xmlGoc, chiXem) {
     if (moc >= 0) {
       const np0 = chen(moc, [["* Key vocabulary", true], [" (Từ vựng trọng tâm):", false]], moc);
       ghi("Key vocabulary", "Từ vựng trọng tâm", "tu", np0);
-      tu.forEach(x => { const np = chen(moc, [["- ", false], [x.en, true], [": " + x.vi, false]], moc); ghi(x.en, x.vi, "tu", np); });
+      tu.forEach(x => { const np = chen(moc, [["- ", false], [x.en, true], [x.vi ? ": " + x.vi : "", false]], moc); ghi(x.en, x.vi, "tu", np); });
     } else canhBao.push("Không thấy phần “Mục tiêu” — chưa chèn được Từ vựng trọng tâm.");
   }
   // 4) Lời GV trên lớp (Classroom English) cuối từng bước của từng hoạt động
@@ -1138,6 +1161,33 @@ function apSongNgu(xmlGoc, chiXem) {
       }
     });
     if (!dsHd.length) canhBao.push("Chưa nhận ra hoạt động nào — chưa chèn được lời GV trên lớp. Dùng «＋ Thêm mốc hoạt động» ở bước 2.");
+  }
+  // 5a) Lồng ghép từ thầy cô điền: thêm " (English)" ngay sau từ tiếng Việt trong câu — chữ cũ giữ nguyên
+  if (C.long) {
+    const dsT = dsTuNhap().filter(x => x.vi && x.en).sort((a, b) => b.vi.length - a.vi.length);
+    const moi1 = SN.longMoi === "moi", daGap = new Set(), cho = new Map();
+    ps.forEach((x, i) => {
+      if (!x.text || (ten && i === ten.i)) return;
+      const raw = chuTho(x.p, moiRun), thuong = raw.toLowerCase(), chiem = [];
+      dsT.forEach(t => {
+        if (!moi1 && daGap.has(t.vi)) return;
+        for (const bt of bienThe(t.vi)) {
+          let j = thuong.indexOf(bt);
+          while (j >= 0) {
+            const e = j + bt.length;
+            if (!/\p{L}/u.test(thuong[j - 1] || "") && !/\p{L}/u.test(thuong[e] || "") && !chiem.some(c => j < c[1] && e > c[0]) && !/^\s*\(/.test(raw.slice(e))) {
+              chiem.push([j, e]); daGap.add(t.vi);
+              if (!cho.has(i)) cho.set(i, []);
+              cho.get(i).push({ pos: e, en: t.en, vi: raw.slice(j, e) });
+              if (!moi1) break;
+            }
+            j = thuong.indexOf(bt, j + 1);
+          }
+          if (!moi1 && daGap.has(t.vi)) break;
+        }
+      });
+    });
+    cho.forEach((ds2, i) => ds2.sort((a, b) => b.pos - a.pos).forEach(c => { chenTrong(i, c.pos, " (" + c.en + ")", false); ghi(c.en, c.vi, "tu", ps[i].p); }));
   }
   // 5) Câu dịch: dòng tiếng Anh ngay dưới đoạn gốc (mượn định dạng đoạn gốc)
   if (C.dich) ps.forEach((x, i) => {
@@ -1177,15 +1227,88 @@ function timTu(ps) {
   });
   return [...dem.values()].sort((a, b) => (a.mon === SN.mon ? 0 : 1) - (b.mon === SN.mon ? 0 : 1) || b.n - a.n);
 }
-function tuMacDinh() {
-  const ds = GA.tim.filter(x => x.mon !== "Dùng chung" && (!SN.mon || x.mon === SN.mon));
-  const gon = ds.filter(x => !ds.some(y => y !== x && y.k.length > x.k.length && y.k.includes(x.k)));   // "cây nhãn" thì bỏ "nhãn"
-  return new Set(gon.slice(0, 12).map(x => x.k));
-}
-function dsTuChon() {
+/* từ thầy cô điền: mỗi dòng "tiếng Việt = English"; bỏ trống English → tra từ điển; chỉ gõ English → tra ngược */
+function dsTuNhap() {
   const ra = [], co = new Set();
-  if (GA) GA.tim.forEach(x => { if (GA.tuChon.has(x.k) && !co.has(x.en.toLowerCase())) { co.add(x.en.toLowerCase()); ra.push({ vi: x.vi, en: x.en }); } });
-  SN.tuTay.forEach(x => { if (norm(x.vi) && norm(x.en) && !co.has(norm(x.en).toLowerCase())) { co.add(norm(x.en).toLowerCase()); ra.push({ vi: norm(x.vi), en: norm(x.en) }); } });
+  String(SN.tuNhap || "").split(/\r?\n|;/).forEach(d => {
+    d = norm(d.replace(/^\s*(?:[-–•*+]|\d+[.)])\s*/, ""));
+    if (!d) return;
+    const m = d.split(/\s*(?:=|\t|\||→|:)\s*/);
+    let vi = norm(m[0]), en = norm(m.slice(1).join(" ")), nguon = "tay";
+    if (!en && !CO_CHU_VIET.test(vi) && /^[A-Za-z][A-Za-z '’-]*$/.test(vi) && !TU_KHOA.some(x => x.k === " " + khoaViet(vi) + " ")) {
+      en = vi; const t = TU.find(x => x.en.toLowerCase() === en.toLowerCase()); vi = t ? t.vi : ""; nguon = t ? "tra" : "tay";
+    } else if (!en) {
+      const k = " " + khoaViet(vi) + " ", ds = TU_KHOA.filter(x => x.k === k), t = ds.find(x => x.mon === SN.mon) || ds[0];
+      if (t) { en = t.en; nguon = "tra"; } else nguon = "thieu";
+    }
+    const khoa = khoaViet(vi) + "|" + en.toLowerCase();
+    if (co.has(khoa)) return; co.add(khoa);
+    ra.push({ vi, en, nguon });
+  });
+  return ra;
+}
+const dsTuChon = () => dsTuNhap().filter(x => x.en);
+/* biến thể cách bỏ dấu: hoá/hóa, thuỷ/thủy, kĩ/kỹ, lí/lý */
+function bienThe(s) {
+  const a = norm(s).toLowerCase(), d = a.normalize("NFD"), T = "[̣̀́̃̉]", v = new Set([a]);
+  v.add(d.replace(new RegExp("([ou])([aey])(" + T + ")", "g"), "$1$3$2").normalize("NFC"));
+  v.add(d.replace(new RegExp("([ou])(" + T + ")([aey])", "g"), "$1$3$2").normalize("NFC"));
+  v.add(a.replace(/(?<=[klmst])ĩ/g, "ỹ").replace(/(?<=[klmst])í/g, "ý"));
+  v.add(a.replace(/(?<=[klmst])ỹ/g, "ĩ").replace(/(?<=[klmst])ý/g, "í"));
+  return [...v].filter(Boolean);
+}
+
+/* ---------- CHẾ ĐỘ CHỈ ĐỌC: tìm câu, cụm tiếng Anh có sẵn trong giáo án ---------- */
+const TU_ANH_PHO = new Set("the a an is are was were be been am do does did have has had of to in on at for with from by and or but not no yes this that these those it its they them their we our you your he she his her me my what which who how why when where can could will would should must may let let's please look listen read write work open close answer discuss present share group groups pair pairs partner time minutes page exercise exercises example question questions class student students teacher lesson activity step task tasks well done good great all everyone today learn learned about some any more most very each other there here now then first next finally new old".split(" "));
+const VN_KHONG_DAU = new Set("cho con anh chi em gia giao hai hay khi kia la lam nay nhau nhu sau theo thanh trong tranh xem sinh minh tinh thi hoa nam ba bao mai phan tam tai cao ngay nhanh xanh canh toan quan chung khung hang dan nhom tiet bai dung lien thong ung".split(" "));
+let EN_TU = null;
+function tuAnhBiet() {
+  if (!EN_TU) {
+    EN_TU = new Set();
+    const them = s => String(s).toLowerCase().split(/[^a-z']+/).forEach(w => { if (w.length > 2) EN_TU.add(w); });
+    TU.forEach(x => them(x.en)); KHUNG_GOC.forEach(k => them(k[1])); NHAN_DAU.forEach(n => them(n.en));
+    Object.values(LOAI_HD_EN).forEach(them); Object.values(LENH_MAC_DINH).forEach(x => them(x[0])); Object.values(LENH_MO_HD).forEach(x => them(x[0]));
+  }
+  return EN_TU;
+}
+function laTuAnh(w) {
+  w = w.toLowerCase().replace(/['’]s$/, "");
+  return TU_ANH_PHO.has(w) || tuAnhBiet().has(w) || (w.length >= 5 && /(tion|sion|ment|ness|ing|ed|ly|ity|ies|ous|ful|less|able|ible|ture|ence|ance|ship|ers|est)$/.test(w));
+}
+function tachAnh(t) {
+  const ra = [], tok = t.match(/[\p{L}\p{N}'’]+|[^\p{L}\p{N}'’]+/gu) || [];
+  let cur = [];
+  const xong = () => {
+    const goc = cur.join(""); cur = [];
+    const coDauNgoac = /^[\s)]*\(/.test(goc);
+    let s = goc.replace(/^[\s\-–•*+"“”'():;,.…]+/, "").replace(/[\s\-–"“”'):;,(…]+$/, "").trim();
+    const truoc = s.match(/^([^()]*)\((.*)$/);   // "HS (Teacher's …" → bỏ chữ viết tắt đứng trước ngoặc
+    if (truoc && !(truoc[1].match(/[A-Za-z]{2,}/g) || []).some(w => !(w === w.toUpperCase() && w.length <= 4))) s = truoc[2];
+    if (!s.includes("(")) s = s.replace(/\)/g, ""); if (!s.includes(")")) s = s.replace(/\(/g, "");
+    s = s.replace(/^(Teacher|Students?|T|Ss?)\s*:\s*/i, "").replace(/[“”"]/g, "").replace(/\s*[:;,]\s*(?:[A-Z]{1,4}\s*)+$/, "").trim();
+    if (coDauNgoac || truoc) s = s.replace(/[\s.,;:]+$/, "");
+    if (!s || CO_CHU_VIET.test(s)) return;
+    const w = (s.match(/[A-Za-z][A-Za-z'’]*/g) || []).filter(x => !(x === x.toUpperCase() && x.length <= 4));
+    if (!w.length) return;
+    const e = w.filter(laTuAnh).length;
+    if ((w.length >= 2 && e >= 1 && e / w.length >= .4) || (w.length === 1 && e === 1 && w[0].length >= 4 && /^\s*\(/.test(goc))) ra.push(s);
+  };
+  tok.forEach(k => { if (/\p{L}/u.test(k) && (CO_CHU_VIET.test(k) || VN_KHONG_DAU.has(k.toLowerCase()))) xong(); else cur.push(k); });
+  xong();
+  return ra;
+}
+function timTiengAnh(ps) {
+  const ra = [], co = new Set();
+  let viTruoc = "";
+  ps.forEach(x => {
+    if (!x.text) return;
+    const ds = tachAnh(x.text);
+    let vi = x.text; ds.forEach(s => { vi = vi.replace(s, " "); });
+    vi = norm(vi.replace(/\(\s*\)/g, "").replace(/[“”"]/g, "").replace(/\s+([:;,.)])/g, "$1").replace(/^[\s\-–•*:;,.]+/, ""));
+    const coViet = CO_CHU_VIET.test(vi) && vi.replace(/[^\p{L}]/gu, "").length >= 3;
+    ds.forEach(s => { const k = s.toLowerCase(); if (co.has(k)) return; co.add(k); ra.push({ en: s, vi: coViet ? vi : viTruoc, nhom: "ga" }); });
+    if (coViet) viTruoc = vi;
+  });
   return ra;
 }
 
@@ -1393,23 +1516,24 @@ function phanTichLai(fileMoi) {
   if (doc.getElementsByTagName("parsererror").length) throw new Error("Không đọc được nội dung file Word.");
   GA.ps = layDoan(doc); GA.cau = phanTich(GA.ps, GA.themMoc);
   if (fileMoi) {
-    GA.vat = moTaVat(demVat(doc)); GA.tim = timTu(GA.ps); GA.tuChon = tuMacDinh();
+    GA.vat = moTaVat(demVat(doc)); GA.tim = timTu(GA.ps);
     GA.chon = new Set(dsDoanDich().filter(x => x.nhom.includes("mt") || x.nhom.includes("ten")).map(x => x.k));
-    if (!SN.mon) { const dem = {}; GA.tim.forEach(x => { if (x.mon !== "Dùng chung") dem[x.mon] = (dem[x.mon] || 0) + x.n; }); const best = Object.keys(dem).sort((a, b) => dem[b] - dem[a])[0]; if (best) { SN.mon = best; $("chonMon").value = best; GA.tim = timTu(GA.ps); GA.tuChon = tuMacDinh(); } }
+    if (!SN.mon) { const dem = {}; GA.tim.forEach(x => { if (x.mon !== "Dùng chung") dem[x.mon] = (dem[x.mon] || 0) + x.n; }); const best = Object.keys(dem).sort((a, b) => dem[b] - dem[a])[0]; if (best) { SN.mon = best; $("chonMon").value = best; GA.tim = timTu(GA.ps); } }
   }
   veHet();
 }
 
 /* ---------- giao diện ---------- */
 const TEN_NHOM = { ten: "Tên bài, tên HĐ", mt: "Mục tiêu", abc: "a) b) c)", giao: "Giao nhiệm vụ (Bước 1)", chot: "Kiến thức chốt", hoi: "Câu hỏi" };
-const TEN_NHOM_DOC = { tat: "Tất cả", tu: "Từ vựng", lenh: "Lời GV trên lớp", dich: "Câu dịch", ten: "Tên bài", khung: "Đề mục khung" };
+const TEN_NHOM_DOC = { tat: "Tất cả", ga: "Câu trong giáo án", tu: "Từ lồng ghép", lenh: "Lời GV trên lớp", dich: "Câu dịch", ten: "Tên bài", khung: "Đề mục khung" };
 let LOC_DOC = "tat", LOC_DICH = "";
 let MUC_HIEN = [];
 function veKhung() {
   const k = $("khungGa");
   if (!GA) { k.innerHTML = '<p class="mo">Chưa có giáo án. Đưa file lên ở bước 1.</p>'; if (!$("trangThai").innerHTML.startsWith("❌")) $("trangThai").innerHTML = "Chưa có file."; return; }
   const c = GA.cau, ps = GA.ps, ten = timTen(ps);
-  $("trangThai").innerHTML = `✅ <b>${TT.esc(GA.ten)}</b>.${GA.nguon} · ${ps.length} đoạn · nhận ra ${c.hd.length} hoạt động` + (GA.vat && GA.nguon === "docx" ? `<div class="giu">🛡️ Có ${TT.esc(GA.vat)} — app không động vào, file tải về giữ nguyên.</div>` : "") + (GA.ghiChu ? `<div class="canh">⚠️ ${GA.ghiChu}</div>` : "");
+  const soAnh = SN.cheDo === "doc" ? timTiengAnh(ps).length : -1;
+  $("trangThai").innerHTML = `✅ <b>${TT.esc(GA.ten)}</b>.${GA.nguon} · ${ps.length} đoạn · ` + (soAnh >= 0 ? (soAnh ? `tìm thấy <b>${soAnh}</b> câu, cụm tiếng Anh để luyện đọc` : `<span class="do">chưa thấy tiếng Anh trong giáo án</span> — chuyển sang «Soạn song ngữ», hoặc điền từ ở bước 2`) : `nhận ra ${c.hd.length} hoạt động`) + (GA.vat && GA.nguon === "docx" ? `<div class="giu">🛡️ Có ${TT.esc(GA.vat)} — app không động vào, file tải về giữ nguyên.</div>` : "") + (GA.ghiChu ? `<div class="canh">⚠️ ${GA.ghiChu}</div>` : "");
   const soKhung = ps.filter((x, i) => x.text && timNhan(chuTho(x.p), i > c.tb && i < c.tt)).length;
   const dong = [
     `<div class="kg ${ten ? "ok" : "thieu"}"><b>Tên bài</b> ${ten ? "· “" + TT.esc(ngan(ps[ten.i].text, 60)) + "”" : '· <span class="do">chưa thấy dòng “Bài …/Tiết …”</span>'}</div>`,
@@ -1426,17 +1550,18 @@ function veKhung() {
   $("chonMoc").innerHTML = '<option value="">— chọn một dòng tên hoạt động —</option>' + ps.slice(tu).filter(x => x.text && x.text.length < 140 && !c.hd.some(h => h.i === x.i)).map(x => `<option value="${x.i}">${TT.esc(ngan(x.text, 90))}</option>`).join("");
 }
 function veTu() {
-  const k = $("dsTu");
-  if (!GA) { k.innerHTML = '<p class="mo">Đưa giáo án lên — app dò thuật ngữ có trong bài.</p>'; }
-  else if (!GA.tim.length) k.innerHTML = '<p class="mo">Chưa thấy thuật ngữ nào trong từ điển của app. Thầy cô thêm tay ở dưới.</p>';
-  else {
-    const mon = GA.tim.filter(x => x.mon === SN.mon), khac = GA.tim.filter(x => x.mon !== SN.mon);
-    const chip = x => `<label class="chip ${GA.tuChon.has(x.k) ? "chon" : ""}" title="${TT.esc(x.mon)} · gặp ${x.n} lần"><input type="checkbox" data-tu="${TT.esc(x.k)}" ${GA.tuChon.has(x.k) ? "checked" : ""}><b>${TT.esc(x.en)}</b> <span>${TT.esc(x.vi)}</span><button class="loa" data-nghe="${TT.esc(x.en)}" title="Nghe">🔊</button></label>`;
-    k.innerHTML = (mon.length ? `<div class="mo nho2">Môn ${TT.esc(SN.mon)} (${mon.length}):</div><div class="chips">${mon.map(chip).join("")}</div>` : "") +
-      (khac.length ? `<details ${mon.length ? "" : "open"}><summary class="nho2">Thuật ngữ môn khác / dùng chung có trong bài (${khac.length})</summary><div class="chips">${khac.map(chip).join("")}</div></details>` : "");
-  }
-  $("dsTuTay").innerHTML = SN.tuTay.map((x, n) => `<div class="hang tu-tay" data-n="${n}"><input data-tt="vi" placeholder="tiếng Việt" value="${TT.esc(x.vi)}"><input data-tt="en" placeholder="English" value="${TT.esc(x.en)}"><button class="nut phu nho" data-nghe="${TT.esc(x.en)}">🔊</button><button class="nut phu nho" data-xoatu="${n}">🗑</button></div>`).join("");
-  $("soTu").textContent = dsTuChon().length;
+  const ds = dsTuNhap();
+  $("dsTuNhap").innerHTML = ds.length ? `<table class="bang tu-bang"><tr><th>Tiếng Việt</th><th>English</th><th></th></tr>${ds.map(x => `<tr class="${x.en ? "" : "thieu"}"><td>${TT.esc(x.vi || "—")}</td><td>${x.en ? "<b>" + TT.esc(x.en) + "</b>" + (x.nguon === "tra" ? ' <span class="nhan n-tt">từ điển</span>' : "") : '<span class="do">chưa có — ghi thêm “= English”</span>'}</td><td>${x.en ? `<button class="loa" data-nghe="${TT.esc(x.en)}" title="Nghe">🔊</button>` : ""}</td></tr>`).join("")}</table>` : '<p class="mo nho2">Chưa có từ nào.</p>';
+  $("soTu").textContent = ds.filter(x => x.en).length;
+  const goiY = $("dsTu");
+  if (!GA || !GA.tim.length) { goiY.innerHTML = '<p class="mo nho2">' + (GA ? "Chưa thấy thuật ngữ nào của từ điển trong bài." : "Đưa giáo án lên — app gợi ý thuật ngữ có trong bài.") + "</p>"; $("soGoiY").textContent = "0"; return; }
+  const co = new Set(ds.map(x => khoaViet(x.vi)));
+  const goi = GA.tim.filter(x => !co.has(khoaViet(x.vi)));
+  $("soGoiY").textContent = goi.length;
+  const mon = goi.filter(x => x.mon === SN.mon), khac = goi.filter(x => x.mon !== SN.mon);
+  const chip = x => `<button class="chip" data-them="${TT.esc(x.vi + " = " + x.en)}" title="${TT.esc(x.mon)} · gặp ${x.n} lần trong bài">＋ <b>${TT.esc(x.en)}</b> <span>${TT.esc(x.vi)}</span></button>`;
+  goiY.innerHTML = (mon.length ? `<div class="mo nho2">Môn ${TT.esc(SN.mon)} · <button class="nut phu nho" data-themhet>＋ Thêm cả ${mon.length} từ</button></div><div class="chips">${mon.map(chip).join("")}</div>` : "") +
+    (khac.length ? `<div class="mo nho2">Môn khác / dùng chung:</div><div class="chips">${khac.map(chip).join("")}</div>` : "") || '<p class="mo nho2">Các thuật ngữ trong bài đã có ở danh sách.</p>';
 }
 function veDich() {
   const k = $("dsDich");
@@ -1450,7 +1575,9 @@ function veDich() {
 }
 function veXem() {
   const k = $("xemTruoc");
-  if (!GA) { k.innerHTML = '<p class="mo">Đưa giáo án lên để xem trước.</p>'; $("canhBao").innerHTML = ""; MUC = []; veDoc(); return; }
+  const tuDoc = () => dsTuChon().map(x => ({ en: x.en, vi: x.vi, nhom: "tu" }));
+  if (SN.cheDo === "doc") { MUC = (GA ? timTiengAnh(GA.ps) : []).concat(tuDoc()); veDoc(); return; }
+  if (!GA) { k.innerHTML = '<p class="mo">Đưa giáo án lên để xem trước.</p>'; $("canhBao").innerHTML = ""; MUC = tuDoc(); veDoc(); return; }
   let r;
   try { r = apSongNgu(GA.xml, true); } catch (e) { k.textContent = "Lỗi xem trước: " + e.message; return; }
   MUC = r.muc;
@@ -1475,7 +1602,7 @@ function veChu(en) {   // tách từ để tô sáng khi đọc, tô đúng/sai 
 }
 function veDoc() {
   const k = $("dsDoc"), co = new Set();
-  const THU_TU = { ten: 0, tu: 1, lenh: 2, dich: 3, khung: 4 };
+  const THU_TU = { ga: 0, ten: 0, tu: 1, lenh: 2, dich: 3, khung: 4 };
   MUC_HIEN = MUC.filter(m => m.en && (LOC_DOC === "tat" || m.nhom === LOC_DOC) && !co.has(m.en.toLowerCase()) && co.add(m.en.toLowerCase()))
     .map((m, i) => [m, i]).sort((a, b) => THU_TU[a[0].nhom] - THU_TU[b[0].nhom] || a[1] - b[1]).map(x => x[0]);
   const dem = { tat: 0 }; const co2 = new Set();
@@ -1494,6 +1621,14 @@ function veGiong() {
   $("dsTocDo").textContent = Array.from({ length: Math.max(1, +SN.doc.lap) }, (_, k) => `Lần ${k + 1}: ${tocDo(k)}×`).join(" · ");
 }
 function veHet() { veKhung(); veTu(); veDich(); veXem(); }
+function apCheDo() {
+  const doc = SN.cheDo === "doc";
+  document.body.classList.toggle("che-doc", doc);
+  document.querySelectorAll("[data-chedo]").forEach(b => b.classList.toggle("chon", b.dataset.chedo === SN.cheDo));
+  $("soBuocTu").textContent = doc ? "2" : "3"; $("soBuocDoc").textContent = doc ? "3" : "6";
+  $("tenBuocTu").textContent = doc ? "Từ cần luyện đọc song ngữ" : "Từ cần lồng ghép song ngữ";
+  veHet();
+}
 
 /* ---------- xuất Word ---------- */
 async function xuatWord() {
@@ -1539,7 +1674,7 @@ document.addEventListener("DOMContentLoaded", () => {
   ["dragenter", "dragover"].forEach(t => o.addEventListener(t, e => { e.preventDefault(); o.classList.add("keo"); }));
   ["dragleave", "drop"].forEach(t => o.addEventListener(t, e => { e.preventDefault(); o.classList.remove("keo"); }));
   o.addEventListener("drop", e => { const f = e.dataTransfer.files[0]; if (f) napFile(f); });
-  $("chonMon").onchange = e => { SN.mon = e.target.value; luu(); if (GA) { GA.tim = timTu(GA.ps); GA.tuChon = tuMacDinh(); } veHet(); };
+  $("chonMon").onchange = e => { SN.mon = e.target.value; luu(); if (GA) GA.tim = timTu(GA.ps); veHet(); };
   $("chonLop").onchange = e => { SN.lop = e.target.value; luu(); };
   $("chonMau").onchange = e => { SN.mau = e.target.value; luu(); veXem(); };
   let hen;
@@ -1547,10 +1682,18 @@ document.addEventListener("DOMContentLoaded", () => {
   document.querySelectorAll("[data-che]").forEach(c => c.onchange = () => { SN.che[c.dataset.che] = c.checked; luu(); veXem(); });
   $("bThemMoc").onclick = () => { const v = $("chonMoc").value; if (!GA || v === "") return; GA.themMoc.push(+v); phanTichLai(); TT.toast("Đã thêm mốc hoạt động", "ok"); };
   // từ vựng
-  $("dsTu").addEventListener("change", e => { const k = e.target.dataset.tu; if (k == null) return; e.target.checked ? GA.tuChon.add(k) : GA.tuChon.delete(k); veTu(); veXem(); });
-  $("bThemTu").onclick = () => { SN.tuTay.push({ vi: "", en: "" }); luu(); veTu(); const ip = $("dsTuTay").querySelectorAll("input"); if (ip.length) ip[ip.length - 2].focus(); };
-  $("dsTuTay").addEventListener("input", e => { const h = e.target.closest(".tu-tay"); if (!h) return; SN.tuTay[+h.dataset.n][e.target.dataset.tt] = e.target.value; luu(); $("soTu").textContent = dsTuChon().length; clearTimeout(hen); hen = setTimeout(veXem, 600); });
-  $("dsTuTay").addEventListener("click", e => { const b = e.target.closest("[data-xoatu]"); if (!b) return; SN.tuTay.splice(+b.dataset.xoatu, 1); luu(); veTu(); veXem(); });
+  // từ cần lồng ghép
+  $("oTuNhap").value = SN.tuNhap; $("chonLong").value = SN.longMoi;
+  $("oTuNhap").addEventListener("input", e => { SN.tuNhap = e.target.value; luu(); clearTimeout(hen); hen = setTimeout(() => { veTu(); veXem(); }, 450); });
+  $("chonLong").onchange = e => { SN.longMoi = e.target.value; luu(); veXem(); };
+  const themTu = dong => { const o = $("oTuNhap"); SN.tuNhap = (o.value.replace(/\s+$/, "") ? o.value.replace(/\s+$/, "") + "\n" : "") + dong.join("\n"); o.value = SN.tuNhap; luu(); veTu(); veXem(); };
+  $("dsTu").addEventListener("click", e => {
+    const b = e.target.closest("button"); if (!b) return;
+    if (b.dataset.them) themTu([b.dataset.them]);
+    else if ("themhet" in b.dataset) themTu([...$("dsTu").querySelectorAll(".chips:first-of-type [data-them]")].map(x => x.dataset.them));
+  });
+  // chế độ
+  document.querySelectorAll("[data-chedo]").forEach(b => b.onclick = () => { SN.cheDo = b.dataset.chedo; luu(); apCheDo(); });
   // dịch
   $("locDich").addEventListener("click", e => { const b = e.target.closest("button"); if (!b || !GA) return;
     const g = b.dataset.g;
@@ -1598,7 +1741,7 @@ document.addEventListener("DOMContentLoaded", () => {
   document.addEventListener("click", e => { const b = e.target.closest("[data-nghe]"); if (b) { e.preventDefault(); e.stopPropagation(); nghe(b.dataset.nghe); } }, true);
   if (CO_DOC) { speechSynthesis.onvoiceschanged = veGiong; setTimeout(veGiong, 400); }
   veGiong();
-  if (TT.MAU) napMau(); else veHet();
+  if (TT.MAU) napMau(); else apCheDo();
 });
 async function napMau() {
   const bin = atob(MAU_DOCX), u8 = new Uint8Array(bin.length);
@@ -1612,7 +1755,13 @@ async function napMau() {
     [khoaDich("Hoạt động 2.2: Tìm hiểu kĩ thuật chăm sóc cây nhãn")]: "Activity 2.2: Learning about longan care techniques",
     [khoaDich("Các bước trồng cây nhãn.")]: "Steps for planting longan trees."
   };
+  SN.tuNhap = ["cây nhãn = longan tree", "cây ăn quả", "phiếu học tập", "giống = variety"].join(String.fromCharCode(10));
+  $("oTuNhap").value = SN.tuNhap;
   await napFile(new File([u8], "Giao an mau - Bai 4 cay nhan.docx"));
+  if (/doc/.test(location.hash)) {   // #mau&doc: giáo án đã song ngữ → chỉ đọc
+    GA.xml = apSongNgu(GA.xml, false).xml; GA.ten += " (song ngu)"; SN.cheDo = "doc"; phanTichLai(true);
+  }
+  apCheDo();
 }
 
 </script>
