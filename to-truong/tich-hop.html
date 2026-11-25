@@ -161,7 +161,7 @@ code{background:#f1f5f9;border-radius:5px;padding:0 4px;font-size:12.5px;color:#
   <svg class="logo noi" viewBox="0 0 64 64"><defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ef4444"/><stop offset="1" stop-color="#0070c0"/></linearGradient></defs>
     <rect x="10" y="4" width="44" height="56" rx="8" fill="url(#lg)"/><rect x="18" y="14" width="28" height="4" rx="2" fill="#fff"/><rect x="18" y="24" width="28" height="4" rx="2" fill="#fecaca"/><rect x="18" y="34" width="28" height="4" rx="2" fill="#bfdbfe"/><rect x="18" y="44" width="16" height="4" rx="2" fill="#fff" opacity=".8"/><circle cx="48" cy="50" r="10" fill="#f59e0b"/><path d="M48 44v12M42 50h12" stroke="#fff" stroke-width="3.5" stroke-linecap="round"/></svg>
   <div><h1>TÍCH HỢP NLS – NLAI VÀO GIÁO ÁN</h1><p>Giữ nguyên giáo án cũ · tự lồng ghép vào mục tiêu, thiết bị và từng bước hoạt động · <b style="color:#dc0000">NLS chữ đỏ</b> · <b style="color:#0066cc">NLAI chữ xanh</b></p></div>
-  <div class="phai"><button class="nut xanh" id="bWord">📝 Xuất Word</button></div>
+  <div class="phai"><button class="nut cam" id="bMoi" title="Xoá giáo án và nội dung tích hợp đang làm, bắt đầu soạn lại một giáo án tích hợp mới">🔄 Soạn giáo án mới</button><button class="nut xanh" id="bWord">📝 Xuất Word</button></div>
 </header>
 
 <div class="luoi l2" style="margin-bottom:16px">
@@ -1294,6 +1294,16 @@ document.addEventListener("DOMContentLoaded", () => {
   $("cNgat").onchange = e => { if (GA) GA.ngatHang = e.target.checked; };
   document.addEventListener("change", e => { if (e.target.id === "cBoCu" && GA) { GA.boCu = e.target.checked; datBoCu(); phanTichLai(); TT.toast(GA.boCu ? "Đã bỏ nội dung tích hợp cũ" : "Giữ nội dung tích hợp cũ", "ok"); } });
   $("bWord").onclick = xuatWord; $("bWord2").onclick = xuatWord;
+  $("bMoi").onclick = () => {   // soạn lại giáo án tích hợp mới: xoá giáo án + nội dung đang làm
+    if ((GA || DS.length) && !confirm("Soạn giáo án tích hợp mới?\nGiáo án đang mở và " + DS.length + " nội dung tích hợp đang nhập sẽ được xoá khỏi app (file Word đã tải về không ảnh hưởng).")) return;
+    GA = null; DS = []; luu(); styleGiu = new Set();
+    ["oPPCT", "aiDan"].forEach(id => { if ($(id)) $(id).value = ""; });
+    ["aiBao", "giuNguyen", "canhBao"].forEach(id => { if ($(id)) $(id).innerHTML = ""; });
+    if ($("aiLop")) delete $("aiLop").dataset.tay;
+    $("trangThai").innerHTML = "Chưa có file.";
+    veHet(); window.scrollTo({ top: 0, behavior: "smooth" });
+    TT.toast("Đã làm mới — đưa giáo án cần tích hợp lên ở bước 1", "ok");
+  };
   const ds = $("dsTich");
   ds.addEventListener("input", e => {
     const x = timMuc(e); if (!x) return;
