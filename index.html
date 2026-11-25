@@ -327,6 +327,8 @@
       background-attachment: fixed;
       min-height: 100vh;
     }
+    @keyframes tlBong { from { opacity: 0; transform: translate(-50%, 8px); } to { opacity: 1; transform: translate(-50%, 0); } }
+    .tl-bong { animation: tlBong .35s ease-out; }
     .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
     .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; }
     .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
@@ -3101,6 +3103,65 @@
       return <div className={'noi-dung-ai ' + (className || '')} dangerouslySetInnerHTML={{ __html: window.AI.md(text) }} />;
     }
 
+    // ===== TRANG CHỦ: EM TRỢ LÝ AI 3D (thêm 25/11/2026) =====
+    const LOI_TRO_LY = [
+      'Xin chào thầy cô! Em là trợ lý AI của tổ đây ạ 💜',
+      'Thầy cô muốn soạn giáo án, ra đề hay mở bộ Tổ Trưởng Số ạ?',
+      'Bấm 🔑 Kết nối AI để em viết bằng Gemini thật nhé!',
+      'Mọi sản phẩm em làm đều là bản nháp — thầy cô duyệt giúp em ạ.',
+      'Mệt thì nghỉ chút nha thầy cô, việc để em đỡ một tay! ☕',
+      'Di chuột để em nhìn theo, bấm vào em để em vẫy tay nè! 👋'
+    ];
+
+    function TroLyAo3D() {
+      const khungRef = useRef(null);
+      const dieuKhien = useRef(null);
+      const [loi, setLoi] = useState(0);
+      const [loi3D, setLoi3D] = useState(false);
+
+      useEffect(() => {
+        let huy = false;
+        const gan = () => {
+          if (huy || dieuKhien.current || !khungRef.current || !window.TroLy3D) return;
+          dieuKhien.current = window.TroLy3D.mount(khungRef.current, {
+            onClick: () => setLoi((i) => (i + 1) % LOI_TRO_LY.length)
+          });
+          if (!dieuKhien.current) setLoi3D(true);
+          else dieuKhien.current.noi(2200);
+        };
+        gan();
+        window.addEventListener('trolyly3d-san-sang', gan);
+        const cho = setTimeout(() => { if (!window.TroLy3D) setLoi3D(true); }, 12000);
+        return () => {
+          huy = true; clearTimeout(cho);
+          window.removeEventListener('trolyly3d-san-sang', gan);
+          if (dieuKhien.current) { dieuKhien.current.go(); dieuKhien.current = null; }
+        };
+      }, []);
+
+      useEffect(() => {
+        if (dieuKhien.current) dieuKhien.current.noi(1800);
+        const h = setTimeout(() => setLoi((i) => (i + 1) % LOI_TRO_LY.length), 7000);
+        return () => clearTimeout(h);
+      }, [loi]);
+
+      return (
+        <div className="relative w-full h-80 sm:h-[26rem] select-none">
+          <div ref={khungRef} className="absolute inset-0" aria-label="Em trợ lý AI 3D — bấm để em vẫy tay" role="img"></div>
+          {loi3D && (
+            <div className="absolute inset-0 flex items-center justify-center text-[8rem] animate-bounce">🤖</div>
+          )}
+          <div key={loi} className="absolute top-2 left-1/2 -translate-x-1/2 max-w-[85%] bg-white text-slate-800 text-xs sm:text-sm font-semibold px-4 py-2.5 rounded-2xl shadow-lg border border-violet-200 tl-bong text-center">
+            {LOI_TRO_LY[loi]}
+            <span className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-3 h-3 bg-white border-r border-b border-violet-200 rotate-45"></span>
+          </div>
+          <div className="absolute bottom-1 inset-x-0 text-center text-[11px] text-violet-200/80 pointer-events-none">
+            ✨ Bấm vào em để em vẫy tay nhé
+          </div>
+        </div>
+      );
+    }
+
     function App() {
       // Nhận diện tham số ?fullscreenApplet=true từ URL để tự động kích hoạt chế độ Toàn Màn Hình Applet
       const [isHdtnFullscreen, setIsHdtnFullscreen] = useState(() => {
@@ -3112,7 +3173,7 @@
         }
       });
 
-      const [activeTab, setActiveTab] = useState('HDTN_TEMPLATE_GENERATOR');
+      const [activeTab, setActiveTab] = useState(() => isHdtnFullscreen ? 'HDTN_TEMPLATE_GENERATOR' : 'HOME');
       // Chế độ xem Tổ Trưởng Số: 'GRID' (Lưới 10 công cụ mở toàn màn hình mượt mà, chống treo) hoặc 'IFRAME'
       const [toTruongViewMode, setToTruongViewMode] = useState('GRID');
 
@@ -5483,7 +5544,7 @@ Yêu cầu: đáp án chính xác, không trùng ý giữa các câu, phương �
           {/* TOP NAVBAR - SCIENTIFIC SLATE STYLE */}
           <header className={isHdtnFullscreen && activeTab === 'HDTN_TEMPLATE_GENERATOR' ? "hidden" : "bg-slate-900 text-white border-b border-slate-800 sticky top-0 z-50 shadow-md"}>
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-              <div className="flex items-center space-x-3">
+              <div className="flex items-center space-x-3 cursor-pointer" onClick={() => setActiveTab('HOME')} title="Về trang chủ">
                 <div className="flex items-center justify-center shrink-0">
                   <img
                     src="logo.png"
@@ -5505,6 +5566,9 @@ Yêu cầu: đáp án chính xác, không trùng ý giữa các câu, phương �
 
               {/* Status Indicators representing Architecture Diagram & User Profile */}
               <div className="hidden md:flex items-center space-x-4 text-xs text-slate-300">
+                <button type="button" onClick={() => setActiveTab('HOME')} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md border ${activeTab === 'HOME' ? 'bg-violet-600 border-violet-400 text-white font-semibold' : 'border-slate-700 text-slate-200 hover:bg-slate-800'}`}>
+                  <span>🏠</span><span>Trang chủ</span>
+                </button>
                 <button type="button" onClick={moAiKetNoi} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md border ${coAI ? 'bg-emerald-900/60 border-emerald-600 text-emerald-200' : 'bg-amber-500 border-amber-400 text-white font-semibold'}`}>
                   <span className={`w-2 h-2 rounded-full ${coAI ? 'bg-emerald-400 animate-pulse' : 'bg-white'}`}></span>
                   <span>{coAI ? 'AI Gemini: đã bật' : '🔑 Kết nối AI'}</span>
@@ -5648,7 +5712,21 @@ Yêu cầu: đáp án chính xác, không trùng ý giữa các câu, phương �
             {/* SIDEBAR NAVIGATION */}
             <aside className={isHdtnFullscreen && activeTab === 'HDTN_TEMPLATE_GENERATOR' ? "hidden" : "w-64 bg-white/90 backdrop-blur-md rounded-xl border border-slate-200/80 shadow-sm p-4 flex flex-col justify-between hidden md:flex shrink-0"}>
               <div className="space-y-1">
-                <div className="px-3 py-1.5 text-xs font-bold text-slate-400 uppercase tracking-wider">
+                {/* TỔ TRƯỞNG SỐ — ĐẦU MENU (25/11/2026) */}
+                <button
+                  onClick={() => setActiveTab('TO_TRUONG')}
+                  className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                    activeTab === 'TO_TRUONG' ? 'bg-violet-50 text-violet-800 font-bold border-l-4 border-violet-600 shadow-sm' : 'text-slate-700 hover:bg-slate-50'
+                  }`}
+                >
+                  <div className="flex items-center space-x-2.5 truncate">
+                    <i data-lucide="briefcase" className="w-4 h-4 text-violet-600 shrink-0"></i>
+                    <span className="truncate">Tổ Trưởng Số</span>
+                  </div>
+                  <span className="bg-violet-100 text-violet-700 text-[10px] px-1.5 py-0.5 rounded-full font-bold">10</span>
+                </button>
+
+                <div className="pt-3 px-3 py-1.5 text-xs font-bold text-slate-400 uppercase tracking-wider border-t border-slate-100 mt-2">
                   Trợ Lý Chuyên Môn AI
                 </div>
                 
@@ -5760,19 +5838,6 @@ Yêu cầu: đáp án chính xác, không trùng ý giữa các câu, phương �
                   <span className="bg-blue-100 text-blue-700 text-[10px] px-1.5 py-0.5 rounded-full font-bold">55</span>
                 </button>
 
-                {/* TAB MỚI: TỔ TRƯỞNG SỐ */}
-                <button
-                  onClick={() => setActiveTab('TO_TRUONG')}
-                  className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
-                    activeTab === 'TO_TRUONG' ? 'bg-violet-50 text-violet-800 font-bold border-l-4 border-violet-600 shadow-sm' : 'text-slate-700 hover:bg-slate-50'
-                  }`}
-                >
-                  <div className="flex items-center space-x-2.5 truncate">
-                    <i data-lucide="briefcase" className="w-4 h-4 text-violet-600 shrink-0"></i>
-                    <span className="truncate">Tổ Trưởng Số</span>
-                  </div>
-                  <span className="bg-violet-100 text-violet-700 text-[10px] px-1.5 py-0.5 rounded-full font-bold">10</span>
-                </button>
 
                 {/* TAB 5: THƯ VIỆN HỌC LIỆU */}
                 <button
@@ -5824,9 +5889,17 @@ Yêu cầu: đáp án chính xác, không trùng ý giữa các câu, phương �
             </aside>
 
             {/* MAIN CONTENT AREA */}
-            <main className={isHdtnFullscreen && activeTab === 'HDTN_TEMPLATE_GENERATOR' ? "w-full p-3 sm:p-5 md:p-6 space-y-6" : "flex-1 space-y-6"}>
+            <main className={isHdtnFullscreen && activeTab === 'HDTN_TEMPLATE_GENERATOR' ? "w-full p-3 sm:p-5 md:p-6 space-y-6" : "flex-1 min-w-0 space-y-6"}>
             {/* MOBILE NAVIGATION STRIP */}
             <div className={isHdtnFullscreen && activeTab === 'HDTN_TEMPLATE_GENERATOR' ? "hidden" : "md:hidden flex overflow-x-auto gap-2 pb-2 mb-4 border-b border-slate-200"}>
+              <button
+                onClick={() => setActiveTab('TO_TRUONG')}
+                className={`px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap ${
+                  activeTab === 'TO_TRUONG' ? 'bg-violet-600 text-white font-bold' : 'bg-white text-slate-700 border border-slate-200'
+                }`}
+              >
+                🧑‍💼 Tổ Trưởng Số (10)
+              </button>
               <button
                 onClick={() => setActiveTab('HDTN_TEMPLATE_GENERATOR')}
                 className={`px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap ${
@@ -5892,14 +5965,6 @@ Yêu cầu: đáp án chính xác, không trùng ý giữa các câu, phương �
               >
                 📐 3D Hình Học Toán (55)
               </button>
-              <button
-                onClick={() => setActiveTab('TO_TRUONG')}
-                className={`px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap ${
-                  activeTab === 'TO_TRUONG' ? 'bg-violet-600 text-white font-bold' : 'bg-white text-slate-700 border border-slate-200'
-                }`}
-              >
-                🧑‍💼 Tổ Trưởng Số (10)
-              </button>
 
               <button
                 onClick={() => setActiveTab('MATERIALS')}
@@ -5921,6 +5986,69 @@ Yêu cầu: đáp án chính xác, không trùng ý giữa các câu, phương �
 
 
               
+              {/* ===== TRANG CHỦ: EM TRỢ LÝ AI 3D (25/11/2026) ===== */}
+              {activeTab === 'HOME' && (
+                <div className="space-y-6">
+                  <section className="relative overflow-hidden rounded-3xl shadow-xl border border-violet-400/30 bg-gradient-to-br from-indigo-950 via-violet-900 to-sky-900 text-white">
+                    <div className="absolute -top-24 -left-24 w-72 h-72 rounded-full bg-fuchsia-500/20 blur-3xl pointer-events-none"></div>
+                    <div className="absolute -bottom-24 -right-16 w-80 h-80 rounded-full bg-cyan-400/20 blur-3xl pointer-events-none"></div>
+                    <div className="relative grid lg:grid-cols-2 gap-2 items-center p-5 sm:p-8">
+                      <div className="space-y-4 order-2 lg:order-1">
+                        <span className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1 rounded-full bg-white/10 border border-white/20 text-violet-100">
+                          ✨ Trợ lý chuyên môn AI · THCS Tịnh Biên
+                        </span>
+                        <h2 className="text-3xl sm:text-4xl font-extrabold leading-tight tracking-tight">
+                          Xin chào thầy cô! <br/>
+                          <span className="bg-gradient-to-r from-cyan-300 via-violet-200 to-pink-300 bg-clip-text text-transparent">Em là Trợ Lý Thông Minh</span>
+                        </h2>
+                        <p className="text-sm sm:text-base text-violet-100/90 leading-relaxed max-w-xl">
+                          Em đỡ thầy cô việc soạn giáo án, ra đề, phân phối chương trình, học liệu số và bộ công cụ dành cho tổ trưởng chuyên môn. Mọi sản phẩm là <strong className="text-amber-300">bản nháp</strong> — thầy cô duyệt trước khi dùng.
+                        </p>
+                        <div className="flex flex-wrap gap-2.5 pt-1">
+                          <button type="button" onClick={() => setActiveTab('TO_TRUONG')} className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold bg-gradient-to-r from-violet-500 to-fuchsia-500 hover:from-violet-600 hover:to-fuchsia-600 shadow-lg active:scale-95 transition-all">
+                            🧑‍💼 <span>Mở Tổ Trưởng Số</span>
+                          </button>
+                          <button type="button" onClick={() => setActiveTab('HDTN_TEMPLATE_GENERATOR')} className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold bg-white/10 hover:bg-white/20 border border-white/25 active:scale-95 transition-all">
+                            🌟 <span>Soạn GA theo mẫu</span>
+                          </button>
+                          <button type="button" onClick={moAiKetNoi} className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold border active:scale-95 transition-all ${coAI ? 'bg-emerald-500/20 border-emerald-300/50 text-emerald-100' : 'bg-amber-400 hover:bg-amber-500 border-amber-300 text-slate-900'}`}>
+                            🔑 <span>{coAI ? 'AI Gemini: đã bật' : 'Kết nối AI'}</span>
+                          </button>
+                        </div>
+                      </div>
+                      <div className="order-1 lg:order-2">
+                        <TroLyAo3D />
+                      </div>
+                    </div>
+                  </section>
+
+                  <section className="bg-white/90 backdrop-blur-md rounded-2xl border border-slate-200/80 shadow-sm p-5">
+                    <h3 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-3">Thầy cô cần gì hôm nay?</h3>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+                      {[
+                        { tab: 'TO_TRUONG', bieu: '🧑‍💼', ten: 'Tổ Trưởng Số', mo: '10 công cụ cho tổ trưởng', mau: 'from-violet-500 to-fuchsia-500' },
+                        { tab: 'HDTN_TEMPLATE_GENERATOR', bieu: '🌟', ten: 'Soạn GA theo mẫu', mo: 'HĐTN – HN, đúng mẫu tổ', mau: 'from-emerald-500 to-teal-500' },
+                        { tab: 'AI_GENERATOR', bieu: '🤖', ten: 'KHBD 5512 Công nghệ', mo: 'Soạn kế hoạch bài dạy', mau: 'from-cyan-500 to-sky-500' },
+                        { tab: 'PPCT_GENERATOR', bieu: '📅', ten: 'Phân phối CT', mo: 'PPCT 7 cột', mau: 'from-blue-500 to-indigo-500' },
+                        { tab: 'EXAM_GENERATOR', bieu: '📝', ten: 'Đề & Ma trận', mo: 'Ngân hàng đề kiểm tra', mau: 'from-slate-600 to-slate-800' },
+                        { tab: 'APPS_3D', bieu: '🎮', ten: 'App thực hành 3D', mo: '13 app Công nghệ', mau: 'from-cyan-500 to-teal-500' },
+                        { tab: 'ELEARNING', bieu: '📺', ten: 'Kho E-Learning', mo: '68 bài tự học CN 6–9', mau: 'from-emerald-500 to-green-600' },
+                        { tab: 'HINH_HOC_3D', bieu: '📐', ten: '3D Hình học Toán', mo: '55 bài Toán 6–9', mau: 'from-blue-500 to-violet-500' },
+                        { tab: 'IUPAC', bieu: '🧪', ten: 'Hoá học IUPAC', mo: 'Luyện đọc tên chất', mau: 'from-orange-400 to-rose-500' },
+                        { tab: 'MATERIALS', bieu: '📂', ten: 'Thư viện học liệu', mo: 'Tài liệu dùng chung', mau: 'from-amber-400 to-orange-500' },
+                        { tab: 'STATS', bieu: '📊', ten: 'Báo cáo & Thống kê', mo: 'Số lượt sử dụng web', mau: 'from-indigo-500 to-purple-600' }
+                      ].map((o) => (
+                        <button key={o.tab} type="button" onClick={() => setActiveTab(o.tab)} className="group text-left p-3.5 rounded-xl border border-slate-200 bg-white hover:border-violet-300 hover:shadow-md hover:-translate-y-0.5 transition-all">
+                          <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${o.mau} flex items-center justify-center text-xl shadow-sm mb-2 group-hover:scale-110 transition-transform`}>{o.bieu}</div>
+                          <div className="font-bold text-sm text-slate-800">{o.ten}</div>
+                          <div className="text-xs text-slate-500 mt-0.5">{o.mo}</div>
+                        </button>
+                      ))}
+                    </div>
+                  </section>
+                </div>
+              )}
+
               {/* TAB 0: TRỢ LÝ SOẠN GIÁO ÁN THEO MẪU (MODULE TRO_LY_SOAN_GA_HDTN) */}
               {activeTab === 'HDTN_TEMPLATE_GENERATOR' && (
                 <div className="space-y-6">
@@ -10457,6 +10585,362 @@ CREATE TABLE IF NOT EXISTS public.materials (
           });
       });
     }
+  </script>
+  <!-- EM TRỢ LÝ AI 3D TRANG CHỦ (25/11/2026) -->
+  <script type="module">
+// ===== EM TRỢ LÝ AI 3D (Three.js, tự vẽ bằng khối — không dùng mô hình tải ngoài) =====
+// window.TroLy3D.mount(khung, { onClick }) → trả về { noi(ms), vay(), go() } hoặc null nếu máy không có WebGL
+import * as THREE from 'https://unpkg.com/three@0.160.0/build/three.module.js';
+
+function bangToon() {
+  const d = new Uint8Array([110, 110, 110, 255, 175, 175, 175, 255, 225, 225, 225, 255, 255, 255, 255, 255]);
+  const t = new THREE.DataTexture(d, 4, 1, THREE.RGBAFormat);
+  t.minFilter = t.magFilter = THREE.NearestFilter;
+  t.needsUpdate = true;
+  return t;
+}
+
+function anhTim() {
+  const c = document.createElement('canvas'); c.width = c.height = 64;
+  const g = c.getContext('2d');
+  g.fillStyle = '#ff5fa2';
+  g.beginPath();
+  g.moveTo(32, 54);
+  g.bezierCurveTo(4, 36, 6, 10, 22, 10);
+  g.bezierCurveTo(28, 10, 32, 15, 32, 19);
+  g.bezierCurveTo(32, 15, 36, 10, 42, 10);
+  g.bezierCurveTo(58, 10, 60, 36, 32, 54);
+  g.fill();
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;
+}
+
+function anhQuang() {
+  const c = document.createElement('canvas'); c.width = c.height = 128;
+  const g = c.getContext('2d');
+  const r = g.createRadialGradient(64, 64, 0, 64, 64, 64);
+  r.addColorStop(0, 'rgba(120,230,255,0.85)');
+  r.addColorStop(0.45, 'rgba(140,110,255,0.35)');
+  r.addColorStop(1, 'rgba(140,110,255,0)');
+  g.fillStyle = r; g.fillRect(0, 0, 128, 128);
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;
+}
+
+function mount(khung, opts = {}) {
+  let renderer;
+  try {
+    renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+  } catch (e) { return null; }
+  const giamChuyenDong = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  renderer.outputColorSpace = THREE.SRGBColorSpace;
+  renderer.domElement.style.cssText = 'width:100%;height:100%;display:block;cursor:pointer;touch-action:pan-y';
+  khung.appendChild(renderer.domElement);
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(28, 1, 0.1, 100);
+  camera.position.set(0, 1.6, 7.8);
+  camera.lookAt(0, 1.55, 0);
+
+  scene.add(new THREE.HemisphereLight(0xffffff, 0xcdbfff, 1.25));
+  const den = new THREE.DirectionalLight(0xffffff, 1.7); den.position.set(3, 5, 5); scene.add(den);
+  const vien = new THREE.DirectionalLight(0x9f8cff, 1.1); vien.position.set(-4, 3, -3); scene.add(vien);
+
+  const grad = bangToon();
+  const toon = (color, extra = {}) => new THREE.MeshToonMaterial({ color, gradientMap: grad, ...extra });
+  const sang = (color, opacity = 1) => new THREE.MeshBasicMaterial({ color, transparent: opacity < 1, opacity });
+  const matVien = new THREE.MeshBasicMaterial({ color: 0x2b1d45, side: THREE.BackSide });
+  const vienNet = (mesh, k = 1.035) => {
+    const o = new THREE.Mesh(mesh.geometry, matVien);
+    o.scale.setScalar(k); mesh.add(o); return mesh;
+  };
+
+  const DA = 0xffd8c2, TOC = 0x4a2f73, TOC2 = 0x6b4aa8, AO = 0x8466ff, TRANG = 0xf7f4ff, XANH = 0x55eaff;
+
+  const nv = new THREE.Group(); scene.add(nv);
+
+  // ---------- ĐẦU ----------
+  const dau = new THREE.Group();
+  const R = 0.6, KZ = 0.95;
+  const matTren = (x, y, them = 0) => KZ * Math.sqrt(Math.max(0, R * R - x * x - y * y)) + them;
+  const huongRa = (obj, x, y, z) => obj.lookAt(x * 2, y * 2, z * 2 / (KZ * KZ));
+
+  const dauMesh = new THREE.Mesh(new THREE.SphereGeometry(R, 48, 32), toon(DA));
+  dauMesh.scale.set(1, 0.96, KZ); vienNet(dauMesh, 1.03); dau.add(dauMesh);
+
+  // mắt
+  const mat = [];
+  [-1, 1].forEach((s) => {
+    const x = 0.21 * s, y = -0.03, z = matTren(x, y, -0.01);
+    const g = new THREE.Group(); g.position.set(x, y, z); huongRa(g, x, y, z);
+    const nen = new THREE.Mesh(new THREE.SphereGeometry(0.115, 32, 16), toon(0x2d1f4d));
+    nen.scale.set(0.82, 1.18, 0.32); g.add(nen);
+    const trong = new THREE.Mesh(new THREE.SphereGeometry(0.09, 32, 16), toon(0x8a5cff, { emissive: 0x3a1f99, emissiveIntensity: 0.5 }));
+    trong.scale.set(0.78, 1.0, 0.3); trong.position.set(0, -0.025, 0.012); g.add(trong);
+    const sau = new THREE.Mesh(new THREE.SphereGeometry(0.06, 24, 12), sang(0x55eaff, 0.55));
+    sau.scale.set(0.8, 0.6, 0.3); sau.position.set(0, -0.06, 0.02); g.add(sau);
+    const lo1 = new THREE.Mesh(new THREE.SphereGeometry(0.032, 16, 8), sang(0xffffff));
+    lo1.position.set(-0.03 * s, 0.05, 0.045); g.add(lo1);
+    const lo2 = new THREE.Mesh(new THREE.SphereGeometry(0.016, 12, 8), sang(0xffffff));
+    lo2.position.set(0.03 * s, -0.045, 0.045); g.add(lo2);
+    const mi = new THREE.Mesh(new THREE.TorusGeometry(0.1, 0.014, 8, 20, Math.PI * 0.8), sang(0x2b1d45));
+    mi.rotation.z = Math.PI * 0.1; mi.position.set(0, 0.035, 0.03); mi.scale.set(1, 1.15, 1); g.add(mi);
+    const long = new THREE.Mesh(new THREE.ConeGeometry(0.02, 0.07, 8), sang(0x2b1d45));
+    long.position.set(0.1 * s, 0.11, 0.02); long.rotation.z = -0.9 * s; g.add(long);
+    dau.add(g); mat.push(g);
+  });
+  // lông mày
+  [-1, 1].forEach((s) => {
+    const x = 0.22 * s, y = 0.2, z = matTren(x, y, 0.005);
+    const m = new THREE.Mesh(new THREE.CapsuleGeometry(0.012, 0.08, 4, 8), sang(0x3a2560));
+    m.position.set(x, y, z); m.rotation.z = Math.PI / 2 + 0.15 * s; dau.add(m);
+  });
+  // má hồng
+  [-1, 1].forEach((s) => {
+    const x = 0.34 * s, y = -0.17, z = matTren(x, y, 0.006);
+    const m = new THREE.Mesh(new THREE.CircleGeometry(0.075, 24), new THREE.MeshBasicMaterial({ color: 0xff8fb5, transparent: true, opacity: 0.55, depthWrite: false }));
+    m.position.set(x, y, z); huongRa(m, x, y, z); m.scale.set(1, 0.65, 1); dau.add(m);
+  });
+  // miệng cười + miệng nói
+  const mieng = new THREE.Mesh(new THREE.TorusGeometry(0.055, 0.012, 8, 16, Math.PI), sang(0x9b3b5a));
+  mieng.position.set(0, -0.2, matTren(0, -0.2, 0.004)); mieng.rotation.z = Math.PI; dau.add(mieng);
+  const miengNoi = new THREE.Mesh(new THREE.SphereGeometry(0.05, 16, 12), toon(0xd9506f));
+  miengNoi.position.set(0, -0.225, matTren(0, -0.225, -0.012)); miengNoi.scale.set(1, 0.01, 0.4); dau.add(miengNoi);
+
+  // tóc
+  const matToc = toon(TOC), matToc2 = toon(TOC2);
+  const nap = new THREE.Mesh(new THREE.SphereGeometry(0.645, 48, 24, 0, Math.PI * 2, 0, Math.PI * 0.42), matToc);
+  nap.position.y = 0.02; vienNet(nap, 1.025); dau.add(nap);
+  const lung = new THREE.Mesh(new THREE.SphereGeometry(0.65, 48, 32, Math.PI / 2 + 0.8, Math.PI * 2 - 1.6, 0, Math.PI * 0.9), matToc);
+  lung.position.set(0, 0, -0.02); lung.scale.set(1, 1.02, 1); dau.add(lung);
+  for (let i = -3; i <= 3; i++) {
+    const x = i * 0.12, y = 0.37 - Math.abs(i) * 0.025, z = matTren(x, y, 0.035);
+    const m = new THREE.Mesh(new THREE.SphereGeometry(0.15, 20, 14), i % 2 ? matToc2 : matToc);
+    m.scale.set(0.95, 1.55, 0.55); m.position.set(x, y, z);
+    m.rotation.set(-0.35, 0, -i * 0.13); dau.add(m);
+  }
+  [-1, 1].forEach((s) => {
+    const m = new THREE.Mesh(new THREE.SphereGeometry(0.14, 20, 14), matToc);
+    m.scale.set(0.55, 2.3, 0.75); m.position.set(0.53 * s, -0.2, 0.16); m.rotation.z = 0.12 * s; dau.add(m);
+  });
+  // tai nghe AI
+  [-1, 1].forEach((s) => {
+    const g = new THREE.Group(); g.position.set(0.62 * s, 0.0, 0.0); g.rotation.z = Math.PI / 2;
+    g.add(new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.15, 0.09, 32), toon(TRANG)));
+    const vong = new THREE.Mesh(new THREE.TorusGeometry(0.1, 0.022, 10, 32), sang(XANH));
+    vong.rotation.x = Math.PI / 2; vong.position.y = 0.05 * s; g.add(vong);
+    dau.add(g);
+  });
+  const quai = new THREE.Mesh(new THREE.TorusGeometry(0.67, 0.035, 10, 48, Math.PI), toon(TRANG));
+  quai.position.set(0, 0.0, -0.05); quai.rotation.y = 0; dau.add(quai);
+  // bím tóc 2 bên
+  const bim = [];
+  [-1, 1].forEach((s) => {
+    const goc = new THREE.Group(); goc.position.set(0.66 * s, 0.12, -0.2);
+    const bt = new THREE.Mesh(new THREE.SphereGeometry(0.2, 24, 16), matToc);
+    bt.scale.set(0.75, 1.9, 0.75); bt.position.set(0.12 * s, -0.36, 0); bt.rotation.z = 0.28 * s;
+    vienNet(bt, 1.04); goc.add(bt);
+    const nut = new THREE.Mesh(new THREE.TorusGeometry(0.075, 0.03, 10, 24), sang(0xff7ab6));
+    nut.rotation.x = Math.PI / 2; nut.position.set(0.04 * s, -0.04, 0); goc.add(nut);
+    [-1, 1].forEach((k) => {
+      const no = new THREE.Mesh(new THREE.ConeGeometry(0.07, 0.15, 12), toon(0xff7ab6));
+      no.rotation.z = (Math.PI / 2) * k; no.position.set(0.04 * s + 0.08 * k, -0.02, 0.02); goc.add(no);
+    });
+    dau.add(goc); bim.push(goc);
+  });
+  // ăng-ten sợi tóc + ngôi sao sáng
+  const angTen = new THREE.Group(); angTen.position.set(0.05, 0.6, 0.05);
+  const soi = new THREE.Mesh(new THREE.TorusGeometry(0.16, 0.022, 8, 20, Math.PI * 0.75), matToc);
+  soi.position.set(0.16, 0, 0); soi.rotation.z = Math.PI * 0.25; angTen.add(soi);
+  const sao = new THREE.Mesh(new THREE.OctahedronGeometry(0.075, 0), sang(XANH));
+  sao.position.set(0.2, 0.22, 0); angTen.add(sao);
+  const saoQuang = new THREE.Sprite(new THREE.SpriteMaterial({ map: anhQuang(), depthWrite: false, blending: THREE.AdditiveBlending }));
+  saoQuang.scale.setScalar(0.5); saoQuang.position.copy(sao.position); angTen.add(saoQuang);
+  dau.add(angTen);
+
+  dau.position.set(0, 1.78, 0);
+  nv.add(dau);
+
+  // ---------- THÂN ----------
+  const co = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.1, 0.18, 16), toon(DA)); co.position.y = 1.15; nv.add(co);
+  const vay = new THREE.Mesh(new THREE.LatheGeometry([
+    new THREE.Vector2(0.0, 1.14), new THREE.Vector2(0.17, 1.12), new THREE.Vector2(0.23, 1.0), new THREE.Vector2(0.21, 0.86),
+    new THREE.Vector2(0.3, 0.7), new THREE.Vector2(0.45, 0.5), new THREE.Vector2(0.5, 0.42), new THREE.Vector2(0.0, 0.42)
+  ], 40), toon(AO));
+  vienNet(vay, 1.03); nv.add(vay);
+  const vienVay = new THREE.Mesh(new THREE.TorusGeometry(0.49, 0.03, 10, 40), toon(TRANG));
+  vienVay.rotation.x = Math.PI / 2; vienVay.position.y = 0.43; nv.add(vienVay);
+  const that = new THREE.Mesh(new THREE.TorusGeometry(0.215, 0.025, 10, 32), toon(TRANG));
+  that.rotation.x = Math.PI / 2; that.position.y = 0.87; nv.add(that);
+  const coAo = new THREE.Mesh(new THREE.ConeGeometry(0.26, 0.12, 32, 1, true), toon(TRANG, { side: THREE.DoubleSide }));
+  coAo.position.y = 1.08; nv.add(coAo);
+  // trái tim AI trước ngực
+  const timAI = new THREE.Mesh(new THREE.IcosahedronGeometry(0.06, 0), sang(XANH));
+  timAI.position.set(0, 0.98, 0.215); nv.add(timAI);
+  const timQuang = new THREE.Sprite(new THREE.SpriteMaterial({ map: anhQuang(), depthWrite: false, blending: THREE.AdditiveBlending }));
+  timQuang.scale.setScalar(0.35); timQuang.position.copy(timAI.position); nv.add(timQuang);
+
+  // tay
+  const taoTay = (s) => {
+    const vai = new THREE.Group(); vai.position.set(0.21 * s, 1.04, 0);
+    const ong = new THREE.Mesh(new THREE.CapsuleGeometry(0.075, 0.26, 6, 12), toon(AO));
+    ong.position.y = -0.18; vienNet(ong, 1.05); vai.add(ong);
+    const coTay = new THREE.Mesh(new THREE.TorusGeometry(0.075, 0.02, 8, 20), toon(TRANG));
+    coTay.rotation.x = Math.PI / 2; coTay.position.y = -0.33; vai.add(coTay);
+    const ban = new THREE.Mesh(new THREE.SphereGeometry(0.085, 16, 12), toon(DA));
+    ban.position.y = -0.41; vai.add(ban);
+    nv.add(vai); return vai;
+  };
+  const tayTrai = taoTay(-1), tayPhai = taoTay(1);
+  // chân
+  [-1, 1].forEach((s) => {
+    const chan = new THREE.Mesh(new THREE.CapsuleGeometry(0.07, 0.22, 6, 12), toon(TRANG));
+    chan.position.set(0.12 * s, 0.27, 0); nv.add(chan);
+    const giay = new THREE.Mesh(new THREE.SphereGeometry(0.1, 16, 12), toon(0x5b3fc4));
+    giay.scale.set(0.9, 0.6, 1.3); giay.position.set(0.12 * s, 0.08, 0.04); vienNet(giay, 1.06); nv.add(giay);
+  });
+
+  // ---------- SÂN KHẤU ẢO ----------
+  const san = new THREE.Group(); scene.add(san);
+  const nen = new THREE.Mesh(new THREE.CircleGeometry(1.1, 48), new THREE.MeshBasicMaterial({ map: anhQuang(), transparent: true, depthWrite: false, blending: THREE.AdditiveBlending }));
+  nen.rotation.x = -Math.PI / 2; nen.position.y = 0.01; san.add(nen);
+  const vong1 = new THREE.Mesh(new THREE.TorusGeometry(1.0, 0.012, 8, 80), sang(XANH, 0.7)); vong1.rotation.x = Math.PI / 2; vong1.position.y = 0.02; san.add(vong1);
+  const vong2 = new THREE.Mesh(new THREE.TorusGeometry(1.25, 0.008, 8, 80, Math.PI * 1.4), sang(0xb59cff, 0.7)); vong2.rotation.x = Math.PI / 2; vong2.position.y = 0.04; san.add(vong2);
+  const vong3 = new THREE.Mesh(new THREE.TorusGeometry(1.45, 0.006, 8, 80, Math.PI * 0.8), sang(0xff8fc8, 0.6)); vong3.rotation.x = Math.PI / 2; vong3.position.y = 0.06; san.add(vong3);
+
+  // bụi sao lấp lánh
+  const SO = 70, vt = new Float32Array(SO * 3), mau = new Float32Array(SO * 3);
+  const bangMau = [new THREE.Color(XANH), new THREE.Color(0xb59cff), new THREE.Color(0xff9fd0)];
+  for (let i = 0; i < SO; i++) {
+    const a = Math.random() * Math.PI * 2, r = 1.2 + Math.random() * 1.3;
+    vt[i * 3] = Math.cos(a) * r; vt[i * 3 + 1] = Math.random() * 3.0; vt[i * 3 + 2] = Math.sin(a) * r - 0.4;
+    const c = bangMau[i % 3]; mau[i * 3] = c.r; mau[i * 3 + 1] = c.g; mau[i * 3 + 2] = c.b;
+  }
+  const hatGeo = new THREE.BufferGeometry();
+  hatGeo.setAttribute('position', new THREE.BufferAttribute(vt, 3));
+  hatGeo.setAttribute('color', new THREE.BufferAttribute(mau, 3));
+  const bui = new THREE.Points(hatGeo, new THREE.PointsMaterial({ size: 0.05, vertexColors: true, transparent: true, opacity: 0.85, depthWrite: false, blending: THREE.AdditiveBlending }));
+  scene.add(bui);
+
+  // tim bay khi bấm
+  const texTim = anhTim();
+  const timBay = [];
+  const thaTim = () => {
+    for (let i = 0; i < 6; i++) {
+      const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: texTim, transparent: true, depthWrite: false }));
+      sp.position.set((Math.random() - 0.5) * 1.2, 1.6 + Math.random() * 0.6, 0.6);
+      sp.scale.setScalar(0.18 + Math.random() * 0.12);
+      sp.userData = { v: 0.6 + Math.random() * 0.6, song: 0 };
+      scene.add(sp); timBay.push(sp);
+    }
+  };
+
+  // ---------- ĐIỀU KHIỂN ----------
+  const chuot = { x: 0, y: 0 }, nhin = { x: 0, y: 0 };
+  const theoChuot = (e) => {
+    const r = khung.getBoundingClientRect();
+    const cx = r.left + r.width / 2, cy = r.top + r.height * 0.35;
+    chuot.x = Math.max(-1, Math.min(1, (e.clientX - cx) / (window.innerWidth * 0.45)));
+    chuot.y = Math.max(-1, Math.min(1, (e.clientY - cy) / (window.innerHeight * 0.45)));
+  };
+  window.addEventListener('pointermove', theoChuot, { passive: true });
+
+  let nhayLuc = 0, nhayCao = 0, vayDen = 3.0, noiDen = 0, chopLuc = 1.5 + Math.random() * 2;
+  const clock = new THREE.Clock();
+  const nhay = () => { if (nhayCao <= 0.001) nhayLuc = 2.6; };
+  const bam = () => { nhay(); thaTim(); vayDen = clock.getElapsedTime() + 1.8; if (opts.onClick) opts.onClick(); };
+  renderer.domElement.addEventListener('click', bam);
+
+  const doiCo = () => {
+    const w = khung.clientWidth || 300, h = khung.clientHeight || 300;
+    renderer.setSize(w, h, false);
+    camera.aspect = w / h;
+    camera.position.z = w / h < 0.8 ? 9.4 : 7.8;
+    camera.updateProjectionMatrix();
+  };
+  doiCo();
+  const ro = new ResizeObserver(doiCo); ro.observe(khung);
+
+  let dangThay = true;
+  const io = new IntersectionObserver((ds) => { dangThay = ds[0].isIntersecting; }, { threshold: 0.01 });
+  io.observe(khung);
+
+  const bienDo = giamChuyenDong ? 0.3 : 1;
+  let raf = 0, truoc = 0;
+  const ve = () => {
+    raf = requestAnimationFrame(ve);
+    if (!dangThay || document.hidden) return;
+    const t = clock.getElapsedTime();
+    const dt = Math.min(0.05, t - truoc); truoc = t;
+
+    // nhún nhảy
+    if (nhayLuc > 0 || nhayCao > 0) { nhayCao += nhayLuc * dt; nhayLuc -= 9 * dt; if (nhayCao <= 0) { nhayCao = 0; nhayLuc = 0; } }
+    nv.position.y = Math.sin(t * 1.8) * 0.05 * bienDo + nhayCao;
+    nhin.x += (chuot.x - nhin.x) * 0.06; nhin.y += (chuot.y - nhin.y) * 0.06;
+    nv.rotation.y = nhin.x * 0.35 + Math.sin(t * 0.5) * 0.08 * bienDo;
+    dau.rotation.y = nhin.x * 0.3;
+    dau.rotation.x = nhin.y * 0.22 + Math.sin(t * 0.9) * 0.03 * bienDo;
+    dau.rotation.z = Math.sin(t * 1.2) * 0.06 * bienDo;
+
+    // chớp mắt
+    chopLuc -= dt;
+    let sy = 1;
+    if (chopLuc < 0.16) sy = Math.max(0.08, Math.abs(chopLuc - 0.08) / 0.08);
+    if (chopLuc <= 0) chopLuc = 2 + Math.random() * 3.5;
+    mat.forEach((m) => { m.scale.y = sy; });
+
+    // vẫy tay
+    const dangVay = t < vayDen;
+    const dichPhai = dangVay ? 2.55 + Math.sin(t * 9) * 0.35 : 0.28 + Math.sin(t * 1.6) * 0.06 * bienDo;
+    tayPhai.rotation.z += (dichPhai - tayPhai.rotation.z) * 0.15;
+    tayPhai.rotation.x = dangVay ? -0.2 : 0;
+    tayTrai.rotation.z = -0.28 - Math.sin(t * 1.6 + 1) * 0.06 * bienDo;
+    if (!dangVay && Math.floor(t) % 9 === 0 && t - Math.floor(t) < dt) vayDen = t + 2.2;
+
+    // tóc, ăng-ten
+    bim[0].rotation.z = Math.sin(t * 2.2) * 0.1 * bienDo - nhin.x * 0.1;
+    bim[1].rotation.z = Math.sin(t * 2.2 + 0.6) * 0.1 * bienDo - nhin.x * 0.1;
+    angTen.rotation.z = Math.sin(t * 3) * 0.12 * bienDo;
+    sao.rotation.y = t * 2;
+    const nhip = 1 + Math.sin(t * 4) * 0.15;
+    saoQuang.scale.setScalar(0.5 * nhip); timQuang.scale.setScalar(0.35 * nhip);
+    timAI.rotation.y = t * 1.5;
+
+    // nói
+    const noi = t < noiDen;
+    miengNoi.scale.y = noi ? 0.35 + Math.abs(Math.sin(t * 14)) * 0.6 : 0.01;
+    mieng.visible = !noi;
+
+    // sân khấu
+    vong1.rotation.z = t * 0.3; vong2.rotation.z = -t * 0.5; vong3.rotation.z = t * 0.8;
+    bui.rotation.y = t * 0.05;
+
+    for (let i = timBay.length - 1; i >= 0; i--) {
+      const sp = timBay[i]; sp.userData.song += dt;
+      sp.position.y += sp.userData.v * dt; sp.position.x += Math.sin(sp.userData.song * 4 + i) * 0.004;
+      sp.material.opacity = Math.max(0, 1 - sp.userData.song / 1.6);
+      if (sp.userData.song > 1.6) { scene.remove(sp); sp.material.dispose(); timBay.splice(i, 1); }
+    }
+    renderer.render(scene, camera);
+  };
+  ve();
+
+  return {
+    noi: (ms = 1600) => { noiDen = clock.getElapsedTime() + ms / 1000; },
+    vay: () => { vayDen = clock.getElapsedTime() + 2; },
+    go: () => {
+      cancelAnimationFrame(raf); ro.disconnect(); io.disconnect();
+      window.removeEventListener('pointermove', theoChuot);
+      renderer.domElement.removeEventListener('click', bam);
+      scene.traverse((o) => { if (o.geometry) o.geometry.dispose(); if (o.material) [].concat(o.material).forEach((m) => { if (m.map) m.map.dispose(); m.dispose(); }); });
+      renderer.dispose();
+      if (renderer.domElement.parentNode) renderer.domElement.parentNode.removeChild(renderer.domElement);
+    }
+  };
+}
+
+window.TroLy3D = { mount };
+window.dispatchEvent(new Event('trolyly3d-san-sang'));
+
   </script>
 </body>
 </html>
