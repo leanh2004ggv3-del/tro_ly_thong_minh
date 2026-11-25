@@ -499,7 +499,7 @@ const LOI = (() => {
         TB: "đọc kĩ văn bản trong sách, luyện lập dàn ý trước khi viết", Y: "luyện đọc hiểu từng phần, viết câu đúng ngữ pháp, đúng chính tả",
         Ke: "luyện đọc thành tiếng, viết câu, đoạn ngắn mỗi ngày dưới sự hướng dẫn của thầy cô" } },
     { ma: "anh", ten: "Tiếng Anh", tiet: [105, 105, 105, 105], loai: "diem",
-      nl: ["nghe", "nói", "đọc", "viết"],
+      nl: ["nghe, nói, đọc, viết tiếng Anh", "sử dụng tiếng Anh trong giao tiếp"],
       viec: { G: "luyện nói, viết theo chủ đề để dùng tiếng Anh tự tin hơn", K: "học thêm từ vựng theo chủ đề và luyện nghe – nói thường xuyên",
         TB: "học thuộc từ vựng, mẫu câu của từng bài và làm đủ bài tập", Y: "ôn lại từ vựng, cấu trúc câu cơ bản mỗi ngày",
         Ke: "học lại từ vựng và mẫu câu cơ bản của từng bài với sự kèm cặp của thầy cô" } },
@@ -547,8 +547,8 @@ const LOI = (() => {
       nl: ["hiểu biết về văn hoá, lịch sử, địa lí của địa phương", "vận dụng hiểu biết vào cuộc sống ở địa phương"],
       viec: { G: "tìm hiểu, giới thiệu thêm về quê hương", K: "liên hệ bài học với thực tế địa phương", TB: "hoàn thành đủ nhiệm vụ, sản phẩm học tập", Y: "hoàn thành đủ nhiệm vụ, sản phẩm học tập", Ke: "hoàn thành đủ nhiệm vụ, sản phẩm học tập" } },
     { ma: "khac", ten: "Môn khác", tiet: [105, 105, 105, 105], loai: "diem",
-      nl: ["kiến thức, kĩ năng của môn học", "vận dụng kiến thức, kĩ năng đã học"],
-      viec: { G: "phát huy, thử sức với nhiệm vụ vận dụng nâng cao", K: "rèn thêm kĩ năng vận dụng để đạt kết quả cao hơn",
+      nl: ["vận dụng kiến thức, kĩ năng đã học", "giải quyết nhiệm vụ học tập"],
+      viec: { G: "thử sức với nhiệm vụ vận dụng nâng cao", K: "rèn thêm kĩ năng vận dụng",
         TB: "nắm chắc kiến thức cơ bản và làm đủ bài tập", Y: "ôn lại kiến thức cơ bản từng bài", Ke: "học lại kiến thức nền tảng với sự hướng dẫn của thầy cô" } }
   ];
   const monTheoMa = ma => MON.find(m => m.ma === ma) || MON[MON.length - 1];
@@ -602,7 +602,7 @@ const LOI = (() => {
      o: { mon (mã), ky "hk1"|"hk2"|"cn", doDai "ngan"|"vua"|"du", kemDiem bool, bien số } */
   function monHoc(d, o) {
     const m = monTheoMa(o.mon), b = o.bien || 0, ghi = tachGhi(d.ghi), dai = o.doDai || "vua";
-    const nl = m.nl;
+    const nl = m.nl, tm = m.ma === "khac" ? "môn học" : "môn " + m.ten;
     if (m.loai === "nx") return monNhanXet(d, o, m, ghi);
     if (d.dtb == null) return "";
     const g = nhom(d.dtb), kd = o.kemDiem;
@@ -621,11 +621,11 @@ const LOI = (() => {
     const giam = /giảm/.test(tienBo);
     /* 2. ưu điểm theo nhóm điểm + năng lực đặc thù */
     const UU = {
-      G: [`nắm vững kiến thức, kĩ năng môn ${m.ten}; năng lực ${nlA} tốt`, `học tốt môn ${m.ten}, thể hiện tốt năng lực ${nlA} và ${nlB}`, `kiến thức môn ${m.ten} vững vàng, ${nlA} tốt`, `có năng lực ${nlA} tốt, vận dụng kiến thức linh hoạt`],
-      K: [`nắm được kiến thức, kĩ năng môn ${m.ten}; năng lực ${nlA} khá`, `học khá môn ${m.ten}, vận dụng được kiến thức vào bài tập`, `nắm chắc kiến thức cơ bản, năng lực ${nlA} khá`, `hiểu bài, làm được phần lớn yêu cầu của môn học`],
-      TB: [`nắm được kiến thức cơ bản của môn ${m.ten}`, `đạt yêu cầu cơ bản của môn học`, `hoàn thành các yêu cầu cơ bản của môn ${m.ten}`, `nắm được kiến thức cơ bản, làm được bài tập mức biết, hiểu`],
-      Y: [`chưa nắm vững kiến thức cơ bản của môn ${m.ten}`, `kiến thức cơ bản còn hổng, năng lực ${nlA} còn hạn chế`, `chưa đạt yêu cầu cơ bản ở một số nội dung`, `còn lúng túng khi làm bài, năng lực ${nlA} chưa đạt yêu cầu`],
-      Ke: [`kiến thức, kĩ năng môn ${m.ten} còn nhiều hạn chế`, `chưa đạt yêu cầu cơ bản của môn học`, `còn hổng nhiều kiến thức nền tảng của môn ${m.ten}`]
+      G: [`nắm vững kiến thức, kĩ năng ${tm}; năng lực ${nlA} tốt`, `học tốt ${tm}, thể hiện tốt năng lực ${nlA} và ${nlB}`, `kiến thức ${tm} vững vàng, ${nlA} tốt`, `có năng lực ${nlA} tốt, vận dụng kiến thức linh hoạt`],
+      K: [`nắm được kiến thức, kĩ năng ${tm}; năng lực ${nlA} khá`, `học khá ${tm}, vận dụng được kiến thức vào bài tập`, `nắm chắc kiến thức cơ bản, năng lực ${nlA} khá`, `hiểu bài, làm được phần lớn yêu cầu của môn học`],
+      TB: [`nắm được kiến thức cơ bản của ${tm}`, `đạt yêu cầu cơ bản của môn học`, `hoàn thành các yêu cầu cơ bản của ${tm}`, `nắm được kiến thức cơ bản, làm được bài tập mức biết, hiểu`],
+      Y: [`chưa nắm vững kiến thức cơ bản của ${tm}`, `kiến thức cơ bản còn hổng, năng lực ${nlA} còn hạn chế`, `chưa đạt yêu cầu cơ bản ở một số nội dung`, `còn lúng túng khi làm bài, năng lực ${nlA} chưa đạt yêu cầu`],
+      Ke: [`kiến thức, kĩ năng ${tm} còn nhiều hạn chế`, `chưa đạt yêu cầu cơ bản của môn học`, `còn hổng nhiều kiến thức nền tảng của ${tm}`]
     };
     /* 3. phẩm chất gắn với việc học môn (chăm chỉ, trách nhiệm) */
     const PC = {
@@ -646,21 +646,21 @@ const LOI = (() => {
     if (ghi.han.length) can = ghi.han.join("; ") + "; ";
     if (giam) can = tienBo + "; " + can;
     if (g === "G") can += (ghi.han.length || giam ? "cần " : "cần phát huy, ") + viec;
-    else if (g === "K") can += "cần " + viec + " để đạt kết quả cao hơn";
+    else if (g === "K") can += (ghi.han.length || giam ? "cần " : "để đạt kết quả cao hơn, cần ") + viec;
     else can += dai === "ngan" ? "cần " + viec : chon(PC[g], b) + "; " + viec;
     phan.push(cau(can));
     return phan.join(" ");
   }
   function monNhanXet(d, o, m, ghi) {
     if (!d.kq) return "";
-    const b = o.bien || 0, nlA = chon(m.nl, b), nlB = chon(m.nl, b + 1);
+    const b = o.bien || 0, nlA = chon(m.nl, b), nlB = chon(m.nl, b + 1), tm = m.ma === "khac" ? "môn học" : "môn " + m.ten;
     if (d.kq === "Đạt") {
       const tot = ghi.uu.length > 0;
-      let s = chon([`hoàn thành các yêu cầu của môn ${m.ten}; ${nlA} đạt yêu cầu`, `đạt yêu cầu môn ${m.ten}, tích cực tham gia các hoạt động học tập`, `tham gia đầy đủ, hoàn thành các nhiệm vụ của môn học; ${nlA}, ${nlB} đạt yêu cầu`], b);
+      let s = chon([`hoàn thành các yêu cầu của ${tm}; ${nlA} đạt yêu cầu`, `đạt yêu cầu ${tm}, tích cực tham gia các hoạt động học tập`, `tham gia đầy đủ, hoàn thành các nhiệm vụ của môn học; ${nlA}, ${nlB} đạt yêu cầu`], b);
       if (tot) s += "; " + ghi.uu.join("; ");
       return [cau(s), cau((ghi.han.length ? ghi.han.join("; ") + "; " : "") + "cần " + m.viec[tot ? "G" : "K"])].join(" ");
     }
-    return [cau(chon([`chưa hoàn thành một số yêu cầu của môn ${m.ten}`, `chưa đạt yêu cầu ở một số nội dung của môn ${m.ten}`], b) + (ghi.uu.length ? "; " + ghi.uu.join("; ") : "")),
+    return [cau(chon([`chưa hoàn thành một số yêu cầu của ${tm}`, `chưa đạt yêu cầu ở một số nội dung của ${tm}`], b) + (ghi.uu.length ? "; " + ghi.uu.join("; ") : "")),
       cau((ghi.han.length ? ghi.han.join("; ") + "; " : "") + "cần " + m.viec.TB)].join(" ");
   }
 
@@ -684,7 +684,10 @@ const LOI = (() => {
         "Chưa đạt": ["kết quả học tập chưa đạt yêu cầu", "học tập còn nhiều hạn chế", "chưa đạt yêu cầu về học tập"] }[h.hoc];
       hoc = L ? chon(L, b) : "";
     } else if (ds.length) hoc = "học tập " + (ds.every(([, t]) => t >= 65) ? "khá đồng đều" : "có cố gắng");
-    if (manh.length) hoc += (hoc ? ", " : "") + chon(["nổi bật ở môn ", "học tốt môn ", "có thế mạnh ở môn "], b) + noi(manh);
+    if (manh.length) {
+      const khaTro = !h.hoc || h.hoc === "Tốt" || h.hoc === "Khá";
+      hoc += (hoc ? (khaTro ? ", " : "; ") : "") + (khaTro ? chon(["nổi bật ở môn ", "học tốt môn ", "có thế mạnh ở môn "], b) : chon(["học khá tốt môn ", "có cố gắng ở môn "], b)) + noi(manh);
+    }
     if (hoc) phan.push(cau(hoc));
     /* phẩm chất, năng lực chung */
     const pc = h.pc || {};
@@ -698,14 +701,17 @@ const LOI = (() => {
     /* hạn chế + việc cần làm */
     const can = [];
     ghi.han.forEach(s => can.push(s));
-    canPc.slice(0, 2).forEach(x => can.push("cần " + x.can));
-    if (yeu.length) can.push("cần cố gắng nhiều hơn ở môn " + noi(yeu));
     if (nxCd.length) can.push("cần hoàn thành yêu cầu môn " + noi(nxCd));
-    if (!can.length) {
-      if (h.hoc === "Tốt" && h.rl === "Tốt") can.push(chon(["cần phát huy kết quả đã đạt được", "tiếp tục phát huy, là tấm gương tốt cho các bạn noi theo", "cần giữ vững và phát huy hơn nữa"], b));
+    if (yeu.length) can.push("cần cố gắng nhiều hơn ở môn " + noi(yeu));
+    canPc.slice(0, 2).forEach(x => can.push("cần " + x.can));
+    if (!can.some(s => /^cần /.test(s))) {
+      if (h.hoc === "Tốt" && h.rl === "Tốt" && !ghi.han.length) can.push(chon(["cần phát huy kết quả đã đạt được", "cần tiếp tục phát huy những ưu điểm đã có", "cần giữ vững và phát huy hơn nữa"], b));
       else can.push(chon(["cần cố gắng hơn nữa để đạt kết quả cao hơn", "cần phát huy ưu điểm, cố gắng hơn ở học kỳ tới", "cần tiếp tục rèn luyện, học tập chăm chỉ hơn"], b));
     }
-    phan.push(cau(can.join("; ")));
+    // chỉ giữ chữ «cần» ở việc đầu tiên: «Cần A; B; C»
+    let daCan = false;
+    const canGon = can.slice(0, dai === "ngan" ? 2 : dai === "vua" ? 3 : 4).map(s => { if (/^cần /.test(s)) { if (daCan) return s.slice(4); daCan = true; } return s; });
+    phan.push(cau(canGon.join("; ")));
     return phan.join(" ");
   }
 
