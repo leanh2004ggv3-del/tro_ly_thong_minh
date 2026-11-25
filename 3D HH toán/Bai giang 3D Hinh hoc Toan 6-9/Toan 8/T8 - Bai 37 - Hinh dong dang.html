@@ -205,7 +205,8 @@ function renderScript(fig,k,p){FIG=fig;drawBoard();(fig.base||[]).forEach(it=>dr
  (fig.top||[]).forEach(it=>drawItem(it,1));
  tools.filter(t=>t.k!=='pencil'&&t.k!=='compass').forEach(drawTool);tools.filter(t=>t.k==='pencil'||t.k==='compass').forEach(drawTool)}
 /* tập hợp mọi điểm của hình để vừa khung */
-function figPts(fig){return Object.values(fig.P)}
+function figPts(fig){const out=Object.values(fig.P).slice(),A=x=>Array.isArray(x)&&typeof x[0]==='number';
+ (fig.base||[]).forEach(it=>{['a','b','p','at','c'].forEach(k=>{if(A(it[k]))out.push(it[k])});if(it.t==='circ'&&it.r){const c=A(it.c)?it.c:fig.P[it.c];if(c)out.push([c[0]-it.r,c[1]-it.r],[c[0]+it.r,c[1]+it.r])}});return out}
 
 /* ---------------- ÂM THANH PHẢN HỒI (không đọc giọng) ---------------- */
 let AC=null;function beep(ok){try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();const seq=ok?[660,880,1175]:[300,220];seq.forEach((f,i)=>{const o=AC.createOscillator(),g=AC.createGain();o.type=ok?'triangle':'sawtooth';o.frequency.value=f;g.gain.setValueAtTime(.0001,AC.currentTime+i*.11);g.gain.exponentialRampToValueAtTime(.18,AC.currentTime+i*.11+.02);g.gain.exponentialRampToValueAtTime(.0001,AC.currentTime+i*.11+.2);o.connect(g);g.connect(AC.destination);o.start(AC.currentTime+i*.11);o.stop(AC.currentTime+i*.11+.22)})}catch(e){}}
@@ -285,7 +286,7 @@ MODS.cm={i:0,k:0,t0:0,
 MODS.thu={i:0,done:{},t0:0,
  open(a){this.i=+(a.q||0);this.ord=[];this.show();if(a.a!=null&&S.still)this.answer(+a.a)},
  qs(){return LESSON.thu},
- show(){const q=this.qs()[this.i];this.t0=performance.now();this.ord=[];this.res=this.done[this.i]||null;camFit(figPts(q.fig),{now:true,yaw:q.fig.yaw==null?-8:q.fig.yaw,pitch:q.fig.pitch||72,pad:1.2});this.panel()},
+ show(){const q=this.qs()[this.i];this.t0=performance.now();this.ord=[];this.res=this.done[this.i]||null;const pp=q.fig.pitch||72,khoi=!!(LESSON.lang||LESSON.khoi||LESSON.tron),phang=q.fig.nghieng?false:(khoi?pp>=78:true);camFit(figPts(q.fig),{now:true,yaw:phang?0:(q.fig.yaw!=null?q.fig.yaw:-8),pitch:phang?89.4:pp,pad:1.2});this.panel()},
  draw(){const q=this.qs()[this.i];FIG=q.fig;drawBoard();(q.fig.base||((q.fig.steps||[])[0]||{}).items||[]).forEach(it=>drawItem(it,1));if(this.res&&q.fig.sau)q.fig.sau.forEach(it=>drawItem(it,Math.min(1,(performance.now()-this.res.t)/600)))},
  answer(v){const q=this.qs()[this.i];let ok;
   if(q.kieu==='so'){ok=q.a.every((x,j)=>Math.abs(+String(v[j]).trim().replace(',','.')-x)<(q.tol||1e-6))}else if(q.kieu==='xep'){ok=[q.a].concat(q.alt||[]).some(a=>v.join(',')===a.join(','))}else ok=v===q.a;
@@ -810,6 +811,26 @@ function catKhung(A,B,box,tia){const d=V.sub(B,A);let t0=tia?0:-1e9,t1=1e9;const
 const veDuong=(A,B,box,col,w,dash,tia)=>{const e=catKhung(A,B,box,tia);if(e)line2(e[0],e[1],col,w,dash);return e};
 const chanDT=(M,A,B)=>{const u=V.unit(V.sub(B,A));return V.add(A,V.mul(u,V.dot(V.sub(M,A),u)))};
 
+/* Hình riêng cho câu «Thử ngay» (rà 25/11/2026): hq({P, tg:['ABC'] đa giác kín, doan:['AH'] đoạn, net:['AH'] nét đứt, nhan:{AB:'5 cm'}, goc:[['A','B','C','60°']] góc tại A,
+   vuong:['ABC'] vuông tại A, tron:[['O',R,{opts}]], an:'XY' (không ghi tên), them:[mục], to:{A:'đỏ'…}) — nhãn cạnh tự đặt phía ngoài hình */
+const tenD=s=>s.match(/[A-Z][′']?\d?/g)||[];
+function hq(o){const P=o.P,base=[],ks=Object.keys(P).filter(k=>k[0]!=='_'),cen=V.mul(ks.reduce((s,k)=>V.add(s,P[k]),[0,0]),1/Math.max(1,ks.length));
+ (o.tron||[]).forEach(t=>base.push(Object.assign({t:'circ',c:t[0],r:t[1],col:'#1d4f9a',w:2.2},t[2]||{})));
+ (o.to||[]).forEach(([s,col])=>base.push(poly(tenD(s),col)));
+ (o.tg||[]).forEach(s=>{const n=tenD(s);n.forEach((a,i)=>base.push(seg(a,n[(i+1)%n.length],{w:2.6})))});
+ (o.doan||[]).forEach(s=>{const n=tenD(s);base.push(seg(n[0],n[1],{w:2.6}))});
+ (o.net||[]).forEach(s=>{const n=tenD(s);base.push(seg(n[0],n[1],{dash:[6,5],col:'#5b6684',w:2}))});
+ Object.entries(o.nhan||{}).forEach(([s,lab])=>{const[a,b]=tenD(s),A=P[a],B=P[b],m=V.mid(A,B),sg=Math.sign(V.dot(V.perp(V.sub(B,A)),V.sub(m,cen)))||1;base.push(nhanDai(a,b,lab,{off:.45*sg,col:'#1d4f9a',size:16,at2:[-.01,1]}))});
+ (o.goc||[]).forEach(([v,a,b,lab,col])=>base.push(ang(v,a,b,{lab,col:col||'#dc2626',r:.6,lr:.6,size:15,fill:true})));
+ (o.vuong||[]).forEach(s=>{const n=tenD(s);base.push(ang(n[0],n[1],n[2],{right:true,col:'#1d4f9a',r:.32}))});
+ ks.filter(k=>!(o.an||'').includes(k)).forEach(k=>base.push(pt(k,o.d&&o.d[k]?{d:o.d[k]}:{})));
+ return Object.assign({P,pitch:85,base:base.concat(o.them||[])},o.x||{})}
+/* hình hộp vẽ phối cảnh (mặt trước a × c, chiều sâu b), nhãn ba kích thước */
+function hopQ(a,b,c,la,lb,lc,ten){const k=.45,d=[b*k,b*k*.75],P={_A:[0,0],_B:[a,0],_C:[a,c],_D:[0,c]};P._E=V.add(P._A,d);P._F=V.add(P._B,d);P._G=V.add(P._C,d);P._H=V.add(P._D,d);
+ const s=(x,y,o)=>seg(x,y,Object.assign({w:2.4},o||{})),h={dash:[6,5],w:1.8,col:'#5b6684'};
+ return{P,pitch:85,base:[s('_A','_B'),s('_B','_C'),s('_C','_D'),s('_D','_A'),s('_B','_F'),s('_C','_G'),s('_D','_H'),s('_F','_G'),s('_G','_H'),s('_A','_E',h),s('_E','_F',h),s('_E','_H',h),
+  nhanDai('_A','_B',la||'',{off:-.45,size:15,at2:[-.01,1]}),nhanDai('_B','_F',lb||'',{off:-.5,size:15,at2:[-.01,1]}),nhanDai('_D','_A',lc||'',{off:.5,size:15,at2:[-.01,1]})].concat(ten||[])}}
+
 /* ===== Toán 8 (KNTT) — Bài 37. HÌNH ĐỒNG DẠNG — SGK tập hai tr.104–107 =====
    Phần «em gợi ý» là lời giải/cách vẽ em đề xuất cho câu hỏi SGK để HS tự làm — GV soát. */
 const PH=s=>`<span class="m">${s}</span>`;
@@ -873,13 +894,14 @@ const qAnh=(()=>{const O=[0,1],A=[3,2.5],B=[3,-.5],Ap=viTu(O,A,2),Bp=viTu(O,B,2)
 const qHaiDeu=(()=>{const A=[0,0],B=[2,0],C=V.pol(A,60,2),D=[4,.5],E=V.pol(D,-20,3),F=V.pol(D,40,3);return{P:{A,B,C,D,E,F},pitch:78,base:[{t:'poly',pts:[A,B,C],col:'rgba(47,125,225,.2)',stroke:'#1d4f9a'},{t:'poly',pts:[D,E,F],col:'rgba(224,138,30,.2)',stroke:'#b5650d'}]}})();
 const qVuong2=(()=>{const P={A:[0,0],B:[1.5,0],C:[1.5,1.5],D:[0,1.5],E:[3,-.5],F:[6,.5],G:[5,3.5],H:[2,2.5]};return{P,pitch:78,base:[{t:'poly',pts:['A','B','C','D'],col:'rgba(47,125,225,.2)',stroke:'#1d4f9a'},{t:'poly',pts:['E','F','G','H'],col:'rgba(224,138,30,.2)',stroke:'#b5650d'}]}})();
 
+const Q37oa={P:{O:[0,0],A:[2,.8],'A′':[5,2]},pitch:85,base:[seg('O','A′',{w:2.6}),pt('O',{d:[-.35,-.3]}),pt('A',{d:[0,.45],col:'#2f7de1'}),pt('A′',{d:[.35,.35],col:'#dc2626'}),nhanDai('O','A','OA = 2 cm',{off:-.5,at2:[-.01,1],size:15,col:'#2f7de1'}),nhanDai('O','A′',"OA′ = 5 cm",{off:-1.1,at:.7,at2:[-.01,1],size:15,col:'#dc2626'})]};
 const LESSON={title:'Bài 37. Hình đồng dạng',sub:'Toán 8 · Kết nối tri thức · Chương IX. Tam giác đồng dạng · SGK tập hai tr.104–107',
  tabs:[['ve','✏️ Vẽ hình'],['lab','🔍 Nhận biết'],['cm','🧠 Chứng minh'],['thu','✅ Thử ngay']],
  ve:[b37ve1,b37ve2],cm:[b37cm1],lab:LAB37,
  thu:[
  {nguon:'HĐ2 · tr.105 · Hình 9.59',fig:qAnh,kieu:'chon',q:'Hai bức ảnh chân dung kích thước 2 × 3 (hình 𝒯) và 4 × 6 (hình 𝒯′). Hình 𝒯′ là:',o:['Hình phóng to của 𝒯 với tỉ số 2','Hình thu nhỏ của 𝒯 với tỉ số 2','Hình phóng to của 𝒯 với tỉ số 1/2'],a:0,giai:'6 : 3 = 4 : 2 = 2: 𝒯′ là hình phóng to của 𝒯 với tỉ số 2; 𝒯 là hình thu nhỏ của 𝒯′ với tỉ số 1/2.',sai:{1:'𝒯′ lớn hơn 𝒯.',2:'Tỉ số phóng to lớn hơn 1.'}},
  {nguon:'Bài 9.29 · tr.107',fig:b37ve2,kieu:'chon',q:'Vẽ hình đồng dạng phối cảnh tâm <i>O</i> của đoạn <i>AB</i> theo tỉ số ½. Điểm <i>A′</i> ứng với <i>A</i> là:',o:['Trung điểm của <i>OA</i>','Điểm trên tia đối của <i>OA</i> với <i>OA′</i> = <i>OA</i>','Điểm trên tia <i>OA</i> với <i>OA′</i> = 2<i>OA</i>'],a:0,giai:'<i>OA′</i> = ½<i>OA</i> và <i>A′</i> thuộc tia <i>OA</i>: <i>A′</i> là trung điểm của <i>OA</i>.',sai:{1:'Hình phối cảnh nằm trên tia <i>OA</i>.',2:'Đó là tỉ số 2.'}},
- {nguon:'Định nghĩa · tr.105',fig:qAnh,kieu:'so',dv:'',q:'Hai hình đồng dạng phối cảnh tâm <i>O</i>: <i>OA</i> = 2 cm, <i>OA′</i> = 5 cm. Tính tỉ số đồng dạng <i>k</i> của hình chứa <i>A′</i> với hình chứa <i>A</i>.',o:['k'],a:[2.5],giai:'<i>k</i> = '+tl('OA′','OA')+' = 5/2 = 2,5.',goiy:'<i>k</i> = '+tl('OA′','OA')+'.'},
+ {nguon:'Định nghĩa · tr.105',fig:Q37oa,kieu:'so',dv:'',q:'Hai hình đồng dạng phối cảnh tâm <i>O</i>: <i>OA</i> = 2 cm, <i>OA′</i> = 5 cm. Tính tỉ số đồng dạng <i>k</i> của hình chứa <i>A′</i> với hình chứa <i>A</i>.',o:['k'],a:[2.5],giai:'<i>k</i> = '+tl('OA′','OA')+' = 5/2 = 2,5.',goiy:'<i>k</i> = '+tl('OA′','OA')+'.'},
  {nguon:'Tranh luận · tr.107',fig:qVuong2,kieu:'chon',q:'Đúng hay sai: «Hai hình vuông bất kì đều đồng dạng với nhau.»',o:['Đúng','Sai'],a:0,giai:'Đúng: phóng to hoặc thu nhỏ hình vuông này (rồi dời hình) được hình vuông kia.',sai:{1:'Hai hình vuông luôn có hình dạng giống nhau.'}},
  {nguon:'Tranh luận · tr.107',fig:qHaiDeu,kieu:'chon',q:'Đúng hay sai: «Hai hình tam giác đều bất kì đều đồng dạng phối cảnh với nhau.»',o:['Đúng','Sai'],a:1,giai:'Sai: chúng luôn đồng dạng nhưng không nhất thiết phối cảnh — nếu một hình bị xoay, các đường nối điểm tương ứng không đi qua một điểm (xem mẫu ⚠️ ở màn Nhận biết).',sai:{0:'Đồng dạng thì đúng, nhưng phối cảnh cần các đường nối điểm tương ứng đi qua một điểm.'}},
  {nguon:'Câu hỏi · tr.105',fig:qHaiDeu,kieu:'chon',q:'Hai hình tam giác bằng nhau bất kì có phải là hai hình đồng dạng phối cảnh không?',o:['Không nhất thiết','Luôn luôn phải'],a:0,giai:'Hai tam giác bằng nhau đồng dạng với tỉ số 1, nhưng nếu một tam giác bị xoay hoặc lật thì không phải phối cảnh.',sai:{1:'Hãy thử xoay một tam giác: các đường nối điểm tương ứng không còn đi qua một điểm.'}}]};

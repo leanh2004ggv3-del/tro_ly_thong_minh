@@ -205,7 +205,8 @@ function renderScript(fig,k,p){FIG=fig;drawBoard();(fig.base||[]).forEach(it=>dr
  (fig.top||[]).forEach(it=>drawItem(it,1));
  tools.filter(t=>t.k!=='pencil'&&t.k!=='compass').forEach(drawTool);tools.filter(t=>t.k==='pencil'||t.k==='compass').forEach(drawTool)}
 /* tập hợp mọi điểm của hình để vừa khung */
-function figPts(fig){return Object.values(fig.P)}
+function figPts(fig){const out=Object.values(fig.P).slice(),A=x=>Array.isArray(x)&&typeof x[0]==='number';
+ (fig.base||[]).forEach(it=>{['a','b','p','at','c'].forEach(k=>{if(A(it[k]))out.push(it[k])});if(it.t==='circ'&&it.r){const c=A(it.c)?it.c:fig.P[it.c];if(c)out.push([c[0]-it.r,c[1]-it.r],[c[0]+it.r,c[1]+it.r])}});return out}
 
 /* ---------------- ÂM THANH PHẢN HỒI (không đọc giọng) ---------------- */
 let AC=null;function beep(ok){try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();const seq=ok?[660,880,1175]:[300,220];seq.forEach((f,i)=>{const o=AC.createOscillator(),g=AC.createGain();o.type=ok?'triangle':'sawtooth';o.frequency.value=f;g.gain.setValueAtTime(.0001,AC.currentTime+i*.11);g.gain.exponentialRampToValueAtTime(.18,AC.currentTime+i*.11+.02);g.gain.exponentialRampToValueAtTime(.0001,AC.currentTime+i*.11+.2);o.connect(g);g.connect(AC.destination);o.start(AC.currentTime+i*.11);o.stop(AC.currentTime+i*.11+.22)})}catch(e){}}
@@ -285,7 +286,7 @@ MODS.cm={i:0,k:0,t0:0,
 MODS.thu={i:0,done:{},t0:0,
  open(a){this.i=+(a.q||0);this.ord=[];this.show();if(a.a!=null&&S.still)this.answer(+a.a)},
  qs(){return LESSON.thu},
- show(){const q=this.qs()[this.i];this.t0=performance.now();this.ord=[];this.res=this.done[this.i]||null;camFit(figPts(q.fig),{now:true,yaw:q.fig.yaw==null?-8:q.fig.yaw,pitch:q.fig.pitch||72,pad:1.2});this.panel()},
+ show(){const q=this.qs()[this.i];this.t0=performance.now();this.ord=[];this.res=this.done[this.i]||null;const pp=q.fig.pitch||72,khoi=!!(LESSON.lang||LESSON.khoi||LESSON.tron),phang=q.fig.nghieng?false:(khoi?pp>=78:true);camFit(figPts(q.fig),{now:true,yaw:phang?0:(q.fig.yaw!=null?q.fig.yaw:-8),pitch:phang?89.4:pp,pad:1.2});this.panel()},
  draw(){const q=this.qs()[this.i];FIG=q.fig;drawBoard();(q.fig.base||((q.fig.steps||[])[0]||{}).items||[]).forEach(it=>drawItem(it,1));if(this.res&&q.fig.sau)q.fig.sau.forEach(it=>drawItem(it,Math.min(1,(performance.now()-this.res.t)/600)))},
  answer(v){const q=this.qs()[this.i];let ok;
   if(q.kieu==='so'){ok=q.a.every((x,j)=>Math.abs(+String(v[j]).trim().replace(',','.')-x)<(q.tol||1e-6))}else if(q.kieu==='xep'){ok=[q.a].concat(q.alt||[]).some(a=>v.join(',')===a.join(','))}else ok=v===q.a;
@@ -810,6 +811,26 @@ function catKhung(A,B,box,tia){const d=V.sub(B,A);let t0=tia?0:-1e9,t1=1e9;const
 const veDuong=(A,B,box,col,w,dash,tia)=>{const e=catKhung(A,B,box,tia);if(e)line2(e[0],e[1],col,w,dash);return e};
 const chanDT=(M,A,B)=>{const u=V.unit(V.sub(B,A));return V.add(A,V.mul(u,V.dot(V.sub(M,A),u)))};
 
+/* Hình riêng cho câu «Thử ngay» (rà 25/11/2026): hq({P, tg:['ABC'] đa giác kín, doan:['AH'] đoạn, net:['AH'] nét đứt, nhan:{AB:'5 cm'}, goc:[['A','B','C','60°']] góc tại A,
+   vuong:['ABC'] vuông tại A, tron:[['O',R,{opts}]], an:'XY' (không ghi tên), them:[mục], to:{A:'đỏ'…}) — nhãn cạnh tự đặt phía ngoài hình */
+const tenD=s=>s.match(/[A-Z][′']?\d?/g)||[];
+function hq(o){const P=o.P,base=[],ks=Object.keys(P).filter(k=>k[0]!=='_'),cen=V.mul(ks.reduce((s,k)=>V.add(s,P[k]),[0,0]),1/Math.max(1,ks.length));
+ (o.tron||[]).forEach(t=>base.push(Object.assign({t:'circ',c:t[0],r:t[1],col:'#1d4f9a',w:2.2},t[2]||{})));
+ (o.to||[]).forEach(([s,col])=>base.push(poly(tenD(s),col)));
+ (o.tg||[]).forEach(s=>{const n=tenD(s);n.forEach((a,i)=>base.push(seg(a,n[(i+1)%n.length],{w:2.6})))});
+ (o.doan||[]).forEach(s=>{const n=tenD(s);base.push(seg(n[0],n[1],{w:2.6}))});
+ (o.net||[]).forEach(s=>{const n=tenD(s);base.push(seg(n[0],n[1],{dash:[6,5],col:'#5b6684',w:2}))});
+ Object.entries(o.nhan||{}).forEach(([s,lab])=>{const[a,b]=tenD(s),A=P[a],B=P[b],m=V.mid(A,B),sg=Math.sign(V.dot(V.perp(V.sub(B,A)),V.sub(m,cen)))||1;base.push(nhanDai(a,b,lab,{off:.45*sg,col:'#1d4f9a',size:16,at2:[-.01,1]}))});
+ (o.goc||[]).forEach(([v,a,b,lab,col])=>base.push(ang(v,a,b,{lab,col:col||'#dc2626',r:.6,lr:.6,size:15,fill:true})));
+ (o.vuong||[]).forEach(s=>{const n=tenD(s);base.push(ang(n[0],n[1],n[2],{right:true,col:'#1d4f9a',r:.32}))});
+ ks.filter(k=>!(o.an||'').includes(k)).forEach(k=>base.push(pt(k,o.d&&o.d[k]?{d:o.d[k]}:{})));
+ return Object.assign({P,pitch:85,base:base.concat(o.them||[])},o.x||{})}
+/* hình hộp vẽ phối cảnh (mặt trước a × c, chiều sâu b), nhãn ba kích thước */
+function hopQ(a,b,c,la,lb,lc,ten){const k=.45,d=[b*k,b*k*.75],P={_A:[0,0],_B:[a,0],_C:[a,c],_D:[0,c]};P._E=V.add(P._A,d);P._F=V.add(P._B,d);P._G=V.add(P._C,d);P._H=V.add(P._D,d);
+ const s=(x,y,o)=>seg(x,y,Object.assign({w:2.4},o||{})),h={dash:[6,5],w:1.8,col:'#5b6684'};
+ return{P,pitch:85,base:[s('_A','_B'),s('_B','_C'),s('_C','_D'),s('_D','_A'),s('_B','_F'),s('_C','_G'),s('_D','_H'),s('_F','_G'),s('_G','_H'),s('_A','_E',h),s('_E','_F',h),s('_E','_H',h),
+  nhanDai('_A','_B',la||'',{off:-.45,size:15,at2:[-.01,1]}),nhanDai('_B','_F',lb||'',{off:-.5,size:15,at2:[-.01,1]}),nhanDai('_D','_A',lc||'',{off:.5,size:15,at2:[-.01,1]})].concat(ten||[])}}
+
 /* ===== Toán 8 (KNTT) — Bài 13. HÌNH CHỮ NHẬT — SGK tập một tr.64–66 =====
    Phần «em gợi ý» là lời giải/cách vẽ em đề xuất cho câu hỏi SGK để HS tự làm — GV soát. */
 
@@ -928,6 +949,7 @@ const tgVuong=(()=>{const A=[0,0],B=[0,3.6],C=[6,0],M=V.mid(B,C);return{P:{A,B,C
 const h356=(()=>{const A=[0,6],D=[12,6],B=[0,0],C=[12,0],M=[6,0];return{P:{A,B,C,D,M},base:[seg('A','D'),seg('D','C'),seg('C','B'),seg('B','A'),seg('A','M'),seg('D','M'),ang('M','A','D',{right:true,col:'#2f7de1'}),pt('A',{d:[-.5,.4]}),pt('D',{d:[.5,.4]}),pt('B',{d:[-.5,-.4]}),pt('C',{d:[.5,-.4]}),pt('M',{d:[0,-.55]}),tick('B','M',1),tick('M','C',1),txt([6,3.4],'chu vi 36 cm',{col:'#e0532f',size:16,font:'bold 16px Arial',box:'rgba(255,255,255,.9)'})]}})();
 const tre=(()=>{const O=[3.5,1.8],r=3.5,A=V.pol(O,150,r),C=V.pol(O,-30,r),B=V.pol(O,30,r),D=V.pol(O,210,r);return{P:{A,B,C,D,O},base:[seg('A','C',{col:'#3f9a4a',w:7}),seg('B','D',{col:'#3f9a4a',w:7}),pt('O',{lab:'',r:5,col:'#b04cc8'}),...pts('ABCD',{A:[-.35,.3],B:[.35,.3],C:[.35,-.3],D:[-.35,-.3]})]}})();
 
+const Q13o=hq({P:{A:[0,0],B:[4,0],C:[4,2.6],D:[0,2.6],O:[2,1.3]},tg:['ABCD'],net:['AC','BD'],vuong:['ABD'],them:[tick('A','O',1),tick('O','C',1),tick('B','O',2),tick('O','D',2)],d:{O:[0,-.45]}});
 const LESSON={title:'Bài 13. Hình chữ nhật',sub:'Toán 8 · Kết nối tri thức · Chương III. Tứ giác · SGK tập một tr.64–66',
  tabs:[['ve','✏️ Vẽ hình'],['nb','🔍 Nhận biết'],['cm','🧠 Chứng minh'],['thu','✅ Thử ngay']],
  ve:[b13ve1,b13ve2,b13ve3],cm:[b13cm1,b13cm2,b13cm3,b13cm4,b13cm5],nb:B13NB,
@@ -935,7 +957,7 @@ const LESSON={title:'Bài 13. Hình chữ nhật',sub:'Toán 8 · Kết nối tr
  {nguon:'HĐ1 · tr.64 · Hình 3.41',fig:h341,kieu:'chon',q:'Trong các hình dưới đây, hình nào là hình chữ nhật? Tại sao?',o:['Hình a','Hình b','Hình c'],a:1,giai:'Hình b có bốn góc vuông: là hình chữ nhật (định nghĩa).',sai:{0:'Hình a không có góc vuông nào được đánh dấu.',2:'Hình c là hình bình hành nhưng không có góc vuông.'}},
  {nguon:'Chú ý · tr.64',fig:ba90,kieu:'chon',q:'Tứ giác <i>ABCD</i> có '+g('A')+' = '+g('B')+' = '+g('C')+' = 90°. Khẳng định nào đúng?',o:['<i>ABCD</i> là hình chữ nhật','Chưa đủ, phải biết thêm '+g('D')+' = 90°','<i>ABCD</i> là hình thang cân, không là hình chữ nhật'],a:0,giai:''+g('D')+' = 360° − 3 · 90° = 90°: tứ giác có ba góc vuông là hình chữ nhật.',sai:{1:'Tính '+g('D')+' từ tổng bốn góc bằng 360°.',2:'Hình chữ nhật cũng là hình thang cân, nhưng ở đây đủ bốn góc vuông.'}},
  {nguon:'HĐ3 · tr.65',fig:b13cm1,kieu:'so',q:'Hình bình hành <i>ABCD</i> có '+g('A')+' = 90°. Tính '+g('B')+', '+g('C')+', '+g('D')+'.',o:['B̂','Ĉ','D̂'],a:[90,90,90],giai:''+g('C')+' = '+g('A')+' = 90°; '+g('B')+' = 180° − 90° = 90°; '+g('D')+' = '+g('B')+' = 90°: <i>ABCD</i> là hình chữ nhật.',goiy:'Góc đối bằng nhau; hai góc kề một cạnh bù nhau.'},
- {nguon:'Luyện tập 2 · tr.66',fig:lt2,kieu:'chon',q:'Tứ giác <i>ABCD</i> có '+g('A')+' = 90°, hai đường chéo cắt nhau tại trung điểm <i>O</i> của mỗi đường. <i>ABCD</i> là hình gì?',o:['Hình chữ nhật','Hình thang cân','Chưa đủ để kết luận'],a:0,giai:'Hai đường chéo cắt nhau tại trung điểm mỗi đường ⇒ hình bình hành (Bài 12); có thêm '+g('A')+' = 90° ⇒ hình chữ nhật (Định lí 2a).',sai:{1:'Đường chéo cắt nhau tại trung điểm mỗi đường cho ta hình bình hành.',2:'Hình bình hành có một góc vuông là đủ.'}},
+ {nguon:'Luyện tập 2 · tr.66',fig:Q13o,kieu:'chon',q:'Tứ giác <i>ABCD</i> có '+g('A')+' = 90°, hai đường chéo cắt nhau tại trung điểm <i>O</i> của mỗi đường. <i>ABCD</i> là hình gì?',o:['Hình chữ nhật','Hình thang cân','Chưa đủ để kết luận'],a:0,giai:'Hai đường chéo cắt nhau tại trung điểm mỗi đường ⇒ hình bình hành (Bài 12); có thêm '+g('A')+' = 90° ⇒ hình chữ nhật (Định lí 2a).',sai:{1:'Đường chéo cắt nhau tại trung điểm mỗi đường cho ta hình bình hành.',2:'Hình bình hành có một góc vuông là đủ.'}},
  {nguon:'Bài 3.40a · tr.74',fig:htcCheo13,kieu:'chon',q:'Đúng hay sai: «Tứ giác có hai đường chéo bằng nhau là hình bình hành.»',o:['Đúng','Sai'],a:1,giai:'Sai. Hình thang cân trên hình có hai đường chéo bằng nhau nhưng không là hình bình hành.',sai:{0:'Nhìn hình: hình thang cân có <i>AC</i> = <i>BD</i> mà <i>AD</i> không song song <i>BC</i>.'}},
  {nguon:'Bài 3.41a · tr.74',fig:hcnCheo,kieu:'chon',q:'Đúng hay sai: «Tứ giác có hai đường chéo bằng nhau và hai cạnh đối nào cũng bằng nhau là hình chữ nhật.»',o:['Đúng','Sai'],a:0,giai:'Đúng: các cạnh đối bằng nhau ⇒ hình bình hành (Định lí 2a, Bài 12); có thêm hai đường chéo bằng nhau ⇒ hình chữ nhật (Định lí 2b).',sai:{1:'Hai cạnh đối nào cũng bằng nhau thì tứ giác là hình bình hành rồi.'}},
  {nguon:'Nhận xét · tr.64 (em đặt số)',fig:tgVuong,kieu:'so',dv:'cm',q:'Tam giác <i>ABC</i> vuông tại <i>A</i>, cạnh huyền <i>BC</i> = 10 cm, <i>AM</i> là đường trung tuyến. Tính <i>AM</i>.',o:['AM'],a:[5],giai:'Đường trung tuyến ứng với cạnh huyền bằng nửa cạnh huyền: <i>AM</i> = 10 : 2 = 5 cm.',goiy:'Xem Nhận xét tr.64.'},

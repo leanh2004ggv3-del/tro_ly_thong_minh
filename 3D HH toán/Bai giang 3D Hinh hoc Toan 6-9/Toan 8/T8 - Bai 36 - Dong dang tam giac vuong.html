@@ -205,7 +205,8 @@ function renderScript(fig,k,p){FIG=fig;drawBoard();(fig.base||[]).forEach(it=>dr
  (fig.top||[]).forEach(it=>drawItem(it,1));
  tools.filter(t=>t.k!=='pencil'&&t.k!=='compass').forEach(drawTool);tools.filter(t=>t.k==='pencil'||t.k==='compass').forEach(drawTool)}
 /* tập hợp mọi điểm của hình để vừa khung */
-function figPts(fig){return Object.values(fig.P)}
+function figPts(fig){const out=Object.values(fig.P).slice(),A=x=>Array.isArray(x)&&typeof x[0]==='number';
+ (fig.base||[]).forEach(it=>{['a','b','p','at','c'].forEach(k=>{if(A(it[k]))out.push(it[k])});if(it.t==='circ'&&it.r){const c=A(it.c)?it.c:fig.P[it.c];if(c)out.push([c[0]-it.r,c[1]-it.r],[c[0]+it.r,c[1]+it.r])}});return out}
 
 /* ---------------- ÂM THANH PHẢN HỒI (không đọc giọng) ---------------- */
 let AC=null;function beep(ok){try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();const seq=ok?[660,880,1175]:[300,220];seq.forEach((f,i)=>{const o=AC.createOscillator(),g=AC.createGain();o.type=ok?'triangle':'sawtooth';o.frequency.value=f;g.gain.setValueAtTime(.0001,AC.currentTime+i*.11);g.gain.exponentialRampToValueAtTime(.18,AC.currentTime+i*.11+.02);g.gain.exponentialRampToValueAtTime(.0001,AC.currentTime+i*.11+.2);o.connect(g);g.connect(AC.destination);o.start(AC.currentTime+i*.11);o.stop(AC.currentTime+i*.11+.22)})}catch(e){}}
@@ -285,7 +286,7 @@ MODS.cm={i:0,k:0,t0:0,
 MODS.thu={i:0,done:{},t0:0,
  open(a){this.i=+(a.q||0);this.ord=[];this.show();if(a.a!=null&&S.still)this.answer(+a.a)},
  qs(){return LESSON.thu},
- show(){const q=this.qs()[this.i];this.t0=performance.now();this.ord=[];this.res=this.done[this.i]||null;camFit(figPts(q.fig),{now:true,yaw:q.fig.yaw==null?-8:q.fig.yaw,pitch:q.fig.pitch||72,pad:1.2});this.panel()},
+ show(){const q=this.qs()[this.i];this.t0=performance.now();this.ord=[];this.res=this.done[this.i]||null;const pp=q.fig.pitch||72,khoi=!!(LESSON.lang||LESSON.khoi||LESSON.tron),phang=q.fig.nghieng?false:(khoi?pp>=78:true);camFit(figPts(q.fig),{now:true,yaw:phang?0:(q.fig.yaw!=null?q.fig.yaw:-8),pitch:phang?89.4:pp,pad:1.2});this.panel()},
  draw(){const q=this.qs()[this.i];FIG=q.fig;drawBoard();(q.fig.base||((q.fig.steps||[])[0]||{}).items||[]).forEach(it=>drawItem(it,1));if(this.res&&q.fig.sau)q.fig.sau.forEach(it=>drawItem(it,Math.min(1,(performance.now()-this.res.t)/600)))},
  answer(v){const q=this.qs()[this.i];let ok;
   if(q.kieu==='so'){ok=q.a.every((x,j)=>Math.abs(+String(v[j]).trim().replace(',','.')-x)<(q.tol||1e-6))}else if(q.kieu==='xep'){ok=[q.a].concat(q.alt||[]).some(a=>v.join(',')===a.join(','))}else ok=v===q.a;
@@ -810,6 +811,26 @@ function catKhung(A,B,box,tia){const d=V.sub(B,A);let t0=tia?0:-1e9,t1=1e9;const
 const veDuong=(A,B,box,col,w,dash,tia)=>{const e=catKhung(A,B,box,tia);if(e)line2(e[0],e[1],col,w,dash);return e};
 const chanDT=(M,A,B)=>{const u=V.unit(V.sub(B,A));return V.add(A,V.mul(u,V.dot(V.sub(M,A),u)))};
 
+/* Hình riêng cho câu «Thử ngay» (rà 25/11/2026): hq({P, tg:['ABC'] đa giác kín, doan:['AH'] đoạn, net:['AH'] nét đứt, nhan:{AB:'5 cm'}, goc:[['A','B','C','60°']] góc tại A,
+   vuong:['ABC'] vuông tại A, tron:[['O',R,{opts}]], an:'XY' (không ghi tên), them:[mục], to:{A:'đỏ'…}) — nhãn cạnh tự đặt phía ngoài hình */
+const tenD=s=>s.match(/[A-Z][′']?\d?/g)||[];
+function hq(o){const P=o.P,base=[],ks=Object.keys(P).filter(k=>k[0]!=='_'),cen=V.mul(ks.reduce((s,k)=>V.add(s,P[k]),[0,0]),1/Math.max(1,ks.length));
+ (o.tron||[]).forEach(t=>base.push(Object.assign({t:'circ',c:t[0],r:t[1],col:'#1d4f9a',w:2.2},t[2]||{})));
+ (o.to||[]).forEach(([s,col])=>base.push(poly(tenD(s),col)));
+ (o.tg||[]).forEach(s=>{const n=tenD(s);n.forEach((a,i)=>base.push(seg(a,n[(i+1)%n.length],{w:2.6})))});
+ (o.doan||[]).forEach(s=>{const n=tenD(s);base.push(seg(n[0],n[1],{w:2.6}))});
+ (o.net||[]).forEach(s=>{const n=tenD(s);base.push(seg(n[0],n[1],{dash:[6,5],col:'#5b6684',w:2}))});
+ Object.entries(o.nhan||{}).forEach(([s,lab])=>{const[a,b]=tenD(s),A=P[a],B=P[b],m=V.mid(A,B),sg=Math.sign(V.dot(V.perp(V.sub(B,A)),V.sub(m,cen)))||1;base.push(nhanDai(a,b,lab,{off:.45*sg,col:'#1d4f9a',size:16,at2:[-.01,1]}))});
+ (o.goc||[]).forEach(([v,a,b,lab,col])=>base.push(ang(v,a,b,{lab,col:col||'#dc2626',r:.6,lr:.6,size:15,fill:true})));
+ (o.vuong||[]).forEach(s=>{const n=tenD(s);base.push(ang(n[0],n[1],n[2],{right:true,col:'#1d4f9a',r:.32}))});
+ ks.filter(k=>!(o.an||'').includes(k)).forEach(k=>base.push(pt(k,o.d&&o.d[k]?{d:o.d[k]}:{})));
+ return Object.assign({P,pitch:85,base:base.concat(o.them||[])},o.x||{})}
+/* hình hộp vẽ phối cảnh (mặt trước a × c, chiều sâu b), nhãn ba kích thước */
+function hopQ(a,b,c,la,lb,lc,ten){const k=.45,d=[b*k,b*k*.75],P={_A:[0,0],_B:[a,0],_C:[a,c],_D:[0,c]};P._E=V.add(P._A,d);P._F=V.add(P._B,d);P._G=V.add(P._C,d);P._H=V.add(P._D,d);
+ const s=(x,y,o)=>seg(x,y,Object.assign({w:2.4},o||{})),h={dash:[6,5],w:1.8,col:'#5b6684'};
+ return{P,pitch:85,base:[s('_A','_B'),s('_B','_C'),s('_C','_D'),s('_D','_A'),s('_B','_F'),s('_C','_G'),s('_D','_H'),s('_F','_G'),s('_G','_H'),s('_A','_E',h),s('_E','_F',h),s('_E','_H',h),
+  nhanDai('_A','_B',la||'',{off:-.45,size:15,at2:[-.01,1]}),nhanDai('_B','_F',lb||'',{off:-.5,size:15,at2:[-.01,1]}),nhanDai('_D','_A',lc||'',{off:.5,size:15,at2:[-.01,1]})].concat(ten||[])}}
+
 /* ===== Toán 8 (KNTT) — Bài 36. CÁC TRƯỜNG HỢP ĐỒNG DẠNG CỦA HAI TAM GIÁC VUÔNG — SGK tập hai tr.98–103 (+ LTC tr.108–109) =====
    Phần «em gợi ý» là lời giải/cách vẽ em đề xuất cho câu hỏi SGK để HS tự làm — GV soát. */
 const PH=s=>`<span class="m">${s}</span>`;
@@ -918,6 +939,7 @@ const qSong=(()=>{const A=[0,2],M=[0,0],B=[10,2],A2=[11.5,-2.5],M2=[11.5,-3.5],B
 const qDoc=(()=>{const A=[0,0],H=[12,0],B=[12,5],A2=[14,0],H2=[20,0],B2=[20,2.5];const s=.55,S=X=>V.mul(X,s);return{P:{A:S(A),H:S(H),B:S(B),A2:S(A2),H2:S(H2),B2:S(B2)},pitch:76,base:[seg('A','H'),seg('H','B'),seg('B','A'),seg('A2','H2'),seg('H2','B2'),seg('B2','A2'),ang('H','A','B',{right:true,col:'#5b6684',fill:false,r:.25}),ang('H2','A2','B2',{right:true,col:'#5b6684',fill:false,r:.25}),pt('A',{d:[-.35,-.3]}),pt('H',{d:[.35,-.3]}),pt('B',{d:[.35,.3]}),pt('A2',{lab:'A′',d:[-.35,-.3]}),pt('H2',{lab:'H′',d:[.35,-.3]}),pt('B2',{lab:'B′',d:[.35,.3]}),nhanDai('A','B','13',{off:.4}),nhanDai('H','B','5',{off:-.35}),nhanDai('A2','B2','6,5',{off:.4}),nhanDai('H2','B2','2,5',{off:-.45})]}})();
 const qCay={P:b36ve2.P,pitch:40,base:[dat(-1,22),seg('B','A',{col:'#2f7a3a',w:8}),seg('K','C',{col:'#c2410c',w:5}),seg('D','M',{col:'#2f7de1',w:6}),seg('M','A',{col:'#e0532f',dash:[8,5]}),...pts('ABCDM',{A:[.5,.2],B:[.4,-.4],C:[0,.45],D:[-.4,-.35],M:[-.45,0]}),nhanDai('K','B','19',{off:-.6}),nhanDai('D','K','1',{off:-.5}),nhanDai('K','C','2,4',{off:.5}),nhanDai('D','M','1,6',{off:.5})]};
 
+const Q36vv=hq({P:{A:[0,0],B:[0,2.4],C:[3.2,0],D:[5,0],E:[5,1.8],F:[7.6,0]},tg:['ABC','DEF'],vuong:['ABC','DEF']});
 const LESSON={title:'Bài 36. Các trường hợp đồng dạng của hai tam giác vuông',sub:'Toán 8 · Kết nối tri thức · Chương IX. Tam giác đồng dạng · SGK tập hai tr.98–103',
  tabs:[['ve','✏️ Vẽ hình'],['lab','🔍 Nhận biết'],['cm','🧠 Chứng minh'],['thu','✅ Thử ngay']],
  ve:[b36ve1,b36ve2],cm:[b36cm1,b36cm2,b36cm3,b36cm4,b36cm5],lab:LAB36,
@@ -928,8 +950,8 @@ const LESSON={title:'Bài 36. Các trường hợp đồng dạng của hai tam 
  {nguon:'Bài 9.36b · tr.109',fig:qCay,kieu:'so',dv:'m',q:'Buổi chiều, bóng An dài 3 m. Bóng cột cờ (cao 7 m) dài bao nhiêu mét?',o:['Bóng cột'],a:[15],giai:'Bóng cột = 3 · 7 : 1,4 = 15 m.',goiy:'Cùng một thời điểm, chiều cao tỉ lệ với bóng.'},
  {nguon:'Bài 9.28 · tr.103 · Hình 9.56',fig:qSong,kieu:'so',dv:'m',q:'<i>AM</i> = 2 m, <i>AM</i> ⊥ <i>AB</i>; vẽ trên giấy Δ<i>A′M′B′</i> vuông tại <i>A′</i>, <i>A′M′</i> = 1 cm, '+g('A′M′B′')+' = '+g('AMB')+', đo được <i>A′B′</i> = 5 cm. Khoảng cách <i>AB</i> là bao nhiêu mét?',o:['AB'],a:[10],giai:'Δ<i>AMB</i> '+DD+' Δ<i>A′M′B′</i> nên <i>AB</i> = 2 · 5 : 1 = 10 m.',goiy:''+tl('AB','A′B′')+' = '+tl('AM','A′M′')+'.'},
  {nguon:'HĐ1 · tr.100 · Hình 9.50',fig:qDoc,kieu:'chon',q:'Hai con dốc: <i>AB</i> = 13 m, <i>BH</i> = 5 m và <i>A′B′</i> = 6,5 m, <i>B′H′</i> = 2,5 m. Độ dốc hai con dốc thế nào?',o:['Như nhau: hai tam giác vuông đồng dạng','Dốc thứ nhất dốc hơn','Dốc thứ hai dốc hơn'],a:0,giai:''+tl('A′B′','AB')+' = '+tl('B′H′','BH')+' = 1/2 (cạnh huyền và cạnh góc vuông tỉ lệ) nên Δ<i>A′H′B′</i> '+DD+' Δ<i>AHB</i>: '+g('HAB')+' = '+g('H′A′B′')+'.',sai:{1:'Dốc thứ nhất dài hơn nhưng góc nghiêng bằng nhau.',2:'Tính tỉ số cạnh huyền và cạnh góc vuông.'}},
- {nguon:'Bài 9.23 · tr.102',fig:qDoc,kieu:'chon',q:'Điều kiện nào dưới đây <b>không</b> chứng tỏ hai tam giác vuông đồng dạng?',o:['Một góc nhọn của tam giác này bằng một góc nhọn của tam giác kia','Cạnh góc vuông và cạnh huyền của tam giác này tỉ lệ với cạnh góc vuông và cạnh huyền của tam giác kia','Một cạnh góc vuông của tam giác này bằng một cạnh góc vuông của tam giác kia','Hai cạnh góc vuông của tam giác này tỉ lệ với hai cạnh góc vuông của tam giác kia'],a:2,giai:'Chỉ một cặp cạnh góc vuông bằng nhau thì chưa đủ (hai tam giác vuông có thể khác hình dạng).',sai:{0:'Đó là Định lí 1.',1:'Đó là trường hợp đặc biệt tr.100.',3:'Đó là Định lí 2.'}},
- {nguon:'Bài 9.40 · tr.110',fig:qDoc,kieu:'chon',q:'Δ<i>ABC</i> vuông tại <i>A</i> (<i>AB</i> ≠ <i>AC</i>), Δ<i>DEF</i> vuông tại <i>D</i> (<i>DE</i> ≠ <i>DF</i>). Điều nào <b>không</b> suy ra Δ<i>ABC</i> '+DD+' Δ<i>DEF</i>?',o:[''+g('B')+' = '+g('E'),''+g('C')+' = '+g('F'),''+g('B')+' + '+g('C')+' = '+g('E')+' + '+g('F'),''+g('B')+' − '+g('C')+' = '+g('E')+' − '+g('F')],a:2,giai:''+g('B')+' + '+g('C')+' = '+g('E')+' + '+g('F')+' = 90° luôn đúng với mọi tam giác vuông nên không cho thêm thông tin.',sai:{0:'Một cặp góc nhọn bằng nhau là đủ.',1:'Một cặp góc nhọn bằng nhau là đủ.',3:'Kết hợp với tổng 90° suy ra '+g('B')+' = '+g('E')+'.'}},
+ {nguon:'Bài 9.23 · tr.102',fig:Q36vv,kieu:'chon',q:'Điều kiện nào dưới đây <b>không</b> chứng tỏ hai tam giác vuông đồng dạng?',o:['Một góc nhọn của tam giác này bằng một góc nhọn của tam giác kia','Cạnh góc vuông và cạnh huyền của tam giác này tỉ lệ với cạnh góc vuông và cạnh huyền của tam giác kia','Một cạnh góc vuông của tam giác này bằng một cạnh góc vuông của tam giác kia','Hai cạnh góc vuông của tam giác này tỉ lệ với hai cạnh góc vuông của tam giác kia'],a:2,giai:'Chỉ một cặp cạnh góc vuông bằng nhau thì chưa đủ (hai tam giác vuông có thể khác hình dạng).',sai:{0:'Đó là Định lí 1.',1:'Đó là trường hợp đặc biệt tr.100.',3:'Đó là Định lí 2.'}},
+ {nguon:'Bài 9.40 · tr.110',fig:Q36vv,kieu:'chon',q:'Δ<i>ABC</i> vuông tại <i>A</i> (<i>AB</i> ≠ <i>AC</i>), Δ<i>DEF</i> vuông tại <i>D</i> (<i>DE</i> ≠ <i>DF</i>). Điều nào <b>không</b> suy ra Δ<i>ABC</i> '+DD+' Δ<i>DEF</i>?',o:[''+g('B')+' = '+g('E'),''+g('C')+' = '+g('F'),''+g('B')+' + '+g('C')+' = '+g('E')+' + '+g('F'),''+g('B')+' − '+g('C')+' = '+g('E')+' − '+g('F')],a:2,giai:''+g('B')+' + '+g('C')+' = '+g('E')+' + '+g('F')+' = 90° luôn đúng với mọi tam giác vuông nên không cho thêm thông tin.',sai:{0:'Một cặp góc nhọn bằng nhau là đủ.',1:'Một cặp góc nhọn bằng nhau là đủ.',3:'Kết hợp với tổng 90° suy ra '+g('B')+' = '+g('E')+'.'}},
  {nguon:'Luyện tập chung · Ví dụ 1 · tr.108',fig:b36cm4,kieu:'so',dv:'cm',q:'Δ<i>ABC</i> vuông tại <i>A</i>, đường cao <i>AH</i>; <i>AB</i> = 5 cm, <i>AH</i> = 4 cm. Tính <i>BH</i>.',o:['BH'],a:[3],giai:'<i>BH</i>² = 5² − 4² = 9 ⇒ <i>BH</i> = 3 cm.',goiy:'Dùng định lí Pythagore trong Δ<i>AHB</i>.'},
  {nguon:'Bài 9.32a · tr.109',fig:b36cm4,kieu:'so',dv:'cm',q:'Δ<i>ABC</i> vuông tại <i>A</i>, đường cao <i>AH</i>, <i>BH</i> = 16 cm, <i>CH</i> = 9 cm. Tính <i>AH</i>.',o:['AH'],a:[12],giai:'Δ<i>AHB</i> '+DD+' Δ<i>CHA</i> ⇒ <i>AH</i>² = <i>BH</i> · <i>CH</i> = 144 ⇒ <i>AH</i> = 12 cm.',goiy:'Nhận xét tr.109: <i>h</i>² = <i>b′c′</i>.'}]};
 

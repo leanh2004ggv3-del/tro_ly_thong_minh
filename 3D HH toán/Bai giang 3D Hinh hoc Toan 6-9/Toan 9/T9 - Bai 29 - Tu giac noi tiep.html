@@ -205,7 +205,8 @@ function renderScript(fig,k,p){FIG=fig;drawBoard();(fig.base||[]).forEach(it=>dr
  (fig.top||[]).forEach(it=>drawItem(it,1));
  tools.filter(t=>t.k!=='pencil'&&t.k!=='compass').forEach(drawTool);tools.filter(t=>t.k==='pencil'||t.k==='compass').forEach(drawTool)}
 /* tập hợp mọi điểm của hình để vừa khung */
-function figPts(fig){return Object.values(fig.P)}
+function figPts(fig){const out=Object.values(fig.P).slice(),A=x=>Array.isArray(x)&&typeof x[0]==='number';
+ (fig.base||[]).forEach(it=>{['a','b','p','at','c'].forEach(k=>{if(A(it[k]))out.push(it[k])});if(it.t==='circ'&&it.r){const c=A(it.c)?it.c:fig.P[it.c];if(c)out.push([c[0]-it.r,c[1]-it.r],[c[0]+it.r,c[1]+it.r])}});return out}
 
 /* ---------------- ÂM THANH PHẢN HỒI (không đọc giọng) ---------------- */
 let AC=null;function beep(ok){try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();const seq=ok?[660,880,1175]:[300,220];seq.forEach((f,i)=>{const o=AC.createOscillator(),g=AC.createGain();o.type=ok?'triangle':'sawtooth';o.frequency.value=f;g.gain.setValueAtTime(.0001,AC.currentTime+i*.11);g.gain.exponentialRampToValueAtTime(.18,AC.currentTime+i*.11+.02);g.gain.exponentialRampToValueAtTime(.0001,AC.currentTime+i*.11+.2);o.connect(g);g.connect(AC.destination);o.start(AC.currentTime+i*.11);o.stop(AC.currentTime+i*.11+.22)})}catch(e){}}
@@ -285,7 +286,7 @@ MODS.cm={i:0,k:0,t0:0,
 MODS.thu={i:0,done:{},t0:0,
  open(a){this.i=+(a.q||0);this.ord=[];this.show();if(a.a!=null&&S.still)this.answer(+a.a)},
  qs(){return LESSON.thu},
- show(){const q=this.qs()[this.i];this.t0=performance.now();this.ord=[];this.res=this.done[this.i]||null;camFit(figPts(q.fig),{now:true,yaw:q.fig.yaw==null?-8:q.fig.yaw,pitch:q.fig.pitch||72,pad:1.2});this.panel()},
+ show(){const q=this.qs()[this.i];this.t0=performance.now();this.ord=[];this.res=this.done[this.i]||null;const pp=q.fig.pitch||72,khoi=!!(LESSON.lang||LESSON.khoi||LESSON.tron),phang=q.fig.nghieng?false:(khoi?pp>=78:true);camFit(figPts(q.fig),{now:true,yaw:phang?0:(q.fig.yaw!=null?q.fig.yaw:-8),pitch:phang?89.4:pp,pad:1.2});this.panel()},
  draw(){const q=this.qs()[this.i];FIG=q.fig;drawBoard();(q.fig.base||((q.fig.steps||[])[0]||{}).items||[]).forEach(it=>drawItem(it,1));if(this.res&&q.fig.sau)q.fig.sau.forEach(it=>drawItem(it,Math.min(1,(performance.now()-this.res.t)/600)))},
  answer(v){const q=this.qs()[this.i];let ok;
   if(q.kieu==='so'){ok=q.a.every((x,j)=>Math.abs(+String(v[j]).trim().replace(',','.')-x)<(q.tol||1e-6))}else if(q.kieu==='xep'){ok=[q.a].concat(q.alt||[]).some(a=>v.join(',')===a.join(','))}else ok=v===q.a;
@@ -810,6 +811,26 @@ function catKhung(A,B,box,tia){const d=V.sub(B,A);let t0=tia?0:-1e9,t1=1e9;const
 const veDuong=(A,B,box,col,w,dash,tia)=>{const e=catKhung(A,B,box,tia);if(e)line2(e[0],e[1],col,w,dash);return e};
 const chanDT=(M,A,B)=>{const u=V.unit(V.sub(B,A));return V.add(A,V.mul(u,V.dot(V.sub(M,A),u)))};
 
+/* Hình riêng cho câu «Thử ngay» (rà 25/11/2026): hq({P, tg:['ABC'] đa giác kín, doan:['AH'] đoạn, net:['AH'] nét đứt, nhan:{AB:'5 cm'}, goc:[['A','B','C','60°']] góc tại A,
+   vuong:['ABC'] vuông tại A, tron:[['O',R,{opts}]], an:'XY' (không ghi tên), them:[mục], to:{A:'đỏ'…}) — nhãn cạnh tự đặt phía ngoài hình */
+const tenD=s=>s.match(/[A-Z][′']?\d?/g)||[];
+function hq(o){const P=o.P,base=[],ks=Object.keys(P).filter(k=>k[0]!=='_'),cen=V.mul(ks.reduce((s,k)=>V.add(s,P[k]),[0,0]),1/Math.max(1,ks.length));
+ (o.tron||[]).forEach(t=>base.push(Object.assign({t:'circ',c:t[0],r:t[1],col:'#1d4f9a',w:2.2},t[2]||{})));
+ (o.to||[]).forEach(([s,col])=>base.push(poly(tenD(s),col)));
+ (o.tg||[]).forEach(s=>{const n=tenD(s);n.forEach((a,i)=>base.push(seg(a,n[(i+1)%n.length],{w:2.6})))});
+ (o.doan||[]).forEach(s=>{const n=tenD(s);base.push(seg(n[0],n[1],{w:2.6}))});
+ (o.net||[]).forEach(s=>{const n=tenD(s);base.push(seg(n[0],n[1],{dash:[6,5],col:'#5b6684',w:2}))});
+ Object.entries(o.nhan||{}).forEach(([s,lab])=>{const[a,b]=tenD(s),A=P[a],B=P[b],m=V.mid(A,B),sg=Math.sign(V.dot(V.perp(V.sub(B,A)),V.sub(m,cen)))||1;base.push(nhanDai(a,b,lab,{off:.45*sg,col:'#1d4f9a',size:16,at2:[-.01,1]}))});
+ (o.goc||[]).forEach(([v,a,b,lab,col])=>base.push(ang(v,a,b,{lab,col:col||'#dc2626',r:.6,lr:.6,size:15,fill:true})));
+ (o.vuong||[]).forEach(s=>{const n=tenD(s);base.push(ang(n[0],n[1],n[2],{right:true,col:'#1d4f9a',r:.32}))});
+ ks.filter(k=>!(o.an||'').includes(k)).forEach(k=>base.push(pt(k,o.d&&o.d[k]?{d:o.d[k]}:{})));
+ return Object.assign({P,pitch:85,base:base.concat(o.them||[])},o.x||{})}
+/* hình hộp vẽ phối cảnh (mặt trước a × c, chiều sâu b), nhãn ba kích thước */
+function hopQ(a,b,c,la,lb,lc,ten){const k=.45,d=[b*k,b*k*.75],P={_A:[0,0],_B:[a,0],_C:[a,c],_D:[0,c]};P._E=V.add(P._A,d);P._F=V.add(P._B,d);P._G=V.add(P._C,d);P._H=V.add(P._D,d);
+ const s=(x,y,o)=>seg(x,y,Object.assign({w:2.4},o||{})),h={dash:[6,5],w:1.8,col:'#5b6684'};
+ return{P,pitch:85,base:[s('_A','_B'),s('_B','_C'),s('_C','_D'),s('_D','_A'),s('_B','_F'),s('_C','_G'),s('_D','_H'),s('_F','_G'),s('_G','_H'),s('_A','_E',h),s('_E','_F',h),s('_E','_H',h),
+  nhanDai('_A','_B',la||'',{off:-.45,size:15,at2:[-.01,1]}),nhanDai('_B','_F',lb||'',{off:-.5,size:15,at2:[-.01,1]}),nhanDai('_D','_A',lc||'',{off:.5,size:15,at2:[-.01,1]})].concat(ten||[])}}
+
 /* ===== Toán 9 (KNTT) — Bài 29. TỨ GIÁC NỘI TIẾP — SGK tập hai tr.80–83 (+ Luyện tập chung tr.90, Ví dụ 1) =====
    Phần «em gợi ý» là lời giải em đề xuất cho câu hỏi SGK để HS tự làm — GV soát. */
 
@@ -882,17 +903,20 @@ const LAB29=labTron({tren:['A','B','C'],tu:['D'],ghi:'Kéo <i>A</i>, <i>B</i>, <
  do:r=>`<div>A ${Math.round(r.gA)}°</div><div>B ${Math.round(r.gB)}°</div><div>C ${Math.round(r.gC)}°</div><div>D ${Math.round(r.gD)}°</div>`});
 
 /* ---------------- 4. THỬ NGAY ---------------- */
+const Q29vu=hq({P:{A:[-1.5,1.5],B:[1.5,1.5],C:[1.5,-1.5],D:[-1.5,-1.5],O:[0,0]},tg:['ABCD'],net:['AC','BD'],tron:[['O',2.121]],nhan:{AB:'3 cm'},d:{O:[.35,-.1]}});
+const Q29th=hq({P:{A:[-2.4,0],B:[0,1.8],C:[2.4,0],D:[0,-1.8],M:[-1.2,.9],N:[1.2,.9],P:[1.2,-.9],Q:[-1.2,-.9],O:[0,0]},tg:['ABCD','MNPQ'],tron:[['O',1.5,{col:'#16a34a'}]],them:[txt([0,-2.5],'cạnh hình thoi 3 cm',{size:14,col:'#1d4f9a'})],d:{O:[.3,-.1],M:[-.35,.3],N:[.35,.3],P:[.35,-.3],Q:[-.35,-.3]}});
+const Q29cong={P:{A:[-2,0],B:[2,0],C:[2,3],D:[-2,3],O:[0,0]},pitch:85,base:[seg([-3.606,0],[3.606,0],{w:2.4}),{t:'arc',c:'O',r:3.606,a0:0,a1:180,col:'#dc2626',w:3},seg('A','D',{w:2.6}),seg('D','C',{w:2.6}),seg('C','B',{w:2.6}),nhanDai('A','B','4 m',{off:.45,at2:[-.01,1],size:15}),nhanDai('B','C','3 m',{off:.45,at2:[-.01,1],size:15}),pt('O',{d:[0,-.42]}),txt([2.9,2.6],'khung thép ?',{size:14,col:'#dc2626'})]};
 const LESSON={title:'Bài 29. Tứ giác nội tiếp',sub:'Toán 9 · Kết nối tri thức · Chương IX. Đường tròn ngoại tiếp và đường tròn nội tiếp · SGK tập hai tr.80–83',
  tabs:[['ve','✏️ Vẽ hình'],['lab','🔍 Nhận biết'],['cm','🧠 Chứng minh'],['thu','✅ Thử ngay']],
  ve:[b29ve1,b29ve2,b29ve3],cm:[b29cm1,b29cm2,b29cm3,b29cm4],lab:LAB29,
  thu:[
  {nguon:'Ví dụ 1 · tr.80 · Hình 9.30',fig:b29cm1,kieu:'chon',q:'Hình nào vẽ một tứ giác nội tiếp đường tròn?',o:['Tứ giác có cả bốn đỉnh nằm trên đường tròn','Tứ giác có ba đỉnh nằm trên đường tròn','Tứ giác có bốn cạnh tiếp xúc với đường tròn'],a:0,giai:'Theo định nghĩa: cả bốn đỉnh phải nằm trên đường tròn.',sai:{1:'Đỉnh thứ tư không nằm trên đường tròn.',2:'Đó không phải tứ giác nội tiếp.'}},
  {nguon:'Bài 9.18a · tr.83',fig:b29cm1,kieu:'so',q:'<i>ABCD</i> là tứ giác nội tiếp có '+g('A')+' = 60°, '+g('B')+' = 80°. Tính '+g('C')+', '+g('D')+'.',o:[g('C'),g('D')],a:[120,100],giai:''+g('C')+' = 180° − 60° = 120°; '+g('D')+' = 180° − 80° = 100°.'},
- {nguon:'HĐ5 · tr.82',fig:b29ve2,kieu:'so',q:'Hình vuông <i>ABCD</i> cạnh 3 cm. Tính bán kính đường tròn ngoại tiếp (làm tròn đến chữ số thập phân thứ hai).',o:['<i>R</i>'],dv:['cm'],a:[2.12],tol:.006,giai:'<i>R</i> = nửa đường chéo = 3√2 : 2 ≈ 2,12 (cm).'},
- {nguon:'Câu hỏi · tr.82',fig:b29ve2,kieu:'chon',q:'Với điểm <i>A</i> cho trước nằm trên đường tròn (<i>O</i>), có bao nhiêu hình vuông có một đỉnh là <i>A</i> nội tiếp đường tròn (<i>O</i>)?',o:['Một','Hai','Vô số'],a:0,giai:'Đỉnh đối diện với <i>A</i> phải là điểm đối xứng với <i>A</i> qua <i>O</i>; hai đỉnh còn lại là giao điểm của (<i>O</i>) với đường kính vuông góc. Chỉ có một hình vuông. (<b>em gợi ý</b>)',sai:{1:'Đổi tên đỉnh vẫn là một hình vuông.',2:'Các đỉnh được xác định duy nhất.'}},
- {nguon:'Luyện tập 2 · tr.83',fig:b29ve2,kieu:'so',q:'Hình thoi <i>ABCD</i> cạnh 3 cm; <i>M</i>, <i>N</i>, <i>P</i>, <i>Q</i> là trung điểm <i>AB</i>, <i>BC</i>, <i>CD</i>, <i>DA</i>. <i>MNPQ</i> là hình chữ nhật. Tính bán kính đường tròn ngoại tiếp <i>MNPQ</i>.',o:['<i>R</i>'],dv:['cm'],a:[1.5],tol:.001,giai:'Đường chéo <i>MP</i> nối trung điểm hai cạnh đối của hình thoi nên <i>MP</i> = <i>AD</i> = 3 cm; <i>R</i> = 1,5 cm. (<b>em gợi ý</b>)'},
+ {nguon:'HĐ5 · tr.82',fig:Q29vu,kieu:'so',q:'Hình vuông <i>ABCD</i> cạnh 3 cm. Tính bán kính đường tròn ngoại tiếp (làm tròn đến chữ số thập phân thứ hai).',o:['<i>R</i>'],dv:['cm'],a:[2.12],tol:.006,giai:'<i>R</i> = nửa đường chéo = 3√2 : 2 ≈ 2,12 (cm).'},
+ {nguon:'Câu hỏi · tr.82',fig:Q29vu,kieu:'chon',q:'Với điểm <i>A</i> cho trước nằm trên đường tròn (<i>O</i>), có bao nhiêu hình vuông có một đỉnh là <i>A</i> nội tiếp đường tròn (<i>O</i>)?',o:['Một','Hai','Vô số'],a:0,giai:'Đỉnh đối diện với <i>A</i> phải là điểm đối xứng với <i>A</i> qua <i>O</i>; hai đỉnh còn lại là giao điểm của (<i>O</i>) với đường kính vuông góc. Chỉ có một hình vuông. (<b>em gợi ý</b>)',sai:{1:'Đổi tên đỉnh vẫn là một hình vuông.',2:'Các đỉnh được xác định duy nhất.'}},
+ {nguon:'Luyện tập 2 · tr.83',fig:Q29th,kieu:'so',q:'Hình thoi <i>ABCD</i> cạnh 3 cm; <i>M</i>, <i>N</i>, <i>P</i>, <i>Q</i> là trung điểm <i>AB</i>, <i>BC</i>, <i>CD</i>, <i>DA</i>. <i>MNPQ</i> là hình chữ nhật. Tính bán kính đường tròn ngoại tiếp <i>MNPQ</i>.',o:['<i>R</i>'],dv:['cm'],a:[1.5],tol:.001,giai:'Đường chéo <i>MP</i> nối trung điểm hai cạnh đối của hình thoi nên <i>MP</i> = <i>AD</i> = 3 cm; <i>R</i> = 1,5 cm. (<b>em gợi ý</b>)'},
  {nguon:'Bài 9.22 · tr.83',fig:b29ve2,kieu:'so',q:'Hình chữ nhật có chiều dài gấp hai lần chiều rộng và bán kính đường tròn ngoại tiếp bằng 2,5 cm. Tính diện tích hình chữ nhật.',o:['<i>S</i>'],dv:['cm²'],a:[10],giai:'Đường chéo 5 cm: <i>w</i>² + 4<i>w</i>² = 25 ⇒ <i>w</i>² = 5; <i>S</i> = 2<i>w</i>² = 10 (cm²). (<b>em gợi ý</b>)'},
- {nguon:'Bài 9.23 · tr.83',fig:b29ve3,kieu:'so',q:'Khung cổng hình chữ nhật rộng 4 m, cao 3 m bao bởi khung thép nửa đường tròn (Hình 9.37). Tính chiều dài đoạn thép (làm tròn đến chữ số thập phân thứ hai).',o:['Chiều dài'],dv:['m'],a:[11.33],tol:.006,giai:'<i>R</i> = √(2² + 3²) = √13; nửa chu vi π√13 ≈ 11,33 (m). (<b>em gợi ý</b>)'}]};
+ {nguon:'Bài 9.23 · tr.83',fig:Q29cong,kieu:'so',q:'Khung cổng hình chữ nhật rộng 4 m, cao 3 m bao bởi khung thép nửa đường tròn (Hình 9.37). Tính chiều dài đoạn thép (làm tròn đến chữ số thập phân thứ hai).',o:['Chiều dài'],dv:['m'],a:[11.33],tol:.006,giai:'<i>R</i> = √(2² + 3²) = √13; nửa chu vi π√13 ≈ 11,33 (m). (<b>em gợi ý</b>)'}]};
 
 boot();
 </script>

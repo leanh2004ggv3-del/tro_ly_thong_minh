@@ -205,7 +205,8 @@ function renderScript(fig,k,p){FIG=fig;drawBoard();(fig.base||[]).forEach(it=>dr
  (fig.top||[]).forEach(it=>drawItem(it,1));
  tools.filter(t=>t.k!=='pencil'&&t.k!=='compass').forEach(drawTool);tools.filter(t=>t.k==='pencil'||t.k==='compass').forEach(drawTool)}
 /* tập hợp mọi điểm của hình để vừa khung */
-function figPts(fig){return Object.values(fig.P)}
+function figPts(fig){const out=Object.values(fig.P).slice(),A=x=>Array.isArray(x)&&typeof x[0]==='number';
+ (fig.base||[]).forEach(it=>{['a','b','p','at','c'].forEach(k=>{if(A(it[k]))out.push(it[k])});if(it.t==='circ'&&it.r){const c=A(it.c)?it.c:fig.P[it.c];if(c)out.push([c[0]-it.r,c[1]-it.r],[c[0]+it.r,c[1]+it.r])}});return out}
 
 /* ---------------- ÂM THANH PHẢN HỒI (không đọc giọng) ---------------- */
 let AC=null;function beep(ok){try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();const seq=ok?[660,880,1175]:[300,220];seq.forEach((f,i)=>{const o=AC.createOscillator(),g=AC.createGain();o.type=ok?'triangle':'sawtooth';o.frequency.value=f;g.gain.setValueAtTime(.0001,AC.currentTime+i*.11);g.gain.exponentialRampToValueAtTime(.18,AC.currentTime+i*.11+.02);g.gain.exponentialRampToValueAtTime(.0001,AC.currentTime+i*.11+.2);o.connect(g);g.connect(AC.destination);o.start(AC.currentTime+i*.11);o.stop(AC.currentTime+i*.11+.22)})}catch(e){}}
@@ -285,7 +286,7 @@ MODS.cm={i:0,k:0,t0:0,
 MODS.thu={i:0,done:{},t0:0,
  open(a){this.i=+(a.q||0);this.ord=[];this.show();if(a.a!=null&&S.still)this.answer(+a.a)},
  qs(){return LESSON.thu},
- show(){const q=this.qs()[this.i];this.t0=performance.now();this.ord=[];this.res=this.done[this.i]||null;camFit(figPts(q.fig),{now:true,yaw:q.fig.yaw==null?-8:q.fig.yaw,pitch:q.fig.pitch||72,pad:1.2});this.panel()},
+ show(){const q=this.qs()[this.i];this.t0=performance.now();this.ord=[];this.res=this.done[this.i]||null;const pp=q.fig.pitch||72,khoi=!!(LESSON.lang||LESSON.khoi||LESSON.tron),phang=q.fig.nghieng?false:(khoi?pp>=78:true);camFit(figPts(q.fig),{now:true,yaw:phang?0:(q.fig.yaw!=null?q.fig.yaw:-8),pitch:phang?89.4:pp,pad:1.2});this.panel()},
  draw(){const q=this.qs()[this.i];FIG=q.fig;drawBoard();(q.fig.base||((q.fig.steps||[])[0]||{}).items||[]).forEach(it=>drawItem(it,1));if(this.res&&q.fig.sau)q.fig.sau.forEach(it=>drawItem(it,Math.min(1,(performance.now()-this.res.t)/600)))},
  answer(v){const q=this.qs()[this.i];let ok;
   if(q.kieu==='so'){ok=q.a.every((x,j)=>Math.abs(+String(v[j]).trim().replace(',','.')-x)<(q.tol||1e-6))}else if(q.kieu==='xep'){ok=[q.a].concat(q.alt||[]).some(a=>v.join(',')===a.join(','))}else ok=v===q.a;
@@ -810,6 +811,26 @@ function catKhung(A,B,box,tia){const d=V.sub(B,A);let t0=tia?0:-1e9,t1=1e9;const
 const veDuong=(A,B,box,col,w,dash,tia)=>{const e=catKhung(A,B,box,tia);if(e)line2(e[0],e[1],col,w,dash);return e};
 const chanDT=(M,A,B)=>{const u=V.unit(V.sub(B,A));return V.add(A,V.mul(u,V.dot(V.sub(M,A),u)))};
 
+/* Hình riêng cho câu «Thử ngay» (rà 25/11/2026): hq({P, tg:['ABC'] đa giác kín, doan:['AH'] đoạn, net:['AH'] nét đứt, nhan:{AB:'5 cm'}, goc:[['A','B','C','60°']] góc tại A,
+   vuong:['ABC'] vuông tại A, tron:[['O',R,{opts}]], an:'XY' (không ghi tên), them:[mục], to:{A:'đỏ'…}) — nhãn cạnh tự đặt phía ngoài hình */
+const tenD=s=>s.match(/[A-Z][′']?\d?/g)||[];
+function hq(o){const P=o.P,base=[],ks=Object.keys(P).filter(k=>k[0]!=='_'),cen=V.mul(ks.reduce((s,k)=>V.add(s,P[k]),[0,0]),1/Math.max(1,ks.length));
+ (o.tron||[]).forEach(t=>base.push(Object.assign({t:'circ',c:t[0],r:t[1],col:'#1d4f9a',w:2.2},t[2]||{})));
+ (o.to||[]).forEach(([s,col])=>base.push(poly(tenD(s),col)));
+ (o.tg||[]).forEach(s=>{const n=tenD(s);n.forEach((a,i)=>base.push(seg(a,n[(i+1)%n.length],{w:2.6})))});
+ (o.doan||[]).forEach(s=>{const n=tenD(s);base.push(seg(n[0],n[1],{w:2.6}))});
+ (o.net||[]).forEach(s=>{const n=tenD(s);base.push(seg(n[0],n[1],{dash:[6,5],col:'#5b6684',w:2}))});
+ Object.entries(o.nhan||{}).forEach(([s,lab])=>{const[a,b]=tenD(s),A=P[a],B=P[b],m=V.mid(A,B),sg=Math.sign(V.dot(V.perp(V.sub(B,A)),V.sub(m,cen)))||1;base.push(nhanDai(a,b,lab,{off:.45*sg,col:'#1d4f9a',size:16,at2:[-.01,1]}))});
+ (o.goc||[]).forEach(([v,a,b,lab,col])=>base.push(ang(v,a,b,{lab,col:col||'#dc2626',r:.6,lr:.6,size:15,fill:true})));
+ (o.vuong||[]).forEach(s=>{const n=tenD(s);base.push(ang(n[0],n[1],n[2],{right:true,col:'#1d4f9a',r:.32}))});
+ ks.filter(k=>!(o.an||'').includes(k)).forEach(k=>base.push(pt(k,o.d&&o.d[k]?{d:o.d[k]}:{})));
+ return Object.assign({P,pitch:85,base:base.concat(o.them||[])},o.x||{})}
+/* hình hộp vẽ phối cảnh (mặt trước a × c, chiều sâu b), nhãn ba kích thước */
+function hopQ(a,b,c,la,lb,lc,ten){const k=.45,d=[b*k,b*k*.75],P={_A:[0,0],_B:[a,0],_C:[a,c],_D:[0,c]};P._E=V.add(P._A,d);P._F=V.add(P._B,d);P._G=V.add(P._C,d);P._H=V.add(P._D,d);
+ const s=(x,y,o)=>seg(x,y,Object.assign({w:2.4},o||{})),h={dash:[6,5],w:1.8,col:'#5b6684'};
+ return{P,pitch:85,base:[s('_A','_B'),s('_B','_C'),s('_C','_D'),s('_D','_A'),s('_B','_F'),s('_C','_G'),s('_D','_H'),s('_F','_G'),s('_G','_H'),s('_A','_E',h),s('_E','_F',h),s('_E','_H',h),
+  nhanDai('_A','_B',la||'',{off:-.45,size:15,at2:[-.01,1]}),nhanDai('_B','_F',lb||'',{off:-.5,size:15,at2:[-.01,1]}),nhanDai('_D','_A',lc||'',{off:.5,size:15,at2:[-.01,1]})].concat(ten||[])}}
+
 /* ===== Toán 7 (KNTT) — Bài 11. ĐỊNH LÍ VÀ CHỨNG MINH ĐỊNH LÍ — SGK tập một tr.55–59 =====
    Phần «em gợi ý» là lời giải/cách vẽ em đề xuất cho câu hỏi SGK để HS tự làm — GV soát. */
 
@@ -873,14 +894,16 @@ const qDD={P:{O:[0,0],x:V.pol([0,0],-20,4),x2:V.pol([0,0],160,4),y:V.pol([0,0],3
 const qBang={P:{O:[0,0],x:[4,0],y:V.pol([0,0],40,4),A:[5,0],B:[9,0],C:V.pol([5,0],40,4)},pitch:76,base:[seg('O','x'),seg('O','y'),seg('A','B'),seg('A','C'),ang('O','x','y',{lab:'40°',col:'#2f7de1',lr:.6}),ang('A','B','C',{lab:'40°',col:'#2f7de1',lr:.6}),pt('O',{d:[-.3,-.3]}),pt('A',{d:[-.3,-.3]})]};
 const q351={P:{O:[0,0],x:[4.5,0],x2:[-4.5,0],z:V.pol([0,0],115,4),y:V.pol([0,0],65,4)},pitch:76,base:[seg('x2','x'),seg('O','z'),seg('O','y'),pt('O',{d:[0,-.45]}),txt([4.8,0],'x'),txt([-4.8,0],'x′'),txt(V.pol([0,0],115,4.4),'z'),txt(V.pol([0,0],65,4.4),'y'),ang('O','z','x2',{lab:'1',col:'#2f7de1',lr:.5,size:14}),ang('O','y','z',{lab:'2',col:'#e08a1e',lr:.5,size:14,n:2}),ang('O','x','y',{lab:'3',col:'#16a34a',lr:.5,size:14,n:3})]};
 const q352={P:{O:[0,0],x:[4.5,0],y:V.pol([0,0],120,4),z:V.pol([0,0],230,4)},pitch:76,base:[seg('O','x'),seg('O','y'),seg('O','z'),pt('O',{d:[.35,-.3]}),txt([4.8,0],'x'),txt(V.pol([0,0],120,4.4),'y'),txt(V.pol([0,0],230,4.4),'z'),ang('O','x','y',{lab:'120°',col:'#2f7de1',lr:.6}),ang('O','y','z',{lab:'110°',col:'#e08a1e',lr:.6,n:2})]};
+const Q11pg=(()=>{const O=[0,0],X=[4,0],Y=V.pol(O,70,4),T=V.pol(O,35,4.2);return{P:{O,X,Y,T},pitch:85,base:[seg('O','X',{w:2.6}),seg('O','Y',{w:2.6}),seg('O','T',{dash:[6,5],col:'#dc2626',w:2.4}),txt([4.25,0],'x',{size:20}),txt(V.pol(O,70,4.3),'y',{size:20}),txt(V.pol(O,35,4.5),'t',{size:20,col:'#dc2626'}),pt('O',{d:[-.3,-.3]})]}})();
+const Q11vg=(()=>{const P={C1:[0,-2.6],C2:[0,2.6],A1:[-3,1.2],A2:[3,1.2],B1:[-3,-1.2],B2:[3,-1.2],I:[0,1.2],J:[0,-1.2]};return{P,pitch:85,base:[seg('C1','C2',{w:2.6}),seg('A1','A2',{w:2.6,col:'#2f7de1'}),seg('B1','B2',{w:2.6,col:'#e08a1e'}),ang('I','A2','C2',{right:true}),ang('J','B2','C2',{right:true}),txt([.3,2.8],'c',{size:20}),txt([3.3,1.2],'a',{size:20,col:'#2f7de1'}),txt([3.3,-1.2],'b',{size:20,col:'#e08a1e'})]}})();
 const LESSON={title:'Bài 11. Định lí và chứng minh định lí',sub:'Toán 7 · Kết nối tri thức · Chương III. Góc và đường thẳng song song · SGK tập một tr.55–59',
  tabs:[['ve','✏️ Vẽ hình'],['cm','🧠 Chứng minh'],['thu','✅ Thử ngay']],
  ve:[b11ve1,b11ve2],cm:[b11cm1,b11cm2,b11cm3,b11cm4],
  thu:[
  {nguon:'Luyện tập 1 · tr.56',fig:qDD,kieu:'chon',q:'Định lí «Hai góc đối đỉnh thì bằng nhau». <b>Giả thiết</b> của định lí là:',o:[''+g('O')+'<sub>1</sub>, '+g('O')+'<sub>2</sub> là hai góc đối đỉnh','<i>Ô</i><sub>1</sub> = <i>Ô</i><sub>2</sub>','Hai đường thẳng cắt nhau'],a:0,giai:'GT: '+g('O')+'<sub>1</sub>, '+g('O')+'<sub>2</sub> đối đỉnh. KL: '+g('O')+'<sub>1</sub> = '+g('O')+'<sub>2</sub>.',sai:{1:'Đó là kết luận (phần sau «thì»).',2:'Giả thiết là phần sau «nếu»: hai góc đối đỉnh.'}},
  {nguon:'Tranh luận · tr.57',fig:qBang,kieu:'chon',q:'«Hai góc bằng nhau thì đối đỉnh» có phải là định lí không?',o:['Không: hai góc trên hình bằng nhau (40°) nhưng không đối đỉnh','Có: vì hai góc đối đỉnh thì bằng nhau'],a:0,giai:'Khẳng định đảo của một định lí chưa chắc đúng. Chỉ cần một ví dụ sai (phản ví dụ) là đủ khẳng định điều đó không đúng.',sai:{1:'Đổi chỗ giả thiết và kết luận chưa chắc được một định lí đúng. Xem hình phản ví dụ.'}},
- {nguon:'Bài 3.26 · tr.57',fig:qBang,kieu:'chon',q:'Cho góc <i>xOy</i> không phải góc bẹt. Khẳng định nào đúng?<br>(1) Nếu <i>Ot</i> là tia phân giác của '+g('xOy')+' thì '+g('xOt')+' = '+g('tOy')+'.<br>(2) Nếu tia <i>Ot</i> thoả mãn '+g('xOt')+' = '+g('tOy')+' thì <i>Ot</i> là tia phân giác của '+g('xOy')+'.',o:['Chỉ (1) đúng','Chỉ (2) đúng','Cả (1) và (2) đều đúng'],a:0,giai:'(2) sai: tia đối <i>Ot′</i> của tia phân giác <i>Ot</i> cũng có '+g('xOt′')+' = '+g('t′Oy')+' nhưng không nằm giữa hai cạnh.',sai:{1:'(1) là tính chất của tia phân giác nên đúng.',2:'Xét tia đối của tia phân giác (gợi ý của SGK).'}},
- {nguon:'Bài 3.28 · tr.58',fig:qDD,kieu:'chon',q:'Định lí «Hai đường thẳng phân biệt cùng vuông góc với một đường thẳng thứ ba thì chúng song song với nhau». <b>Kết luận</b> là:',o:['Hai đường thẳng đó song song với nhau','Hai đường thẳng cùng vuông góc với đường thẳng thứ ba','Có một đường thẳng thứ ba'],a:0,giai:'Phần sau «thì» là kết luận.',sai:{1:'Đó là giả thiết.',2:'Đó là một phần của giả thiết.'}},
+ {nguon:'Bài 3.26 · tr.57',fig:Q11pg,kieu:'chon',q:'Cho góc <i>xOy</i> không phải góc bẹt. Khẳng định nào đúng?<br>(1) Nếu <i>Ot</i> là tia phân giác của '+g('xOy')+' thì '+g('xOt')+' = '+g('tOy')+'.<br>(2) Nếu tia <i>Ot</i> thoả mãn '+g('xOt')+' = '+g('tOy')+' thì <i>Ot</i> là tia phân giác của '+g('xOy')+'.',o:['Chỉ (1) đúng','Chỉ (2) đúng','Cả (1) và (2) đều đúng'],a:0,giai:'(2) sai: tia đối <i>Ot′</i> của tia phân giác <i>Ot</i> cũng có '+g('xOt′')+' = '+g('t′Oy')+' nhưng không nằm giữa hai cạnh.',sai:{1:'(1) là tính chất của tia phân giác nên đúng.',2:'Xét tia đối của tia phân giác (gợi ý của SGK).'}},
+ {nguon:'Bài 3.28 · tr.58',fig:Q11vg,kieu:'chon',q:'Định lí «Hai đường thẳng phân biệt cùng vuông góc với một đường thẳng thứ ba thì chúng song song với nhau». <b>Kết luận</b> là:',o:['Hai đường thẳng đó song song với nhau','Hai đường thẳng cùng vuông góc với đường thẳng thứ ba','Có một đường thẳng thứ ba'],a:0,giai:'Phần sau «thì» là kết luận.',sai:{1:'Đó là giả thiết.',2:'Đó là một phần của giả thiết.'}},
  {nguon:'Chứng minh định lí · tr.56',fig:b11cm1,kieu:'xep',q:'Sắp xếp các bước chứng minh «hai góc đồng vị bằng nhau» (Hình 3.46).',o:['Theo tiên đề Euclid, <i>b′</i> trùng <i>b</i>','Kẻ <i>b′</i> qua <i>B</i> sao cho '+g('B')+'<sub>2</sub> = '+g('A')+'<sub>1</sub>','Suy ra '+g('B')+'<sub>1</sub> = '+g('A')+'<sub>1</sub>','Theo dấu hiệu nhận biết, <i>a</i> // <i>b′</i>'],a:[1,3,0,2],giai:'Dựng <i>b′</i> → <i>a</i> // <i>b′</i> → tiên đề Euclid → kết luận.',goiy:'Muốn dùng tiên đề Euclid phải có <i>a</i> // <i>b′</i> trước.'},
  {nguon:'Bài 3.35b · tr.59 · Hình 3.51',fig:q351,kieu:'so',q:'<i>Ox</i>, <i>Ox′</i> là hai tia đối nhau. Biết '+g('O')+'<sub>1</sub> = 60°, '+g('O')+'<sub>3</sub> = 70°. Tính '+g('O')+'<sub>2</sub>.',o:['Ô₂'],a:[50],giai:''+g('O')+'<sub>1</sub> + '+g('O')+'<sub>2</sub> + '+g('O')+'<sub>3</sub> = 180° nên '+g('O')+'<sub>2</sub> = 180° − 60° − 70° = 50°.',goiy:'Ba góc ghép thành góc bẹt <i>x′Ox</i>.'},
  {nguon:'Bài 3.36 · tr.59 · Hình 3.52',fig:q352,kieu:'so',q:'Biết '+g('xOy')+' = 120°, '+g('yOz')+' = 110°. Tính '+g('zOx')+'.',o:['zOx'],a:[130],giai:'Kẻ tia đối <i>Oy′</i> của <i>Oy</i>: '+g('xOy′')+' = 60°, '+g('y′Oz')+' = 70° nên '+g('zOx')+' = 130° (hay 360° − 120° − 110°).',goiy:'Kẻ thêm tia đối của tia <i>Oy</i> (gợi ý của SGK).'}]};

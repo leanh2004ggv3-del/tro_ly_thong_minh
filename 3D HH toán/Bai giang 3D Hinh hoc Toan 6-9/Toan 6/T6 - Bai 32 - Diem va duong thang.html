@@ -205,7 +205,8 @@ function renderScript(fig,k,p){FIG=fig;drawBoard();(fig.base||[]).forEach(it=>dr
  (fig.top||[]).forEach(it=>drawItem(it,1));
  tools.filter(t=>t.k!=='pencil'&&t.k!=='compass').forEach(drawTool);tools.filter(t=>t.k==='pencil'||t.k==='compass').forEach(drawTool)}
 /* tập hợp mọi điểm của hình để vừa khung */
-function figPts(fig){return Object.values(fig.P)}
+function figPts(fig){const out=Object.values(fig.P).slice(),A=x=>Array.isArray(x)&&typeof x[0]==='number';
+ (fig.base||[]).forEach(it=>{['a','b','p','at','c'].forEach(k=>{if(A(it[k]))out.push(it[k])});if(it.t==='circ'&&it.r){const c=A(it.c)?it.c:fig.P[it.c];if(c)out.push([c[0]-it.r,c[1]-it.r],[c[0]+it.r,c[1]+it.r])}});return out}
 
 /* ---------------- ÂM THANH PHẢN HỒI (không đọc giọng) ---------------- */
 let AC=null;function beep(ok){try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();const seq=ok?[660,880,1175]:[300,220];seq.forEach((f,i)=>{const o=AC.createOscillator(),g=AC.createGain();o.type=ok?'triangle':'sawtooth';o.frequency.value=f;g.gain.setValueAtTime(.0001,AC.currentTime+i*.11);g.gain.exponentialRampToValueAtTime(.18,AC.currentTime+i*.11+.02);g.gain.exponentialRampToValueAtTime(.0001,AC.currentTime+i*.11+.2);o.connect(g);g.connect(AC.destination);o.start(AC.currentTime+i*.11);o.stop(AC.currentTime+i*.11+.22)})}catch(e){}}
@@ -285,7 +286,7 @@ MODS.cm={i:0,k:0,t0:0,
 MODS.thu={i:0,done:{},t0:0,
  open(a){this.i=+(a.q||0);this.ord=[];this.show();if(a.a!=null&&S.still)this.answer(+a.a)},
  qs(){return LESSON.thu},
- show(){const q=this.qs()[this.i];this.t0=performance.now();this.ord=[];this.res=this.done[this.i]||null;camFit(figPts(q.fig),{now:true,yaw:q.fig.yaw==null?-8:q.fig.yaw,pitch:q.fig.pitch||72,pad:1.2});this.panel()},
+ show(){const q=this.qs()[this.i];this.t0=performance.now();this.ord=[];this.res=this.done[this.i]||null;const pp=q.fig.pitch||72,khoi=!!(LESSON.lang||LESSON.khoi||LESSON.tron),phang=q.fig.nghieng?false:(khoi?pp>=78:true);camFit(figPts(q.fig),{now:true,yaw:phang?0:(q.fig.yaw!=null?q.fig.yaw:-8),pitch:phang?89.4:pp,pad:1.2});this.panel()},
  draw(){const q=this.qs()[this.i];FIG=q.fig;drawBoard();(q.fig.base||((q.fig.steps||[])[0]||{}).items||[]).forEach(it=>drawItem(it,1));if(this.res&&q.fig.sau)q.fig.sau.forEach(it=>drawItem(it,Math.min(1,(performance.now()-this.res.t)/600)))},
  answer(v){const q=this.qs()[this.i];let ok;
   if(q.kieu==='so'){ok=q.a.every((x,j)=>Math.abs(+String(v[j]).trim().replace(',','.')-x)<(q.tol||1e-6))}else if(q.kieu==='xep'){ok=[q.a].concat(q.alt||[]).some(a=>v.join(',')===a.join(','))}else ok=v===q.a;
@@ -810,6 +811,26 @@ function catKhung(A,B,box,tia){const d=V.sub(B,A);let t0=tia?0:-1e9,t1=1e9;const
 const veDuong=(A,B,box,col,w,dash,tia)=>{const e=catKhung(A,B,box,tia);if(e)line2(e[0],e[1],col,w,dash);return e};
 const chanDT=(M,A,B)=>{const u=V.unit(V.sub(B,A));return V.add(A,V.mul(u,V.dot(V.sub(M,A),u)))};
 
+/* Hình riêng cho câu «Thử ngay» (rà 25/11/2026): hq({P, tg:['ABC'] đa giác kín, doan:['AH'] đoạn, net:['AH'] nét đứt, nhan:{AB:'5 cm'}, goc:[['A','B','C','60°']] góc tại A,
+   vuong:['ABC'] vuông tại A, tron:[['O',R,{opts}]], an:'XY' (không ghi tên), them:[mục], to:{A:'đỏ'…}) — nhãn cạnh tự đặt phía ngoài hình */
+const tenD=s=>s.match(/[A-Z][′']?\d?/g)||[];
+function hq(o){const P=o.P,base=[],ks=Object.keys(P).filter(k=>k[0]!=='_'),cen=V.mul(ks.reduce((s,k)=>V.add(s,P[k]),[0,0]),1/Math.max(1,ks.length));
+ (o.tron||[]).forEach(t=>base.push(Object.assign({t:'circ',c:t[0],r:t[1],col:'#1d4f9a',w:2.2},t[2]||{})));
+ (o.to||[]).forEach(([s,col])=>base.push(poly(tenD(s),col)));
+ (o.tg||[]).forEach(s=>{const n=tenD(s);n.forEach((a,i)=>base.push(seg(a,n[(i+1)%n.length],{w:2.6})))});
+ (o.doan||[]).forEach(s=>{const n=tenD(s);base.push(seg(n[0],n[1],{w:2.6}))});
+ (o.net||[]).forEach(s=>{const n=tenD(s);base.push(seg(n[0],n[1],{dash:[6,5],col:'#5b6684',w:2}))});
+ Object.entries(o.nhan||{}).forEach(([s,lab])=>{const[a,b]=tenD(s),A=P[a],B=P[b],m=V.mid(A,B),sg=Math.sign(V.dot(V.perp(V.sub(B,A)),V.sub(m,cen)))||1;base.push(nhanDai(a,b,lab,{off:.45*sg,col:'#1d4f9a',size:16,at2:[-.01,1]}))});
+ (o.goc||[]).forEach(([v,a,b,lab,col])=>base.push(ang(v,a,b,{lab,col:col||'#dc2626',r:.6,lr:.6,size:15,fill:true})));
+ (o.vuong||[]).forEach(s=>{const n=tenD(s);base.push(ang(n[0],n[1],n[2],{right:true,col:'#1d4f9a',r:.32}))});
+ ks.filter(k=>!(o.an||'').includes(k)).forEach(k=>base.push(pt(k,o.d&&o.d[k]?{d:o.d[k]}:{})));
+ return Object.assign({P,pitch:85,base:base.concat(o.them||[])},o.x||{})}
+/* hình hộp vẽ phối cảnh (mặt trước a × c, chiều sâu b), nhãn ba kích thước */
+function hopQ(a,b,c,la,lb,lc,ten){const k=.45,d=[b*k,b*k*.75],P={_A:[0,0],_B:[a,0],_C:[a,c],_D:[0,c]};P._E=V.add(P._A,d);P._F=V.add(P._B,d);P._G=V.add(P._C,d);P._H=V.add(P._D,d);
+ const s=(x,y,o)=>seg(x,y,Object.assign({w:2.4},o||{})),h={dash:[6,5],w:1.8,col:'#5b6684'};
+ return{P,pitch:85,base:[s('_A','_B'),s('_B','_C'),s('_C','_D'),s('_D','_A'),s('_B','_F'),s('_C','_G'),s('_D','_H'),s('_F','_G'),s('_G','_H'),s('_A','_E',h),s('_E','_F',h),s('_E','_H',h),
+  nhanDai('_A','_B',la||'',{off:-.45,size:15,at2:[-.01,1]}),nhanDai('_B','_F',lb||'',{off:-.5,size:15,at2:[-.01,1]}),nhanDai('_D','_A',lc||'',{off:.5,size:15,at2:[-.01,1]})].concat(ten||[])}}
+
 /* ===== Toán 6 (KNTT) — Bài 32. ĐIỂM VÀ ĐƯỜNG THẲNG — SGK tập hai tr.43–47 =====
    Phần «em gợi ý» là lời giải em đề xuất cho câu hỏi SGK để HS tự làm — GV soát. */
 const keo32=(A,B,k)=>V.add(B,V.mul(V.unit(V.sub(B,A)),k));
@@ -864,6 +885,8 @@ const f82={P:{A:[-1.5,-.5],B:[.5,.17],C:[1.6,-.4],E:[-3,-1],F:[3,1]},pitch:85,ba
 const f84=(()=>{const A=[-2,-.8],B=[1,1.6],C=[2,-.4];return{P:{A,B,C,a1:keo32(B,A,1),a2:keo32(A,B,1),b1:keo32(C,B,1),b2:keo32(B,C,1.2),c1:keo32(C,A,1),c2:keo32(A,C,1)},pitch:85,base:[seg('a1','a2'),seg('b1','b2'),seg('c1','c2'),...pts('ABC',{A:[-.2,.4],B:[-.4,.1],C:[.1,.4]})]}})();
 const f87=(()=>{const B=[0,0],A=V.pol(B,205,1.6),C=V.pol(B,25,1.8),D=V.pol(B,155,2),E=V.pol(B,-25,1.8);return{P:{A,B,C,D,E,a1:V.pol(B,205,3),a2:V.pol(B,25,3),b1:V.pol(B,155,3),b2:V.pol(B,-25,3)},pitch:85,base:[seg('a1','a2'),seg('b1','b2'),...pts('ABCDE',{A:[0,.4],B:[0,.4],C:[0,.4],D:[0,.4],E:[0,.4]})]}})();
 const f83={P:{A:[-3,0],B:[-1.5,0],C:[.8,0],D:[3,0]},pitch:85,base:[seg('A','D'),...pts('ABCD',{A:[0,.4],B:[0,.4],C:[0,.4],D:[0,.4]})]};
+const Q32coc=(()=>{const A=[-2,-.3],B=[2,.5];return{P:{A,B},pitch:85,base:[seg(keo32(B,A,2.2),keo32(A,B,2.2),{col:'#16a34a',w:3}),pt('A',{d:[0,-.45]}),pt('B',{d:[0,-.45]}),txt([-2,.35],'cọc',{size:14,col:'#b5650d'}),txt([2,1.15],'cọc',{size:14,col:'#b5650d'}),txt([0,-1.1],'sợi dây căng qua hai cọc',{size:14,col:'#16a34a'})]}})();
+const Q32thu=(()=>{const A=[-2,2.2],B=[0,1.2],C=[2.4,0];return{P:{A,B,C},pitch:85,base:[seg([-4,0],[4,0],{w:3}),txt([4.25,.25],'d',{size:20}),seg('A','C',{dash:[6,5],col:'#dc2626',w:2}),pt('A',{d:[-.35,.3]}),pt('B',{d:[.2,.4]}),pt('C',{d:[0,-.45],col:'#dc2626'})]}})();
 const LESSON={title:'Bài 32. Điểm và đường thẳng',sub:'Toán 6 · Kết nối tri thức · Chương VIII. Những hình hình học cơ bản · SGK tập hai tr.43–47',
  tabs:[['ve','✏️ Vẽ – kiểm tra'],['lab','🔍 Điểm, đường thẳng'],['thu','✅ Thử ngay']],
  ve:[b32ve1,b32ve2,b32ve3],lab:LAB32,
@@ -871,9 +894,9 @@ const LESSON={title:'Bài 32. Điểm và đường thẳng',sub:'Toán 6 · K�
  {nguon:'Câu hỏi · tr.44 · Hình 8.2',fig:f82,kieu:'chon',q:'Trong hình, những điểm nào thuộc đường thẳng <i>d</i>, điểm nào không thuộc <i>d</i>?',o:['<i>A</i>, <i>B</i> ∈ <i>d</i>; <i>C</i> ∉ <i>d</i>','<i>A</i>, <i>C</i> ∈ <i>d</i>; <i>B</i> ∉ <i>d</i>','Cả ba điểm thuộc <i>d</i>'],a:0,giai:'<i>A</i>, <i>B</i> nằm trên đường thẳng <i>d</i>; <i>C</i> nằm ngoài <i>d</i>. (<b>em gợi ý</b>)'},
  {nguon:'Câu hỏi · tr.45 · Hình 8.4',fig:f84,kieu:'so',q:'Hình có bao nhiêu đường thẳng? (Đọc tên: <i>AB</i>, <i>BC</i>, <i>CA</i>.)',o:['Số đường thẳng'],dv:[''],a:[3],giai:'Ba đường thẳng <i>AB</i>, <i>BC</i>, <i>CA</i>. (<b>em gợi ý</b>)'},
  {nguon:'Câu hỏi · tr.45 · Hình 8.7',fig:f87,kieu:'chon',q:'Kể tên hai bộ ba điểm thẳng hàng trong hình.',o:['<i>A</i>, <i>B</i>, <i>C</i> và <i>D</i>, <i>B</i>, <i>E</i>','<i>A</i>, <i>B</i>, <i>D</i> và <i>C</i>, <i>B</i>, <i>E</i>','<i>A</i>, <i>C</i>, <i>E</i> và <i>B</i>, <i>D</i>, <i>E</i>'],a:0,giai:'<i>A</i>, <i>B</i>, <i>C</i> cùng thuộc một đường thẳng; <i>D</i>, <i>B</i>, <i>E</i> cùng thuộc đường thẳng kia. (<b>em gợi ý</b>)'},
- {nguon:'Vận dụng · tr.46',fig:f82,kieu:'chon',q:'Căng sợi dây qua hai cái cọc rồi dựa vào sợi dây để vẽ vạch vôi. Vì sao làm như vậy được vạch thẳng?',o:['Có một và chỉ một đường thẳng đi qua hai điểm phân biệt','Vì sợi dây rất dài','Vì hai cọc song song'],a:0,giai:'Hai cọc là hai điểm phân biệt; sợi dây căng cho ta hình ảnh đường thẳng duy nhất đi qua hai điểm đó. (<b>em gợi ý</b>)'},
+ {nguon:'Vận dụng · tr.46',fig:Q32coc,kieu:'chon',q:'Căng sợi dây qua hai cái cọc rồi dựa vào sợi dây để vẽ vạch vôi. Vì sao làm như vậy được vạch thẳng?',o:['Có một và chỉ một đường thẳng đi qua hai điểm phân biệt','Vì sợi dây rất dài','Vì hai cọc song song'],a:0,giai:'Hai cọc là hai điểm phân biệt; sợi dây căng cho ta hình ảnh đường thẳng duy nhất đi qua hai điểm đó. (<b>em gợi ý</b>)'},
  {nguon:'HĐ4 · tr.46',fig:f84,kieu:'chon',q:'Hai đường thẳng phân biệt có thể có nhiều hơn một điểm chung không?',o:['Không','Có'],a:0,giai:'Nếu có hai điểm chung thì cả hai cùng đi qua hai điểm phân biệt — chỉ có một đường thẳng như vậy, nên chúng trùng nhau. (<b>em gợi ý</b>)'},
- {nguon:'Thử thách nhỏ · tr.47',fig:f82,kieu:'chon',q:'Cho đường thẳng <i>d</i> và hai điểm <i>A</i>, <i>B</i> không thuộc <i>d</i>. Tìm <i>C</i> ∈ <i>d</i> sao cho <i>A</i>, <i>B</i>, <i>C</i> thẳng hàng. Khi nào không tìm được <i>C</i>?',o:['Khi đường thẳng <i>AB</i> song song với <i>d</i>','Khi <i>A</i>, <i>B</i> ở hai phía của <i>d</i>','Không bao giờ'],a:0,giai:'<i>C</i> là giao điểm của đường thẳng <i>AB</i> với <i>d</i>; nếu <i>AB</i> // <i>d</i> thì không có giao điểm. (<b>em gợi ý</b>)'},
+ {nguon:'Thử thách nhỏ · tr.47',fig:Q32thu,kieu:'chon',q:'Cho đường thẳng <i>d</i> và hai điểm <i>A</i>, <i>B</i> không thuộc <i>d</i>. Tìm <i>C</i> ∈ <i>d</i> sao cho <i>A</i>, <i>B</i>, <i>C</i> thẳng hàng. Khi nào không tìm được <i>C</i>?',o:['Khi đường thẳng <i>AB</i> song song với <i>d</i>','Khi <i>A</i>, <i>B</i> ở hai phía của <i>d</i>','Không bao giờ'],a:0,giai:'<i>C</i> là giao điểm của đường thẳng <i>AB</i> với <i>d</i>; nếu <i>AB</i> // <i>d</i> thì không có giao điểm. (<b>em gợi ý</b>)'},
  {nguon:'Bài 8.3 · tr.47',fig:f83,kieu:'so',q:'Bốn điểm <i>A</i>, <i>B</i>, <i>C</i>, <i>D</i> cùng nằm trên một đường thẳng. Có bao nhiêu bộ ba điểm thẳng hàng?',o:['Số bộ'],dv:[''],a:[4],giai:'<i>ABC</i>, <i>ABD</i>, <i>ACD</i>, <i>BCD</i>. (<b>em gợi ý</b>)'}]};
 
 boot();

@@ -205,7 +205,8 @@ function renderScript(fig,k,p){FIG=fig;drawBoard();(fig.base||[]).forEach(it=>dr
  (fig.top||[]).forEach(it=>drawItem(it,1));
  tools.filter(t=>t.k!=='pencil'&&t.k!=='compass').forEach(drawTool);tools.filter(t=>t.k==='pencil'||t.k==='compass').forEach(drawTool)}
 /* tập hợp mọi điểm của hình để vừa khung */
-function figPts(fig){return Object.values(fig.P)}
+function figPts(fig){const out=Object.values(fig.P).slice(),A=x=>Array.isArray(x)&&typeof x[0]==='number';
+ (fig.base||[]).forEach(it=>{['a','b','p','at','c'].forEach(k=>{if(A(it[k]))out.push(it[k])});if(it.t==='circ'&&it.r){const c=A(it.c)?it.c:fig.P[it.c];if(c)out.push([c[0]-it.r,c[1]-it.r],[c[0]+it.r,c[1]+it.r])}});return out}
 
 /* ---------------- ÂM THANH PHẢN HỒI (không đọc giọng) ---------------- */
 let AC=null;function beep(ok){try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();const seq=ok?[660,880,1175]:[300,220];seq.forEach((f,i)=>{const o=AC.createOscillator(),g=AC.createGain();o.type=ok?'triangle':'sawtooth';o.frequency.value=f;g.gain.setValueAtTime(.0001,AC.currentTime+i*.11);g.gain.exponentialRampToValueAtTime(.18,AC.currentTime+i*.11+.02);g.gain.exponentialRampToValueAtTime(.0001,AC.currentTime+i*.11+.2);o.connect(g);g.connect(AC.destination);o.start(AC.currentTime+i*.11);o.stop(AC.currentTime+i*.11+.22)})}catch(e){}}
@@ -285,7 +286,7 @@ MODS.cm={i:0,k:0,t0:0,
 MODS.thu={i:0,done:{},t0:0,
  open(a){this.i=+(a.q||0);this.ord=[];this.show();if(a.a!=null&&S.still)this.answer(+a.a)},
  qs(){return LESSON.thu},
- show(){const q=this.qs()[this.i];this.t0=performance.now();this.ord=[];this.res=this.done[this.i]||null;camFit(figPts(q.fig),{now:true,yaw:q.fig.yaw==null?-8:q.fig.yaw,pitch:q.fig.pitch||72,pad:1.2});this.panel()},
+ show(){const q=this.qs()[this.i];this.t0=performance.now();this.ord=[];this.res=this.done[this.i]||null;const pp=q.fig.pitch||72,khoi=!!(LESSON.lang||LESSON.khoi||LESSON.tron),phang=q.fig.nghieng?false:(khoi?pp>=78:true);camFit(figPts(q.fig),{now:true,yaw:phang?0:(q.fig.yaw!=null?q.fig.yaw:-8),pitch:phang?89.4:pp,pad:1.2});this.panel()},
  draw(){const q=this.qs()[this.i];FIG=q.fig;drawBoard();(q.fig.base||((q.fig.steps||[])[0]||{}).items||[]).forEach(it=>drawItem(it,1));if(this.res&&q.fig.sau)q.fig.sau.forEach(it=>drawItem(it,Math.min(1,(performance.now()-this.res.t)/600)))},
  answer(v){const q=this.qs()[this.i];let ok;
   if(q.kieu==='so'){ok=q.a.every((x,j)=>Math.abs(+String(v[j]).trim().replace(',','.')-x)<(q.tol||1e-6))}else if(q.kieu==='xep'){ok=[q.a].concat(q.alt||[]).some(a=>v.join(',')===a.join(','))}else ok=v===q.a;
@@ -810,6 +811,26 @@ function catKhung(A,B,box,tia){const d=V.sub(B,A);let t0=tia?0:-1e9,t1=1e9;const
 const veDuong=(A,B,box,col,w,dash,tia)=>{const e=catKhung(A,B,box,tia);if(e)line2(e[0],e[1],col,w,dash);return e};
 const chanDT=(M,A,B)=>{const u=V.unit(V.sub(B,A));return V.add(A,V.mul(u,V.dot(V.sub(M,A),u)))};
 
+/* Hình riêng cho câu «Thử ngay» (rà 25/11/2026): hq({P, tg:['ABC'] đa giác kín, doan:['AH'] đoạn, net:['AH'] nét đứt, nhan:{AB:'5 cm'}, goc:[['A','B','C','60°']] góc tại A,
+   vuong:['ABC'] vuông tại A, tron:[['O',R,{opts}]], an:'XY' (không ghi tên), them:[mục], to:{A:'đỏ'…}) — nhãn cạnh tự đặt phía ngoài hình */
+const tenD=s=>s.match(/[A-Z][′']?\d?/g)||[];
+function hq(o){const P=o.P,base=[],ks=Object.keys(P).filter(k=>k[0]!=='_'),cen=V.mul(ks.reduce((s,k)=>V.add(s,P[k]),[0,0]),1/Math.max(1,ks.length));
+ (o.tron||[]).forEach(t=>base.push(Object.assign({t:'circ',c:t[0],r:t[1],col:'#1d4f9a',w:2.2},t[2]||{})));
+ (o.to||[]).forEach(([s,col])=>base.push(poly(tenD(s),col)));
+ (o.tg||[]).forEach(s=>{const n=tenD(s);n.forEach((a,i)=>base.push(seg(a,n[(i+1)%n.length],{w:2.6})))});
+ (o.doan||[]).forEach(s=>{const n=tenD(s);base.push(seg(n[0],n[1],{w:2.6}))});
+ (o.net||[]).forEach(s=>{const n=tenD(s);base.push(seg(n[0],n[1],{dash:[6,5],col:'#5b6684',w:2}))});
+ Object.entries(o.nhan||{}).forEach(([s,lab])=>{const[a,b]=tenD(s),A=P[a],B=P[b],m=V.mid(A,B),sg=Math.sign(V.dot(V.perp(V.sub(B,A)),V.sub(m,cen)))||1;base.push(nhanDai(a,b,lab,{off:.45*sg,col:'#1d4f9a',size:16,at2:[-.01,1]}))});
+ (o.goc||[]).forEach(([v,a,b,lab,col])=>base.push(ang(v,a,b,{lab,col:col||'#dc2626',r:.6,lr:.6,size:15,fill:true})));
+ (o.vuong||[]).forEach(s=>{const n=tenD(s);base.push(ang(n[0],n[1],n[2],{right:true,col:'#1d4f9a',r:.32}))});
+ ks.filter(k=>!(o.an||'').includes(k)).forEach(k=>base.push(pt(k,o.d&&o.d[k]?{d:o.d[k]}:{})));
+ return Object.assign({P,pitch:85,base:base.concat(o.them||[])},o.x||{})}
+/* hình hộp vẽ phối cảnh (mặt trước a × c, chiều sâu b), nhãn ba kích thước */
+function hopQ(a,b,c,la,lb,lc,ten){const k=.45,d=[b*k,b*k*.75],P={_A:[0,0],_B:[a,0],_C:[a,c],_D:[0,c]};P._E=V.add(P._A,d);P._F=V.add(P._B,d);P._G=V.add(P._C,d);P._H=V.add(P._D,d);
+ const s=(x,y,o)=>seg(x,y,Object.assign({w:2.4},o||{})),h={dash:[6,5],w:1.8,col:'#5b6684'};
+ return{P,pitch:85,base:[s('_A','_B'),s('_B','_C'),s('_C','_D'),s('_D','_A'),s('_B','_F'),s('_C','_G'),s('_D','_H'),s('_F','_G'),s('_G','_H'),s('_A','_E',h),s('_E','_F',h),s('_E','_H',h),
+  nhanDai('_A','_B',la||'',{off:-.45,size:15,at2:[-.01,1]}),nhanDai('_B','_F',lb||'',{off:-.5,size:15,at2:[-.01,1]}),nhanDai('_D','_A',lc||'',{off:.5,size:15,at2:[-.01,1]})].concat(ten||[])}}
+
 /* ===== Toán 6 (KNTT) — Bài 22. HÌNH CÓ TÂM ĐỐI XỨNG — SGK tập một tr.103–107 =====
    Phần «em gợi ý» là lời giải em đề xuất cho câu hỏi SGK để HS tự làm — GV soát. Mô phỏng quay, gấp giấy 3D là em làm thêm. */
 const ez22=x=>{x=Math.max(0,Math.min(1,x));return x<.5?2*x*x:1-2*(1-x)*(1-x)};
@@ -868,6 +889,7 @@ const LAB22=labDoiXung({kieu:'tam',hinh:['hbh','hcn','thoi','vuong','luc','tron'
 /* ---------------- 3. THỬ NGAY ---------------- */
 const fChu22=(s)=>({P:{O:[0,0]},pitch:88,base:s.split('').map((c,i)=>txt([(i-(s.length-1)/2)*1.6,0],c,{size:56,col:'#2f7de1',font:'bold 56px Arial'}))});
 const fHinh22=(k)=>{const h=HINH_DX[k];return{P:{O:[0,0]},pitch:85,base:h.tron?[{t:'circ',c:[0,0],r:h.R,col:'#1d4f9a',w:2.5}]:h.v.map((a,i)=>seg(a,h.v[(i+1)%h.v.length],{w:3}))}};
+const Q22c=(k,n)=>{const v=HINH_DX[k].v,P={O:[0,0]},b=[];v.forEach((p,i)=>{P['_'+i]=p;b.push(seg('_'+i,'_'+((i+1)%v.length),{w:3}))});for(let i=0;i<n;i++)b.push(seg('_'+i,'_'+(i+v.length/2),{dash:[6,5],col:'#16a34a',w:2}));b.push(pt('O',{d:[.3,.35],col:'#dc2626'}));return{P,pitch:85,base:b}};
 const LESSON={title:'Bài 22. Hình có tâm đối xứng',sub:'Toán 6 · Kết nối tri thức · Chương V. Tính đối xứng của hình phẳng trong tự nhiên · SGK tập một tr.103–107',
  tabs:[['ve','🔄 Quay – cắt giấy'],['lab','🎯 Tìm tâm đối xứng'],['thu','✅ Thử ngay']],
  ve:[b22ve1,b22ve2,b22ve3,b22ve4],lab:LAB22,
@@ -875,8 +897,8 @@ const LESSON={title:'Bài 22. Hình có tâm đối xứng',sub:'Toán 6 · Kế
  {nguon:'Khái niệm · tr.104',fig:fHinh22('hbh'),kieu:'chon',q:'Điểm <i>O</i> là tâm đối xứng của một hình khi nào?',o:['Quay hình quanh <i>O</i> đúng nửa vòng thì hình chồng khít với chính nó','Quay hình quanh <i>O</i> một phần tư vòng thì chồng khít','<i>O</i> là một đỉnh của hình'],a:0,giai:'Hình có một điểm <i>O</i> mà khi quay hình đó quanh <i>O</i> đúng nửa vòng thì hình thu được «chồng khít» với chính nó ở vị trí ban đầu (tr.104).'},
  {nguon:'Luyện tập 1 ① · tr.104',fig:{P:{A:[-2.5,0],B:[2.5,0],O:[0,0]},pitch:85,base:[seg('A','B',{w:3}),pt('A',{d:[0,-.4]}),pt('B',{d:[0,-.4]})]},kieu:'chon',q:'Đoạn thẳng <i>AB</i> là hình có tâm đối xứng. Tâm đối xứng của nó là điểm nào?',o:['Trung điểm của <i>AB</i>','Điểm <i>A</i>','Điểm <i>B</i>'],a:0,giai:'Quay đoạn <i>AB</i> nửa vòng quanh trung điểm <i>O</i> thì <i>A</i> đến vị trí <i>B</i>, <i>B</i> đến vị trí <i>A</i>. (<b>em gợi ý</b>)'},
  {nguon:'Luyện tập 1 ② · tr.104',fig:fChu22('HKMNX'),kieu:'chon',q:'Những chữ cái nào trong <b>H K M N X</b> có tâm đối xứng?',o:['H, N, X','H, K, M','Cả năm chữ'],a:0,giai:'Quay nửa vòng quanh điểm chính giữa: H, N, X chồng khít với chính nó; K và M thì không. (<b>em gợi ý</b>, theo kiểu chữ in trong SGK)',sai:{1:'Quay K, M nửa vòng: K quay ngược chiều, M thành W.',2:'K và M không có tâm đối xứng.'}},
- {nguon:'Nhận xét · tr.105',fig:fHinh22('thoi'),kieu:'chon',q:'Tâm đối xứng của hình thoi là điểm nào?',o:['Giao điểm của hai đường chéo','Một đỉnh của hình thoi','Trung điểm một cạnh'],a:0,giai:'Tâm đối xứng của hình bình hành, hình thoi, hình vuông, hình chữ nhật là giao điểm của hai đường chéo (tr.105).'},
- {nguon:'Nhận xét · tr.105',fig:fHinh22('luc'),kieu:'chon',q:'Tâm đối xứng của hình lục giác đều là điểm nào?',o:['Giao điểm của các đường chéo chính','Một đỉnh','Trung điểm một cạnh'],a:0,giai:'Tâm đối xứng của hình lục giác đều là giao điểm của các đường chéo chính (tr.105).'},
+ {nguon:'Nhận xét · tr.105',fig:Q22c('thoi',2),kieu:'chon',q:'Tâm đối xứng của hình thoi là điểm nào?',o:['Giao điểm của hai đường chéo','Một đỉnh của hình thoi','Trung điểm một cạnh'],a:0,giai:'Tâm đối xứng của hình bình hành, hình thoi, hình vuông, hình chữ nhật là giao điểm của hai đường chéo (tr.105).'},
+ {nguon:'Nhận xét · tr.105',fig:Q22c('luc',3),kieu:'chon',q:'Tâm đối xứng của hình lục giác đều là điểm nào?',o:['Giao điểm của các đường chéo chính','Một đỉnh','Trung điểm một cạnh'],a:0,giai:'Tâm đối xứng của hình lục giác đều là giao điểm của các đường chéo chính (tr.105).'},
  {nguon:'tr.106',fig:fHinh22('deu3'),kieu:'chon',q:'Tam giác đều có tâm đối xứng không?',o:['Không','Có'],a:0,giai:'Cũng có hình không có tâm đối xứng như hình tam giác đều (tr.106). Thử trong tab «Tìm tâm đối xứng».'}]};
 
 boot();

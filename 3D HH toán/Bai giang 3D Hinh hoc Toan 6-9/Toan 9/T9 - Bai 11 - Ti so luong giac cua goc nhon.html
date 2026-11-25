@@ -205,7 +205,8 @@ function renderScript(fig,k,p){FIG=fig;drawBoard();(fig.base||[]).forEach(it=>dr
  (fig.top||[]).forEach(it=>drawItem(it,1));
  tools.filter(t=>t.k!=='pencil'&&t.k!=='compass').forEach(drawTool);tools.filter(t=>t.k==='pencil'||t.k==='compass').forEach(drawTool)}
 /* tập hợp mọi điểm của hình để vừa khung */
-function figPts(fig){return Object.values(fig.P)}
+function figPts(fig){const out=Object.values(fig.P).slice(),A=x=>Array.isArray(x)&&typeof x[0]==='number';
+ (fig.base||[]).forEach(it=>{['a','b','p','at','c'].forEach(k=>{if(A(it[k]))out.push(it[k])});if(it.t==='circ'&&it.r){const c=A(it.c)?it.c:fig.P[it.c];if(c)out.push([c[0]-it.r,c[1]-it.r],[c[0]+it.r,c[1]+it.r])}});return out}
 
 /* ---------------- ÂM THANH PHẢN HỒI (không đọc giọng) ---------------- */
 let AC=null;function beep(ok){try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();const seq=ok?[660,880,1175]:[300,220];seq.forEach((f,i)=>{const o=AC.createOscillator(),g=AC.createGain();o.type=ok?'triangle':'sawtooth';o.frequency.value=f;g.gain.setValueAtTime(.0001,AC.currentTime+i*.11);g.gain.exponentialRampToValueAtTime(.18,AC.currentTime+i*.11+.02);g.gain.exponentialRampToValueAtTime(.0001,AC.currentTime+i*.11+.2);o.connect(g);g.connect(AC.destination);o.start(AC.currentTime+i*.11);o.stop(AC.currentTime+i*.11+.22)})}catch(e){}}
@@ -285,7 +286,7 @@ MODS.cm={i:0,k:0,t0:0,
 MODS.thu={i:0,done:{},t0:0,
  open(a){this.i=+(a.q||0);this.ord=[];this.show();if(a.a!=null&&S.still)this.answer(+a.a)},
  qs(){return LESSON.thu},
- show(){const q=this.qs()[this.i];this.t0=performance.now();this.ord=[];this.res=this.done[this.i]||null;camFit(figPts(q.fig),{now:true,yaw:q.fig.yaw==null?-8:q.fig.yaw,pitch:q.fig.pitch||72,pad:1.2});this.panel()},
+ show(){const q=this.qs()[this.i];this.t0=performance.now();this.ord=[];this.res=this.done[this.i]||null;const pp=q.fig.pitch||72,khoi=!!(LESSON.lang||LESSON.khoi||LESSON.tron),phang=q.fig.nghieng?false:(khoi?pp>=78:true);camFit(figPts(q.fig),{now:true,yaw:phang?0:(q.fig.yaw!=null?q.fig.yaw:-8),pitch:phang?89.4:pp,pad:1.2});this.panel()},
  draw(){const q=this.qs()[this.i];FIG=q.fig;drawBoard();(q.fig.base||((q.fig.steps||[])[0]||{}).items||[]).forEach(it=>drawItem(it,1));if(this.res&&q.fig.sau)q.fig.sau.forEach(it=>drawItem(it,Math.min(1,(performance.now()-this.res.t)/600)))},
  answer(v){const q=this.qs()[this.i];let ok;
   if(q.kieu==='so'){ok=q.a.every((x,j)=>Math.abs(+String(v[j]).trim().replace(',','.')-x)<(q.tol||1e-6))}else if(q.kieu==='xep'){ok=[q.a].concat(q.alt||[]).some(a=>v.join(',')===a.join(','))}else ok=v===q.a;
@@ -810,6 +811,26 @@ function catKhung(A,B,box,tia){const d=V.sub(B,A);let t0=tia?0:-1e9,t1=1e9;const
 const veDuong=(A,B,box,col,w,dash,tia)=>{const e=catKhung(A,B,box,tia);if(e)line2(e[0],e[1],col,w,dash);return e};
 const chanDT=(M,A,B)=>{const u=V.unit(V.sub(B,A));return V.add(A,V.mul(u,V.dot(V.sub(M,A),u)))};
 
+/* Hình riêng cho câu «Thử ngay» (rà 25/11/2026): hq({P, tg:['ABC'] đa giác kín, doan:['AH'] đoạn, net:['AH'] nét đứt, nhan:{AB:'5 cm'}, goc:[['A','B','C','60°']] góc tại A,
+   vuong:['ABC'] vuông tại A, tron:[['O',R,{opts}]], an:'XY' (không ghi tên), them:[mục], to:{A:'đỏ'…}) — nhãn cạnh tự đặt phía ngoài hình */
+const tenD=s=>s.match(/[A-Z][′']?\d?/g)||[];
+function hq(o){const P=o.P,base=[],ks=Object.keys(P).filter(k=>k[0]!=='_'),cen=V.mul(ks.reduce((s,k)=>V.add(s,P[k]),[0,0]),1/Math.max(1,ks.length));
+ (o.tron||[]).forEach(t=>base.push(Object.assign({t:'circ',c:t[0],r:t[1],col:'#1d4f9a',w:2.2},t[2]||{})));
+ (o.to||[]).forEach(([s,col])=>base.push(poly(tenD(s),col)));
+ (o.tg||[]).forEach(s=>{const n=tenD(s);n.forEach((a,i)=>base.push(seg(a,n[(i+1)%n.length],{w:2.6})))});
+ (o.doan||[]).forEach(s=>{const n=tenD(s);base.push(seg(n[0],n[1],{w:2.6}))});
+ (o.net||[]).forEach(s=>{const n=tenD(s);base.push(seg(n[0],n[1],{dash:[6,5],col:'#5b6684',w:2}))});
+ Object.entries(o.nhan||{}).forEach(([s,lab])=>{const[a,b]=tenD(s),A=P[a],B=P[b],m=V.mid(A,B),sg=Math.sign(V.dot(V.perp(V.sub(B,A)),V.sub(m,cen)))||1;base.push(nhanDai(a,b,lab,{off:.45*sg,col:'#1d4f9a',size:16,at2:[-.01,1]}))});
+ (o.goc||[]).forEach(([v,a,b,lab,col])=>base.push(ang(v,a,b,{lab,col:col||'#dc2626',r:.6,lr:.6,size:15,fill:true})));
+ (o.vuong||[]).forEach(s=>{const n=tenD(s);base.push(ang(n[0],n[1],n[2],{right:true,col:'#1d4f9a',r:.32}))});
+ ks.filter(k=>!(o.an||'').includes(k)).forEach(k=>base.push(pt(k,o.d&&o.d[k]?{d:o.d[k]}:{})));
+ return Object.assign({P,pitch:85,base:base.concat(o.them||[])},o.x||{})}
+/* hình hộp vẽ phối cảnh (mặt trước a × c, chiều sâu b), nhãn ba kích thước */
+function hopQ(a,b,c,la,lb,lc,ten){const k=.45,d=[b*k,b*k*.75],P={_A:[0,0],_B:[a,0],_C:[a,c],_D:[0,c]};P._E=V.add(P._A,d);P._F=V.add(P._B,d);P._G=V.add(P._C,d);P._H=V.add(P._D,d);
+ const s=(x,y,o)=>seg(x,y,Object.assign({w:2.4},o||{})),h={dash:[6,5],w:1.8,col:'#5b6684'};
+ return{P,pitch:85,base:[s('_A','_B'),s('_B','_C'),s('_C','_D'),s('_D','_A'),s('_B','_F'),s('_C','_G'),s('_D','_H'),s('_F','_G'),s('_G','_H'),s('_A','_E',h),s('_E','_F',h),s('_E','_H',h),
+  nhanDai('_A','_B',la||'',{off:-.45,size:15,at2:[-.01,1]}),nhanDai('_B','_F',lb||'',{off:-.5,size:15,at2:[-.01,1]}),nhanDai('_D','_A',lc||'',{off:.5,size:15,at2:[-.01,1]})].concat(ten||[])}}
+
 /* ===== Toán 9 (KNTT) — Bài 11. TỈ SỐ LƯỢNG GIÁC CỦA GÓC NHỌN — SGK tập một tr.66–73 =====
    Phần «em gợi ý» là lời giải em đề xuất cho câu hỏi SGK để HS tự làm — GV soát. */
 const fr=(a,b)=>`<span style="display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;line-height:1.15;margin:0 2px"><span style="border-bottom:1.4px solid currentColor;padding:0 2px">${a}</span><span style="padding:0 2px">${b}</span></span>`;
@@ -880,18 +901,23 @@ const LAB11=labVuong({dh:[
 
 /* ---------------- 4. THỬ NGAY ---------------- */
 const qV=VG([3,0],[0,0],[3,4],{d:{A:[.35,-.3],B:[-.4,-.3],C:[.35,.3]}});
+const Q11a=hq({P:{A:[0,0],B:[-2.5,0],C:[0,6]},tg:['ABC'],nhan:{AB:'5 cm',AC:'12 cm'},vuong:['ABC'],goc:[['B','A','C','?']]});
+const Q11b=hq({P:{A:[0,0],B:[-3,0],C:[0,3]},tg:['ABC'],nhan:{AB:'c'},vuong:['ABC'],goc:[['C','A','B','45°']]});
+const Q11doc=hq({P:{A:[0,0],H:[4.97,0],B:[4.97,.5]},tg:['AHB'],nhan:{AB:'4 m',HB:'0,4 m'},vuong:['HAB'],goc:[['A','H','B','α?']],an:'AHB'});
+const Q11c=hq({P:{A:[0,0],C:[4.33,0],B:[4.33,2.5]},tg:['ABC'],nhan:{BC:'5 cm',AB:'?'},vuong:['CAB'],goc:[['A','C','B','30°']]});
+const Q11d=hq({P:{A:[0,0],B:[3,0],C:[3,1.732],D:[0,1.732]},tg:['ABCD'],doan:['AC'],nhan:{AB:'3',DA:'√3'},vuong:['ABD'],goc:[['A','D','C','?']]});
 const LESSON={title:'Bài 11. Tỉ số lượng giác của góc nhọn',sub:'Toán 9 · Kết nối tri thức · Chương IV. Hệ thức lượng trong tam giác vuông · SGK tập một tr.66–73',
  tabs:[['ve','✏️ Vẽ hình'],['lab','🔍 Nhận biết'],['cm','🧠 Tính toán'],['thu','✅ Thử ngay']],
  ve:[b11ve1,b11ve2,b11ve3],cm:[b11cm1,b11cm2,b11cm3,b11cm4,b11cm5],lab:LAB11,
  thu:[
  {nguon:'Câu hỏi · tr.67 · Hình 4.3',fig:qV,kieu:'chon',q:'Xét góc <i>C</i> của tam giác <i>ABC</i> vuông tại <i>A</i>. Cạnh đối và cạnh kề của góc <i>C</i> là:',o:['Cạnh đối <i>AB</i>, cạnh kề <i>AC</i>','Cạnh đối <i>AC</i>, cạnh kề <i>AB</i>','Cạnh đối <i>BC</i>, cạnh kề <i>AC</i>'],a:0,giai:'Cạnh đối diện góc <i>C</i> là <i>AB</i>; cạnh góc vuông kề góc <i>C</i> là <i>AC</i>.',sai:{1:'Đó là của góc <i>B</i>.',2:'<i>BC</i> là cạnh huyền.'}},
- {nguon:'Luyện tập 1 · tr.68',fig:qV,kieu:'chon',q:'Tam giác <i>ABC</i> vuông tại <i>A</i> có <i>AB</i> = 5 cm, <i>AC</i> = 12 cm. sin <i>B</i> bằng:',o:[fr('12','13'),fr('5','13'),fr('12','5')],a:0,giai:'<i>BC</i> = √(25 + 144) = 13; sin <i>B</i> = '+fr('<i>AC</i>','<i>BC</i>')+' = '+fr('12','13')+'; cos <i>B</i> = '+fr('5','13')+'; tan <i>B</i> = '+fr('12','5')+'; cot <i>B</i> = '+fr('5','12')+'.',sai:{1:'Đó là cos <i>B</i>.',2:'Đó là tan <i>B</i>.'}},
- {nguon:'Luyện tập 2 · tr.70',fig:qV,kieu:'chon',q:'Tam giác <i>ABC</i> vuông tại <i>A</i> có '+g('C')+' = 45° và <i>AB</i> = <i>c</i>. Khi đó:',o:['<i>AC</i> = <i>c</i>, <i>BC</i> = <i>c</i>√2','<i>AC</i> = <i>c</i>√2, <i>BC</i> = <i>c</i>','<i>AC</i> = <i>BC</i> = <i>c</i>'],a:0,giai:'Tam giác vuông cân: <i>AC</i> = <i>AB</i> = <i>c</i>; <i>BC</i> = <i>AB</i> : sin 45° = <i>c</i>√2. (<b>em gợi ý</b>)',sai:{1:'Cạnh huyền lớn nhất.',2:'Cạnh huyền không bằng cạnh góc vuông.'}},
+ {nguon:'Luyện tập 1 · tr.68',fig:Q11a,kieu:'chon',q:'Tam giác <i>ABC</i> vuông tại <i>A</i> có <i>AB</i> = 5 cm, <i>AC</i> = 12 cm. sin <i>B</i> bằng:',o:[fr('12','13'),fr('5','13'),fr('12','5')],a:0,giai:'<i>BC</i> = √(25 + 144) = 13; sin <i>B</i> = '+fr('<i>AC</i>','<i>BC</i>')+' = '+fr('12','13')+'; cos <i>B</i> = '+fr('5','13')+'; tan <i>B</i> = '+fr('12','5')+'; cot <i>B</i> = '+fr('5','12')+'.',sai:{1:'Đó là cos <i>B</i>.',2:'Đó là tan <i>B</i>.'}},
+ {nguon:'Luyện tập 2 · tr.70',fig:Q11b,kieu:'chon',q:'Tam giác <i>ABC</i> vuông tại <i>A</i> có '+g('C')+' = 45° và <i>AB</i> = <i>c</i>. Khi đó:',o:['<i>AC</i> = <i>c</i>, <i>BC</i> = <i>c</i>√2','<i>AC</i> = <i>c</i>√2, <i>BC</i> = <i>c</i>','<i>AC</i> = <i>BC</i> = <i>c</i>'],a:0,giai:'Tam giác vuông cân: <i>AC</i> = <i>AB</i> = <i>c</i>; <i>BC</i> = <i>AB</i> : sin 45° = <i>c</i>√2. (<b>em gợi ý</b>)',sai:{1:'Cạnh huyền lớn nhất.',2:'Cạnh huyền không bằng cạnh góc vuông.'}},
  {nguon:'Luyện tập 4 · tr.71',fig:qV,kieu:'so',q:'Dùng MTCT tính (làm tròn đến chữ số thập phân thứ ba; gõ dấu phẩy hoặc dấu chấm): a) sin 40°54′; b) cos 52°15′; c) tan 69°36′; d) cot 25°18′.',o:['a)','b)','c)','d)'],dv:['','','',''],a:[.655,.612,2.689,2.116],tol:.0011,giai:'sin 40°54′ ≈ 0,655; cos 52°15′ ≈ 0,612; tan 69°36′ ≈ 2,689; cot 25°18′ ≈ 2,116 (em bấm máy kiểm tra).',goiy:'Nhập độ, phút bằng phím °′″; cot = 1 : tan.'},
  {nguon:'Luyện tập 5 · tr.72',fig:qV,kieu:'so',q:'Dùng MTCT tìm góc α (làm tròn đến phút) biết sin α = 0,3782. Nhập số độ và số phút.',o:['độ','phút'],dv:['°','′'],a:[22,13],giai:'α ≈ 22°13′. (Các câu còn lại: cos α = 0,6251 ⇒ α ≈ 51°19′; tan α = 2,154 ⇒ α ≈ 65°6′; cot α = 3,253 ⇒ α ≈ 17°5′.)',goiy:'Bấm SHIFT sin 0,3782 = rồi phím °′″.'},
- {nguon:'Vận dụng · tr.72',fig:b11ve1,kieu:'so',q:'Đoạn dốc dài 4 m, đỉnh dốc cao 0,4 m. Tính góc dốc (làm tròn đến phút).',o:['độ','phút'],dv:['°','′'],a:[5,44],giai:'sin α = 0,1 ⇒ α ≈ 5°44′ < 6°: đúng tiêu chuẩn. (<b>em gợi ý</b>)',goiy:'Cạnh đối là độ cao, cạnh huyền là chiều dài dốc.'},
- {nguon:'Bài 4.3 · tr.73',fig:qV,kieu:'so',q:'Tam giác vuông có một góc nhọn 30° và cạnh đối với góc này bằng 5 cm. Tính cạnh huyền.',o:['Cạnh huyền'],dv:['cm'],a:[10],giai:'Cạnh huyền = 5 : sin 30° = 10 (cm).'},
- {nguon:'Bài 4.4 · tr.73',fig:qV,kieu:'so',q:'Hình chữ nhật có chiều dài 3 và chiều rộng √3. Tính góc giữa đường chéo và cạnh ngắn hơn.',o:['Góc'],a:[60],giai:'tan của góc đó = 3 : √3 = √3 nên góc bằng 60°. (<b>em gợi ý</b>)',goiy:'Cạnh đối là chiều dài, cạnh kề là chiều rộng.'}]};
+ {nguon:'Vận dụng · tr.72',fig:Q11doc,kieu:'so',q:'Đoạn dốc dài 4 m, đỉnh dốc cao 0,4 m. Tính góc dốc (làm tròn đến phút).',o:['độ','phút'],dv:['°','′'],a:[5,44],giai:'sin α = 0,1 ⇒ α ≈ 5°44′ < 6°: đúng tiêu chuẩn. (<b>em gợi ý</b>)',goiy:'Cạnh đối là độ cao, cạnh huyền là chiều dài dốc.'},
+ {nguon:'Bài 4.3 · tr.73',fig:Q11c,kieu:'so',q:'Tam giác vuông có một góc nhọn 30° và cạnh đối với góc này bằng 5 cm. Tính cạnh huyền.',o:['Cạnh huyền'],dv:['cm'],a:[10],giai:'Cạnh huyền = 5 : sin 30° = 10 (cm).'},
+ {nguon:'Bài 4.4 · tr.73',fig:Q11d,kieu:'so',q:'Hình chữ nhật có chiều dài 3 và chiều rộng √3. Tính góc giữa đường chéo và cạnh ngắn hơn.',o:['Góc'],a:[60],giai:'tan của góc đó = 3 : √3 = √3 nên góc bằng 60°. (<b>em gợi ý</b>)',goiy:'Cạnh đối là chiều dài, cạnh kề là chiều rộng.'}]};
 
 boot();
 </script>

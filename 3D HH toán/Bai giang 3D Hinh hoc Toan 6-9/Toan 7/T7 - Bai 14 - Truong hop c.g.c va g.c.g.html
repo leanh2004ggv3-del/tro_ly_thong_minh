@@ -205,7 +205,8 @@ function renderScript(fig,k,p){FIG=fig;drawBoard();(fig.base||[]).forEach(it=>dr
  (fig.top||[]).forEach(it=>drawItem(it,1));
  tools.filter(t=>t.k!=='pencil'&&t.k!=='compass').forEach(drawTool);tools.filter(t=>t.k==='pencil'||t.k==='compass').forEach(drawTool)}
 /* tập hợp mọi điểm của hình để vừa khung */
-function figPts(fig){return Object.values(fig.P)}
+function figPts(fig){const out=Object.values(fig.P).slice(),A=x=>Array.isArray(x)&&typeof x[0]==='number';
+ (fig.base||[]).forEach(it=>{['a','b','p','at','c'].forEach(k=>{if(A(it[k]))out.push(it[k])});if(it.t==='circ'&&it.r){const c=A(it.c)?it.c:fig.P[it.c];if(c)out.push([c[0]-it.r,c[1]-it.r],[c[0]+it.r,c[1]+it.r])}});return out}
 
 /* ---------------- ÂM THANH PHẢN HỒI (không đọc giọng) ---------------- */
 let AC=null;function beep(ok){try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();const seq=ok?[660,880,1175]:[300,220];seq.forEach((f,i)=>{const o=AC.createOscillator(),g=AC.createGain();o.type=ok?'triangle':'sawtooth';o.frequency.value=f;g.gain.setValueAtTime(.0001,AC.currentTime+i*.11);g.gain.exponentialRampToValueAtTime(.18,AC.currentTime+i*.11+.02);g.gain.exponentialRampToValueAtTime(.0001,AC.currentTime+i*.11+.2);o.connect(g);g.connect(AC.destination);o.start(AC.currentTime+i*.11);o.stop(AC.currentTime+i*.11+.22)})}catch(e){}}
@@ -285,7 +286,7 @@ MODS.cm={i:0,k:0,t0:0,
 MODS.thu={i:0,done:{},t0:0,
  open(a){this.i=+(a.q||0);this.ord=[];this.show();if(a.a!=null&&S.still)this.answer(+a.a)},
  qs(){return LESSON.thu},
- show(){const q=this.qs()[this.i];this.t0=performance.now();this.ord=[];this.res=this.done[this.i]||null;camFit(figPts(q.fig),{now:true,yaw:q.fig.yaw==null?-8:q.fig.yaw,pitch:q.fig.pitch||72,pad:1.2});this.panel()},
+ show(){const q=this.qs()[this.i];this.t0=performance.now();this.ord=[];this.res=this.done[this.i]||null;const pp=q.fig.pitch||72,khoi=!!(LESSON.lang||LESSON.khoi||LESSON.tron),phang=q.fig.nghieng?false:(khoi?pp>=78:true);camFit(figPts(q.fig),{now:true,yaw:phang?0:(q.fig.yaw!=null?q.fig.yaw:-8),pitch:phang?89.4:pp,pad:1.2});this.panel()},
  draw(){const q=this.qs()[this.i];FIG=q.fig;drawBoard();(q.fig.base||((q.fig.steps||[])[0]||{}).items||[]).forEach(it=>drawItem(it,1));if(this.res&&q.fig.sau)q.fig.sau.forEach(it=>drawItem(it,Math.min(1,(performance.now()-this.res.t)/600)))},
  answer(v){const q=this.qs()[this.i];let ok;
   if(q.kieu==='so'){ok=q.a.every((x,j)=>Math.abs(+String(v[j]).trim().replace(',','.')-x)<(q.tol||1e-6))}else if(q.kieu==='xep'){ok=[q.a].concat(q.alt||[]).some(a=>v.join(',')===a.join(','))}else ok=v===q.a;
@@ -810,6 +811,26 @@ function catKhung(A,B,box,tia){const d=V.sub(B,A);let t0=tia?0:-1e9,t1=1e9;const
 const veDuong=(A,B,box,col,w,dash,tia)=>{const e=catKhung(A,B,box,tia);if(e)line2(e[0],e[1],col,w,dash);return e};
 const chanDT=(M,A,B)=>{const u=V.unit(V.sub(B,A));return V.add(A,V.mul(u,V.dot(V.sub(M,A),u)))};
 
+/* Hình riêng cho câu «Thử ngay» (rà 25/11/2026): hq({P, tg:['ABC'] đa giác kín, doan:['AH'] đoạn, net:['AH'] nét đứt, nhan:{AB:'5 cm'}, goc:[['A','B','C','60°']] góc tại A,
+   vuong:['ABC'] vuông tại A, tron:[['O',R,{opts}]], an:'XY' (không ghi tên), them:[mục], to:{A:'đỏ'…}) — nhãn cạnh tự đặt phía ngoài hình */
+const tenD=s=>s.match(/[A-Z][′']?\d?/g)||[];
+function hq(o){const P=o.P,base=[],ks=Object.keys(P).filter(k=>k[0]!=='_'),cen=V.mul(ks.reduce((s,k)=>V.add(s,P[k]),[0,0]),1/Math.max(1,ks.length));
+ (o.tron||[]).forEach(t=>base.push(Object.assign({t:'circ',c:t[0],r:t[1],col:'#1d4f9a',w:2.2},t[2]||{})));
+ (o.to||[]).forEach(([s,col])=>base.push(poly(tenD(s),col)));
+ (o.tg||[]).forEach(s=>{const n=tenD(s);n.forEach((a,i)=>base.push(seg(a,n[(i+1)%n.length],{w:2.6})))});
+ (o.doan||[]).forEach(s=>{const n=tenD(s);base.push(seg(n[0],n[1],{w:2.6}))});
+ (o.net||[]).forEach(s=>{const n=tenD(s);base.push(seg(n[0],n[1],{dash:[6,5],col:'#5b6684',w:2}))});
+ Object.entries(o.nhan||{}).forEach(([s,lab])=>{const[a,b]=tenD(s),A=P[a],B=P[b],m=V.mid(A,B),sg=Math.sign(V.dot(V.perp(V.sub(B,A)),V.sub(m,cen)))||1;base.push(nhanDai(a,b,lab,{off:.45*sg,col:'#1d4f9a',size:16,at2:[-.01,1]}))});
+ (o.goc||[]).forEach(([v,a,b,lab,col])=>base.push(ang(v,a,b,{lab,col:col||'#dc2626',r:.6,lr:.6,size:15,fill:true})));
+ (o.vuong||[]).forEach(s=>{const n=tenD(s);base.push(ang(n[0],n[1],n[2],{right:true,col:'#1d4f9a',r:.32}))});
+ ks.filter(k=>!(o.an||'').includes(k)).forEach(k=>base.push(pt(k,o.d&&o.d[k]?{d:o.d[k]}:{})));
+ return Object.assign({P,pitch:85,base:base.concat(o.them||[])},o.x||{})}
+/* hình hộp vẽ phối cảnh (mặt trước a × c, chiều sâu b), nhãn ba kích thước */
+function hopQ(a,b,c,la,lb,lc,ten){const k=.45,d=[b*k,b*k*.75],P={_A:[0,0],_B:[a,0],_C:[a,c],_D:[0,c]};P._E=V.add(P._A,d);P._F=V.add(P._B,d);P._G=V.add(P._C,d);P._H=V.add(P._D,d);
+ const s=(x,y,o)=>seg(x,y,Object.assign({w:2.4},o||{})),h={dash:[6,5],w:1.8,col:'#5b6684'};
+ return{P,pitch:85,base:[s('_A','_B'),s('_B','_C'),s('_C','_D'),s('_D','_A'),s('_B','_F'),s('_C','_G'),s('_D','_H'),s('_F','_G'),s('_G','_H'),s('_A','_E',h),s('_E','_F',h),s('_E','_H',h),
+  nhanDai('_A','_B',la||'',{off:-.45,size:15,at2:[-.01,1]}),nhanDai('_B','_F',lb||'',{off:-.5,size:15,at2:[-.01,1]}),nhanDai('_D','_A',lc||'',{off:.5,size:15,at2:[-.01,1]})].concat(ten||[])}}
+
 /* ===== Toán 7 (KNTT) — Bài 14. TRƯỜNG HỢP BẰNG NHAU THỨ HAI VÀ THỨ BA CỦA TAM GIÁC (c.g.c, g.c.g) — SGK tập một tr.70–74 =====
    Phần «em gợi ý» là lời giải em đề xuất cho câu hỏi SGK để HS tự làm — GV soát. */
 
@@ -887,16 +908,19 @@ const q435=(()=>{const tg=(o,aL,aR)=>{const L=o,Rr=V.add(o,[3,0]);return[L,Rr,V.
   ...pts('ABCHGKMPNEDF',{A:[0,.4],B:[-.35,-.3],C:[.35,-.3],H:[0,.4],G:[-.35,-.3],K:[.35,-.3],M:[0,.4],P:[-.35,-.3],N:[.35,-.3],E:[-.35,-.3],D:[.35,-.3],F:[0,.4]}),
   lb('B','C','A','50°'),lb('C','A','B','70°'),lb('H','G','K','50°'),lb('K','H','G','70°'),lb('P','N','M','70°'),lb('N','M','P','50°'),lb('E','D','F','50°'),lb('F','E','D','70°')]}})();
 const q438=(()=>{const A=[0,0],B=[1.4,1.6],C=[3.4,0],o=[4.4,0];return{P:{A,B,C,Ap:V.add(A,o),Bp:V.add(B,o),Cp:V.add(C,o)},pitch:80,base:[seg('A','B'),seg('B','C'),seg('C','A'),seg('Ap','Bp'),seg('Bp','Cp'),seg('Cp','Ap'),pt('A',{d:[-.35,-.25]}),pt('B',{d:[0,.4]}),pt('C',{d:[.35,-.25]}),pt('Ap',{lab:'A′',d:[-.35,-.25]}),pt('Bp',{lab:'B′',d:[0,.4]}),pt('Cp',{lab:'C′',d:[.35,-.25]}),tick('A','C',1),tick('Ap','Cp',1),ang('A','C','B',{col:'#2f7de1',r:.5}),ang('Ap','Cp','Bp',{col:'#2f7de1',r:.5}),ang('B','A','C',{col:'#e08a1e',n:2,r:.4}),ang('Bp','Ap','Cp',{col:'#e08a1e',n:2,r:.4})]}})();
+const Q14a=hq({P:{A:[2.366,2.366],B:[0,0],C:[3,0],D:[6.866,2.366],E:[4.5,0],F:[7.5,0]},tg:['ABC','DEF'],nhan:{BC:'6 cm'},goc:[['A','B','C','60°'],['B','A','C','45°','#2f7de1'],['D','E','F','60°']],them:[tick('A','B',1),tick('D','E',1),tick('A','C',2),tick('D','F',2)]});
+const Q14b=hq({P:{A:[1.254,3.447],B:[0.0,0.0],C:[4.147,0.0],D:[7.254,3.447],E:[6.0,0.0],F:[10.147,0.0]},tg:['ABC','DEF'],nhan:{AC:'6 cm',DF:'?'},goc:[['B','A','C','70°','#2f7de1'],['A','B','C','60°'],['E','D','F','70°','#2f7de1'],['D','E','F','60°']],them:[tick('A','B',1),tick('D','E',1)]});
+const Q14c=hq({P:{A:[1.2,2.6],B:[0,0],C:[4,0]},tg:['ABC'],goc:[['A','B','C','?']],them:[seg('A','B',{col:'#2f7de1',w:4}),seg('A','C',{col:'#2f7de1',w:4})]});
 const LESSON={title:'Bài 14. Trường hợp bằng nhau thứ hai và thứ ba của tam giác',sub:'Toán 7 · Kết nối tri thức · Chương IV. Tam giác bằng nhau · SGK tập một tr.70–74',
  tabs:[['ve','✏️ Vẽ hình'],['lab','🔍 Nhận biết'],['cm','🧠 Chứng minh'],['thu','✅ Thử ngay']],
  ve:[b14ve1,b14ve2],cm:[b14cm1,b14cm2,b14cm3,b14cm4,b14cm5],lab:LAB14,
  thu:[
  {nguon:'Câu hỏi · tr.72 · Hình 4.35',fig:q435,kieu:'chon',q:'Trong Hình 4.35, tam giác nào bằng tam giác <i>ABC</i>?',o:['Δ<i>MPN</i>','Δ<i>HGK</i>','Δ<i>FED</i>'],a:0,giai:'Δ<i>ABC</i> và Δ<i>MNP</i> có '+g('B')+' = '+g('N')+' = 50°, <i>BC</i> = <i>NP</i>, '+g('C')+' = '+g('P')+' = 70° (g.c.g). Đỉnh tương ứng: <i>A</i>↔<i>M</i>, <i>B</i>↔<i>N</i>, <i>C</i>↔<i>P</i>.',sai:{1:'Cạnh <i>GK</i> kề góc <i>G</i> = 60° và góc <i>K</i> = 70°, không phải 50° và 70°.',2:'Cạnh <i>ED</i> kề góc 50° và góc <i>D</i> = 60°.'},goiy:'Tìm tam giác có cạnh được đánh dấu kề hai góc 50° và 70°.'},
- {nguon:'Bài 4.16 · tr.74',fig:b14cm1,kieu:'so',q:'Cho Δ<i>ABC</i>, Δ<i>DEF</i>: <i>AB</i> = <i>DE</i>, <i>AC</i> = <i>DF</i>, '+g('BAC')+' = '+g('EDF')+' = 60°, <i>BC</i> = 6 cm, '+g('ABC')+' = 45°. Tính <i>EF</i>, '+g('ACB')+', '+g('DEF')+', '+g('EFD')+'.',o:['<i>EF</i>',g('ACB'),g('DEF'),g('EFD')],dv:['cm','°','°','°'],a:[6,75,45,75],giai:'Δ<i>ABC</i> = Δ<i>DEF</i> (c.g.c) ⇒ <i>EF</i> = <i>BC</i> = 6 cm; '+g('ACB')+' = 180° − 60° − 45° = 75°; '+g('DEF')+' = '+g('ABC')+' = 45°; '+g('EFD')+' = '+g('ACB')+' = 75°.',goiy:'Chứng minh hai tam giác bằng nhau trước (c.g.c).'},
- {nguon:'Bài 4.17 · tr.74',fig:b14cm5,kieu:'so',q:'Δ<i>ABC</i>, Δ<i>DEF</i> có <i>AB</i> = <i>DE</i>, '+g('ABC')+' = '+g('DEF')+' = 70°, '+g('BAC')+' = '+g('EDF')+' = 60°, <i>AC</i> = 6 cm. Tính <i>DF</i>.',o:['<i>DF</i>'],dv:['cm'],a:[6],giai:'Δ<i>ABC</i> = Δ<i>DEF</i> (g.c.g) nên <i>DF</i> = <i>AC</i> = 6 cm.',goiy:'Cạnh <i>AB</i> kề hai góc <i>A</i> và <i>B</i>.'},
+ {nguon:'Bài 4.16 · tr.74',fig:Q14a,kieu:'so',q:'Cho Δ<i>ABC</i>, Δ<i>DEF</i>: <i>AB</i> = <i>DE</i>, <i>AC</i> = <i>DF</i>, '+g('BAC')+' = '+g('EDF')+' = 60°, <i>BC</i> = 6 cm, '+g('ABC')+' = 45°. Tính <i>EF</i>, '+g('ACB')+', '+g('DEF')+', '+g('EFD')+'.',o:['<i>EF</i>',g('ACB'),g('DEF'),g('EFD')],dv:['cm','°','°','°'],a:[6,75,45,75],giai:'Δ<i>ABC</i> = Δ<i>DEF</i> (c.g.c) ⇒ <i>EF</i> = <i>BC</i> = 6 cm; '+g('ACB')+' = 180° − 60° − 45° = 75°; '+g('DEF')+' = '+g('ABC')+' = 45°; '+g('EFD')+' = '+g('ACB')+' = 75°.',goiy:'Chứng minh hai tam giác bằng nhau trước (c.g.c).'},
+ {nguon:'Bài 4.17 · tr.74',fig:Q14b,kieu:'so',q:'Δ<i>ABC</i>, Δ<i>DEF</i> có <i>AB</i> = <i>DE</i>, '+g('ABC')+' = '+g('DEF')+' = 70°, '+g('BAC')+' = '+g('EDF')+' = 60°, <i>AC</i> = 6 cm. Tính <i>DF</i>.',o:['<i>DF</i>'],dv:['cm'],a:[6],giai:'Δ<i>ABC</i> = Δ<i>DEF</i> (g.c.g) nên <i>DF</i> = <i>AC</i> = 6 cm.',goiy:'Cạnh <i>AB</i> kề hai góc <i>A</i> và <i>B</i>.'},
  {nguon:'Thử thách nhỏ · tr.73 · Hình 4.38',fig:q438,kieu:'chon',q:'Bạn Lan nói: «Nếu tam giác này có một cạnh, một góc kề và góc đối diện cạnh đó bằng của tam giác kia thì hai tam giác bằng nhau». Lan nói đúng không?',o:['Đúng, vì góc còn lại cũng bằng nhau nên đưa về g.c.g','Sai, vì góc đối diện không phải góc kề','Chỉ đúng với tam giác vuông'],a:0,giai:'Tổng ba góc bằng 180° nên góc kề còn lại của hai tam giác cũng bằng nhau → g.c.g. (Lời giải <b>em gợi ý</b>.)',sai:{1:'Hãy tính góc thứ ba của mỗi tam giác.',2:'Đúng với mọi tam giác.'}},
  {nguon:'Ví dụ 2 · tr.72',fig:b14cm3,kieu:'xep',q:'Sắp xếp các bước chứng minh Δ<i>ABC</i> = Δ<i>DEC</i> (Hình 4.36).',o:['Vậy Δ<i>ABC</i> = Δ<i>DEC</i> (g.c.g)','<i>AC</i> = <i>DC</i> (giả thiết)',''+g('BCA')+' = '+g('ECD')+' (đối đỉnh)',''+g('BAC')+' = '+g('EDC')+' (giả thiết)'],a:[3,1,2,0],alt:[[1,3,2,0],[2,1,3,0],[3,2,1,0],[1,2,3,0],[2,3,1,0]],giai:'Nêu đủ ba yếu tố góc – cạnh – góc rồi mới kết luận.',goiy:'Kết luận đặt cuối cùng.'},
- {nguon:'Định lí · tr.71',fig:b14cm1,kieu:'chon',q:'Trong tam giác <i>ABC</i>, góc xen giữa hai cạnh <i>AB</i> và <i>AC</i> là:',o:['Góc <i>A</i>','Góc <i>B</i>','Góc <i>C</i>'],a:0,giai:'Góc tạo bởi hai cạnh <i>AB</i>, <i>AC</i> có đỉnh chung <i>A</i>.',sai:{1:'Góc <i>B</i> xen giữa <i>BA</i> và <i>BC</i>.',2:'Góc <i>C</i> xen giữa <i>CA</i> và <i>CB</i>.'}}]};
+ {nguon:'Định lí · tr.71',fig:Q14c,kieu:'chon',q:'Trong tam giác <i>ABC</i>, góc xen giữa hai cạnh <i>AB</i> và <i>AC</i> là:',o:['Góc <i>A</i>','Góc <i>B</i>','Góc <i>C</i>'],a:0,giai:'Góc tạo bởi hai cạnh <i>AB</i>, <i>AC</i> có đỉnh chung <i>A</i>.',sai:{1:'Góc <i>B</i> xen giữa <i>BA</i> và <i>BC</i>.',2:'Góc <i>C</i> xen giữa <i>CA</i> và <i>CB</i>.'}}]};
 
 boot();
 </script>

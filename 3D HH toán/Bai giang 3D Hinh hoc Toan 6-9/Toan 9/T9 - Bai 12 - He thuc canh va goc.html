@@ -205,7 +205,8 @@ function renderScript(fig,k,p){FIG=fig;drawBoard();(fig.base||[]).forEach(it=>dr
  (fig.top||[]).forEach(it=>drawItem(it,1));
  tools.filter(t=>t.k!=='pencil'&&t.k!=='compass').forEach(drawTool);tools.filter(t=>t.k==='pencil'||t.k==='compass').forEach(drawTool)}
 /* tập hợp mọi điểm của hình để vừa khung */
-function figPts(fig){return Object.values(fig.P)}
+function figPts(fig){const out=Object.values(fig.P).slice(),A=x=>Array.isArray(x)&&typeof x[0]==='number';
+ (fig.base||[]).forEach(it=>{['a','b','p','at','c'].forEach(k=>{if(A(it[k]))out.push(it[k])});if(it.t==='circ'&&it.r){const c=A(it.c)?it.c:fig.P[it.c];if(c)out.push([c[0]-it.r,c[1]-it.r],[c[0]+it.r,c[1]+it.r])}});return out}
 
 /* ---------------- ÂM THANH PHẢN HỒI (không đọc giọng) ---------------- */
 let AC=null;function beep(ok){try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();const seq=ok?[660,880,1175]:[300,220];seq.forEach((f,i)=>{const o=AC.createOscillator(),g=AC.createGain();o.type=ok?'triangle':'sawtooth';o.frequency.value=f;g.gain.setValueAtTime(.0001,AC.currentTime+i*.11);g.gain.exponentialRampToValueAtTime(.18,AC.currentTime+i*.11+.02);g.gain.exponentialRampToValueAtTime(.0001,AC.currentTime+i*.11+.2);o.connect(g);g.connect(AC.destination);o.start(AC.currentTime+i*.11);o.stop(AC.currentTime+i*.11+.22)})}catch(e){}}
@@ -285,7 +286,7 @@ MODS.cm={i:0,k:0,t0:0,
 MODS.thu={i:0,done:{},t0:0,
  open(a){this.i=+(a.q||0);this.ord=[];this.show();if(a.a!=null&&S.still)this.answer(+a.a)},
  qs(){return LESSON.thu},
- show(){const q=this.qs()[this.i];this.t0=performance.now();this.ord=[];this.res=this.done[this.i]||null;camFit(figPts(q.fig),{now:true,yaw:q.fig.yaw==null?-8:q.fig.yaw,pitch:q.fig.pitch||72,pad:1.2});this.panel()},
+ show(){const q=this.qs()[this.i];this.t0=performance.now();this.ord=[];this.res=this.done[this.i]||null;const pp=q.fig.pitch||72,khoi=!!(LESSON.lang||LESSON.khoi||LESSON.tron),phang=q.fig.nghieng?false:(khoi?pp>=78:true);camFit(figPts(q.fig),{now:true,yaw:phang?0:(q.fig.yaw!=null?q.fig.yaw:-8),pitch:phang?89.4:pp,pad:1.2});this.panel()},
  draw(){const q=this.qs()[this.i];FIG=q.fig;drawBoard();(q.fig.base||((q.fig.steps||[])[0]||{}).items||[]).forEach(it=>drawItem(it,1));if(this.res&&q.fig.sau)q.fig.sau.forEach(it=>drawItem(it,Math.min(1,(performance.now()-this.res.t)/600)))},
  answer(v){const q=this.qs()[this.i];let ok;
   if(q.kieu==='so'){ok=q.a.every((x,j)=>Math.abs(+String(v[j]).trim().replace(',','.')-x)<(q.tol||1e-6))}else if(q.kieu==='xep'){ok=[q.a].concat(q.alt||[]).some(a=>v.join(',')===a.join(','))}else ok=v===q.a;
@@ -810,6 +811,26 @@ function catKhung(A,B,box,tia){const d=V.sub(B,A);let t0=tia?0:-1e9,t1=1e9;const
 const veDuong=(A,B,box,col,w,dash,tia)=>{const e=catKhung(A,B,box,tia);if(e)line2(e[0],e[1],col,w,dash);return e};
 const chanDT=(M,A,B)=>{const u=V.unit(V.sub(B,A));return V.add(A,V.mul(u,V.dot(V.sub(M,A),u)))};
 
+/* Hình riêng cho câu «Thử ngay» (rà 25/11/2026): hq({P, tg:['ABC'] đa giác kín, doan:['AH'] đoạn, net:['AH'] nét đứt, nhan:{AB:'5 cm'}, goc:[['A','B','C','60°']] góc tại A,
+   vuong:['ABC'] vuông tại A, tron:[['O',R,{opts}]], an:'XY' (không ghi tên), them:[mục], to:{A:'đỏ'…}) — nhãn cạnh tự đặt phía ngoài hình */
+const tenD=s=>s.match(/[A-Z][′']?\d?/g)||[];
+function hq(o){const P=o.P,base=[],ks=Object.keys(P).filter(k=>k[0]!=='_'),cen=V.mul(ks.reduce((s,k)=>V.add(s,P[k]),[0,0]),1/Math.max(1,ks.length));
+ (o.tron||[]).forEach(t=>base.push(Object.assign({t:'circ',c:t[0],r:t[1],col:'#1d4f9a',w:2.2},t[2]||{})));
+ (o.to||[]).forEach(([s,col])=>base.push(poly(tenD(s),col)));
+ (o.tg||[]).forEach(s=>{const n=tenD(s);n.forEach((a,i)=>base.push(seg(a,n[(i+1)%n.length],{w:2.6})))});
+ (o.doan||[]).forEach(s=>{const n=tenD(s);base.push(seg(n[0],n[1],{w:2.6}))});
+ (o.net||[]).forEach(s=>{const n=tenD(s);base.push(seg(n[0],n[1],{dash:[6,5],col:'#5b6684',w:2}))});
+ Object.entries(o.nhan||{}).forEach(([s,lab])=>{const[a,b]=tenD(s),A=P[a],B=P[b],m=V.mid(A,B),sg=Math.sign(V.dot(V.perp(V.sub(B,A)),V.sub(m,cen)))||1;base.push(nhanDai(a,b,lab,{off:.45*sg,col:'#1d4f9a',size:16,at2:[-.01,1]}))});
+ (o.goc||[]).forEach(([v,a,b,lab,col])=>base.push(ang(v,a,b,{lab,col:col||'#dc2626',r:.6,lr:.6,size:15,fill:true})));
+ (o.vuong||[]).forEach(s=>{const n=tenD(s);base.push(ang(n[0],n[1],n[2],{right:true,col:'#1d4f9a',r:.32}))});
+ ks.filter(k=>!(o.an||'').includes(k)).forEach(k=>base.push(pt(k,o.d&&o.d[k]?{d:o.d[k]}:{})));
+ return Object.assign({P,pitch:85,base:base.concat(o.them||[])},o.x||{})}
+/* hình hộp vẽ phối cảnh (mặt trước a × c, chiều sâu b), nhãn ba kích thước */
+function hopQ(a,b,c,la,lb,lc,ten){const k=.45,d=[b*k,b*k*.75],P={_A:[0,0],_B:[a,0],_C:[a,c],_D:[0,c]};P._E=V.add(P._A,d);P._F=V.add(P._B,d);P._G=V.add(P._C,d);P._H=V.add(P._D,d);
+ const s=(x,y,o)=>seg(x,y,Object.assign({w:2.4},o||{})),h={dash:[6,5],w:1.8,col:'#5b6684'};
+ return{P,pitch:85,base:[s('_A','_B'),s('_B','_C'),s('_C','_D'),s('_D','_A'),s('_B','_F'),s('_C','_G'),s('_D','_H'),s('_F','_G'),s('_G','_H'),s('_A','_E',h),s('_E','_F',h),s('_E','_H',h),
+  nhanDai('_A','_B',la||'',{off:-.45,size:15,at2:[-.01,1]}),nhanDai('_B','_F',lb||'',{off:-.5,size:15,at2:[-.01,1]}),nhanDai('_D','_A',lc||'',{off:.5,size:15,at2:[-.01,1]})].concat(ten||[])}}
+
 /* ===== Toán 9 (KNTT) — Bài 12. MỘT SỐ HỆ THỨC GIỮA CẠNH, GÓC TRONG TAM GIÁC VUÔNG VÀ ỨNG DỤNG — SGK tập một tr.74–81 (gồm Luyện tập chung, Bài tập cuối chương IV) =====
    Phần «em gợi ý» là lời giải em đề xuất cho câu hỏi SGK để HS tự làm — GV soát. */
 const fr=(a,b)=>`<span style="display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;line-height:1.15;margin:0 2px"><span style="border-bottom:1.4px solid currentColor;padding:0 2px">${a}</span><span style="padding:0 2px">${b}</span></span>`;
@@ -889,20 +910,27 @@ const LAB12=labVuong({dh:[
 
 /* ---------------- 4. THỬ NGAY ---------------- */
 const qV=VG([3,0],[0,0],[3,4],{d:{A:[.35,-.3],B:[-.4,-.3],C:[.35,.3]}});
+const Q12song=hq({P:{A:[0,0],H:[0,2.5],B:[2,2.5]},tg:['AHB'],nhan:{AH:'250 m',AB:'320 m'},vuong:['HAB'],goc:[['A','H','B','α']],them:[seg([-2,0],[4,0],{col:'#2f7de1',w:2}),seg([-2,2.5],[4,2.5],{col:'#2f7de1',w:2}),txt([3.4,1.25],'sông',{size:15,col:'#2f7de1'})]});
+const Q12cay=hq({P:{A:[0,0],B:[5,0],C:[5,4.195]},tg:['ABC'],nhan:{AB:'25 m',BC:'?'},vuong:['BAC'],goc:[['A','B','C','40°']]});
+const Q12ab=hq({P:{A:[0,0],B:[0,2],C:[3.464,0]},tg:['ABC'],nhan:{AB:'4',BC:'8',CA:'?'},vuong:['ABC']});
+const Q12345=hq({P:{B:[0,0],A:[2.4,0],C:[2.4,3.2]},tg:['ABC'],nhan:{BA:'3',AC:'4',CB:'5'},vuong:['ABC'],goc:[['B','A','C','α']]});
+const Q12d=hq({P:{A:[0,0],B:[5,0],C:[5,4.195]},tg:['ABC'],nhan:{AB:'50 m',BC:'d'},vuong:['BAC'],goc:[['A','B','C','40°']],them:[seg([-1,0],[6.5,0],{col:'#2f7de1',w:2}),seg([-1,4.195],[6.5,4.195],{col:'#2f7de1',w:2})]});
+const Q12tau=hq({P:{A:[0,0],H:[4.668,0],B:[4.668,-1.792]},tg:['AHB'],nhan:{AB:'200 m',HB:'?'},vuong:['HAB'],goc:[['A','H','B','21°']],them:[seg([-1,0],[6,0],{col:'#2f7de1',w:2}),txt([5.4,.3],'mặt nước',{size:13,col:'#2f7de1'})]});
+const Q12leu=hq({P:{B:[0,0],C:[4.4,0],A:[2.2,1.8],H:[2.2,0]},tg:['ABC'],net:['AH'],nhan:{BC:'4,4 m',AH:'1,8 m'},vuong:['HCA'],goc:[['B','C','A','α']],an:'H'});
 const LESSON={title:'Bài 12. Một số hệ thức giữa cạnh, góc trong tam giác vuông và ứng dụng',sub:'Toán 9 · Kết nối tri thức · Chương IV. Hệ thức lượng trong tam giác vuông · SGK tập một tr.74–81',
  tabs:[['ve','✏️ Vẽ hình'],['lab','🔍 Nhận biết'],['cm','🧠 Tính toán'],['thu','✅ Thử ngay']],
  ve:[b12ve1,b12ve2,b12ve3],cm:[b12cm1,b12cm2,b12cm3,b12cm4,b12cm5,b12cm6],lab:LAB12,
  thu:[
- {nguon:'Luyện tập 1.2 · tr.75 · Hình 4.15',fig:qV,kieu:'so',q:'Khúc sông rộng khoảng 250 m. Con đò chèo qua sông bị dòng nước đẩy xiên nên phải chèo khoảng 320 m mới sang được bờ bên kia. Dòng nước đẩy con đò lệch một góc α bằng bao nhiêu (làm tròn đến phút)?',o:['độ','phút'],dv:['°','′'],a:[38,37],giai:'cos α = '+fr('250','320')+' ⇒ α ≈ 38°37′. (<b>em gợi ý</b>)',goiy:'250 m là cạnh kề của góc α, 320 m là cạnh huyền.'},
- {nguon:'Luyện tập 2 · tr.76 · Hình 4.18',fig:qV,kieu:'so',q:'Bóng trên mặt đất của cây dài 25 m, tia nắng tạo với mặt đất góc 40°. Tính chiều cao của cây (làm tròn đến dm), nhập theo mét.',o:['Chiều cao'],dv:['m'],a:[21],tol:.051,giai:'<i>h</i> = 25 · tan 40° ≈ 20,98 m ≈ 21,0 m (210 dm). (<b>em gợi ý</b>)',goiy:'Định lí 2.'},
- {nguon:'Luyện tập 3 · tr.77',fig:qV,kieu:'so',q:'Tam giác <i>ABC</i> vuông có cạnh góc vuông <i>AB</i> = 4, cạnh huyền <i>BC</i> = 8. Tính <i>AC</i> (làm tròn đến chữ số thập phân thứ ba) và các góc <i>B</i>, <i>C</i>.',o:['<i>AC</i>',g('B'),g('C')],dv:['','°','°'],a:[6.928,60,30],tol:.0011,giai:'sin <i>C</i> = '+fr('4','8')+' = ½ ⇒ '+g('C')+' = 30°, '+g('B')+' = 60°; <i>AC</i> = 8 · cos 30° = 4√3 ≈ 6,928. (<b>em gợi ý</b>)'},
- {nguon:'Bài 4.21 · tr.81 · Hình 4.32',fig:qV,kieu:'chon',q:'Tam giác vuông có ba cạnh 3, 4, 5; α là góc kề với cạnh 3. cos α bằng:',o:[fr('3','5'),fr('4','5'),fr('5','3'),fr('3','4')],a:0,giai:'cos α = '+fr('cạnh kề','cạnh huyền')+' = '+fr('3','5')+'.',sai:{1:'Đó là sin α.',2:'Côsin nhỏ hơn 1.',3:'Đó là cot α.'}},
+ {nguon:'Luyện tập 1.2 · tr.75 · Hình 4.15',fig:Q12song,kieu:'so',q:'Khúc sông rộng khoảng 250 m. Con đò chèo qua sông bị dòng nước đẩy xiên nên phải chèo khoảng 320 m mới sang được bờ bên kia. Dòng nước đẩy con đò lệch một góc α bằng bao nhiêu (làm tròn đến phút)?',o:['độ','phút'],dv:['°','′'],a:[38,37],giai:'cos α = '+fr('250','320')+' ⇒ α ≈ 38°37′. (<b>em gợi ý</b>)',goiy:'250 m là cạnh kề của góc α, 320 m là cạnh huyền.'},
+ {nguon:'Luyện tập 2 · tr.76 · Hình 4.18',fig:Q12cay,kieu:'so',q:'Bóng trên mặt đất của cây dài 25 m, tia nắng tạo với mặt đất góc 40°. Tính chiều cao của cây (làm tròn đến dm), nhập theo mét.',o:['Chiều cao'],dv:['m'],a:[21],tol:.051,giai:'<i>h</i> = 25 · tan 40° ≈ 20,98 m ≈ 21,0 m (210 dm). (<b>em gợi ý</b>)',goiy:'Định lí 2.'},
+ {nguon:'Luyện tập 3 · tr.77',fig:Q12ab,kieu:'so',q:'Tam giác <i>ABC</i> vuông có cạnh góc vuông <i>AB</i> = 4, cạnh huyền <i>BC</i> = 8. Tính <i>AC</i> (làm tròn đến chữ số thập phân thứ ba) và các góc <i>B</i>, <i>C</i>.',o:['<i>AC</i>',g('B'),g('C')],dv:['','°','°'],a:[6.928,60,30],tol:.0011,giai:'sin <i>C</i> = '+fr('4','8')+' = ½ ⇒ '+g('C')+' = 30°, '+g('B')+' = 60°; <i>AC</i> = 8 · cos 30° = 4√3 ≈ 6,928. (<b>em gợi ý</b>)'},
+ {nguon:'Bài 4.21 · tr.81 · Hình 4.32',fig:Q12345,kieu:'chon',q:'Tam giác vuông có ba cạnh 3, 4, 5; α là góc kề với cạnh 3. cos α bằng:',o:[fr('3','5'),fr('4','5'),fr('5','3'),fr('3','4')],a:0,giai:'cos α = '+fr('cạnh kề','cạnh huyền')+' = '+fr('3','5')+'.',sai:{1:'Đó là sin α.',2:'Côsin nhỏ hơn 1.',3:'Đó là cot α.'}},
  {nguon:'Bài 4.23 · tr.81',fig:qV,kieu:'chon',q:'Trong tam giác <i>ABC</i> vuông tại <i>A</i>, tan <i>B</i> bằng:',o:[fr('<i>AC</i>','<i>AB</i>'),fr('<i>AB</i>','<i>AC</i>'),fr('<i>AB</i>','<i>BC</i>'),fr('<i>BC</i>','<i>AC</i>')],a:0,giai:'tan <i>B</i> = '+fr('cạnh đối','cạnh kề')+' = '+fr('<i>AC</i>','<i>AB</i>')+'.',sai:{1:'Đó là cot <i>B</i>.',2:'Đó là cos <i>B</i>.',3:'Không phải tỉ số lượng giác của <i>B</i>.'}},
  {nguon:'Bài 4.24 · tr.81',fig:qV,kieu:'chon',q:'Với mọi góc nhọn α, ta có:',o:['sin (90° − α) = cos α','tan (90° − α) = cos α','cot (90° − α) = 1 − tan α','cot (90° − α) = sin α'],a:0,giai:'Hai góc phụ nhau: sin góc này bằng côsin góc kia.',sai:{1:'tan (90° − α) = cot α.',2:'cot (90° − α) = tan α.',3:'cot (90° − α) = tan α.'}},
  {nguon:'Bài 4.25 · tr.81',fig:qV,kieu:'chon',q:'Giá trị tan 30° bằng:',o:[fr('1','√3'),'√3',fr('√3','2'),'1'],a:0,giai:'tan 30° = '+fr('√3','3')+' = '+fr('1','√3')+'.',sai:{1:'Đó là tan 60°.',2:'Đó là cos 30°.',3:'Đó là tan 45°.'}},
- {nguon:'Bài 4.16 · tr.80 · Hình 4.27',fig:qV,kieu:'so',q:'Tìm chiều rộng <i>d</i> của dòng sông (làm tròn đến mét), biết đoạn dọc bờ dài 50 m và góc ngắm 40° như Hình 4.27.',o:['<i>d</i>'],dv:['m'],a:[42],giai:'<i>d</i> = 50 · tan 40° ≈ 42 (m). (<b>em gợi ý</b> — thầy cô đối chiếu Hình 4.27)'},
- {nguon:'Bài 4.20a · tr.80',fig:qV,kieu:'so',q:'Tàu ngầm di chuyển theo đường thẳng tạo với mặt nước biển góc 21° để lặn xuống. Đi được 200 m thì tàu ở độ sâu bao nhiêu (làm tròn đến mét)?',o:['Độ sâu'],dv:['m'],a:[72],giai:'200 · sin 21° ≈ 71,7 ≈ 72 (m). (<b>em gợi ý</b>)'},
- {nguon:'Bài 4.27 · tr.81 · Hình 4.35',fig:qV,kieu:'so',q:'Lều có chiều cao 1,8 m, chiều rộng đáy 4,4 m (mặt cắt là tam giác cân). Tìm góc α giữa cạnh mái lều và mặt đất (làm tròn đến phút).',o:['độ','phút'],dv:['°','′'],a:[39,17],giai:'tan α = '+fr('1,8','2,2')+' ⇒ α ≈ 39°17′. (<b>em gợi ý</b>)',goiy:'Đường cao chia đáy 4,4 m thành hai đoạn 2,2 m.'}]};
+ {nguon:'Bài 4.16 · tr.80 · Hình 4.27',fig:Q12d,kieu:'so',q:'Tìm chiều rộng <i>d</i> của dòng sông (làm tròn đến mét), biết đoạn dọc bờ dài 50 m và góc ngắm 40° như Hình 4.27.',o:['<i>d</i>'],dv:['m'],a:[42],giai:'<i>d</i> = 50 · tan 40° ≈ 42 (m). (<b>em gợi ý</b> — thầy cô đối chiếu Hình 4.27)'},
+ {nguon:'Bài 4.20a · tr.80',fig:Q12tau,kieu:'so',q:'Tàu ngầm di chuyển theo đường thẳng tạo với mặt nước biển góc 21° để lặn xuống. Đi được 200 m thì tàu ở độ sâu bao nhiêu (làm tròn đến mét)?',o:['Độ sâu'],dv:['m'],a:[72],giai:'200 · sin 21° ≈ 71,7 ≈ 72 (m). (<b>em gợi ý</b>)'},
+ {nguon:'Bài 4.27 · tr.81 · Hình 4.35',fig:Q12leu,kieu:'so',q:'Lều có chiều cao 1,8 m, chiều rộng đáy 4,4 m (mặt cắt là tam giác cân). Tìm góc α giữa cạnh mái lều và mặt đất (làm tròn đến phút).',o:['độ','phút'],dv:['°','′'],a:[39,17],giai:'tan α = '+fr('1,8','2,2')+' ⇒ α ≈ 39°17′. (<b>em gợi ý</b>)',goiy:'Đường cao chia đáy 4,4 m thành hai đoạn 2,2 m.'}]};
 
 boot();
 </script>

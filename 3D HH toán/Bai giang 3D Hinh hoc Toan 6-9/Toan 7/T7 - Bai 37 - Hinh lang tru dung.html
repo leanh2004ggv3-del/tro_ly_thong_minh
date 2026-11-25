@@ -205,7 +205,8 @@ function renderScript(fig,k,p){FIG=fig;drawBoard();(fig.base||[]).forEach(it=>dr
  (fig.top||[]).forEach(it=>drawItem(it,1));
  tools.filter(t=>t.k!=='pencil'&&t.k!=='compass').forEach(drawTool);tools.filter(t=>t.k==='pencil'||t.k==='compass').forEach(drawTool)}
 /* tập hợp mọi điểm của hình để vừa khung */
-function figPts(fig){return Object.values(fig.P)}
+function figPts(fig){const out=Object.values(fig.P).slice(),A=x=>Array.isArray(x)&&typeof x[0]==='number';
+ (fig.base||[]).forEach(it=>{['a','b','p','at','c'].forEach(k=>{if(A(it[k]))out.push(it[k])});if(it.t==='circ'&&it.r){const c=A(it.c)?it.c:fig.P[it.c];if(c)out.push([c[0]-it.r,c[1]-it.r],[c[0]+it.r,c[1]+it.r])}});return out}
 
 /* ---------------- ÂM THANH PHẢN HỒI (không đọc giọng) ---------------- */
 let AC=null;function beep(ok){try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();const seq=ok?[660,880,1175]:[300,220];seq.forEach((f,i)=>{const o=AC.createOscillator(),g=AC.createGain();o.type=ok?'triangle':'sawtooth';o.frequency.value=f;g.gain.setValueAtTime(.0001,AC.currentTime+i*.11);g.gain.exponentialRampToValueAtTime(.18,AC.currentTime+i*.11+.02);g.gain.exponentialRampToValueAtTime(.0001,AC.currentTime+i*.11+.2);o.connect(g);g.connect(AC.destination);o.start(AC.currentTime+i*.11);o.stop(AC.currentTime+i*.11+.22)})}catch(e){}}
@@ -285,7 +286,7 @@ MODS.cm={i:0,k:0,t0:0,
 MODS.thu={i:0,done:{},t0:0,
  open(a){this.i=+(a.q||0);this.ord=[];this.show();if(a.a!=null&&S.still)this.answer(+a.a)},
  qs(){return LESSON.thu},
- show(){const q=this.qs()[this.i];this.t0=performance.now();this.ord=[];this.res=this.done[this.i]||null;camFit(figPts(q.fig),{now:true,yaw:q.fig.yaw==null?-8:q.fig.yaw,pitch:q.fig.pitch||72,pad:1.2});this.panel()},
+ show(){const q=this.qs()[this.i];this.t0=performance.now();this.ord=[];this.res=this.done[this.i]||null;const pp=q.fig.pitch||72,khoi=!!(LESSON.lang||LESSON.khoi||LESSON.tron),phang=q.fig.nghieng?false:(khoi?pp>=78:true);camFit(figPts(q.fig),{now:true,yaw:phang?0:(q.fig.yaw!=null?q.fig.yaw:-8),pitch:phang?89.4:pp,pad:1.2});this.panel()},
  draw(){const q=this.qs()[this.i];FIG=q.fig;drawBoard();(q.fig.base||((q.fig.steps||[])[0]||{}).items||[]).forEach(it=>drawItem(it,1));if(this.res&&q.fig.sau)q.fig.sau.forEach(it=>drawItem(it,Math.min(1,(performance.now()-this.res.t)/600)))},
  answer(v){const q=this.qs()[this.i];let ok;
   if(q.kieu==='so'){ok=q.a.every((x,j)=>Math.abs(+String(v[j]).trim().replace(',','.')-x)<(q.tol||1e-6))}else if(q.kieu==='xep'){ok=[q.a].concat(q.alt||[]).some(a=>v.join(',')===a.join(','))}else ok=v===q.a;
@@ -810,6 +811,26 @@ function catKhung(A,B,box,tia){const d=V.sub(B,A);let t0=tia?0:-1e9,t1=1e9;const
 const veDuong=(A,B,box,col,w,dash,tia)=>{const e=catKhung(A,B,box,tia);if(e)line2(e[0],e[1],col,w,dash);return e};
 const chanDT=(M,A,B)=>{const u=V.unit(V.sub(B,A));return V.add(A,V.mul(u,V.dot(V.sub(M,A),u)))};
 
+/* Hình riêng cho câu «Thử ngay» (rà 25/11/2026): hq({P, tg:['ABC'] đa giác kín, doan:['AH'] đoạn, net:['AH'] nét đứt, nhan:{AB:'5 cm'}, goc:[['A','B','C','60°']] góc tại A,
+   vuong:['ABC'] vuông tại A, tron:[['O',R,{opts}]], an:'XY' (không ghi tên), them:[mục], to:{A:'đỏ'…}) — nhãn cạnh tự đặt phía ngoài hình */
+const tenD=s=>s.match(/[A-Z][′']?\d?/g)||[];
+function hq(o){const P=o.P,base=[],ks=Object.keys(P).filter(k=>k[0]!=='_'),cen=V.mul(ks.reduce((s,k)=>V.add(s,P[k]),[0,0]),1/Math.max(1,ks.length));
+ (o.tron||[]).forEach(t=>base.push(Object.assign({t:'circ',c:t[0],r:t[1],col:'#1d4f9a',w:2.2},t[2]||{})));
+ (o.to||[]).forEach(([s,col])=>base.push(poly(tenD(s),col)));
+ (o.tg||[]).forEach(s=>{const n=tenD(s);n.forEach((a,i)=>base.push(seg(a,n[(i+1)%n.length],{w:2.6})))});
+ (o.doan||[]).forEach(s=>{const n=tenD(s);base.push(seg(n[0],n[1],{w:2.6}))});
+ (o.net||[]).forEach(s=>{const n=tenD(s);base.push(seg(n[0],n[1],{dash:[6,5],col:'#5b6684',w:2}))});
+ Object.entries(o.nhan||{}).forEach(([s,lab])=>{const[a,b]=tenD(s),A=P[a],B=P[b],m=V.mid(A,B),sg=Math.sign(V.dot(V.perp(V.sub(B,A)),V.sub(m,cen)))||1;base.push(nhanDai(a,b,lab,{off:.45*sg,col:'#1d4f9a',size:16,at2:[-.01,1]}))});
+ (o.goc||[]).forEach(([v,a,b,lab,col])=>base.push(ang(v,a,b,{lab,col:col||'#dc2626',r:.6,lr:.6,size:15,fill:true})));
+ (o.vuong||[]).forEach(s=>{const n=tenD(s);base.push(ang(n[0],n[1],n[2],{right:true,col:'#1d4f9a',r:.32}))});
+ ks.filter(k=>!(o.an||'').includes(k)).forEach(k=>base.push(pt(k,o.d&&o.d[k]?{d:o.d[k]}:{})));
+ return Object.assign({P,pitch:85,base:base.concat(o.them||[])},o.x||{})}
+/* hình hộp vẽ phối cảnh (mặt trước a × c, chiều sâu b), nhãn ba kích thước */
+function hopQ(a,b,c,la,lb,lc,ten){const k=.45,d=[b*k,b*k*.75],P={_A:[0,0],_B:[a,0],_C:[a,c],_D:[0,c]};P._E=V.add(P._A,d);P._F=V.add(P._B,d);P._G=V.add(P._C,d);P._H=V.add(P._D,d);
+ const s=(x,y,o)=>seg(x,y,Object.assign({w:2.4},o||{})),h={dash:[6,5],w:1.8,col:'#5b6684'};
+ return{P,pitch:85,base:[s('_A','_B'),s('_B','_C'),s('_C','_D'),s('_D','_A'),s('_B','_F'),s('_C','_G'),s('_D','_H'),s('_F','_G'),s('_G','_H'),s('_A','_E',h),s('_E','_F',h),s('_E','_H',h),
+  nhanDai('_A','_B',la||'',{off:-.45,size:15,at2:[-.01,1]}),nhanDai('_B','_F',lb||'',{off:-.5,size:15,at2:[-.01,1]}),nhanDai('_D','_A',lc||'',{off:.5,size:15,at2:[-.01,1]})].concat(ten||[])}}
+
 /* ===== Toán 7 (KNTT) — Bài 37. HÌNH LĂNG TRỤ ĐỨNG TAM GIÁC VÀ HÌNH LĂNG TRỤ ĐỨNG TỨ GIÁC — SGK tập hai tr.94–99 =====
    Phần «em gợi ý» là lời giải/cách vẽ em đề xuất cho câu hỏi SGK để HS tự làm — GV soát. */
 
@@ -877,6 +898,10 @@ const b37cm7=Object.assign({ten:'Thử thách nhỏ · Bể bơi',nguon:'SGK tr.
 
 /* ---------------- 4. THỬ NGAY ---------------- */
 const q37=LTb(4.2);
+const Q37ht=(()=>{const d=[1.6,1.1],F=[[0,0],[3,0],[1.5,1.5],[0,1.5]],P={};F.forEach((p,i)=>{P['_f'+i]=p;P['_b'+i]=V.add(p,d)});const s=(a,b,o)=>seg(a,b,Object.assign({w:2.4},o||{})),h={dash:[6,5],w:1.8,col:'#5b6684'};
+ return{P,pitch:85,base:[s('_f0','_f1'),s('_f1','_f2'),s('_f2','_f3'),s('_f3','_f0'),s('_f1','_b1'),s('_f2','_b2'),s('_f3','_b3'),s('_b1','_b2'),s('_b2','_b3'),s('_f0','_b0',h),s('_b0','_b1',h),s('_b0','_b3',h),ang('_f0','_f1','_f3',{right:true,r:.3}),
+  nhanDai('_f0','_f1','3 m',{off:-.45,size:15,at2:[-.01,1]}),nhanDai('_f3','_f2','1,5 m',{off:.4,size:15,at2:[-.01,1]}),nhanDai('_f3','_f0','1,5 m',{off:-.5,size:15,at2:[-.01,1]}),nhanDai('_f1','_b1','2 m',{off:-.5,size:15,at2:[-.01,1]})]}})();
+const Q37hop=hopQ(4,2,1.6,'20 cm','10 cm','8 cm');
 const LESSON={title:'Bài 37. Hình lăng trụ đứng tam giác và hình lăng trụ đứng tứ giác',sub:'Toán 7 · Kết nối tri thức · Chương X. Một số hình khối trong thực tiễn · SGK tập hai tr.94–99',
  tabs:[['ve','✏️ Vẽ hình'],['lang','🧊 Khối 3D'],['cm','🧠 Tính toán'],['thu','✅ Thử ngay']],
  ve:[b37ve1,b37ve2],cm:[b37cm1,b37cm2,b37cm3,b37cm4,b37cm5,b37cm6,b37cm7],lang:LANG37,
@@ -885,8 +910,8 @@ const LESSON={title:'Bài 37. Hình lăng trụ đứng tam giác và hình lăn
  {nguon:'Nhận xét · tr.95',fig:q37,kieu:'chon',q:'Các cạnh bên của hình lăng trụ đứng:',o:['Song song và bằng nhau','Cắt nhau tại một điểm','Bằng các cạnh đáy'],a:0,giai:'Các cạnh bên song song và bằng nhau; độ dài cạnh bên là chiều cao của lăng trụ đứng.',sai:{1:'Đó là hình chóp.',2:'Không nhất thiết.'}},
  {nguon:'Ví dụ 2 · tr.96',fig:b37cm2,kieu:'so',q:'Giá đỡ lịch hình lăng trụ đứng tam giác, đáy có các cạnh 20 cm, 20 cm, 7 cm, chiều cao 25 cm. Diện tích xung quanh bằng:',o:['S<sub>xq</sub>'],dv:['cm²'],a:[1175],giai:'(20 + 20 + 7) · 25 = 1 175 (cm²).',goiy:'S<sub>xq</sub> = <i>C</i> · <i>h</i>.'},
  {nguon:'Bài 10.13 · tr.99',fig:q37,kieu:'so',q:'Lăng trụ đứng tam giác có đáy là tam giác vuông cạnh 6 cm, 8 cm, 10 cm và chiều cao 15 cm (Hình 10.33). Tính diện tích xung quanh và thể tích.',o:['S<sub>xq</sub>','<i>V</i>'],dv:['cm²','cm³'],a:[360,360],giai:'S<sub>xq</sub> = (6 + 8 + 10) · 15 = 360 (cm²); S<sub>đáy</sub> = ½ · 6 · 8 = 24 (cm²); <i>V</i> = 24 · 15 = 360 (cm³). (<b>em gợi ý</b>)',goiy:'Tam giác vuông có hai cạnh góc vuông 6 cm và 8 cm.'},
- {nguon:'Bài 10.14 · tr.99',fig:q37,kieu:'so',q:'Thùng máy nông nghiệp dạng lăng trụ đứng tứ giác, đáy là hình thang vuông có đáy lớn 3 m, đáy nhỏ 1,5 m, chiều cao hình thang 1,5 m; chiều cao lăng trụ 2 m (Hình 10.34). Tính dung tích thùng (có thể gõ dấu phẩy).',o:['<i>V</i>'],dv:['m³'],a:[6.75],tol:.001,giai:'S<sub>đáy</sub> = (3 + 1,5) · 1,5 : 2 = 3,375 (m²); <i>V</i> = 3,375 · 2 = 6,75 (m³). (<b>em gợi ý</b> — thầy cô đối chiếu kích thước trên Hình 10.34)',goiy:'<i>V</i> = S<sub>đáy</sub> · <i>h</i>.'},
- {nguon:'Bài 10.16 · tr.99',fig:q37,kieu:'so',q:'Hộp khẩu trang hình hộp chữ nhật kích thước 20 cm, 10 cm, 8 cm (Hình 10.36). a) Tính thể tích; b) Tính diện tích bìa làm hộp (bỏ qua mép dán).',o:['<i>V</i>','Diện tích bìa'],dv:['cm³','cm²'],a:[1600,880],giai:'<i>V</i> = 20 · 10 · 8 = 1 600 (cm³). Bìa: 2 · (20 · 10 + 20 · 8 + 10 · 8) = 880 (cm²). (<b>em gợi ý</b>)',goiy:'Hộp kín có 6 mặt.'}]};
+ {nguon:'Bài 10.14 · tr.99',fig:Q37ht,kieu:'so',q:'Thùng máy nông nghiệp dạng lăng trụ đứng tứ giác, đáy là hình thang vuông có đáy lớn 3 m, đáy nhỏ 1,5 m, chiều cao hình thang 1,5 m; chiều cao lăng trụ 2 m (Hình 10.34). Tính dung tích thùng (có thể gõ dấu phẩy).',o:['<i>V</i>'],dv:['m³'],a:[6.75],tol:.001,giai:'S<sub>đáy</sub> = (3 + 1,5) · 1,5 : 2 = 3,375 (m²); <i>V</i> = 3,375 · 2 = 6,75 (m³). (<b>em gợi ý</b> — thầy cô đối chiếu kích thước trên Hình 10.34)',goiy:'<i>V</i> = S<sub>đáy</sub> · <i>h</i>.'},
+ {nguon:'Bài 10.16 · tr.99',fig:Q37hop,kieu:'so',q:'Hộp khẩu trang hình hộp chữ nhật kích thước 20 cm, 10 cm, 8 cm (Hình 10.36). a) Tính thể tích; b) Tính diện tích bìa làm hộp (bỏ qua mép dán).',o:['<i>V</i>','Diện tích bìa'],dv:['cm³','cm²'],a:[1600,880],giai:'<i>V</i> = 20 · 10 · 8 = 1 600 (cm³). Bìa: 2 · (20 · 10 + 20 · 8 + 10 · 8) = 880 (cm²). (<b>em gợi ý</b>)',goiy:'Hộp kín có 6 mặt.'}]};
 
 boot();
 </script>

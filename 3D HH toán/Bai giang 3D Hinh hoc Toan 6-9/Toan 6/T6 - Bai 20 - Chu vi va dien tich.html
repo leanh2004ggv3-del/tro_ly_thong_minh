@@ -205,7 +205,8 @@ function renderScript(fig,k,p){FIG=fig;drawBoard();(fig.base||[]).forEach(it=>dr
  (fig.top||[]).forEach(it=>drawItem(it,1));
  tools.filter(t=>t.k!=='pencil'&&t.k!=='compass').forEach(drawTool);tools.filter(t=>t.k==='pencil'||t.k==='compass').forEach(drawTool)}
 /* tập hợp mọi điểm của hình để vừa khung */
-function figPts(fig){return Object.values(fig.P)}
+function figPts(fig){const out=Object.values(fig.P).slice(),A=x=>Array.isArray(x)&&typeof x[0]==='number';
+ (fig.base||[]).forEach(it=>{['a','b','p','at','c'].forEach(k=>{if(A(it[k]))out.push(it[k])});if(it.t==='circ'&&it.r){const c=A(it.c)?it.c:fig.P[it.c];if(c)out.push([c[0]-it.r,c[1]-it.r],[c[0]+it.r,c[1]+it.r])}});return out}
 
 /* ---------------- ÂM THANH PHẢN HỒI (không đọc giọng) ---------------- */
 let AC=null;function beep(ok){try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();const seq=ok?[660,880,1175]:[300,220];seq.forEach((f,i)=>{const o=AC.createOscillator(),g=AC.createGain();o.type=ok?'triangle':'sawtooth';o.frequency.value=f;g.gain.setValueAtTime(.0001,AC.currentTime+i*.11);g.gain.exponentialRampToValueAtTime(.18,AC.currentTime+i*.11+.02);g.gain.exponentialRampToValueAtTime(.0001,AC.currentTime+i*.11+.2);o.connect(g);g.connect(AC.destination);o.start(AC.currentTime+i*.11);o.stop(AC.currentTime+i*.11+.22)})}catch(e){}}
@@ -285,7 +286,7 @@ MODS.cm={i:0,k:0,t0:0,
 MODS.thu={i:0,done:{},t0:0,
  open(a){this.i=+(a.q||0);this.ord=[];this.show();if(a.a!=null&&S.still)this.answer(+a.a)},
  qs(){return LESSON.thu},
- show(){const q=this.qs()[this.i];this.t0=performance.now();this.ord=[];this.res=this.done[this.i]||null;camFit(figPts(q.fig),{now:true,yaw:q.fig.yaw==null?-8:q.fig.yaw,pitch:q.fig.pitch||72,pad:1.2});this.panel()},
+ show(){const q=this.qs()[this.i];this.t0=performance.now();this.ord=[];this.res=this.done[this.i]||null;const pp=q.fig.pitch||72,khoi=!!(LESSON.lang||LESSON.khoi||LESSON.tron),phang=q.fig.nghieng?false:(khoi?pp>=78:true);camFit(figPts(q.fig),{now:true,yaw:phang?0:(q.fig.yaw!=null?q.fig.yaw:-8),pitch:phang?89.4:pp,pad:1.2});this.panel()},
  draw(){const q=this.qs()[this.i];FIG=q.fig;drawBoard();(q.fig.base||((q.fig.steps||[])[0]||{}).items||[]).forEach(it=>drawItem(it,1));if(this.res&&q.fig.sau)q.fig.sau.forEach(it=>drawItem(it,Math.min(1,(performance.now()-this.res.t)/600)))},
  answer(v){const q=this.qs()[this.i];let ok;
   if(q.kieu==='so'){ok=q.a.every((x,j)=>Math.abs(+String(v[j]).trim().replace(',','.')-x)<(q.tol||1e-6))}else if(q.kieu==='xep'){ok=[q.a].concat(q.alt||[]).some(a=>v.join(',')===a.join(','))}else ok=v===q.a;
@@ -810,6 +811,26 @@ function catKhung(A,B,box,tia){const d=V.sub(B,A);let t0=tia?0:-1e9,t1=1e9;const
 const veDuong=(A,B,box,col,w,dash,tia)=>{const e=catKhung(A,B,box,tia);if(e)line2(e[0],e[1],col,w,dash);return e};
 const chanDT=(M,A,B)=>{const u=V.unit(V.sub(B,A));return V.add(A,V.mul(u,V.dot(V.sub(M,A),u)))};
 
+/* Hình riêng cho câu «Thử ngay» (rà 25/11/2026): hq({P, tg:['ABC'] đa giác kín, doan:['AH'] đoạn, net:['AH'] nét đứt, nhan:{AB:'5 cm'}, goc:[['A','B','C','60°']] góc tại A,
+   vuong:['ABC'] vuông tại A, tron:[['O',R,{opts}]], an:'XY' (không ghi tên), them:[mục], to:{A:'đỏ'…}) — nhãn cạnh tự đặt phía ngoài hình */
+const tenD=s=>s.match(/[A-Z][′']?\d?/g)||[];
+function hq(o){const P=o.P,base=[],ks=Object.keys(P).filter(k=>k[0]!=='_'),cen=V.mul(ks.reduce((s,k)=>V.add(s,P[k]),[0,0]),1/Math.max(1,ks.length));
+ (o.tron||[]).forEach(t=>base.push(Object.assign({t:'circ',c:t[0],r:t[1],col:'#1d4f9a',w:2.2},t[2]||{})));
+ (o.to||[]).forEach(([s,col])=>base.push(poly(tenD(s),col)));
+ (o.tg||[]).forEach(s=>{const n=tenD(s);n.forEach((a,i)=>base.push(seg(a,n[(i+1)%n.length],{w:2.6})))});
+ (o.doan||[]).forEach(s=>{const n=tenD(s);base.push(seg(n[0],n[1],{w:2.6}))});
+ (o.net||[]).forEach(s=>{const n=tenD(s);base.push(seg(n[0],n[1],{dash:[6,5],col:'#5b6684',w:2}))});
+ Object.entries(o.nhan||{}).forEach(([s,lab])=>{const[a,b]=tenD(s),A=P[a],B=P[b],m=V.mid(A,B),sg=Math.sign(V.dot(V.perp(V.sub(B,A)),V.sub(m,cen)))||1;base.push(nhanDai(a,b,lab,{off:.45*sg,col:'#1d4f9a',size:16,at2:[-.01,1]}))});
+ (o.goc||[]).forEach(([v,a,b,lab,col])=>base.push(ang(v,a,b,{lab,col:col||'#dc2626',r:.6,lr:.6,size:15,fill:true})));
+ (o.vuong||[]).forEach(s=>{const n=tenD(s);base.push(ang(n[0],n[1],n[2],{right:true,col:'#1d4f9a',r:.32}))});
+ ks.filter(k=>!(o.an||'').includes(k)).forEach(k=>base.push(pt(k,o.d&&o.d[k]?{d:o.d[k]}:{})));
+ return Object.assign({P,pitch:85,base:base.concat(o.them||[])},o.x||{})}
+/* hình hộp vẽ phối cảnh (mặt trước a × c, chiều sâu b), nhãn ba kích thước */
+function hopQ(a,b,c,la,lb,lc,ten){const k=.45,d=[b*k,b*k*.75],P={_A:[0,0],_B:[a,0],_C:[a,c],_D:[0,c]};P._E=V.add(P._A,d);P._F=V.add(P._B,d);P._G=V.add(P._C,d);P._H=V.add(P._D,d);
+ const s=(x,y,o)=>seg(x,y,Object.assign({w:2.4},o||{})),h={dash:[6,5],w:1.8,col:'#5b6684'};
+ return{P,pitch:85,base:[s('_A','_B'),s('_B','_C'),s('_C','_D'),s('_D','_A'),s('_B','_F'),s('_C','_G'),s('_D','_H'),s('_F','_G'),s('_G','_H'),s('_A','_E',h),s('_E','_F',h),s('_E','_H',h),
+  nhanDai('_A','_B',la||'',{off:-.45,size:15,at2:[-.01,1]}),nhanDai('_B','_F',lb||'',{off:-.5,size:15,at2:[-.01,1]}),nhanDai('_D','_A',lc||'',{off:.5,size:15,at2:[-.01,1]})].concat(ten||[])}}
+
 /* ===== Toán 6 (KNTT) — Bài 20. CHU VI VÀ DIỆN TÍCH CỦA MỘT SỐ TỨ GIÁC ĐÃ HỌC — SGK tập một tr.90–94 =====
    Phần «em gợi ý» là lời giải em đề xuất cho câu hỏi SGK để HS tự làm — GV soát. */
 const e20=x=>{x=Math.max(0,Math.min(1,x));return x<.5?2*x*x:1-2*(1-x)*(1-x)};
@@ -897,16 +918,18 @@ const fThoi20=(()=>{const A=[0,2.5],B=[4,5],C=[8,2.5],D=[4,0];return{P:{A,B,C,D,
 const fHBH20=(()=>{const P0={A:[0,0],N:[3,0],D:[6,0],B:[0,5],M:[3,5],C:[6,5]};return{P:P0,pitch:80,base:[seg('A','D'),seg('D','C'),seg('C','B'),seg('B','A'),poly(['A','M','C','N'],'rgba(224,138,30,.3)'),seg('A','M'),seg('N','C'),...pts('ABCDMN',{A:[-.3,-.3],B:[-.3,.3],C:[.3,.3],D:[.3,-.3],M:[0,.35],N:[0,-.35]}),nhanDai('A','B','10 m',{off:.55})]}})();
 const fThang21=(()=>{const A=[0,4],B=[2,4],D=[0,0],E=[2,0],C=[5,0];return{P:{A,B,C,D,E},pitch:80,base:[seg('A','B'),seg('B','C'),seg('C','D'),seg('D','A'),seg('B','E',{dash:[5,4]}),ang('D','E','A',{right:true}),...pts('ABCDE',{A:[-.3,.3],B:[.2,.35],C:[.3,-.3],D:[-.3,-.3],E:[0,-.35]})]}})();
 
+const Q20hcn=hq({P:{A:[0,0],B:[4,0],C:[4,6],D:[0,6]},tg:['ABCD'],nhan:{AB:'4 cm',BC:'6 cm'},vuong:['ABD','BCA','CDB','DAC']});
+const Q20moc=hq({P:{A:[0,0],B:[5,0],C:[4,.98],D:[1,.98],_H1:[3.4,.98],_H2:[3.4,1.7]},tg:['ABCD'],nhan:{AB:'25 cm',CD:'15 cm',BC:'7 cm',DA:'7 cm'},an:'ABCD',them:[seg('_H1','_H2',{col:'#dc2626',w:3}),{t:'arc',c:[3.68,1.7],r:.28,a0:0,a1:180,col:'#dc2626',w:3},txt([5.1,1.85],'móc: ? cm',{size:15,col:'#dc2626',font:'bold 15px Arial'})]});
 const LESSON={title:'Bài 20. Chu vi và diện tích của một số tứ giác đã học',sub:'Toán 6 · Kết nối tri thức · Chương IV. Một số hình phẳng trong thực tiễn · SGK tập một tr.90–94',
  tabs:[['ve','✂️ Cắt – ghép'],['cm','🧮 Tính toán'],['lab','📐 Đo – tính'],['thu','✅ Thử ngay']],
  ve:[b20ve1,b20ve2,b20ve3],cm:[b20cm1,b20cm2,b20cm3,b20cm4,b20cm5],lab:LAB20,
  thu:[
  {nguon:'Luyện tập 1 ① · tr.91',fig:fHCN20(3.5,3,'35 cm','30 cm'),kieu:'so',q:'Khung thép hình chữ nhật dài 35 cm, rộng 30 cm. Dùng 260 m dây thép thì làm được bao nhiêu khung?',o:['Số khung'],dv:[''],a:[200],giai:'Chu vi một khung: 2·(35 + 30) = 130 (cm) = 1,3 (m). Số khung: 260 : 1,3 = 200 (khung). (<b>em gợi ý</b>)',goiy:'Tính chu vi một khung rồi đổi ra mét.'},
  {nguon:'Luyện tập 1 ③ · tr.91',fig:fRuong,kieu:'so',q:'Thửa ruộng gồm một hình thang (đáy 30 m và 50 m, cao 10 m) và một hình chữ nhật 50 m × 15 m. Mỗi mét vuông thu được 0,8 kg thóc. Thửa ruộng thu được bao nhiêu kilôgam thóc?',o:['Số thóc'],dv:['kg'],a:[920],giai:'Hình thang: ½(30 + 50)·10 = 400 (m²); hình chữ nhật: 50·15 = 750 (m²). Tổng 1 150 m²; thóc: 1 150·0,8 = 920 (kg). (<b>em gợi ý</b>, theo cách em đọc hình)'},
- {nguon:'Thử thách nhỏ · tr.91',fig:fThang20,kieu:'so',q:'Móc treo quần áo dài 60 cm dây nhôm; phần hình thang cân có đáy nhỏ 15 cm, đáy lớn 25 cm, cạnh bên 7 cm. Phần còn lại làm móc dài bao nhiêu?',o:['Độ dài'],dv:['cm'],a:[6],giai:'Chu vi hình thang cân: 15 + 25 + 7 + 7 = 54 (cm). Phần móc: 60 − 54 = 6 (cm). (<b>em gợi ý</b>)'},
+ {nguon:'Thử thách nhỏ · tr.91',fig:Q20moc,kieu:'so',q:'Móc treo quần áo dài 60 cm dây nhôm; phần hình thang cân có đáy nhỏ 15 cm, đáy lớn 25 cm, cạnh bên 7 cm. Phần còn lại làm móc dài bao nhiêu?',o:['Độ dài'],dv:['cm'],a:[6],giai:'Chu vi hình thang cân: 15 + 25 + 7 + 7 = 54 (cm). Phần móc: 60 − 54 = 6 (cm). (<b>em gợi ý</b>)'},
  {nguon:'Luyện tập 2 · tr.93',fig:fHBH20,kieu:'so',q:'Mảnh đất hình chữ nhật 12 m × 10 m; khu hình bình hành <i>AMCN</i> (<i>AN</i> = 6 m) trồng hoa, phần còn lại trồng cỏ. Trồng hoa 50 000 đ/m², trồng cỏ 40 000 đ/m². Tổng tiền công bao nhiêu?',o:['Tiền công'],dv:['đồng'],a:[5400000],giai:'Hoa: 6·10 = 60 (m²); cỏ: 12·10 − 60 = 60 (m²). Tiền: 60·50 000 + 60·40 000 = 5 400 000 (đồng). (<b>em gợi ý</b>)'},
  {nguon:'Luyện tập 3 · tr.94',fig:fThoi20,kieu:'so',q:'Vườn hình chữ nhật 8 m × 5 m; mảnh hình thoi có hai đường chéo bằng chiều dài và chiều rộng vườn. Mỗi mét vuông trồng 4 cây hoa thì cần bao nhiêu cây?',o:['Số cây'],dv:[''],a:[80],giai:'Diện tích hình thoi: ½·8·5 = 20 (m²). Số cây: 20·4 = 80 (cây). (<b>em gợi ý</b>)'},
- {nguon:'Bài 4.16 · tr.94',fig:fHCN20(4,3,'4 cm','6 cm'),kieu:'so',q:'Hình chữ nhật <i>ABCD</i> có <i>AB</i> = 4 cm, <i>BC</i> = 6 cm. Tính chu vi và diện tích.',o:['Chu vi','Diện tích'],dv:['cm','cm²'],a:[20,24],giai:'C = 2·(4 + 6) = 20 (cm); S = 4·6 = 24 (cm²). (<b>em gợi ý</b>)'},
+ {nguon:'Bài 4.16 · tr.94',fig:Q20hcn,kieu:'so',q:'Hình chữ nhật <i>ABCD</i> có <i>AB</i> = 4 cm, <i>BC</i> = 6 cm. Tính chu vi và diện tích.',o:['Chu vi','Diện tích'],dv:['cm','cm²'],a:[20,24],giai:'C = 2·(4 + 6) = 20 (cm); S = 4·6 = 24 (cm²). (<b>em gợi ý</b>)'},
  {nguon:'Bài 4.18 · tr.94',fig:fHCN20(5,3.3,'15 m','10 m'),kieu:'so',q:'Khu vườn hình chữ nhật dài 15 m, rộng 10 m; cổng vào rộng bằng ⅓ chiều dài, phần còn lại là hàng rào. Hàng rào dài bao nhiêu mét?',o:['Hàng rào'],dv:['m'],a:[45],giai:'Chu vi: 2·(15 + 10) = 50 (m); cổng: 15 : 3 = 5 (m); hàng rào: 50 − 5 = 45 (m). (<b>em gợi ý</b>)'},
  {nguon:'Bài 4.19 · tr.94',fig:fThang20,kieu:'so',q:'Mảnh ruộng hình thang có đáy 15 m và 25 m, chiều cao 10 m; năng suất 0,8 kg/m². Tính diện tích và sản lượng thóc.',o:['Diện tích','Sản lượng'],dv:['m²','kg'],a:[200,160],giai:'S = ½(15 + 25)·10 = 200 (m²); thóc: 200·0,8 = 160 (kg). (<b>em gợi ý</b>)'},
  {nguon:'Bài 4.21 · tr.94',fig:fThang21,kieu:'so',q:'Hình thang <i>ABCD</i> có <i>AB</i> = 10 m, <i>DC</i> = 25 m; hình chữ nhật <i>ABED</i> có diện tích 150 m². Tính diện tích hình thang.',o:['Diện tích'],dv:['m²'],a:[262.5],giai:'<i>AD</i> = 150 : 10 = 15 (m) là chiều cao. S = ½(10 + 25)·15 = 262,5 (m²). (<b>em gợi ý</b>)'},

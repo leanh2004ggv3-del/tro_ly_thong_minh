@@ -205,7 +205,8 @@ function renderScript(fig,k,p){FIG=fig;drawBoard();(fig.base||[]).forEach(it=>dr
  (fig.top||[]).forEach(it=>drawItem(it,1));
  tools.filter(t=>t.k!=='pencil'&&t.k!=='compass').forEach(drawTool);tools.filter(t=>t.k==='pencil'||t.k==='compass').forEach(drawTool)}
 /* tập hợp mọi điểm của hình để vừa khung */
-function figPts(fig){return Object.values(fig.P)}
+function figPts(fig){const out=Object.values(fig.P).slice(),A=x=>Array.isArray(x)&&typeof x[0]==='number';
+ (fig.base||[]).forEach(it=>{['a','b','p','at','c'].forEach(k=>{if(A(it[k]))out.push(it[k])});if(it.t==='circ'&&it.r){const c=A(it.c)?it.c:fig.P[it.c];if(c)out.push([c[0]-it.r,c[1]-it.r],[c[0]+it.r,c[1]+it.r])}});return out}
 
 /* ---------------- ÂM THANH PHẢN HỒI (không đọc giọng) ---------------- */
 let AC=null;function beep(ok){try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();const seq=ok?[660,880,1175]:[300,220];seq.forEach((f,i)=>{const o=AC.createOscillator(),g=AC.createGain();o.type=ok?'triangle':'sawtooth';o.frequency.value=f;g.gain.setValueAtTime(.0001,AC.currentTime+i*.11);g.gain.exponentialRampToValueAtTime(.18,AC.currentTime+i*.11+.02);g.gain.exponentialRampToValueAtTime(.0001,AC.currentTime+i*.11+.2);o.connect(g);g.connect(AC.destination);o.start(AC.currentTime+i*.11);o.stop(AC.currentTime+i*.11+.22)})}catch(e){}}
@@ -285,7 +286,7 @@ MODS.cm={i:0,k:0,t0:0,
 MODS.thu={i:0,done:{},t0:0,
  open(a){this.i=+(a.q||0);this.ord=[];this.show();if(a.a!=null&&S.still)this.answer(+a.a)},
  qs(){return LESSON.thu},
- show(){const q=this.qs()[this.i];this.t0=performance.now();this.ord=[];this.res=this.done[this.i]||null;camFit(figPts(q.fig),{now:true,yaw:q.fig.yaw==null?-8:q.fig.yaw,pitch:q.fig.pitch||72,pad:1.2});this.panel()},
+ show(){const q=this.qs()[this.i];this.t0=performance.now();this.ord=[];this.res=this.done[this.i]||null;const pp=q.fig.pitch||72,khoi=!!(LESSON.lang||LESSON.khoi||LESSON.tron),phang=q.fig.nghieng?false:(khoi?pp>=78:true);camFit(figPts(q.fig),{now:true,yaw:phang?0:(q.fig.yaw!=null?q.fig.yaw:-8),pitch:phang?89.4:pp,pad:1.2});this.panel()},
  draw(){const q=this.qs()[this.i];FIG=q.fig;drawBoard();(q.fig.base||((q.fig.steps||[])[0]||{}).items||[]).forEach(it=>drawItem(it,1));if(this.res&&q.fig.sau)q.fig.sau.forEach(it=>drawItem(it,Math.min(1,(performance.now()-this.res.t)/600)))},
  answer(v){const q=this.qs()[this.i];let ok;
   if(q.kieu==='so'){ok=q.a.every((x,j)=>Math.abs(+String(v[j]).trim().replace(',','.')-x)<(q.tol||1e-6))}else if(q.kieu==='xep'){ok=[q.a].concat(q.alt||[]).some(a=>v.join(',')===a.join(','))}else ok=v===q.a;
@@ -810,6 +811,26 @@ function catKhung(A,B,box,tia){const d=V.sub(B,A);let t0=tia?0:-1e9,t1=1e9;const
 const veDuong=(A,B,box,col,w,dash,tia)=>{const e=catKhung(A,B,box,tia);if(e)line2(e[0],e[1],col,w,dash);return e};
 const chanDT=(M,A,B)=>{const u=V.unit(V.sub(B,A));return V.add(A,V.mul(u,V.dot(V.sub(M,A),u)))};
 
+/* Hình riêng cho câu «Thử ngay» (rà 25/11/2026): hq({P, tg:['ABC'] đa giác kín, doan:['AH'] đoạn, net:['AH'] nét đứt, nhan:{AB:'5 cm'}, goc:[['A','B','C','60°']] góc tại A,
+   vuong:['ABC'] vuông tại A, tron:[['O',R,{opts}]], an:'XY' (không ghi tên), them:[mục], to:{A:'đỏ'…}) — nhãn cạnh tự đặt phía ngoài hình */
+const tenD=s=>s.match(/[A-Z][′']?\d?/g)||[];
+function hq(o){const P=o.P,base=[],ks=Object.keys(P).filter(k=>k[0]!=='_'),cen=V.mul(ks.reduce((s,k)=>V.add(s,P[k]),[0,0]),1/Math.max(1,ks.length));
+ (o.tron||[]).forEach(t=>base.push(Object.assign({t:'circ',c:t[0],r:t[1],col:'#1d4f9a',w:2.2},t[2]||{})));
+ (o.to||[]).forEach(([s,col])=>base.push(poly(tenD(s),col)));
+ (o.tg||[]).forEach(s=>{const n=tenD(s);n.forEach((a,i)=>base.push(seg(a,n[(i+1)%n.length],{w:2.6})))});
+ (o.doan||[]).forEach(s=>{const n=tenD(s);base.push(seg(n[0],n[1],{w:2.6}))});
+ (o.net||[]).forEach(s=>{const n=tenD(s);base.push(seg(n[0],n[1],{dash:[6,5],col:'#5b6684',w:2}))});
+ Object.entries(o.nhan||{}).forEach(([s,lab])=>{const[a,b]=tenD(s),A=P[a],B=P[b],m=V.mid(A,B),sg=Math.sign(V.dot(V.perp(V.sub(B,A)),V.sub(m,cen)))||1;base.push(nhanDai(a,b,lab,{off:.45*sg,col:'#1d4f9a',size:16,at2:[-.01,1]}))});
+ (o.goc||[]).forEach(([v,a,b,lab,col])=>base.push(ang(v,a,b,{lab,col:col||'#dc2626',r:.6,lr:.6,size:15,fill:true})));
+ (o.vuong||[]).forEach(s=>{const n=tenD(s);base.push(ang(n[0],n[1],n[2],{right:true,col:'#1d4f9a',r:.32}))});
+ ks.filter(k=>!(o.an||'').includes(k)).forEach(k=>base.push(pt(k,o.d&&o.d[k]?{d:o.d[k]}:{})));
+ return Object.assign({P,pitch:85,base:base.concat(o.them||[])},o.x||{})}
+/* hình hộp vẽ phối cảnh (mặt trước a × c, chiều sâu b), nhãn ba kích thước */
+function hopQ(a,b,c,la,lb,lc,ten){const k=.45,d=[b*k,b*k*.75],P={_A:[0,0],_B:[a,0],_C:[a,c],_D:[0,c]};P._E=V.add(P._A,d);P._F=V.add(P._B,d);P._G=V.add(P._C,d);P._H=V.add(P._D,d);
+ const s=(x,y,o)=>seg(x,y,Object.assign({w:2.4},o||{})),h={dash:[6,5],w:1.8,col:'#5b6684'};
+ return{P,pitch:85,base:[s('_A','_B'),s('_B','_C'),s('_C','_D'),s('_D','_A'),s('_B','_F'),s('_C','_G'),s('_D','_H'),s('_F','_G'),s('_G','_H'),s('_A','_E',h),s('_E','_F',h),s('_E','_H',h),
+  nhanDai('_A','_B',la||'',{off:-.45,size:15,at2:[-.01,1]}),nhanDai('_B','_F',lb||'',{off:-.5,size:15,at2:[-.01,1]}),nhanDai('_D','_A',lc||'',{off:.5,size:15,at2:[-.01,1]})].concat(ten||[])}}
+
 /* ===== Toán 7 (KNTT) — Bài 34. SỰ ĐỒNG QUY CỦA BA ĐƯỜNG TRUNG TUYẾN, BA ĐƯỜNG PHÂN GIÁC TRONG MỘT TAM GIÁC — SGK tập hai tr.72–75 =====
    Phần «em gợi ý» là lời giải/cách vẽ em đề xuất cho câu hỏi SGK để HS tự làm — GV soát. */
 const TRONG=(A,B,C)=>V.mul(V.add(V.add(A,B),C),1/3);
@@ -894,17 +915,19 @@ const LAB34={vung:[-.6,-.8,7,4.8],ghi:'Kéo ba đỉnh. Chọn thẻ <b>Trung tu
  do:r=>`<div>GA ${so2(r.GA,2)}</div><div>MA ${so2(r.MA,2)}</div><div>IH ${so2(r.IH,2)}</div><div>IK ${so2(r.IK,2)}</div><div>IL ${so2(r.IL,2)}</div>`};
 
 /* ---------------- 4. THỬ NGAY ---------------- */
+const Q34bn=hq({P:{A:[1.5,3.6],B:[0,0],C:[4.5,0],N:[3,1.8],G:[2,1.2]},tg:['ABC'],doan:['BN'],nhan:{GN:'1 cm'},them:[tick('A','N',1),tick('N','C',1)]});
+const Q34bc=hq({P:{A:[1.5,3.6],B:[0,0],C:[4.5,0],N:[3,1.8],P:[.75,1.8],G:[2,1.2]},tg:['ABC'],doan:['BN','CP'],them:[tick('A','N',1),tick('N','C',1),tick('A','P',2),tick('P','B',2)]});
 const LESSON={title:'Bài 34. Sự đồng quy của ba đường trung tuyến, ba đường phân giác trong một tam giác',sub:'Toán 7 · Kết nối tri thức · Chương IX. Quan hệ giữa các yếu tố trong một tam giác · SGK tập hai tr.72–75',
  tabs:[['ve','✏️ Vẽ hình'],['lab','🔍 Nhận biết'],['cm','🧠 Chứng minh'],['thu','✅ Thử ngay']],
  ve:[b34ve1,b34ve2,b34ve3],cm:[b34cm1,b34cm2,b34cm3,b34cm4],lab:LAB34,
  thu:[
  {nguon:'Câu hỏi · tr.72',fig:b34cm1,kieu:'so',q:'Mỗi tam giác có mấy đường trung tuyến?',o:['Số đường'],dv:[''],a:[3],giai:'Mỗi đỉnh có một đường trung tuyến: 3 đường.',goiy:'Đường trung tuyến nối một đỉnh với trung điểm cạnh đối diện.'},
  {nguon:'Ví dụ 1b · tr.73',fig:b34cm1,kieu:'so',q:'<i>G</i> là trọng tâm tam giác <i>ABC</i>, <i>AM</i> là trung tuyến, <i>GM</i> = 2 cm. Tính <i>GA</i>.',o:['<i>GA</i>'],dv:['cm'],a:[4],giai:'<i>GA</i> = 2<i>GM</i> = 4 cm.',goiy:'<i>GA</i> = 2<i>GM</i>.'},
- {nguon:'Luyện tập 1 · tr.73',fig:b34cm1,kieu:'so',q:'Trong tam giác <i>ABC</i> ở Ví dụ 1, cho trung tuyến <i>BN</i> và <i>GN</i> = 1 cm. Tính <i>GB</i> và <i>NB</i>.',o:['<i>GB</i>','<i>NB</i>'],dv:['cm','cm'],a:[2,3],giai:'<i>GB</i> = 2<i>GN</i> = 2 cm; <i>NB</i> = <i>GB</i> + <i>GN</i> = 3 cm.',goiy:'Tương tự Ví dụ 1.'},
+ {nguon:'Luyện tập 1 · tr.73',fig:Q34bn,kieu:'so',q:'Trong tam giác <i>ABC</i> ở Ví dụ 1, cho trung tuyến <i>BN</i> và <i>GN</i> = 1 cm. Tính <i>GB</i> và <i>NB</i>.',o:['<i>GB</i>','<i>NB</i>'],dv:['cm','cm'],a:[2,3],giai:'<i>GB</i> = 2<i>GN</i> = 2 cm; <i>NB</i> = <i>GB</i> + <i>GN</i> = 3 cm.',goiy:'Tương tự Ví dụ 1.'},
  {nguon:'HĐ2 · tr.73',fig:b34ve1,kieu:'chon',q:'Trên giấy kẻ ô, tỉ số <i>GA</i>/<i>MA</i> bằng:',o:['2/3','1/2','1/3'],a:0,giai:'<i>GA</i> = 5 ô, <i>MA</i> = 7,5 ô ⇒ 2/3.',sai:{1:'Đếm lại số ô từ <i>G</i> đến <i>A</i>.',2:'1/3 là tỉ số <i>GM</i>/<i>MA</i>.'}},
  {nguon:'Tranh luận · tr.74',fig:b34cm1,kieu:'chon',q:'Ngoài cách lấy giao điểm của hai đường trung tuyến, còn cách nào tìm trọng tâm <i>G</i>?',o:['Vẽ một đường trung tuyến <i>AM</i> rồi lấy <i>G</i> trên <i>AM</i> với <i>AG</i> = 2/3 <i>AM</i>','Lấy trung điểm của một cạnh','Lấy giao điểm hai đường phân giác'],a:0,giai:'Theo định lí 1, <i>G</i> cách đỉnh <i>A</i> một khoảng bằng 2/3 độ dài trung tuyến <i>AM</i>. (<b>em gợi ý</b>)',sai:{1:'Trung điểm cạnh không phải trọng tâm.',2:'Giao điểm hai đường phân giác là điểm cách đều ba cạnh.'}},
  {nguon:'Định lí 2 · tr.75',fig:b34cm3,kieu:'chon',q:'Giao điểm của ba đường phân giác của một tam giác có tính chất:',o:['Cách đều ba cạnh của tam giác','Cách đều ba đỉnh của tam giác','Cách mỗi đỉnh 2/3 độ dài trung tuyến'],a:0,giai:'Định lí 2: điểm đồng quy của ba đường phân giác cách đều ba cạnh.',sai:{1:'Cách đều ba đỉnh là giao điểm ba đường trung trực (Bài 35).',2:'Đó là tính chất của trọng tâm.'}},
- {nguon:'Bài 9.20 · tr.76',fig:b34cm1,kieu:'so',q:'Tam giác <i>ABC</i> có hai đường trung tuyến <i>BN</i>, <i>CP</i> và trọng tâm <i>G</i>. Điền số vào dấu ?: <i>BG</i> = ? <i>GN</i>; <i>CG</i> = ? <i>GP</i>.',o:['<i>BG</i> : <i>GN</i>','<i>CG</i> : <i>GP</i>'],dv:['',''],a:[2,2],giai:'<i>BG</i> = (2/3)<i>BN</i> = 2<i>GN</i>; <i>CG</i> = (2/3)<i>CP</i> = 2<i>GP</i>.',goiy:'Định lí 1 và Ví dụ 1.'},
+ {nguon:'Bài 9.20 · tr.76',fig:Q34bc,kieu:'so',q:'Tam giác <i>ABC</i> có hai đường trung tuyến <i>BN</i>, <i>CP</i> và trọng tâm <i>G</i>. Điền số vào dấu ?: <i>BG</i> = ? <i>GN</i>; <i>CG</i> = ? <i>GP</i>.',o:['<i>BG</i> : <i>GN</i>','<i>CG</i> : <i>GP</i>'],dv:['',''],a:[2,2],giai:'<i>BG</i> = (2/3)<i>BN</i> = 2<i>GN</i>; <i>CG</i> = (2/3)<i>CP</i> = 2<i>GP</i>.',goiy:'Định lí 1 và Ví dụ 1.'},
  {nguon:'Bài 9.23 · tr.76',fig:b34cm3,kieu:'so',q:'<i>I</i> là điểm đồng quy của ba đường phân giác trong tam giác <i>ABC</i>. Tính góc <i>BIC</i> khi biết góc <i>BAC</i> bằng 120°.',o:[g('BIC')],a:[150],giai:''+g('B')+' + '+g('C')+' = 60° ⇒ '+g('IBC')+' + '+g('ICB')+' = 30° ⇒ '+g('BIC')+' = 180° − 30° = 150°. (<b>em gợi ý</b>)',goiy:'<i>BI</i>, <i>CI</i> chia đôi góc <i>B</i>, góc <i>C</i>.'}]};
 
 boot();

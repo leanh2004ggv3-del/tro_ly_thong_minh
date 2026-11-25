@@ -205,7 +205,8 @@ function renderScript(fig,k,p){FIG=fig;drawBoard();(fig.base||[]).forEach(it=>dr
  (fig.top||[]).forEach(it=>drawItem(it,1));
  tools.filter(t=>t.k!=='pencil'&&t.k!=='compass').forEach(drawTool);tools.filter(t=>t.k==='pencil'||t.k==='compass').forEach(drawTool)}
 /* tập hợp mọi điểm của hình để vừa khung */
-function figPts(fig){return Object.values(fig.P)}
+function figPts(fig){const out=Object.values(fig.P).slice(),A=x=>Array.isArray(x)&&typeof x[0]==='number';
+ (fig.base||[]).forEach(it=>{['a','b','p','at','c'].forEach(k=>{if(A(it[k]))out.push(it[k])});if(it.t==='circ'&&it.r){const c=A(it.c)?it.c:fig.P[it.c];if(c)out.push([c[0]-it.r,c[1]-it.r],[c[0]+it.r,c[1]+it.r])}});return out}
 
 /* ---------------- ÂM THANH PHẢN HỒI (không đọc giọng) ---------------- */
 let AC=null;function beep(ok){try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();const seq=ok?[660,880,1175]:[300,220];seq.forEach((f,i)=>{const o=AC.createOscillator(),g=AC.createGain();o.type=ok?'triangle':'sawtooth';o.frequency.value=f;g.gain.setValueAtTime(.0001,AC.currentTime+i*.11);g.gain.exponentialRampToValueAtTime(.18,AC.currentTime+i*.11+.02);g.gain.exponentialRampToValueAtTime(.0001,AC.currentTime+i*.11+.2);o.connect(g);g.connect(AC.destination);o.start(AC.currentTime+i*.11);o.stop(AC.currentTime+i*.11+.22)})}catch(e){}}
@@ -285,7 +286,7 @@ MODS.cm={i:0,k:0,t0:0,
 MODS.thu={i:0,done:{},t0:0,
  open(a){this.i=+(a.q||0);this.ord=[];this.show();if(a.a!=null&&S.still)this.answer(+a.a)},
  qs(){return LESSON.thu},
- show(){const q=this.qs()[this.i];this.t0=performance.now();this.ord=[];this.res=this.done[this.i]||null;camFit(figPts(q.fig),{now:true,yaw:q.fig.yaw==null?-8:q.fig.yaw,pitch:q.fig.pitch||72,pad:1.2});this.panel()},
+ show(){const q=this.qs()[this.i];this.t0=performance.now();this.ord=[];this.res=this.done[this.i]||null;const pp=q.fig.pitch||72,khoi=!!(LESSON.lang||LESSON.khoi||LESSON.tron),phang=q.fig.nghieng?false:(khoi?pp>=78:true);camFit(figPts(q.fig),{now:true,yaw:phang?0:(q.fig.yaw!=null?q.fig.yaw:-8),pitch:phang?89.4:pp,pad:1.2});this.panel()},
  draw(){const q=this.qs()[this.i];FIG=q.fig;drawBoard();(q.fig.base||((q.fig.steps||[])[0]||{}).items||[]).forEach(it=>drawItem(it,1));if(this.res&&q.fig.sau)q.fig.sau.forEach(it=>drawItem(it,Math.min(1,(performance.now()-this.res.t)/600)))},
  answer(v){const q=this.qs()[this.i];let ok;
   if(q.kieu==='so'){ok=q.a.every((x,j)=>Math.abs(+String(v[j]).trim().replace(',','.')-x)<(q.tol||1e-6))}else if(q.kieu==='xep'){ok=[q.a].concat(q.alt||[]).some(a=>v.join(',')===a.join(','))}else ok=v===q.a;
@@ -810,6 +811,26 @@ function catKhung(A,B,box,tia){const d=V.sub(B,A);let t0=tia?0:-1e9,t1=1e9;const
 const veDuong=(A,B,box,col,w,dash,tia)=>{const e=catKhung(A,B,box,tia);if(e)line2(e[0],e[1],col,w,dash);return e};
 const chanDT=(M,A,B)=>{const u=V.unit(V.sub(B,A));return V.add(A,V.mul(u,V.dot(V.sub(M,A),u)))};
 
+/* Hình riêng cho câu «Thử ngay» (rà 25/11/2026): hq({P, tg:['ABC'] đa giác kín, doan:['AH'] đoạn, net:['AH'] nét đứt, nhan:{AB:'5 cm'}, goc:[['A','B','C','60°']] góc tại A,
+   vuong:['ABC'] vuông tại A, tron:[['O',R,{opts}]], an:'XY' (không ghi tên), them:[mục], to:{A:'đỏ'…}) — nhãn cạnh tự đặt phía ngoài hình */
+const tenD=s=>s.match(/[A-Z][′']?\d?/g)||[];
+function hq(o){const P=o.P,base=[],ks=Object.keys(P).filter(k=>k[0]!=='_'),cen=V.mul(ks.reduce((s,k)=>V.add(s,P[k]),[0,0]),1/Math.max(1,ks.length));
+ (o.tron||[]).forEach(t=>base.push(Object.assign({t:'circ',c:t[0],r:t[1],col:'#1d4f9a',w:2.2},t[2]||{})));
+ (o.to||[]).forEach(([s,col])=>base.push(poly(tenD(s),col)));
+ (o.tg||[]).forEach(s=>{const n=tenD(s);n.forEach((a,i)=>base.push(seg(a,n[(i+1)%n.length],{w:2.6})))});
+ (o.doan||[]).forEach(s=>{const n=tenD(s);base.push(seg(n[0],n[1],{w:2.6}))});
+ (o.net||[]).forEach(s=>{const n=tenD(s);base.push(seg(n[0],n[1],{dash:[6,5],col:'#5b6684',w:2}))});
+ Object.entries(o.nhan||{}).forEach(([s,lab])=>{const[a,b]=tenD(s),A=P[a],B=P[b],m=V.mid(A,B),sg=Math.sign(V.dot(V.perp(V.sub(B,A)),V.sub(m,cen)))||1;base.push(nhanDai(a,b,lab,{off:.45*sg,col:'#1d4f9a',size:16,at2:[-.01,1]}))});
+ (o.goc||[]).forEach(([v,a,b,lab,col])=>base.push(ang(v,a,b,{lab,col:col||'#dc2626',r:.6,lr:.6,size:15,fill:true})));
+ (o.vuong||[]).forEach(s=>{const n=tenD(s);base.push(ang(n[0],n[1],n[2],{right:true,col:'#1d4f9a',r:.32}))});
+ ks.filter(k=>!(o.an||'').includes(k)).forEach(k=>base.push(pt(k,o.d&&o.d[k]?{d:o.d[k]}:{})));
+ return Object.assign({P,pitch:85,base:base.concat(o.them||[])},o.x||{})}
+/* hình hộp vẽ phối cảnh (mặt trước a × c, chiều sâu b), nhãn ba kích thước */
+function hopQ(a,b,c,la,lb,lc,ten){const k=.45,d=[b*k,b*k*.75],P={_A:[0,0],_B:[a,0],_C:[a,c],_D:[0,c]};P._E=V.add(P._A,d);P._F=V.add(P._B,d);P._G=V.add(P._C,d);P._H=V.add(P._D,d);
+ const s=(x,y,o)=>seg(x,y,Object.assign({w:2.4},o||{})),h={dash:[6,5],w:1.8,col:'#5b6684'};
+ return{P,pitch:85,base:[s('_A','_B'),s('_B','_C'),s('_C','_D'),s('_D','_A'),s('_B','_F'),s('_C','_G'),s('_D','_H'),s('_F','_G'),s('_G','_H'),s('_A','_E',h),s('_E','_F',h),s('_E','_H',h),
+  nhanDai('_A','_B',la||'',{off:-.45,size:15,at2:[-.01,1]}),nhanDai('_B','_F',lb||'',{off:-.5,size:15,at2:[-.01,1]}),nhanDai('_D','_A',lc||'',{off:.5,size:15,at2:[-.01,1]})].concat(ten||[])}}
+
 /* ===== Toán 9 (KNTT) — Bài 28. ĐƯỜNG TRÒN NGOẠI TIẾP VÀ ĐƯỜNG TRÒN NỘI TIẾP CỦA MỘT TAM GIÁC — SGK tập hai tr.72–79 (gồm Luyện tập chung) =====
    Phần «em gợi ý» là lời giải/cách vẽ em đề xuất cho câu hỏi SGK để HS tự làm — GV soát. */
 const fr=(a,b)=>`<span style="display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;line-height:1.15;margin:0 2px"><span style="border-bottom:1.4px solid currentColor;padding:0 2px">${a}</span><span style="padding:0 2px">${b}</span></span>`;
@@ -904,18 +925,22 @@ const LAB28={vung:[-4,-3,4.6,4.4],ghi:'Kéo ba đỉnh. Chọn thẻ <b>Ngoại 
  do:r=>`<div>R ${so2(r.R,2)}</div><div>r ${so2(r.r,2)}</div><div>BC ${so2(r.a,2)}</div>`};
 
 /* ---------------- 4. THỬ NGAY ---------------- */
+const Q28nt=hq({P:{A:V.pol([0,0],90,2.4),B:V.pol([0,0],210,2.4),C:V.pol([0,0],330,2.4),O:[0,0]},tg:['ABC'],doan:['OA'],tron:[['O',2.4]],nhan:{OA:'4 cm'},d:{O:[.35,-.1]}});
+const Q28nt2=hq({P:{A:[1.8,3.118],B:[0,0],C:[3.6,0],I:[1.8,1.039],H:[1.8,0]},tg:['ABC'],net:['IH'],tron:[['I',1.039,{col:'#16a34a'}]],nhan:{BC:'4 cm'},an:'H',d:{I:[.3,.3]},them:[txt([2.05,.5],'r',{size:16,col:'#16a34a'})]});
+const Q28vc=hq({P:{A:[0,0],B:[3.39,0],C:[0,3.39],O:[1.697,1.697]},tg:['ABC'],tron:[['O',2.4]],nhan:{AB:'2√2 cm',CA:'2√2 cm'},vuong:['ABC'],d:{O:[.35,.3]}});
+const Q28ks=hq({P:{A:[0,0],B:[3.2,0],C:[0,2.4],I:[.8,.8]},tg:['ABC'],tron:[['I',.8,{col:'#16a34a'}]],nhan:{AB:'1 200 m',CA:'900 m',BC:'1 500 m'},vuong:['ABC'],d:{I:[.3,.3]}});
 const LESSON={title:'Bài 28. Đường tròn ngoại tiếp và đường tròn nội tiếp của một tam giác',sub:'Toán 9 · Kết nối tri thức · Chương IX. Đường tròn ngoại tiếp và đường tròn nội tiếp · SGK tập hai tr.72–79',
  tabs:[['ve','✏️ Vẽ hình'],['lab','🔍 Nhận biết'],['cm','🧠 Chứng minh'],['thu','✅ Thử ngay']],
  ve:[b28ve1,b28ve2,b28ve3],cm:[b28cm1,b28cm2,b28cm3,b28cm4,b28cm5,b28cm6],lab:LAB28,
  thu:[
  {nguon:'Luyện tập 1 · tr.73',fig:b28cm2,kieu:'so',q:'Tam giác <i>ABC</i> có <i>AC</i> = 3 cm, <i>AB</i> = 4 cm, <i>BC</i> = 5 cm. Tính bán kính đường tròn ngoại tiếp.',o:['<i>R</i>'],dv:['cm'],a:[2.5],tol:.001,giai:'3² + 4² = 5² nên tam giác vuông tại <i>A</i>; <i>R</i> = 5 : 2 = 2,5 (cm). (<b>em gợi ý</b>)'},
- {nguon:'Luyện tập 2 · tr.74',fig:b28cm3,kieu:'so',q:'Tam giác đều <i>ABC</i> nội tiếp đường tròn bán kính 4 cm. Tính độ dài cạnh (làm tròn đến chữ số thập phân thứ hai).',o:['<i>a</i>'],dv:['cm'],a:[6.93],tol:.006,giai:'<i>R</i> = '+fr('√3','3')+'<i>a</i> ⇒ <i>a</i> = <i>R</i>√3 = 4√3 ≈ 6,93 (cm). (<b>em gợi ý</b>)'},
+ {nguon:'Luyện tập 2 · tr.74',fig:Q28nt,kieu:'so',q:'Tam giác đều <i>ABC</i> nội tiếp đường tròn bán kính 4 cm. Tính độ dài cạnh (làm tròn đến chữ số thập phân thứ hai).',o:['<i>a</i>'],dv:['cm'],a:[6.93],tol:.006,giai:'<i>R</i> = '+fr('√3','3')+'<i>a</i> ⇒ <i>a</i> = <i>R</i>√3 = 4√3 ≈ 6,93 (cm). (<b>em gợi ý</b>)'},
  {nguon:'Câu hỏi · tr.75',fig:b28cm6,kieu:'chon',q:'Mỗi tam giác có bao nhiêu đường tròn nội tiếp? Có bao nhiêu tam giác cùng ngoại tiếp một đường tròn?',o:['Một; vô số','Vô số; một','Một; một'],a:0,giai:'Giao điểm ba đường phân giác là duy nhất nên có một đường tròn nội tiếp; một đường tròn có vô số tam giác ngoại tiếp (vẽ ba tiếp tuyến bất kì đôi một cắt nhau tạo thành tam giác chứa đường tròn). (<b>em gợi ý</b>)',sai:{1:'Xem lại định nghĩa.',2:'Có thể vẽ nhiều bộ ba tiếp tuyến.'}},
- {nguon:'Luyện tập 3b · tr.76',fig:b28cm3,kieu:'so',q:'Tam giác đều <i>ABC</i> có <i>BC</i> = 4 cm. Tính bán kính <i>r</i> của đường tròn nội tiếp (làm tròn đến chữ số thập phân thứ hai).',o:['<i>r</i>'],dv:['cm'],a:[1.15],tol:.006,giai:'<i>r</i> = '+fr('√3','6')+' · 4 = '+fr('2√3','3')+' ≈ 1,15 (cm).'},
- {nguon:'Bài 9.7 · tr.76',fig:b28cm2,kieu:'so',q:'Tam giác <i>ABC</i> vuông cân tại <i>A</i> có cạnh bên 2√2 cm. Tính bán kính đường tròn ngoại tiếp.',o:['<i>R</i>'],dv:['cm'],a:[2],giai:'<i>BC</i> = 2√2 · √2 = 4 ⇒ <i>R</i> = 2 (cm). (<b>em gợi ý</b>)'},
+ {nguon:'Luyện tập 3b · tr.76',fig:Q28nt2,kieu:'so',q:'Tam giác đều <i>ABC</i> có <i>BC</i> = 4 cm. Tính bán kính <i>r</i> của đường tròn nội tiếp (làm tròn đến chữ số thập phân thứ hai).',o:['<i>r</i>'],dv:['cm'],a:[1.15],tol:.006,giai:'<i>r</i> = '+fr('√3','6')+' · 4 = '+fr('2√3','3')+' ≈ 1,15 (cm).'},
+ {nguon:'Bài 9.7 · tr.76',fig:Q28vc,kieu:'so',q:'Tam giác <i>ABC</i> vuông cân tại <i>A</i> có cạnh bên 2√2 cm. Tính bán kính đường tròn ngoại tiếp.',o:['<i>R</i>'],dv:['cm'],a:[2],giai:'<i>BC</i> = 2√2 · √2 = 4 ⇒ <i>R</i> = 2 (cm). (<b>em gợi ý</b>)'},
  {nguon:'Bài 9.12 · tr.77',fig:b28ve3,kieu:'so',q:'Khung gỗ tam giác đều đặt vừa khít đồng hồ tròn đường kính 30 cm. Tính độ dài cạnh phía trong (làm tròn đến chữ số thập phân thứ hai).',o:['<i>a</i>'],dv:['cm'],a:[51.96],tol:.006,giai:'<i>r</i> = 15 = '+fr('√3','6')+'<i>a</i> ⇒ <i>a</i> = 30√3 ≈ 51,96 (cm). (<b>em gợi ý</b>)'},
  {nguon:'Bài 9.13 · tr.79',fig:b28cm5,kieu:'so',q:'Tam giác <i>ABC</i> nội tiếp (<i>O</i>), '+g('BOC')+' = 120°, '+g('OCA')+' = 20°. Tính các góc của tam giác <i>ABC</i>.',o:[g('A'),g('B'),g('C')],a:[60,70,50],giai:''+g('A')+' = ½ · 120° = 60°; '+g('AOC')+' = 180° − 2 · 20° = 140° ⇒ '+g('B')+' = 70°; '+g('C')+' = 50°. (<b>em gợi ý</b>)'},
- {nguon:'Bài 9.17 · tr.79 · Hình 9.27',fig:b28cm6,kieu:'so',q:'Khu dân cư hình tam giác có các cạnh 900 m, 1 200 m, 1 500 m. Khách sạn cách đều ba con đường thì cách mỗi con đường bao nhiêu mét?',o:['Khoảng cách'],dv:['m'],a:[300],giai:'Tam giác vuông (900² + 1 200² = 1 500²), <i>S</i> = ½ · 900 · 1 200 = 540 000 m²; <i>r</i> = 2<i>S</i> : (chu vi 3 600) = 300 m. (<b>em gợi ý</b>, dùng Ví dụ 2 Luyện tập chung)'}]};
+ {nguon:'Bài 9.17 · tr.79 · Hình 9.27',fig:Q28ks,kieu:'so',q:'Khu dân cư hình tam giác có các cạnh 900 m, 1 200 m, 1 500 m. Khách sạn cách đều ba con đường thì cách mỗi con đường bao nhiêu mét?',o:['Khoảng cách'],dv:['m'],a:[300],giai:'Tam giác vuông (900² + 1 200² = 1 500²), <i>S</i> = ½ · 900 · 1 200 = 540 000 m²; <i>r</i> = 2<i>S</i> : (chu vi 3 600) = 300 m. (<b>em gợi ý</b>, dùng Ví dụ 2 Luyện tập chung)'}]};
 
 boot();
 </script>

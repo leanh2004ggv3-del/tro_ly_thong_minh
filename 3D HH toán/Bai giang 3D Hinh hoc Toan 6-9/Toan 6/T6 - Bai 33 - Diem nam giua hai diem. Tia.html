@@ -205,7 +205,8 @@ function renderScript(fig,k,p){FIG=fig;drawBoard();(fig.base||[]).forEach(it=>dr
  (fig.top||[]).forEach(it=>drawItem(it,1));
  tools.filter(t=>t.k!=='pencil'&&t.k!=='compass').forEach(drawTool);tools.filter(t=>t.k==='pencil'||t.k==='compass').forEach(drawTool)}
 /* tập hợp mọi điểm của hình để vừa khung */
-function figPts(fig){return Object.values(fig.P)}
+function figPts(fig){const out=Object.values(fig.P).slice(),A=x=>Array.isArray(x)&&typeof x[0]==='number';
+ (fig.base||[]).forEach(it=>{['a','b','p','at','c'].forEach(k=>{if(A(it[k]))out.push(it[k])});if(it.t==='circ'&&it.r){const c=A(it.c)?it.c:fig.P[it.c];if(c)out.push([c[0]-it.r,c[1]-it.r],[c[0]+it.r,c[1]+it.r])}});return out}
 
 /* ---------------- ÂM THANH PHẢN HỒI (không đọc giọng) ---------------- */
 let AC=null;function beep(ok){try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();const seq=ok?[660,880,1175]:[300,220];seq.forEach((f,i)=>{const o=AC.createOscillator(),g=AC.createGain();o.type=ok?'triangle':'sawtooth';o.frequency.value=f;g.gain.setValueAtTime(.0001,AC.currentTime+i*.11);g.gain.exponentialRampToValueAtTime(.18,AC.currentTime+i*.11+.02);g.gain.exponentialRampToValueAtTime(.0001,AC.currentTime+i*.11+.2);o.connect(g);g.connect(AC.destination);o.start(AC.currentTime+i*.11);o.stop(AC.currentTime+i*.11+.22)})}catch(e){}}
@@ -285,7 +286,7 @@ MODS.cm={i:0,k:0,t0:0,
 MODS.thu={i:0,done:{},t0:0,
  open(a){this.i=+(a.q||0);this.ord=[];this.show();if(a.a!=null&&S.still)this.answer(+a.a)},
  qs(){return LESSON.thu},
- show(){const q=this.qs()[this.i];this.t0=performance.now();this.ord=[];this.res=this.done[this.i]||null;camFit(figPts(q.fig),{now:true,yaw:q.fig.yaw==null?-8:q.fig.yaw,pitch:q.fig.pitch||72,pad:1.2});this.panel()},
+ show(){const q=this.qs()[this.i];this.t0=performance.now();this.ord=[];this.res=this.done[this.i]||null;const pp=q.fig.pitch||72,khoi=!!(LESSON.lang||LESSON.khoi||LESSON.tron),phang=q.fig.nghieng?false:(khoi?pp>=78:true);camFit(figPts(q.fig),{now:true,yaw:phang?0:(q.fig.yaw!=null?q.fig.yaw:-8),pitch:phang?89.4:pp,pad:1.2});this.panel()},
  draw(){const q=this.qs()[this.i];FIG=q.fig;drawBoard();(q.fig.base||((q.fig.steps||[])[0]||{}).items||[]).forEach(it=>drawItem(it,1));if(this.res&&q.fig.sau)q.fig.sau.forEach(it=>drawItem(it,Math.min(1,(performance.now()-this.res.t)/600)))},
  answer(v){const q=this.qs()[this.i];let ok;
   if(q.kieu==='so'){ok=q.a.every((x,j)=>Math.abs(+String(v[j]).trim().replace(',','.')-x)<(q.tol||1e-6))}else if(q.kieu==='xep'){ok=[q.a].concat(q.alt||[]).some(a=>v.join(',')===a.join(','))}else ok=v===q.a;
@@ -810,6 +811,26 @@ function catKhung(A,B,box,tia){const d=V.sub(B,A);let t0=tia?0:-1e9,t1=1e9;const
 const veDuong=(A,B,box,col,w,dash,tia)=>{const e=catKhung(A,B,box,tia);if(e)line2(e[0],e[1],col,w,dash);return e};
 const chanDT=(M,A,B)=>{const u=V.unit(V.sub(B,A));return V.add(A,V.mul(u,V.dot(V.sub(M,A),u)))};
 
+/* Hình riêng cho câu «Thử ngay» (rà 25/11/2026): hq({P, tg:['ABC'] đa giác kín, doan:['AH'] đoạn, net:['AH'] nét đứt, nhan:{AB:'5 cm'}, goc:[['A','B','C','60°']] góc tại A,
+   vuong:['ABC'] vuông tại A, tron:[['O',R,{opts}]], an:'XY' (không ghi tên), them:[mục], to:{A:'đỏ'…}) — nhãn cạnh tự đặt phía ngoài hình */
+const tenD=s=>s.match(/[A-Z][′']?\d?/g)||[];
+function hq(o){const P=o.P,base=[],ks=Object.keys(P).filter(k=>k[0]!=='_'),cen=V.mul(ks.reduce((s,k)=>V.add(s,P[k]),[0,0]),1/Math.max(1,ks.length));
+ (o.tron||[]).forEach(t=>base.push(Object.assign({t:'circ',c:t[0],r:t[1],col:'#1d4f9a',w:2.2},t[2]||{})));
+ (o.to||[]).forEach(([s,col])=>base.push(poly(tenD(s),col)));
+ (o.tg||[]).forEach(s=>{const n=tenD(s);n.forEach((a,i)=>base.push(seg(a,n[(i+1)%n.length],{w:2.6})))});
+ (o.doan||[]).forEach(s=>{const n=tenD(s);base.push(seg(n[0],n[1],{w:2.6}))});
+ (o.net||[]).forEach(s=>{const n=tenD(s);base.push(seg(n[0],n[1],{dash:[6,5],col:'#5b6684',w:2}))});
+ Object.entries(o.nhan||{}).forEach(([s,lab])=>{const[a,b]=tenD(s),A=P[a],B=P[b],m=V.mid(A,B),sg=Math.sign(V.dot(V.perp(V.sub(B,A)),V.sub(m,cen)))||1;base.push(nhanDai(a,b,lab,{off:.45*sg,col:'#1d4f9a',size:16,at2:[-.01,1]}))});
+ (o.goc||[]).forEach(([v,a,b,lab,col])=>base.push(ang(v,a,b,{lab,col:col||'#dc2626',r:.6,lr:.6,size:15,fill:true})));
+ (o.vuong||[]).forEach(s=>{const n=tenD(s);base.push(ang(n[0],n[1],n[2],{right:true,col:'#1d4f9a',r:.32}))});
+ ks.filter(k=>!(o.an||'').includes(k)).forEach(k=>base.push(pt(k,o.d&&o.d[k]?{d:o.d[k]}:{})));
+ return Object.assign({P,pitch:85,base:base.concat(o.them||[])},o.x||{})}
+/* hình hộp vẽ phối cảnh (mặt trước a × c, chiều sâu b), nhãn ba kích thước */
+function hopQ(a,b,c,la,lb,lc,ten){const k=.45,d=[b*k,b*k*.75],P={_A:[0,0],_B:[a,0],_C:[a,c],_D:[0,c]};P._E=V.add(P._A,d);P._F=V.add(P._B,d);P._G=V.add(P._C,d);P._H=V.add(P._D,d);
+ const s=(x,y,o)=>seg(x,y,Object.assign({w:2.4},o||{})),h={dash:[6,5],w:1.8,col:'#5b6684'};
+ return{P,pitch:85,base:[s('_A','_B'),s('_B','_C'),s('_C','_D'),s('_D','_A'),s('_B','_F'),s('_C','_G'),s('_D','_H'),s('_F','_G'),s('_G','_H'),s('_A','_E',h),s('_E','_F',h),s('_E','_H',h),
+  nhanDai('_A','_B',la||'',{off:-.45,size:15,at2:[-.01,1]}),nhanDai('_B','_F',lb||'',{off:-.5,size:15,at2:[-.01,1]}),nhanDai('_D','_A',lc||'',{off:.5,size:15,at2:[-.01,1]})].concat(ten||[])}}
+
 /* ===== Toán 6 (KNTT) — Bài 33. ĐIỂM NẰM GIỮA HAI ĐIỂM. TIA — SGK tập hai tr.48–50 =====
    Phần «em gợi ý» là lời giải em đề xuất cho câu hỏi SGK để HS tự làm — GV soát. */
 
@@ -850,6 +871,7 @@ const LAB33={vung:[-5,-2.4,5,2.6],ghi:'Kéo ba điểm <i>A</i>, <i>B</i>, <i>C<
 const f815=(()=>{const A=[0,3],B=[-2,0],C=[3,0],D=[.6,0],E=V.lerp(A,D,.35);return{P:{A,B,C,D,E},pitch:85,base:[seg('A','B'),seg('B','C'),seg('C','A'),seg('A','D'),...pts('ABCDE',{A:[0,.4],B:[-.35,-.2],C:[.35,-.2],D:[0,-.4],E:[-.35,0]})]}})();
 const fxABy=(s)=>{const P={x0:[-4,0],y0:[4,0]},n=s.length;s.split('').forEach((k,i)=>P[k]=[-2.4+4.8*i/(n-1||1),0]);return{P,pitch:85,base:[seg('x0','y0'),txt([-4.3,.25],'x',{size:18}),txt([4.3,.25],'y',{size:18}),...s.split('').map(k=>pt(k,{d:[0,.42]}))]}};
 const f820=(()=>{const A=[0,3],B=[-1.6,0],C=[1.6,0];return{P:{A,B,C,a1:V.lerp(B,A,1.25),a2:V.lerp(C,A,1.25),b1:V.lerp(C,B,1.4),c1:V.lerp(B,C,1.4),b0:V.lerp(A,B,1.2),c0:V.lerp(A,C,1.2)},pitch:85,base:[seg('A','b0'),seg('A','c0'),seg('b1','c1'),...pts('ABC',{A:[-.4,0],B:[-.4,.25],C:[.4,.25]})]}})();
+const Q33m={P:Object.assign({},f820.P,{M:[.56,4.05]}),pitch:85,base:f820.base.concat([seg('A','M',{dash:[6,5],col:'#dc2626',w:2}),pt('M',{d:[.4,0],col:'#dc2626'})])};
 const LESSON={title:'Bài 33. Điểm nằm giữa hai điểm. Tia',sub:'Toán 6 · Kết nối tri thức · Chương VIII. Những hình hình học cơ bản · SGK tập hai tr.48–50',
  tabs:[['ve','✏️ Vẽ hình'],['lab','🔍 Điểm nằm giữa, tia'],['thu','✅ Thử ngay']],
  ve:[b33ve1,b33ve2],lab:LAB33,
@@ -857,7 +879,7 @@ const LESSON={title:'Bài 33. Điểm nằm giữa hai điểm. Tia',sub:'Toán 
  {nguon:'Câu hỏi · tr.48 · Hình 8.15',fig:f815,kieu:'chon',q:'Điểm <i>D</i> nằm giữa hai điểm nào?',o:['<i>B</i> và <i>C</i>','<i>A</i> và <i>E</i>','<i>A</i> và <i>B</i>'],a:0,giai:'<i>B</i>, <i>D</i>, <i>C</i> thẳng hàng và <i>D</i> ở giữa. (<b>em gợi ý</b>)'},
  {nguon:'Câu hỏi · tr.48 · Hình 8.15',fig:f815,kieu:'chon',q:'Hai điểm nào nằm khác phía đối với điểm <i>E</i>?',o:['<i>A</i> và <i>D</i>','<i>B</i> và <i>C</i>','<i>A</i> và <i>B</i>'],a:0,giai:'<i>E</i> nằm giữa <i>A</i> và <i>D</i>. (<b>em gợi ý</b>)'},
  {nguon:'Câu hỏi · tr.49 · Hình 8.19',fig:fxABy('AB'),kieu:'so',q:'Trên đường thẳng <i>xy</i> có hai điểm <i>A</i>, <i>B</i>. Có bao nhiêu tia gốc <i>A</i> hoặc gốc <i>B</i>?',o:['Số tia'],dv:[''],a:[4],giai:'<i>Ax</i>, <i>Ay</i> (hay <i>AB</i>), <i>Bx</i> (hay <i>BA</i>), <i>By</i>. Tia đối của <i>Ax</i> là <i>Ay</i>; tia đối của <i>Bx</i> là <i>By</i>. (<b>em gợi ý</b>)'},
- {nguon:'Luyện tập 2 · tr.49 · Hình 8.20',fig:f820,kieu:'chon',q:'Nếu điểm <i>M</i> nằm trên tia đối của tia <i>AB</i> thì <i>M</i> có thuộc tia <i>BA</i> không?',o:['Có','Không'],a:0,giai:'Tia <i>BA</i> đi từ <i>B</i> qua <i>A</i> và kéo dài mãi; tia đối của <i>AB</i> là phần nằm sau <i>A</i> — nằm trên tia <i>BA</i>. (<b>em gợi ý</b>)'},
+ {nguon:'Luyện tập 2 · tr.49 · Hình 8.20',fig:Q33m,kieu:'chon',q:'Nếu điểm <i>M</i> nằm trên tia đối của tia <i>AB</i> thì <i>M</i> có thuộc tia <i>BA</i> không?',o:['Có','Không'],a:0,giai:'Tia <i>BA</i> đi từ <i>B</i> qua <i>A</i> và kéo dài mãi; tia đối của <i>AB</i> là phần nằm sau <i>A</i> — nằm trên tia <i>BA</i>. (<b>em gợi ý</b>)'},
  {nguon:'Thử thách nhỏ · tr.49',fig:fxABy('AB'),kieu:'chon',q:'Hình gồm điểm <i>A</i> và tất cả các điểm nằm khác phía với điểm <i>B</i> đối với <i>A</i> có phải là một tia không? Tia đó có phải là tia đối của tia <i>AB</i> không?',o:['Là một tia, và là tia đối của tia <i>AB</i>','Là một tia nhưng không phải tia đối','Không phải tia'],a:0,giai:'Hình gồm gốc <i>A</i> và một phần đường thẳng bị chia bởi <i>A</i> (phía không chứa <i>B</i>): đó là tia đối của tia <i>AB</i>. (<b>em gợi ý</b>)'},
  {nguon:'Bài 8.6 · tr.50 · Hình 8.21',fig:fxABy('ACBD'),kieu:'chon',q:'Bốn điểm theo thứ tự <i>A</i>, <i>C</i>, <i>B</i>, <i>D</i> trên <i>xy</i>. Câu nào <b>sai</b>?',o:['<i>B</i> nằm khác phía với <i>A</i> đối với <i>D</i>','<i>B</i> nằm giữa <i>A</i> và <i>D</i>','<i>A</i> và <i>C</i> nằm cùng phía đối với <i>D</i>','<i>B</i> và <i>C</i> nằm cùng phía đối với <i>D</i>'],a:0,giai:'<i>A</i>, <i>B</i> đều ở bên trái <i>D</i> nên nằm cùng phía đối với <i>D</i>. (<b>em gợi ý</b>)'},
  {nguon:'Bài 8.7 · tr.50 · Hình 8.22',fig:fxABy('ABC'),kieu:'so',q:'Trên đường thẳng <i>xy</i> có ba điểm <i>A</i>, <i>B</i>, <i>C</i>. Có tất cả bao nhiêu tia (gốc là một trong ba điểm)?',o:['Số tia'],dv:[''],a:[6],giai:'Mỗi điểm là gốc của hai tia (<i>Ax</i>, <i>Ay</i>; <i>Bx</i>, <i>By</i>; <i>Cx</i>, <i>Cy</i>): 6 tia. (<b>em gợi ý</b>)'}]};

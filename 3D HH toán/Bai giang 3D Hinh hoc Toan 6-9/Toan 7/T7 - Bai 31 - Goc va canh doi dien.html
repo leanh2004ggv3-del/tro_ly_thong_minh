@@ -205,7 +205,8 @@ function renderScript(fig,k,p){FIG=fig;drawBoard();(fig.base||[]).forEach(it=>dr
  (fig.top||[]).forEach(it=>drawItem(it,1));
  tools.filter(t=>t.k!=='pencil'&&t.k!=='compass').forEach(drawTool);tools.filter(t=>t.k==='pencil'||t.k==='compass').forEach(drawTool)}
 /* tập hợp mọi điểm của hình để vừa khung */
-function figPts(fig){return Object.values(fig.P)}
+function figPts(fig){const out=Object.values(fig.P).slice(),A=x=>Array.isArray(x)&&typeof x[0]==='number';
+ (fig.base||[]).forEach(it=>{['a','b','p','at','c'].forEach(k=>{if(A(it[k]))out.push(it[k])});if(it.t==='circ'&&it.r){const c=A(it.c)?it.c:fig.P[it.c];if(c)out.push([c[0]-it.r,c[1]-it.r],[c[0]+it.r,c[1]+it.r])}});return out}
 
 /* ---------------- ÂM THANH PHẢN HỒI (không đọc giọng) ---------------- */
 let AC=null;function beep(ok){try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();const seq=ok?[660,880,1175]:[300,220];seq.forEach((f,i)=>{const o=AC.createOscillator(),g=AC.createGain();o.type=ok?'triangle':'sawtooth';o.frequency.value=f;g.gain.setValueAtTime(.0001,AC.currentTime+i*.11);g.gain.exponentialRampToValueAtTime(.18,AC.currentTime+i*.11+.02);g.gain.exponentialRampToValueAtTime(.0001,AC.currentTime+i*.11+.2);o.connect(g);g.connect(AC.destination);o.start(AC.currentTime+i*.11);o.stop(AC.currentTime+i*.11+.22)})}catch(e){}}
@@ -285,7 +286,7 @@ MODS.cm={i:0,k:0,t0:0,
 MODS.thu={i:0,done:{},t0:0,
  open(a){this.i=+(a.q||0);this.ord=[];this.show();if(a.a!=null&&S.still)this.answer(+a.a)},
  qs(){return LESSON.thu},
- show(){const q=this.qs()[this.i];this.t0=performance.now();this.ord=[];this.res=this.done[this.i]||null;camFit(figPts(q.fig),{now:true,yaw:q.fig.yaw==null?-8:q.fig.yaw,pitch:q.fig.pitch||72,pad:1.2});this.panel()},
+ show(){const q=this.qs()[this.i];this.t0=performance.now();this.ord=[];this.res=this.done[this.i]||null;const pp=q.fig.pitch||72,khoi=!!(LESSON.lang||LESSON.khoi||LESSON.tron),phang=q.fig.nghieng?false:(khoi?pp>=78:true);camFit(figPts(q.fig),{now:true,yaw:phang?0:(q.fig.yaw!=null?q.fig.yaw:-8),pitch:phang?89.4:pp,pad:1.2});this.panel()},
  draw(){const q=this.qs()[this.i];FIG=q.fig;drawBoard();(q.fig.base||((q.fig.steps||[])[0]||{}).items||[]).forEach(it=>drawItem(it,1));if(this.res&&q.fig.sau)q.fig.sau.forEach(it=>drawItem(it,Math.min(1,(performance.now()-this.res.t)/600)))},
  answer(v){const q=this.qs()[this.i];let ok;
   if(q.kieu==='so'){ok=q.a.every((x,j)=>Math.abs(+String(v[j]).trim().replace(',','.')-x)<(q.tol||1e-6))}else if(q.kieu==='xep'){ok=[q.a].concat(q.alt||[]).some(a=>v.join(',')===a.join(','))}else ok=v===q.a;
@@ -810,6 +811,26 @@ function catKhung(A,B,box,tia){const d=V.sub(B,A);let t0=tia?0:-1e9,t1=1e9;const
 const veDuong=(A,B,box,col,w,dash,tia)=>{const e=catKhung(A,B,box,tia);if(e)line2(e[0],e[1],col,w,dash);return e};
 const chanDT=(M,A,B)=>{const u=V.unit(V.sub(B,A));return V.add(A,V.mul(u,V.dot(V.sub(M,A),u)))};
 
+/* Hình riêng cho câu «Thử ngay» (rà 25/11/2026): hq({P, tg:['ABC'] đa giác kín, doan:['AH'] đoạn, net:['AH'] nét đứt, nhan:{AB:'5 cm'}, goc:[['A','B','C','60°']] góc tại A,
+   vuong:['ABC'] vuông tại A, tron:[['O',R,{opts}]], an:'XY' (không ghi tên), them:[mục], to:{A:'đỏ'…}) — nhãn cạnh tự đặt phía ngoài hình */
+const tenD=s=>s.match(/[A-Z][′']?\d?/g)||[];
+function hq(o){const P=o.P,base=[],ks=Object.keys(P).filter(k=>k[0]!=='_'),cen=V.mul(ks.reduce((s,k)=>V.add(s,P[k]),[0,0]),1/Math.max(1,ks.length));
+ (o.tron||[]).forEach(t=>base.push(Object.assign({t:'circ',c:t[0],r:t[1],col:'#1d4f9a',w:2.2},t[2]||{})));
+ (o.to||[]).forEach(([s,col])=>base.push(poly(tenD(s),col)));
+ (o.tg||[]).forEach(s=>{const n=tenD(s);n.forEach((a,i)=>base.push(seg(a,n[(i+1)%n.length],{w:2.6})))});
+ (o.doan||[]).forEach(s=>{const n=tenD(s);base.push(seg(n[0],n[1],{w:2.6}))});
+ (o.net||[]).forEach(s=>{const n=tenD(s);base.push(seg(n[0],n[1],{dash:[6,5],col:'#5b6684',w:2}))});
+ Object.entries(o.nhan||{}).forEach(([s,lab])=>{const[a,b]=tenD(s),A=P[a],B=P[b],m=V.mid(A,B),sg=Math.sign(V.dot(V.perp(V.sub(B,A)),V.sub(m,cen)))||1;base.push(nhanDai(a,b,lab,{off:.45*sg,col:'#1d4f9a',size:16,at2:[-.01,1]}))});
+ (o.goc||[]).forEach(([v,a,b,lab,col])=>base.push(ang(v,a,b,{lab,col:col||'#dc2626',r:.6,lr:.6,size:15,fill:true})));
+ (o.vuong||[]).forEach(s=>{const n=tenD(s);base.push(ang(n[0],n[1],n[2],{right:true,col:'#1d4f9a',r:.32}))});
+ ks.filter(k=>!(o.an||'').includes(k)).forEach(k=>base.push(pt(k,o.d&&o.d[k]?{d:o.d[k]}:{})));
+ return Object.assign({P,pitch:85,base:base.concat(o.them||[])},o.x||{})}
+/* hình hộp vẽ phối cảnh (mặt trước a × c, chiều sâu b), nhãn ba kích thước */
+function hopQ(a,b,c,la,lb,lc,ten){const k=.45,d=[b*k,b*k*.75],P={_A:[0,0],_B:[a,0],_C:[a,c],_D:[0,c]};P._E=V.add(P._A,d);P._F=V.add(P._B,d);P._G=V.add(P._C,d);P._H=V.add(P._D,d);
+ const s=(x,y,o)=>seg(x,y,Object.assign({w:2.4},o||{})),h={dash:[6,5],w:1.8,col:'#5b6684'};
+ return{P,pitch:85,base:[s('_A','_B'),s('_B','_C'),s('_C','_D'),s('_D','_A'),s('_B','_F'),s('_C','_G'),s('_D','_H'),s('_F','_G'),s('_G','_H'),s('_A','_E',h),s('_E','_F',h),s('_E','_H',h),
+  nhanDai('_A','_B',la||'',{off:-.45,size:15,at2:[-.01,1]}),nhanDai('_B','_F',lb||'',{off:-.5,size:15,at2:[-.01,1]}),nhanDai('_D','_A',lc||'',{off:.5,size:15,at2:[-.01,1]})].concat(ten||[])}}
+
 /* ===== Toán 7 (KNTT) — Bài 31. QUAN HỆ GIỮA GÓC VÀ CẠNH ĐỐI DIỆN TRONG MỘT TAM GIÁC — SGK tập hai tr.59–62 =====
    Phần «em gợi ý» là lời giải/cách vẽ em đề xuất cho câu hỏi SGK để HS tự làm — GV soát. */
 
@@ -877,15 +898,18 @@ const LAB31=labTG({
 /* ---------------- 4. THỬ NGAY ---------------- */
 const q91=(()=>{const B=[0,0],C=[5,0],A=V.x(B,V.pol(B,35,1),C,V.pol(C,140,1));return{P:{A,B,C},pitch:80,base:[seg('A','B'),seg('B','C'),seg('C','A'),...pts('ABC',{A:[0,.4],B:[-.4,-.25],C:[.4,-.25]}),ang('A','B','C',{lab:'105°',col:'#2f7de1',r:.4,lr:.65}),ang('B','C','A',{lab:'35°',col:'#2f7de1',r:.7,lr:.85})]}})();
 const qMNP=(()=>{const M=[0,0],P0=[7,0],N=V.cc(M,3,P0,5,[1.5,2]);return{P:{M,N,P:P0},pitch:80,base:[seg('M','N'),seg('N','P'),seg('P','M'),...pts('MNP',{M:[-.4,-.25],N:[0,.4],P:[.4,-.25]}),nhanDai('M','N','3 cm',{off:-.45}),nhanDai('N','P','5 cm',{off:-.45}),nhanDai('P','M','7 cm',{off:-.45})]}})();
+const Q31mnp=hq({P:{M:[0,0],N:[4,0],P:[2.212,2.373]},tg:['MNP'],goc:[['M','N','P','47°'],['N','M','P','53°','#2f7de1']]});
+const Q31can=hq({P:{A:[2,1.8],B:[0,0],C:[4,0]},tg:['ABC'],goc:[['A','B','C','96°']],them:[tick('A','B',1),tick('A','C',1)]});
+const Q31abc=hq({P:{A:[0,0],B:[2,0],C:[4,0],D:[5.2,2.6]},doan:['AC','AD','BD','CD'],goc:[['C','A','D','tù']],d:{A:[0,-.45],B:[0,-.45],C:[0,-.45],D:[.35,.3]},them:[txt([0,-.95],'Mai',{size:13,col:'#5b6684'}),txt([2,-.95],'Việt',{size:13,col:'#5b6684'}),txt([4,-.95],'Hà',{size:13,col:'#5b6684'}),txt([5.4,3.2],'trường',{size:13,col:'#5b6684'})]});
 const LESSON={title:'Bài 31. Quan hệ giữa góc và cạnh đối diện trong một tam giác',sub:'Toán 7 · Kết nối tri thức · Chương IX. Quan hệ giữa các yếu tố trong một tam giác · SGK tập hai tr.59–62',
  tabs:[['ve','✏️ Vẽ hình'],['lab','🔍 Nhận biết'],['cm','🧠 Chứng minh'],['thu','✅ Thử ngay']],
  ve:[b31ve1,b31ve2],cm:[b31cm1,b31cm2,b31cm3,b31cm4],lab:LAB31,
  thu:[
  {nguon:'Luyện tập 1 · tr.60',fig:qMNP,kieu:'xep',q:'Tam giác <i>MNP</i> có <i>MN</i> = 3 cm, <i>NP</i> = 5 cm, <i>MP</i> = 7 cm. Sắp xếp các góc theo thứ tự từ <b>bé đến lớn</b>.',o:[g('M'),g('N'),g('P')],a:[2,0,1],giai:'Góc <i>P</i> đối diện <i>MN</i> = 3, góc <i>M</i> đối diện <i>NP</i> = 5, góc <i>N</i> đối diện <i>MP</i> = 7 nên '+g('P')+' < '+g('M')+' < '+g('N')+'.',goiy:'Tìm góc đối diện với từng cạnh.'},
- {nguon:'Luyện tập 2 · tr.61',fig:qMNP,kieu:'xep',q:'Tam giác <i>MNP</i> có '+g('M')+' = 47°, '+g('N')+' = 53°. Sắp xếp các cạnh theo thứ tự từ <b>bé đến lớn</b>.',o:['<i>MN</i>','<i>NP</i>','<i>MP</i>'],a:[1,2,0],giai:''+g('P')+' = 180° − 47° − 53° = 80°. '+g('M')+' < '+g('N')+' < '+g('P')+' nên <i>NP</i> < <i>MP</i> < <i>MN</i>.',goiy:'Tính góc <i>P</i> trước.'},
+ {nguon:'Luyện tập 2 · tr.61',fig:Q31mnp,kieu:'xep',q:'Tam giác <i>MNP</i> có '+g('M')+' = 47°, '+g('N')+' = 53°. Sắp xếp các cạnh theo thứ tự từ <b>bé đến lớn</b>.',o:['<i>MN</i>','<i>NP</i>','<i>MP</i>'],a:[1,2,0],giai:''+g('P')+' = 180° − 47° − 53° = 80°. '+g('M')+' < '+g('N')+' < '+g('P')+' nên <i>NP</i> < <i>MP</i> < <i>MN</i>.',goiy:'Tính góc <i>P</i> trước.'},
  {nguon:'Bài 9.1 · tr.62',fig:q91,kieu:'chon',q:'Tam giác <i>ABC</i> có '+g('A')+' = 105°, '+g('B')+' = 35°. Cạnh lớn nhất của tam giác <i>ABC</i> là:',o:['<i>BC</i>','<i>AC</i>','<i>AB</i>'],a:0,giai:'Tam giác <i>ABC</i> là tam giác tù (góc <i>A</i> tù). Cạnh đối diện góc tù <i>A</i> là <i>BC</i>: lớn nhất.',sai:{1:'<i>AC</i> đối diện góc <i>B</i> = 35°.',2:'<i>AB</i> đối diện góc <i>C</i> = 40° (nhỏ).'}},
- {nguon:'Bài 9.3 · tr.62',fig:q91,kieu:'chon',q:'Trong tam giác cân có một góc bằng 96°, cạnh lớn nhất là cạnh bên hay cạnh đáy?',o:['Cạnh đáy','Cạnh bên','Ba cạnh bằng nhau'],a:0,giai:'Góc 96° tù nên không thể là góc ở đáy (hai góc đáy bằng nhau, tổng > 180°): đó là góc ở đỉnh. Cạnh đáy đối diện góc 96° nên lớn nhất. (<b>em gợi ý</b>)',sai:{1:'Cạnh bên đối diện góc ở đáy (nhọn).',2:'Tam giác có góc 96° không phải tam giác đều.'}},
- {nguon:'Bài 9.4 · tr.62 · Hình 9.7',fig:b31ve2,kieu:'chon',q:'Ba bạn Mai, Việt, Hà đi từ <i>A</i>, <i>B</i>, <i>C</i> (thẳng hàng, <i>B</i> nằm giữa <i>A</i> và <i>C</i>) đến trường <i>D</i>; '+g('ACD')+' tù. Bạn nào đi xa nhất?',o:['Mai (từ <i>A</i>)','Việt (từ <i>B</i>)','Hà (từ <i>C</i>)'],a:0,giai:'Giống tình huống mở đầu: <i>DC</i> < <i>DB</i> < <i>DA</i>. Mai đi xa nhất, Hà đi gần nhất. (<b>em gợi ý</b>)',sai:{1:'Xét tam giác <i>ABD</i> có góc <i>ABD</i> tù.',2:'Hà đi gần nhất.'}},
+ {nguon:'Bài 9.3 · tr.62',fig:Q31can,kieu:'chon',q:'Trong tam giác cân có một góc bằng 96°, cạnh lớn nhất là cạnh bên hay cạnh đáy?',o:['Cạnh đáy','Cạnh bên','Ba cạnh bằng nhau'],a:0,giai:'Góc 96° tù nên không thể là góc ở đáy (hai góc đáy bằng nhau, tổng > 180°): đó là góc ở đỉnh. Cạnh đáy đối diện góc 96° nên lớn nhất. (<b>em gợi ý</b>)',sai:{1:'Cạnh bên đối diện góc ở đáy (nhọn).',2:'Tam giác có góc 96° không phải tam giác đều.'}},
+ {nguon:'Bài 9.4 · tr.62 · Hình 9.7',fig:Q31abc,kieu:'chon',q:'Ba bạn Mai, Việt, Hà đi từ <i>A</i>, <i>B</i>, <i>C</i> (thẳng hàng, <i>B</i> nằm giữa <i>A</i> và <i>C</i>) đến trường <i>D</i>; '+g('ACD')+' tù. Bạn nào đi xa nhất?',o:['Mai (từ <i>A</i>)','Việt (từ <i>B</i>)','Hà (từ <i>C</i>)'],a:0,giai:'Giống tình huống mở đầu: <i>DC</i> < <i>DB</i> < <i>DA</i>. Mai đi xa nhất, Hà đi gần nhất. (<b>em gợi ý</b>)',sai:{1:'Xét tam giác <i>ABD</i> có góc <i>ABD</i> tù.',2:'Hà đi gần nhất.'}},
  {nguon:'Vận dụng · tr.62',fig:b31ve2,kieu:'chon',q:'Trong tình huống mở đầu, cầu thủ nào gần trái bóng nhất?',o:['Cầu thủ số 3 (tại <i>C</i>)','Cầu thủ số 2 (tại <i>B</i>)','Cầu thủ số 4 (tại <i>A</i>)'],a:0,giai:'<i>DC</i> < <i>DB</i> < <i>DA</i>: số 3 gần nhất, số 4 xa nhất. (<b>em gợi ý</b>)',sai:{1:'Trong Δ<i>BCD</i>, góc <i>C</i> tù nên <i>DB</i> > <i>DC</i>.',2:'Cầu thủ số 4 xa nhất.'}}]};
 
 boot();
