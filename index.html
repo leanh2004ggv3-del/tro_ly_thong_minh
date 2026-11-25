@@ -3214,7 +3214,7 @@
         return () => document.removeEventListener('click', bat, true);
       }, []);
 
-      const [che, setChe] = useState('vao'); // 'vao' | 'dangky'
+      const [che, setChe] = useState('vao'); // 'vao' | 'dangky' | 'quantri'
       const [o, setO] = useState({ ten: '', tenDN: '', mk: '', mk2: '' });
       const doi = (k) => (e) => setO({ ...o, [k]: e.target.value });
       const gui = async (e) => {
@@ -3222,7 +3222,9 @@
         if (che === 'dangky' && o.mk !== o.mk2) { setLoi('Hai lần nhập mật khẩu chưa khớp'); return; }
         setDangXuLy(true);
         try {
-          if (che === 'vao') await TL.dangNhap(o.tenDN, o.mk); else await TL.dangKy(o.ten, o.tenDN, o.mk);
+          if (che === 'vao') await TL.dangNhap(o.tenDN, o.mk);
+          else if (che === 'quantri') await TL.dangNhap('quantri', o.mk);
+          else await TL.dangKy(o.ten, o.tenDN, o.mk);
           setO({ ten: '', tenDN: '', mk: '', mk2: '' });
         } catch (err) {
           setLoi(/fetch|network/i.test(err.message) ? 'Không kết nối được máy chủ, thầy cô kiểm tra mạng rồi thử lại ạ' : err.message);
@@ -3239,20 +3241,22 @@
               <h2 className="text-2xl font-extrabold text-slate-900 mt-2">Trợ Lý Thông Minh</h2>
               <p className="text-sm text-slate-500">Mời thầy cô đăng nhập để sử dụng web</p>
             </div>
-            <div className="grid grid-cols-2 bg-slate-100 rounded-xl p-1 text-sm font-bold">
+            <div className="grid grid-cols-3 bg-slate-100 rounded-xl p-1 text-sm font-bold">
               <button type="button" onClick={() => { setChe('vao'); setLoi(''); }} className={'py-2 rounded-lg ' + (che === 'vao' ? 'bg-white shadow text-violet-700' : 'text-slate-500')}>Đăng nhập</button>
               <button type="button" onClick={() => { setChe('dangky'); setLoi(''); }} className={'py-2 rounded-lg ' + (che === 'dangky' ? 'bg-white shadow text-violet-700' : 'text-slate-500')}>Tạo tài khoản</button>
+              <button type="button" onClick={() => { setChe('quantri'); setLoi(''); }} className={'py-2 rounded-lg ' + (che === 'quantri' ? 'bg-amber-500 shadow text-white' : 'text-slate-500')}>🔑 Quản trị</button>
             </div>
             {!TL_DA_CAU_HINH ? (
               <div className="text-sm text-rose-700 bg-rose-50 border border-rose-200 rounded-xl p-3">Web chưa được cấu hình máy chủ số liệu.</div>
             ) : (
               <form onSubmit={gui} className="space-y-3">
                 {che === 'dangky' && <input className={oCls} placeholder="Họ và tên (VD: Nguyễn Văn An)" value={o.ten} onChange={doi('ten')} required />}
-                <input className={oCls} placeholder={che === 'dangky' ? 'Tên đăng nhập (VD: an.cn — không dấu)' : 'Tên đăng nhập'} value={o.tenDN} onChange={doi('tenDN')} autoComplete="username" autoCapitalize="none" required />
-                <input className={oCls} type="password" placeholder={che === 'dangky' ? 'Mật khẩu (ít nhất 6 ký tự)' : 'Mật khẩu'} value={o.mk} onChange={doi('mk')} autoComplete={che === 'vao' ? 'current-password' : 'new-password'} required />
+                {che === 'quantri' && <p className="text-xs text-amber-800 bg-amber-50 border border-amber-200 rounded-xl p-2.5">Dành cho quản trị web: nhập <b>mật khẩu quản trị</b> (mật khẩu đặt ở mục QUAN_TRI_MK trong Apps Script — <b>không phải</b> mật khẩu Gmail).</p>}
+                {che !== 'quantri' && <input className={oCls} placeholder={che === 'dangky' ? 'Tên đăng nhập (VD: an.cn — không dấu)' : 'Tên đăng nhập (không phải Gmail)'} value={o.tenDN} onChange={doi('tenDN')} autoComplete="username" autoCapitalize="none" required />}
+                <input className={oCls} type="password" placeholder={che === 'dangky' ? 'Mật khẩu (ít nhất 6 ký tự)' : (che === 'quantri' ? 'Mật khẩu quản trị' : 'Mật khẩu')} value={o.mk} onChange={doi('mk')} autoComplete={che === 'vao' ? 'current-password' : 'new-password'} required />
                 {che === 'dangky' && <input className={oCls} type="password" placeholder="Nhập lại mật khẩu" value={o.mk2} onChange={doi('mk2')} autoComplete="new-password" required />}
                 <button type="submit" disabled={dangXuLy} className="w-full py-3 rounded-xl font-bold text-white bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-700 hover:to-fuchsia-700 disabled:opacity-60">
-                  {dangXuLy ? 'Đang xử lý…' : (che === 'vao' ? 'Đăng nhập' : 'Tạo tài khoản và vào web')}
+                  {dangXuLy ? 'Đang xử lý…' : (che === 'vao' ? 'Đăng nhập' : che === 'quantri' ? 'Vào trang quản trị' : 'Tạo tài khoản và vào web')}
                 </button>
               </form>
             )}
