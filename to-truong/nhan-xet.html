@@ -134,6 +134,16 @@ th button.pc-dau{border:0;background:none;cursor:pointer;font:700 12.5px var(--f
 .xuat{display:flex;gap:10px;flex-wrap:wrap}
 .xuat .nut{flex:1 1 220px;justify-content:center;min-height:56px;font-size:16.5px}
 @media print{.khong-in{display:none}}
+/* điện thoại: mỗi học sinh một thẻ, ô nhận xét rộng hết hàng */
+@media (max-width:700px){
+  .bang-nx thead{display:none}
+  .bang-nx,.bang-nx tbody{display:block}
+  .bang-nx tr{display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;padding:8px 6px;border-top:1px solid #e2e8f0}
+  .bang-nx td{border:0!important;padding:2px!important}
+  .bang-nx td.o-nx{order:9;flex:1 1 100%}
+  .bang-nx td:last-child{margin-left:auto}
+  .bang-nx textarea{min-height:110px}
+}
 </style>
 </head>
 <body>
@@ -1577,7 +1587,7 @@ const MAU_NX = {
       }
       const viec = !cn ? tinhMon(h).viec : "";
       s += `<tr><td class="stt" style="color:var(--mo)">${i + 1}</td><td style="font-weight:600;min-width:130px">${E(h.ten || "(chưa có tên)")}</td>${cot}
-        <td><textarea data-nx="${i}" class="${h.sua ? "sua" : ""}" placeholder="${viec ? "Chưa tính được — " + E(viec) : "Bấm ✨ Tạo nhận xét"}">${E(h.nx || "")}</textarea><div class="dem">${(h.nx || "").length} kí tự${h.sua ? " · đã sửa tay" : ""}</div></td>
+        <td class="o-nx"><textarea data-nx="${i}" class="${h.sua ? "sua" : ""}" placeholder="${viec ? "Chưa tính được — " + E(viec) : "Bấm ✨ Tạo nhận xét"}">${E(h.nx || "")}</textarea><div class="dem">${(h.nx || "").length} kí tự${h.sua ? " · đã sửa tay" : ""}</div></td>
         <td><button class="nut phu nho" data-doi="${i}" title="Đổi cách viết">🔀</button></td></tr>`;
     });
     $("vungNx").innerHTML = s + "</tbody></table>";
