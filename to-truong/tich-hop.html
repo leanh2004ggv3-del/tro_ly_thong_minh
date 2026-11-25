@@ -117,6 +117,14 @@ footer.cuoi .nhap{display:inline-block;background:#fef9c3;color:#713f12;border:1
 .tudong.cho{background:#f8fafc;border-color:#e2e8f0;color:#64748b}
 .tudong ol{margin:4px 0 0;padding-left:22px}.tudong li{margin:2px 0}
 .tudong .tay{font-size:12px;background:#fef3c7;color:#92400e;border-radius:99px;padding:0 7px}
+.ai-hop{background:linear-gradient(135deg,#f5f3ff,#ecfeff);border:1.5px solid #c4b5fd;border-radius:14px;padding:10px 14px;margin-bottom:12px}
+#aiBao .canh,#tichHopCu .canh{background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;border-radius:10px;padding:6px 10px;margin-top:6px}
+.xoay{display:inline-block;width:14px;height:14px;border:2.5px solid #c4b5fd;border-top-color:#7c3aed;border-radius:50%;animation:xoay 0.8s linear infinite;vertical-align:-2px}
+@keyframes xoay{to{transform:rotate(360deg)}}
+.cu{background:#fff7ed;border:1.5px solid #fdba74;border-radius:12px;padding:8px 12px;margin-bottom:8px;font-size:14px}
+.cu.giu-cu{background:#f8fafc;border-color:#e2e8f0}
+.cu ul{margin:6px 0;padding-left:20px;max-height:220px;overflow:auto}.cu li{margin:2px 0}
+.cu li.c-nls{color:#dc0000}.cu li.c-nlai{color:#0066cc}
 .dslg{display:flex;flex-direction:column;gap:6px;margin-top:6px}
 .lg{background:#f8fafc;border-radius:10px;padding:6px 10px}
 .lg .tick{display:flex;gap:6px;align-items:center;flex-wrap:wrap;font-size:14px}
@@ -171,6 +179,7 @@ code{background:#f1f5f9;border-radius:5px;padding:0 4px;font-size:12.5px;color:#
   </div>
   <div class="the">
     <div class="buoc"><span class="so">2</span><b>Khung giáo án app nhận ra</b></div>
+    <div id="tichHopCu"></div>
     <div id="khungGa"></div>
     <div class="hang" style="margin-top:8px">
       <select id="chonMoc" style="flex:1 1 240px;min-width:0"></select>
@@ -186,6 +195,20 @@ code{background:#f1f5f9;border-radius:5px;padding:0 4px;font-size:12.5px;color:#
       <button class="nut nho" id="bThemNls" style="background:linear-gradient(135deg,#ef4444,#b91c1c)">＋ NLS</button>
       <button class="nut nho" id="bThemNlai" style="background:linear-gradient(135deg,#0ea5e9,#0070c0)">＋ NLAI</button>
       <button class="nut phu nho" id="bXoaHet">Xoá hết</button></span></div>
+  <div class="ai-hop">
+    <div class="hang" style="align-items:center"><b style="font-size:15.5px">✨ Chưa có nội dung tích hợp? Để AI tự chọn và lồng ghép</b>
+      <span style="margin-left:auto;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+        <select id="aiLop" title="Lớp (app tự đoán từ giáo án)" style="width:auto"></select>
+        <select id="aiSo" style="width:auto"><option value="1-1">1 NLS + 1 NLAI</option><option value="nls">Chỉ 1 NLS</option><option value="nlai">Chỉ 1 NLAI</option><option value="2-1">2 NLS + 1 NLAI</option><option value="tu">Để AI tự quyết số lượng</option></select>
+        <button class="nut xanh nho" id="bAiTuDong">✨ AI tự tích hợp</button>
+        <button class="nut phu nho" id="bAiChep">📋 Chép câu lệnh</button></span></div>
+    <div class="mo nho2" style="margin-top:4px">AI đọc phần chữ của giáo án, chọn mã trong bảng tra của tổ hợp với bài, gắn vào hoạt động phù hợp nhất và soạn câu lồng ghép sát nội dung từng hoạt động. Thầy cô đã điền thì app dùng đúng nội dung thầy cô điền.</div>
+    <div id="aiKhoa" class="nho2" style="margin-top:4px"></div>
+    <details id="aiDanHop" style="margin-top:4px"><summary class="nho2" style="cursor:pointer">Không có khoá Gemini? Dán câu trả lời của ChatGPT/Gemini vào đây</summary>
+      <textarea id="aiDan" rows="4" style="width:100%;margin-top:6px" placeholder="Dán nguyên câu trả lời (dạng JSON) của AI…"></textarea>
+      <button class="nut nho" id="bAiDung" style="margin-top:6px">⬇ Dùng câu trả lời này</button></details>
+    <div id="aiBao" class="nho2" style="margin-top:6px"></div>
+  </div>
   <details style="margin-bottom:12px"><summary style="cursor:pointer;font-weight:700">📋 Dán nhanh dòng tích hợp từ PPCT / KHDH của tổ</summary>
     <textarea id="oPPCT" rows="3" style="width:100%;margin-top:8px" placeholder="VD: - NLS 1.1.TC2c: Quan sát video/hình ảnh số về giâm, chiết, ghép để hỗ trợ thực hành. - NLAI: 9.B2.1: HS dùng Gemini/Canva tạo sơ đồ…"></textarea>
     <div class="hang" style="margin-top:6px"><button class="nut nho" id="bTach">✂️ Tách thành từng nội dung</button><span class="mo nho2">App tự nhận mã, điền nội dung chỉ báo theo bảng tra; thầy cô chỉ cần chọn hoạt động.</span></div>
@@ -573,7 +596,12 @@ function phanTich(ps, themMoc) {
     let tc = -1, cachTc = "";
     if (s.d >= 0) {
       const o = tim2(p => p.cha && p.cha.localName === "tc" && !tieuDeBang(p.text), s.d + 1);
+      const tr = j => { const tc2 = ps[j].cha; if (!tc2 || tc2.localName !== "tc") return false; const row = tc2.parentNode, bang = row && row.parentNode; if (!bang) return false;
+        const hang = [...bang.childNodes].filter(c => c.localName === "tr"), o1 = [...row.childNodes].filter(c => c.localName === "tc")[0];
+        return hang.indexOf(row) > 0 && o1 === tc2; };
+      let oTrong = -1; for (let j = s.d + 1; j < h.het && oTrong < 0; j++) if (tr(j)) oTrong = j;
       if (o >= 0) { tc = cuoiKhoi(o, h.het); cachTc = "cuối ô hoạt động của GV – HS"; }
+      else if (oTrong >= 0) { tc = oTrong; cachTc = "ô hoạt động của GV – HS (đang trống)"; }
       else { tc = cuoiKhoi(s.d, h.het); cachTc = "cuối mục Tổ chức thực hiện"; }
     }
     if (tc < 0) {
@@ -910,10 +938,72 @@ async function napFile(f) {
       const r = await docPdf(buf); zip = r.zip; xml = r.xml;
       ghiChu = `PDF ${r.trang} trang đã được dựng lại thành Word (chữ Times New Roman 13). Bảng, hình, khung trong PDF <b>không giữ được</b>; chỉ số trên/dưới (x², H₂O) app cố giữ, còn <b>phân số, căn, công thức nhiều tầng sẽ bị vỡ</b>. Môn Toán, KHTN, Vật lí, Hoá: thầy cô đưa <b>file Word gốc</b> để giữ nguyên công thức.`;
     }
-    GA = { ten: ten.replace(/\.(docx|pdf)$/i, ""), nguon, zip, xml, ghiChu, themMoc: [] };
+    GA = { ten: ten.replace(/\.(docx|pdf)$/i, ""), nguon, zip, xml, xmlGoc: xml, ghiChu, themMoc: [], boCu: true };
+    datBoCu(true);
     phanTichLai(true);
     TT.ting(); TT.toast("Đã đọc xong giáo án", "ok");
   } catch (e) { GA = null; $("trangThai").textContent = "❌ " + (e.message || "Không đọc được file."); TT.buzz(); veHet(); }
+}
+/* ---------- bỏ nội dung tích hợp CŨ (chữ đỏ / xanh dương của lần tích hợp trước) ---------- */
+function loaiMau(hex) {   // đỏ tươi → nls · xanh dương tươi → nlai · màu khác (xanh đậm tiêu đề 1F4E79, đen…) → không đụng
+  if (!/^[0-9A-F]{6}$/i.test(hex || "")) return null;
+  const r = parseInt(hex.slice(0, 2), 16), g = parseInt(hex.slice(2, 4), 16), b = parseInt(hex.slice(4, 6), 16);
+  if (r >= 170 && g <= 70 && b <= 70) return "nls";
+  if (r <= 20 && b >= 180 && g <= 170) return "nlai";
+  return null;
+}
+function donTichHopCu(xml) {
+  const doc = new DOMParser().parseFromString(xml, "application/xml");
+  const truoc = demVat(doc), ps = layDoan(doc), mau = [];
+  let soRun = 0, soDoan = 0;
+  const chuRun = r => [...r.childNodes].map(c => c.localName === "t" ? c.textContent : (c.localName === "tab" || c.localName === "br") ? " " : "").join("");
+  const chiChu = r => [...r.childNodes].every(c => c.nodeType !== 1 || ["rPr", "t", "tab", "br", "lastRenderedPageBreak", "softHyphen", "noBreakHyphen"].includes(c.localName));
+  const mauCua = r => { const rp = [...r.childNodes].find(c => c.localName === "rPr"), c = rp && [...rp.childNodes].find(x => x.localName === "color"); return c ? loaiMau(c.getAttributeNS(W, "val") || c.getAttribute("w:val")) : null; };
+  ps.forEach(({ p }) => {
+    const runs = [...p.getElementsByTagNameNS(W, "r")].filter(r => r.parentNode && r.parentNode.namespaceURI !== MNS && /\S/.test(chuRun(r)));
+    const bo = runs.filter(r => mauCua(r) && chiChu(r));
+    if (!bo.length) return;
+    const coVat = [...p.getElementsByTagName("*")].some(e => ["oMath", "object", "drawing", "pict", "fldChar", "fldSimple"].includes(e.localName));
+    const conLai = runs.filter(r => !bo.includes(r)).map(chuRun).join("");
+    const chuBo = norm(bo.map(chuRun).join(""));
+    if (mau.length < 60) mau.push({ loai: mauCua(bo[0]), chu: chuBo });
+    // dọn dấu câu lẻ ở chỗ vừa bỏ (VD "điểm). , có" → "điểm). có"; "theo nhóm: ." → "theo nhóm:")
+    const tRun = r => [...r.childNodes].filter(c => c.localName === "t");
+    const sau = runs.map((r, k) => bo.includes(r) && !bo.includes(runs[k + 1]) ? runs[k + 1] : null).filter(Boolean);
+    bo.forEach(r => r.parentNode.removeChild(r)); soRun += bo.length;
+    const conRuns = runs.filter(r => !bo.includes(r));
+    sau.forEach(r => {
+      const k = conRuns.indexOf(r), truocChu = conRuns.slice(0, k).map(chuRun).join("");
+      const t = tRun(r)[0];
+      if (t && (!truocChu.trim() || /[.:;,!?)]\s*$/.test(truocChu))) t.textContent = t.textContent.replace(/^\s*[.,;]+(?=\s|$)/, "");
+    });
+    const cuoiR = conRuns[conRuns.length - 1], tc = cuoiR && tRun(cuoiR).pop();
+    if (tc && /[:;,]\s*[.,;]\s*$/.test(conRuns.map(chuRun).join(""))) tc.textContent = tc.textContent.replace(/\s*[.,;]\s*$/, "");
+    if (!coVat && !/[^\s.,;:()\-–—•*+"'“”]/.test(conLai)) {   // cả đoạn là nội dung tích hợp → bỏ cả đoạn
+      const cha = p.parentNode;
+      if (cha.localName === "tc" && [...cha.childNodes].filter(c => c.localName === "p").length === 1) [...p.childNodes].filter(c => c.localName !== "pPr").forEach(c => p.removeChild(c));
+      else cha.removeChild(p);
+      soDoan++;
+    }
+  });
+  const sau = demVat(doc), lech = Object.keys(truoc).filter(k => k !== "vertAlign" && truoc[k] !== sau[k]);
+  if (lech.length) return { xml, soRun: 0, soDoan: 0, mau: [], loi: "Không bỏ được nội dung cũ an toàn (" + lech.map(k => VAT[k]).join(", ") + ") — giữ nguyên giáo án." };
+  let s = new XMLSerializer().serializeToString(doc);
+  if (!/^<\?xml/.test(s)) s = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\r\n' + s;
+  return { xml: soRun ? s : xml, soRun, soDoan, mau };
+}
+function datBoCu(lanDau) {
+  if (lanDau || !GA.cu) GA.cu = donTichHopCu(GA.xmlGoc);
+  GA.xml = GA.boCu && GA.cu.soRun ? GA.cu.xml : GA.xmlGoc;
+}
+function veCu() {
+  const k = $("tichHopCu"); if (!k) return;
+  if (!GA || !GA.cu || (!GA.cu.soRun && !GA.cu.loi)) { k.innerHTML = ""; return; }
+  if (GA.cu.loi) { k.innerHTML = `<div class="canh">⚠️ ${TT.esc(GA.cu.loi)}</div>`; return; }
+  const c = GA.cu;
+  k.innerHTML = `<div class="cu ${GA.boCu ? "" : "giu-cu"}"><label class="tick"><input type="checkbox" id="cBoCu" ${GA.boCu ? "checked" : ""}> 🧹 <b>Giáo án đã có nội dung tích hợp cũ</b> (${c.soRun} đoạn chữ đỏ/xanh${c.soDoan ? ", " + c.soDoan + " dòng riêng" : ""}) — <b>bỏ hết</b>, chỉ lồng ghép nội dung thầy cô điền ở bước 3</label>
+    <details><summary class="mo nho2">Xem các chỗ sẽ bỏ</summary><ul>${c.mau.map(m => `<li class="c-${m.loai}">${TT.esc(ngan(m.chu, 140))}</li>`).join("")}${c.soRun > c.mau.length ? "<li class='mo'>…</li>" : ""}</ul>
+    <div class="mo nho2">App chỉ bỏ chữ <b>đỏ tươi</b> và <b>xanh dương tươi</b>; chữ đen, tiêu đề xanh đậm, công thức, hình giữ nguyên. Giáo án dùng chữ đỏ cho việc khác (VD lưu ý) thì bỏ tích ô trên.</div></details></div>`;
 }
 function phanTichLai(fileMoi) {
   const doc = new DOMParser().parseFromString(GA.xml, "application/xml");
@@ -976,7 +1066,8 @@ function veLongGhep(x, h) {
     return `<div class="lg ${tat ? "tat" : ""}"><label class="tick"><input type="checkbox" data-tat="${k}" ${tat ? "" : "checked"}> <b>${ten}</b> <span class="mo nho2">— ${TT.esc(vt)}</span>${x.lg && x.lg[k] != null ? ' <span class="tay">đã sửa</span>' : ""}</label>${tat ? "" : `<textarea data-lg="${k}" rows="2">${TT.esc(v)}</textarea>`}</div>`;
   });
   return `<div class="tudong">🧩 <b>App tự lồng ghép vào ${so} chỗ</b>${h.thay ? " (trong " + TT.esc(ngan(h.thay.ten, 50)) + ")" : ""}: mục tiêu bài, thiết bị, a) b) c) và cả 4 bước của hoạt động. Câu đã soạn sẵn theo nội dung — xem ở bước 4.
-      <div class="hang" style="margin-top:6px"><button class="nut phu nho" data-mo>✏️ ${x.mo ? "Thu gọn" : "Xem / sửa từng câu"}</button>${x.lg && Object.keys(x.lg).length ? '<button class="nut phu nho" data-taolai>↺ Soạn lại theo nội dung</button>' : ""}</div></div>
+      ${x.ai ? `<div class="nho2" style="margin-top:4px">✨ <b>Câu do AI soạn sát bài</b>${x.lyDo ? " — " + TT.esc(x.lyDo) : ""}</div>` : ""}
+      <div class="hang" style="margin-top:6px"><button class="nut xanh nho" data-aicau title="Gemini đọc hoạt động này và viết lại 10 câu lồng ghép cho sát nội dung bài">✨ AI viết câu sát bài</button><button class="nut phu nho" data-mo>✏️ ${x.mo ? "Thu gọn" : "Xem / sửa từng câu"}</button>${x.lg && Object.keys(x.lg).length ? '<button class="nut phu nho" data-taolai>↺ Soạn lại theo nội dung</button>' : ""}</div><div class="aibao nho2"></div></div>
     ${x.mo ? `<div class="dslg">${hang.join("")}</div>` : ""}`;
 }
 function veDs() {
@@ -1067,7 +1158,7 @@ function chuCoDam(p) {   // chữ của đoạn để xem trước: đậm, màu
   di(p);
   return s;
 }
-function veHet() { veKhung(); veDs(); veXem(); }
+function veHet() { veKhung(); veCu(); veDs(); veXem(); if (window.veAI) veAI(); }
 
 /* ---------- gợi ý nội dung khi PPCT chưa ghi rõ ---------- */
 const GOI_Y_NLS = {
@@ -1159,6 +1250,7 @@ document.addEventListener("DOMContentLoaded", () => {
   $("bThemMoc").onclick = () => { const v = $("chonMoc").value; if (!GA || v === "") return; GA.themMoc.push(+v); phanTichLai(); TT.toast("Đã thêm mốc hoạt động", "ok"); };
   $("bXoaHet").onclick = () => { if (!DS.length || !confirm("Xoá hết các nội dung tích hợp đang nhập?")) return; DS = []; luu(); veDs(); veXem(); };
   $("chiQuanh").onchange = veXem;
+  document.addEventListener("change", e => { if (e.target.id === "cBoCu" && GA) { GA.boCu = e.target.checked; datBoCu(); phanTichLai(); TT.toast(GA.boCu ? "Đã bỏ nội dung tích hợp cũ" : "Giữ nội dung tích hợp cũ", "ok"); } });
   $("bWord").onclick = xuatWord; $("bWord2").onclick = xuatWord;
   const ds = $("dsTich");
   ds.addEventListener("input", e => {
@@ -1185,7 +1277,7 @@ document.addEventListener("DOMContentLoaded", () => {
     else if ("xoa" in b.dataset) { DS = DS.filter(y => y !== x); }
     else if ("laynd" in b.dataset) { const t = traMa(x.ma); if (t) x.nd = t.nd; }
     else if ("mo" in b.dataset) { x.mo = !x.mo; luu(); veDs(); return; }
-    else if ("taolai" in b.dataset) { if (!confirm("Bỏ các câu đã sửa tay, soạn lại theo nội dung?")) return; x.lg = {}; }
+    else if ("taolai" in b.dataset) { if (!confirm("Bỏ các câu đã sửa tay, soạn lại theo nội dung?")) return; x.lg = {}; x.ai = false; }
     else if ("goiy" in b.dataset) { if (norm(x.viec) && !confirm("Thay nội dung đang có bằng câu gợi ý?")) return; x.viec = goiY(x); }
     else return;
     luu(); veDs(); veXem();
@@ -1204,6 +1296,258 @@ async function napMau() {
   [a, b].forEach(x => x.hdTen = GA.cau.hd.find(h => h.i === x.hd).ten);
   DS.push(a, b); veHet();
 }
+
+</script>
+<script>
+/* ✨ AI (Gemini) tự tích hợp NLS – NLAI khi thầy cô chưa điền, hoặc viết câu lồng ghép sát bài.
+   Khoá Gemini dùng chung với trang chủ và các app khác (localStorage user_gemini_api_key).
+   Không có khoá: chép câu lệnh sang ChatGPT/Gemini, dán câu trả lời về. Giáo án chỉ gửi PHẦN CHỮ, không gửi file. */
+const AIG = (() => {
+  const KHOA = "user_gemini_api_key", MO_HINH = "user_gemini_model";
+  const DS_MH = ["gemini-2.5-flash", "gemini-flash-latest", "gemini-2.0-flash", "gemini-2.5-flash-lite"];
+  const layKhoa = () => { try { return (localStorage.getItem(KHOA) || "").trim(); } catch (e) { return ""; } };
+  function doiKhoa() {
+    const v = prompt("Dán khoá Gemini (bắt đầu bằng AIza…, lấy miễn phí ở aistudio.google.com/apikey). Để trống rồi OK để xoá khoá khỏi máy này:", "");
+    if (v === null) return;
+    try { if (v.trim()) localStorage.setItem(KHOA, v.trim()); else { localStorage.removeItem(KHOA); localStorage.removeItem(MO_HINH); } } catch (e) {}
+    veAI();
+  }
+  const ngu = ms => new Promise(r => setTimeout(r, ms));
+  async function goi(lenh, onBao) {
+    const key = layKhoa();
+    let daLuu = ""; try { daLuu = localStorage.getItem(MO_HINH) || ""; } catch (e) {}
+    const ds = daLuu ? [daLuu, ...DS_MH.filter(m => m !== daLuu)] : DS_MH;
+    let loiCuoi = "", quaTai = false;
+    for (let vong = 1; vong <= 2; vong++) {
+      if (vong === 2) { if (!quaTai) break; for (let g = 20; g > 0; g--) { onBao && onBao(`Mọi mô hình Gemini đang quá tải — đợi ${g} giây rồi thử vòng nữa…`); await ngu(1000); } }
+      for (const model of ds) {
+        const gen = { temperature: 0.4, maxOutputTokens: 16384, responseMimeType: "application/json" };
+        if (/^gemini-2\.5-flash/.test(model)) gen.thinkingConfig = { thinkingBudget: 0 };
+        for (let lan = 1; lan <= 3; lan++) {
+          let r;
+          try {
+            r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
+              method: "POST", headers: { "Content-Type": "application/json", "x-goog-api-key": key },
+              body: JSON.stringify({ contents: [{ role: "user", parts: [{ text: lenh }] }], generationConfig: gen })
+            });
+          } catch (e) {
+            loiCuoi = "Không kết nối được tới Gemini — thầy cô kiểm tra mạng Internet.";
+            if (lan < 3) { onBao && onBao(`Mạng chập chờn — thử lại sau ${lan * 3} giây (lần ${lan + 1}/3)…`); await ngu(lan * 3000); continue; }
+            throw new Error(loiCuoi);
+          }
+          if (!r.ok) {
+            let msg = ""; try { msg = ((await r.json()).error || {}).message || ""; } catch (e) {}
+            if (r.status === 400 && /API key/i.test(msg)) throw new Error("Khoá Gemini không đúng — bấm «Đổi khoá» để dán lại.");
+            if (r.status === 403) throw new Error("Khoá Gemini bị từ chối — tạo khoá mới ở aistudio.google.com/apikey.");
+            if ([500, 502, 503, 504].includes(r.status) || /overloaded|high demand|unavailable/i.test(msg)) {
+              quaTai = true; loiCuoi = "Gemini đang quá tải";
+              if (lan < 3) { onBao && onBao(`Gemini (${model}) đang quá tải — tự thử lại sau ${lan * 4} giây (lần ${lan + 1}/3)…`); await ngu(lan * 4000); continue; }
+              onBao && onBao(`${model} vẫn quá tải — chuyển sang mô hình khác…`); break;
+            }
+            loiCuoi = r.status === 429 ? "Khoá đã hết lượt miễn phí trong phút/ngày — đợi ít phút rồi thử lại." : "Gemini báo lỗi " + r.status + (msg ? ": " + msg : "");
+            if (r.status === 404 || r.status === 429 || /not found|not supported/i.test(msg)) break;
+            throw new Error(loiCuoi);
+          }
+          let j = null; try { j = await r.json(); } catch (e) {}
+          const c = j && (j.candidates || [])[0];
+          const chu = c && c.content && c.content.parts ? c.content.parts.map(p => p.text || "").join("") : "";
+          if (!chu.trim()) { loiCuoi = "Gemini không trả về nội dung"; if (lan < 3) { await ngu(lan * 3000); continue; } break; }
+          try { localStorage.setItem(MO_HINH, model); } catch (e) {}
+          return chu;
+        }
+      }
+    }
+    if (quaTai) throw new Error("Máy chủ Gemini đang quá tải — app đã tự thử lại nhiều lần. Thầy cô đợi 1–2 phút rồi bấm lại.");
+    throw new Error((loiCuoi || "Không gọi được Gemini") + " — thầy cô bấm thử lại.");
+  }
+  return { layKhoa, doiKhoa, goi };
+})();
+
+const AIX = (() => {
+  let dang = false;
+  const LUAT = `QUY TẮC:
+1. Chỉ dùng mã có trong DANH SÁCH MÃ bên dưới, chép đúng mã (giữ dấu chấm như "1.1.TC2a", "9.D1.1").
+2. Mỗi mã chỉ tích hợp ở MỘT hoạt động.
+3. Bám sát chính nhiệm vụ, trò chơi, phiếu học tập, tranh ảnh, sản phẩm đang có trong hoạt động; không đổi mục tiêu bài; không bịa số liệu, số trang SGK, tên văn bản, tên phần mềm lạ.
+4. Phù hợp lứa tuổi: lớp 6–7 HS KHÔNG tự đăng nhập công cụ AI (GV thao tác trên màn hình chiếu, HS quan sát, nhận xét); mọi lần dùng AI đều nhắc kiểm chứng kết quả với SGK/thực tế và không đưa thông tin cá nhân lên công cụ AI.
+5. Văn phong kế hoạch bài dạy, câu gọn, tiếng Việt chuẩn, dùng "GV", "HS". Không dùng từ tiếng Anh khi có từ Việt (trừ tên công cụ, "prompt").`;
+  const GIAI_THICH_LG = `Các trường của "lg" (mỗi trường MỘT câu, KHÔNG có dấu "-" đầu dòng; trừ "mtBai", mọi câu đều kết thúc bằng "(NLS <mã>)" hoặc "(NLAI <mã>)"):
+- "mtBai": dòng ghi vào mục tiêu bài, dạng "NLS 1.1.TC2a: <nội dung>" hoặc "NLAI 9.D1.1: <nội dung>".
+- "tbGv": học liệu số / công cụ GV chuẩn bị. "tbHs": thiết bị HS chuẩn bị ("" nếu HS không cần chuẩn bị gì thêm).
+- "mtHd": câu nối thêm vào cuối "a) Mục tiêu" của hoạt động.
+- "ndHd": câu nối thêm vào cuối "b) Nội dung".
+- "sp": sản phẩm tích hợp HS tạo ra (thêm ở "c) Sản phẩm").
+- "cg", "th", "bc", "kl": việc GV/HS làm thêm ở 4 bước Chuyển giao nhiệm vụ – Thực hiện nhiệm vụ – Báo cáo, thảo luận – Kết luận, nhận định.
+Câu mẫu đúng kiểu của tổ: "HS quan sát các hình ảnh học liệu số do GV cung cấp để nhận biết các loại cây ăn quả phổ biến ở địa phương (NLS 1.1.TC2a)." · "GV chốt lại thông điệp: AI là công cụ hỗ trợ, con người giữ vai trò kiểm soát, định hướng và dẫn dắt AI (NLAI 9.D1.1)."`;
+
+  function doanLop() {
+    if (!GA) return 9;
+    const t = GA.ps.slice(0, 80).map(p => p.text).join(" ");
+    const m = t.match(/(?:lớp|khối)\s*(\d{1,2})\b/i) || t.match(/(?:Công nghệ|Toán|Ngữ văn|Tiếng Anh|KHTN|Khoa học tự nhiên|Tin học|Lịch sử|Địa lí|GDCD|Giáo dục công dân|Âm nhạc|Mĩ thuật|Mỹ thuật|HĐTN|Trải nghiệm|Vật lí|Hoá học|Hóa học|Sinh học|Giáo dục thể chất)[^\d]{0,12}(\d{1,2})\b/i) || t.match(/\bCN\s?(\d)\b/);
+    const n = m ? +m[1] : 0;
+    return n >= 6 && n <= 12 ? n : 9;
+  }
+  function dsMa(lop) {
+    const muc = lop <= 7 ? "TC1" : "TC2";
+    const nls = MA_NLS.filter(x => x.ma.includes(muc)).map(x => `${x.ma.replace(/^(\d\.\d)TC/, "$1.TC")}: ${x.nd}`);
+    const l = Math.min(Math.max(lop, 6), 9);
+    const nlai = MA_NLAI.filter(x => x.ma.startsWith(l + ".")).map(x => `${x.ma}: ${x.nd}`);
+    return { nls, nlai, ghi: lop >= 10 ? `(Bảng tra của tổ chỉ có lớp 6–9: dùng mức NLS TC2 và mã NLAI lớp 9.)` : "" };
+  }
+  function chuGA() {
+    const ps = GA.ps, c = GA.cau;
+    const lay = (a, b, max) => ps.slice(Math.max(a, 0), b).map(p => p.text).filter(Boolean).join("\n").slice(0, max);
+    const het = c.tt > 0 ? c.tt : Math.min(ps.length, (c.mt > 0 ? c.mt : 0) + 50);
+    const hd = c.hd.filter(h => !h.con);
+    return {
+      ten: lay(0, Math.max(c.mt, 6), 700),
+      mt: lay(c.mt >= 0 ? c.mt : 0, het, 3500),
+      hd: hd.map(h => ({ ten: h.ten, chu: lay(h.i, h.het, 2200) }))
+    };
+  }
+  function lenhTuDong(lop, kieu) {
+    const g = chuGA(), m = dsMa(lop);
+    const yc = { "1-1": "1 nội dung NLS và 1 nội dung NLAI", "nls": "1 nội dung NLS (không dùng NLAI)", "nlai": "1 nội dung NLAI (không dùng NLS)", "2-1": "2 nội dung NLS (ở 2 hoạt động khác nhau) và 1 nội dung NLAI", "tu": "từ 1 đến 3 nội dung NLS/NLAI — số lượng do bạn chọn cho hợp lý" }[kieu] || "1 nội dung NLS và 1 nội dung NLAI";
+    return `Bạn là tổ trưởng chuyên môn giàu kinh nghiệm, hỗ trợ giáo viên THCS–THPT Việt Nam tích hợp Năng lực số (NLS) và Năng lực trí tuệ nhân tạo (NLAI) vào kế hoạch bài dạy theo CT GDPT 2018.
+NHIỆM VỤ: Đọc giáo án lớp ${lop} dưới đây, chọn ${yc} hợp lý nhất với bài, gắn mỗi nội dung vào hoạt động phù hợp nhất (hoạt động có sẵn tranh ảnh, video, phiếu, sản phẩm, tình huống có thể dùng công nghệ số/AI một cách tự nhiên), rồi soạn các câu lồng ghép.
+${LUAT}
+TRẢ LỜI: chỉ một mảng JSON, mỗi phần tử có dạng:
+{"loai":"nls" hoặc "nlai","ma":"<mã>","hoatDong":"<chép NGUYÊN VĂN một tên trong mục HOẠT ĐỘNG>","noiDung":"<nội dung cần tích hợp, 1 câu kiểu PPCT: HS làm gì, dùng học liệu/công cụ số nào, để làm gì>","lyDo":"<1 câu ngắn: vì sao chọn mã và hoạt động này>","lg":{"mtBai":"…","tbGv":"…","tbHs":"…","mtHd":"…","ndHd":"…","sp":"…","cg":"…","th":"…","bc":"…","kl":"…"}}
+${GIAI_THICH_LG}
+
+DANH SÁCH MÃ NLS ${m.ghi}
+${m.nls.join("\n")}
+
+DANH SÁCH MÃ NLAI
+${m.nlai.join("\n")}
+
+HOẠT ĐỘNG (chọn trong các tên này):
+${g.hd.map((h, i) => `${i + 1}. ${h.ten}`).join("\n")}
+
+GIÁO ÁN:
+${g.ten}
+${g.mt}
+${g.hd.map(h => "\n=== " + h.ten + " ===\n" + h.chu).join("\n")}`;
+  }
+  function lenhVietCau(x) {
+    const g = chuGA(), h = GA.cau.hd.find(y => y.i === x.hd), hh = h && (h.thay || h);
+    const tra = traMa(x.ma), nhan = x.loai === "nls" ? "NLS" : "NLAI";
+    return `Bạn là tổ trưởng chuyên môn giàu kinh nghiệm. Giáo viên đã chọn tích hợp ${nhan} ${norm(x.ma)}${tra ? " (" + tra.nd + ")" : ""} vào hoạt động "${hh ? hh.ten : ""}" với nội dung: "${norm(x.viec) || norm(x.nd)}".
+NHIỆM VỤ: Soạn các câu lồng ghép nội dung này vào giáo án, bám sát đúng nhiệm vụ, trò chơi, phiếu, sản phẩm của hoạt động đó. GIỮ NGUYÊN mã và ý nội dung giáo viên đã điền.
+${LUAT}
+TRẢ LỜI: chỉ một đối tượng JSON dạng {"lg":{"mtBai":"…","tbGv":"…","tbHs":"…","mtHd":"…","ndHd":"…","sp":"…","cg":"…","th":"…","bc":"…","kl":"…"}}
+${GIAI_THICH_LG}
+
+TÊN BÀI VÀ MỤC TIÊU:
+${g.ten}
+${g.mt.slice(0, 2000)}
+
+HOẠT ĐỘNG ĐƯỢC TÍCH HỢP:
+${hh ? GA.ps.slice(hh.i, hh.het).map(p => p.text).filter(Boolean).join("\n").slice(0, 3500) : ""}`;
+  }
+  function docJSON(chu) {
+    let s = String(chu || "").trim().replace(/^```(?:json)?\s*/i, "").replace(/```\s*$/, "");
+    try { return JSON.parse(s); } catch (e) {}
+    const a = s.indexOf("["), b = s.lastIndexOf("]"), c = s.indexOf("{"), d = s.lastIndexOf("}");
+    for (const [i, j] of [[a, b], [c, d]]) if (i >= 0 && j > i) { try { return JSON.parse(s.slice(i, j + 1)); } catch (e) {} }
+    throw new Error("Câu trả lời của AI không đúng dạng JSON — bấm lại để AI soạn lại.");
+  }
+  // mã theo kiểu tổ ghi trong PPCT: 1.1.TC2a · 9.D1.1
+  const maChuan = ma => { const m = norm(ma).match(/^(\d)\.(\d)\.?\s*TC\s*(\d)\s*([a-d])$/i); return m ? `${m[1]}.${m[2]}.TC${m[3]}${m[4].toLowerCase()}` : norm(ma); };
+  function lamSachLG(lg, loai, ma) {
+    const nhan = loai === "nls" ? "NLS" : "NLAI", out = {};
+    ma = maChuan(ma);
+    PHAN.forEach(([k]) => {
+      let v = norm(lg && lg[k]).replace(/^[-–•*+]\s*/, "").replace(/(\d)\.(\d)TC(\d)([a-d])/gi, (t, a, b, c, d) => `${a}.${b}.TC${c}${d.toLowerCase()}`);
+      if (!v) { if (k === "tbHs") out[k] = ""; return; }
+      if (k !== "mtBai" && !/\((NLS|NLAI)\s[^)]+\)\s*[.]?$/.test(v)) v = v.replace(/[.\s]*$/, "") + ` (${nhan} ${ma}).`;
+      if (k === "mtBai" && !/^(NLS|NLAI)\s/.test(v)) v = `${nhan} ${ma}: ` + v;
+      out[k] = v;
+    });
+    return out;
+  }
+  function timHd(ten) {
+    const t = norm(ten).toLowerCase(), ds = GA.cau.hd;
+    return ds.find(h => norm(h.ten).toLowerCase() === t) || ds.find(h => norm(h.ten).toLowerCase().startsWith(t.slice(0, 25))) || ds.find(h => t && norm(h.ten).toLowerCase().includes(t.slice(0, 18)))
+      || ds.filter(h => !h.con).map(h => ({ h, d: norm(h.ten).toLowerCase().split(" ").filter(w => t.includes(w)).length })).sort((p, q) => q.d - p.d)[0]?.h;
+  }
+  function apTuDong(kq) {
+    const ds = Array.isArray(kq) ? kq : (kq && (kq.noiDung || kq.items || kq.ds)) || [];
+    const moi = [], bo = [];
+    ds.forEach(o => {
+      const tra = traMa(o.ma), loai = (tra && tra.loai) || (/nlai/i.test(o.loai) ? "nlai" : "nls");
+      const h = timHd(o.hoatDong || "");
+      if (!tra) { bo.push(`mã “${o.ma}” không có trong bảng tra`); return; }
+      if (!h) { bo.push(`${o.ma}: không khớp hoạt động “${o.hoatDong}”`); return; }
+      const x = moiMuc(loai);
+      Object.assign(x, { ma: maChuan(o.ma), nd: tra.nd, hd: h.i, hdTen: h.ten, viec: norm(o.noiDung), lg: lamSachLG(o.lg, loai, o.ma), ai: true, lyDo: norm(o.lyDo) });
+      moi.push(x);
+    });
+    return { moi, bo };
+  }
+  async function chay(lenh, bao, xong) {
+    if (dang) { TT.toast("Gemini đang làm việc — đợi chút ạ", ""); return; }
+    dang = true; bao(`<span class="xoay"></span> ✨ Đang gửi phần chữ của giáo án tới Gemini…`);
+    try { const chu = await AIG.goi(lenh, t => bao(`<span class="xoay"></span> ⏳ ${TT.esc(t)}`)); xong(docJSON(chu)); }
+    catch (e) { bao(`<span class="do">✖ ${TT.esc(e.message || String(e))}</span>`); TT.buzz(); }
+    finally { dang = false; }
+  }
+  function nhanTuDong(kq) {
+    const { moi, bo } = apTuDong(kq);
+    if (!moi.length) throw new Error("AI chưa đưa ra nội dung dùng được" + (bo.length ? ": " + bo.join("; ") : "") + ".");
+    if (DS.length && !confirm(`Thay ${DS.length} nội dung đang có bằng ${moi.length} nội dung AI chọn?\n(Bấm Huỷ để THÊM vào sau.)`)) DS.push(...moi); else DS = moi;
+    luu(); veDs(); veXem();
+    $("aiBao").innerHTML = `✔ AI đã chọn <b>${moi.length}</b> nội dung: ${moi.map(x => `<b>${TT.esc(x.ma)}</b> → ${TT.esc(tenHdNgan(GA.cau.hd.find(h => h.i === x.hd)))}`).join(" · ")}${bo.length ? `<div class="canh">Bỏ qua: ${TT.esc(bo.join("; "))}</div>` : ""}<div class="mo nho2">Xem, sửa ở từng thẻ bên dưới và ở bước 4 trước khi xuất. Nên đối chiếu với PPCT của tổ.</div>`;
+    TT.ting();
+  }
+  function tuDong() {
+    if (!GA) { TT.toast("Đưa giáo án lên trước ạ", "loi"); return; }
+    if (!GA.cau.hd.length) { TT.toast("App chưa nhận ra hoạt động nào trong giáo án", "loi"); return; }
+    if (!AIG.layKhoa()) { AIG.doiKhoa(); if (!AIG.layKhoa()) return; }
+    const lenh = lenhTuDong(+$("aiLop").value, $("aiSo").value);
+    chay(lenh, h => $("aiBao").innerHTML = h, kq => { try { nhanTuDong(kq); } catch (e) { $("aiBao").innerHTML = `<span class="do">✖ ${TT.esc(e.message)}</span>`; } });
+  }
+  function chepLenh() {
+    if (!GA) { TT.toast("Đưa giáo án lên trước ạ", "loi"); return; }
+    const lenh = lenhTuDong(+$("aiLop").value, $("aiSo").value);
+    const xong = () => { TT.toast("Đã chép câu lệnh — dán vào ChatGPT/Gemini, rồi dán câu trả lời vào ô bên dưới", "ok"); $("aiDanHop").open = true; };
+    (navigator.clipboard ? navigator.clipboard.writeText(lenh) : Promise.reject()).then(xong, () => { const t = document.createElement("textarea"); t.value = lenh; document.body.appendChild(t); t.select(); document.execCommand("copy"); t.remove(); xong(); });
+  }
+  function dungTraLoi() {
+    try { nhanTuDong(docJSON($("aiDan").value)); $("aiDan").value = ""; } catch (e) { $("aiBao").innerHTML = `<span class="do">✖ ${TT.esc(e.message)}</span>`; TT.buzz(); }
+  }
+  function vietCau(x) {
+    if (!GA || x.hd == null) { TT.toast("Chọn hoạt động trước ạ", "loi"); return; }
+    if (!norm(x.ma)) { TT.toast("Điền mã trước ạ", "loi"); return; }
+    if (!AIG.layKhoa()) { AIG.doiKhoa(); if (!AIG.layKhoa()) return; }
+    const o = () => document.querySelector(`.muc[data-id="${x.id}"] .aibao`);
+    chay(lenhVietCau(x), h => { const k = o(); if (k) k.innerHTML = h; }, kq => {
+      const lg = (kq && kq.lg) || kq;
+      x.lg = lamSachLG(lg, x.loai, norm(x.ma)); x.ai = true; x.mo = true;
+      luu(); veDs(); veXem(); TT.ting(); TT.toast("AI đã viết lại câu lồng ghép sát bài — xem, sửa trước khi xuất", "ok");
+    });
+  }
+  return { tuDong, chepLenh, dungTraLoi, vietCau, doanLop };
+})();
+
+function veAI() {
+  const k = $("aiKhoa"); if (!k) return;
+  k.innerHTML = AIG.layKhoa()
+    ? `🔑 Đã có khoá Gemini trên máy này (dùng chung với trang chủ). <a href="#" data-doikhoa="1">Đổi khoá</a>`
+    : `🔑 Chưa có khoá Gemini — <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer">lấy khoá miễn phí</a> rồi <a href="#" data-doikhoa="1">dán vào đây</a> (làm một lần). Không có khoá: bấm <b>📋 Chép câu lệnh</b> sang ChatGPT/Gemini rồi dán câu trả lời về.`;
+  const l = $("aiLop");
+  if (l && GA && !l.dataset.tay) l.value = String(AIX.doanLop());
+}
+document.addEventListener("DOMContentLoaded", () => {
+  $("aiLop").innerHTML = [6, 7, 8, 9, 10, 11, 12].map(n => `<option value="${n}">Lớp ${n}</option>`).join("");
+  $("aiLop").value = "9"; $("aiLop").onchange = () => $("aiLop").dataset.tay = "1";
+  $("bAiTuDong").onclick = AIX.tuDong;
+  $("bAiChep").onclick = AIX.chepLenh;
+  $("bAiDung").onclick = AIX.dungTraLoi;
+  document.addEventListener("click", e => { const a = e.target.closest("[data-doikhoa]"); if (a) { e.preventDefault(); AIG.doiKhoa(); } });
+  $("dsTich").addEventListener("click", e => { const b = e.target.closest("[data-aicau]"); if (!b) return; const x = timMuc(e); if (x) AIX.vietCau(x); });
+  veAI();
+});
 
 </script>
 </body>
