@@ -372,51 +372,6 @@
     
     const INITIAL_MATERIALS = [
   {
-    "id": "mat_1",
-    "title": "Bản vẽ chi tiết trục ren - CAD 2D chuẩn TCVN",
-    "category": "CAD_DRAWING",
-    "grade": "8",
-    "file_path": "materials/cad/truc_ren_chi_tiet_lop8.dwg",
-    "download_url": "materials/cad/truc_ren_chi_tiet_lop8.dwg",
-    "view_url": "materials/cad/truc_ren_chi_tiet_lop8.dwg",
-    "size": "2.4 MB",
-    "file_size": "2.4 MB",
-    "file_type": "DWG/PDF",
-    "downloads": 342,
-    "created_at": "2026-08-20",
-    "description": "Bản vẽ kỹ thuật chi tiết dùng cho tiết thực hành môn Công nghệ lớp 8"
-  },
-  {
-    "id": "mat_2",
-    "title": "Slide bài giảng Mô hình nhà kính thông minh STEM",
-    "category": "SLIDE",
-    "grade": "8",
-    "file_path": "materials/slides/nha_kinh_thong_minh_lop8.pptx",
-    "download_url": "materials/slides/nha_kinh_thong_minh_lop8.pptx",
-    "view_url": "materials/slides/nha_kinh_thong_minh_lop8.pptx",
-    "size": "15.8 MB",
-    "file_size": "15.8 MB",
-    "file_type": "PPTX",
-    "downloads": 528,
-    "created_at": "2026-08-22",
-    "description": "Bộ slide trực quan có chèn video và câu hỏi tương tác mở đầu"
-  },
-  {
-    "id": "mat_3",
-    "title": "Đề kiểm tra giữa kỳ I môn Công nghệ 8 (Ma trận + Đáp án)",
-    "category": "EXAM",
-    "grade": "8",
-    "file_path": "materials/exams/de_thi_giua_ky_1_cn8.docx",
-    "download_url": "materials/exams/de_thi_giua_ky_1_cn8.docx",
-    "view_url": "materials/exams/de_thi_giua_ky_1_cn8.docx",
-    "size": "540 KB",
-    "file_size": "540 KB",
-    "file_type": "DOCX",
-    "downloads": 415,
-    "created_at": "2026-08-23",
-    "description": "Đề thi chuẩn 4 mức độ nhận thức theo định hướng Thông tư 22"
-  },
-  {
     "id": "mat_game_4",
     "title": "01 . Thư Viện STEM-STEAM.png",
     "category": "SLIDE",
@@ -3665,11 +3620,6 @@
 
       // TẠO BÀI DẠY TỔNG HỢP THEO MẪU CHUẨN
       const handleGenerateHdtnPlan = async () => {
-        if (!currentUser) {
-          setAuthError('Kính mời Thầy/Cô (và Admin) vui lòng Đăng ký hoặc Đăng nhập để sử dụng tính năng Soạn Kế hoạch bài dạy HĐTN!');
-          openLoginModal();
-          return;
-        }
         if (!coAI) { handleGenerateHdtnPlanKhuon(); return; }
         setIsGeneratingHdtn(true);
         setHdtnToast('AI Gemini đang viết giáo án theo đúng bài (khoảng 30–90 giây), thầy cô chờ chút ạ...');
@@ -4364,11 +4314,6 @@
       ]);
 
       const handleGeneratePpct = async () => {
-        if (!currentUser) {
-          setAuthError('Kính mời Thầy/Cô (và Admin) vui lòng Đăng ký hoặc Đăng nhập để sử dụng tính năng Tạo PPCT 7 Cột!');
-          openLoginModal();
-          return;
-        }
         if (!coAI) { handleGeneratePpctKhuon(); setPpctCanhBao('Đây là bảng MẪU minh hoạ (chưa bật AI), chưa theo sách của thầy cô. Bấm 🔑 Kết nối AI để AI lập theo SGK.'); return; }
         setIsGeneratingPpct(true);
         setPpctCanhBao('');
@@ -4515,11 +4460,6 @@ Quy tắc:
 
       // TỰ ĐỘNG GỬI BÁO CÁO THỐNG KÊ CHO GMAIL LEANH2004GGV3@GMAIL.COM (NGÀY 30 HÀNG THÁNG)
       const handleSendMonthlyReportToGmail = () => {
-        if (!currentUser) {
-          setAuthError('Kính mời Quản trị viên vui lòng Đăng nhập để thực hiện gửi báo cáo định kỳ!');
-          openLoginModal();
-          return;
-        }
         const targetEmail = 'leanh2004ggv3@gmail.com';
         const d = new Date();
         const dateFormatted = `${d.getDate()}/${d.getMonth() + 1}/${d.getFullYear()}`;
@@ -4654,11 +4594,6 @@ Quy tắc:
 
       // XUẤT BÁO CÁO THỐNG KÊ SỬ DỤNG WEB DẠNG EXCEL / CSV (.CSV)
       const handleExportStatsCsv = () => {
-        if (!currentUser) {
-          setAuthError('Kính mời Thầy/Cô (và Admin) vui lòng Đăng ký hoặc Đăng nhập để xuất file báo cáo Excel/CSV!');
-          openLoginModal();
-          return;
-        }
         let csv = '\uFEFF'; // UTF-8 BOM chống lỗi font tiếng Việt trong Excel
         csv += 'BÁO CÁO THỐNG KÊ SỐ LƯỢNG VÀ TÌNH HÌNH SỬ DỤNG HỆ THỐNG TRỢ LÝ AI DẠY HỌC\n';
         csv += `Đơn vị: TRƯỜNG THCS TỊNH BIÊN - TỔ BỘ MÔN CÔNG NGHỆ & HƯỚNG NGHIỆP\n`;
@@ -4700,11 +4635,6 @@ Quy tắc:
 
       // XUẤT BÁO CÁO THỐNG KÊ SỬ DỤNG WEB DẠNG VĂN BẢN WORD (.DOC) CHUẨN SƯ PHẠM
       const handleExportStatsWord = () => {
-        if (!currentUser) {
-          setAuthError('Kính mời Thầy/Cô (và Admin) vui lòng Đăng ký hoặc Đăng nhập để xuất file báo cáo Word!');
-          openLoginModal();
-          return;
-        }
         const d = new Date();
         const dateFormatted = `ngày ${d.getDate()} tháng ${d.getMonth() + 1} năm ${d.getFullYear()}`;
         const dateStr = `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;
@@ -5358,11 +5288,6 @@ Mỗi câu: question (câu hỏi), options (4 chuỗi, có tiền tố "A. ", "B
       };
 
       const handleGenerateLesson = async () => {
-        if (!currentUser) {
-          setAuthError('Kính mời Thầy/Cô (và Admin) vui lòng Đăng ký hoặc Đăng nhập để sử dụng tính năng Soạn KHBD 5512!');
-          openLoginModal();
-          return;
-        }
         if (!coAI) { handleGenerateLessonKhuon(); return; }
         setIsGenerating(true);
         setGeneratedStreamText('');
@@ -5447,11 +5372,6 @@ Nếu nhiều tiết, ghi rõ **TIẾT 1**, **TIẾT 2**… trước các hoạt
       };
 
       const handleTaoDe = async () => {
-        if (!currentUser) {
-          setAuthError('Kính mời Thầy/Cô vui lòng Đăng ký hoặc Đăng nhập để sử dụng tính năng Ra đề kiểm tra!');
-          openLoginModal();
-          return;
-        }
         if (!coAI) { moAiKetNoi(); return; }
         if (!deNoiDung.trim() && !deTep) { setDeLoi('Thầy cô ghi nội dung kiểm tra (các bài, chủ đề) hoặc gửi tệp SGK/đề cương trước ạ.'); return; }
         setDangTaoDe(true); setDeLoi(''); setDeKetQua('');
@@ -5489,11 +5409,6 @@ Yêu cầu: đáp án chính xác, không trùng ý giữa các câu, phương �
 
       // Export Word Function
       const exportToWord = (plan) => {
-        if (!currentUser) {
-          setAuthError('Kính mời Thầy/Cô (và Admin) vui lòng Đăng ký hoặc Đăng nhập để tải file Word giáo án!');
-          openLoginModal();
-          return;
-        }
         if (window.AI) {
           window.AI.xuatWord(plan.title, window.AI.md(plan.contentMarkdown), plan.title.replace(/\s+/g, '_'));
           trackActivity('Xuất file Word KHBD 5512', `Tải về file: ${plan.title}.doc`);
@@ -5513,11 +5428,6 @@ Yêu cầu: đáp án chính xác, không trùng ý giữa các câu, phương �
 
       // Export PDF Function
       const exportToPdf = (plan) => {
-        if (!currentUser) {
-          setAuthError('Kính mời Thầy/Cô (và Admin) vui lòng Đăng ký hoặc Đăng nhập để in/tải PDF giáo án!');
-          openLoginModal();
-          return;
-        }
         const win = window.open('', '_blank');
         win.document.write('<!DOCTYPE html>\n<' + `html>
             <head>
@@ -5573,140 +5483,11 @@ Yêu cầu: đáp án chính xác, không trùng ý giữa các câu, phương �
                   <span className={`w-2 h-2 rounded-full ${coAI ? 'bg-emerald-400 animate-pulse' : 'bg-white'}`}></span>
                   <span>{coAI ? 'AI Gemini: đã bật' : '🔑 Kết nối AI'}</span>
                 </button>
-                <div className="flex items-center gap-1.5 bg-slate-800 px-3 py-1.5 rounded-md border border-slate-700">
-                  <i data-lucide="shield-check" className="w-4 h-4 text-cyan-400"></i>
-                  <span>Supabase Auth</span>
-                </div>
 
-                {currentUser ? (
-                  <div className="relative border-l border-slate-700 pl-4">
-                    <div
-                      onClick={() => setShowProfileMenu(!showProfileMenu)}
-                      className="flex items-center gap-2.5 cursor-pointer hover:opacity-90 transition-opacity bg-slate-800/80 px-3 py-1.5 rounded-lg border border-slate-700/80"
-                    >
-                      <img src={currentUser.avatarUrl} className="w-7 h-7 rounded-full border border-emerald-500 object-cover" />
-                      <div className="text-left">
-                        <p className="font-semibold text-white text-xs flex items-center gap-1">
-                          {currentUser.fullName}
-                          <i data-lucide="chevron-down" className="w-3.5 h-3.5 text-slate-400"></i>
-                        </p>
-                        <p className="text-[10px] text-slate-400 truncate max-w-[120px]">{currentUser.schoolName}</p>
-                      </div>
-                    </div>
-
-                    {showProfileMenu && (
-                      <div className="absolute right-0 mt-2 w-64 bg-slate-900 border border-slate-700 rounded-xl shadow-2xl p-2 z-50 text-slate-200 animate-in fade-in zoom-in-95 duration-150 top-12">
-                        <div className="p-2.5 border-b border-slate-800 bg-slate-950/50 rounded-lg">
-                          <p className="font-bold text-xs text-white">{currentUser.fullName}</p>
-                          <p className="text-[11px] text-slate-400 truncate">{currentUser.email}</p>
-                          <span className="inline-block mt-1 text-[10px] bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded border border-emerald-500/30">
-                            {currentUser.subject}
-                          </span>
-                        </div>
-                        <div className="pt-2 pb-1 px-1 border-b border-slate-800 text-[11px] text-slate-400 space-y-1">
-                          <div className="flex justify-between">
-                            <span>Vai trò:</span>
-                            <span className="font-semibold text-white">{currentUser.role === 'ADMIN' ? 'Quản trị viên' : 'Giáo viên'}</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span>Lượt đăng nhập:</span>
-                            <strong className="text-emerald-400 font-bold">
-                              {(registeredUsers.find(u => u.email && u.email.toLowerCase() === currentUser.email.toLowerCase()) || {}).loginCount || 1} lượt
-                            </strong>
-                          </div>
-                        </div>
-
-                        <div className="pt-1.5 space-y-1">
-                          <button
-                            onClick={() => { setAuthTab('LOGIN'); setShowAuthModal(true); setShowProfileMenu(false); }}
-                            className="w-full flex items-center space-x-2 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-300 hover:text-white hover:bg-slate-800 transition-colors"
-                          >
-                            <i data-lucide="arrow-left-right" className="w-3.5 h-3.5 text-cyan-400"></i>
-                            <span>Đổi Tài Khoản Khác</span>
-                          </button>
-                          <button
-                            onClick={() => { setAuthTab('REGISTER'); setShowAuthModal(true); setShowProfileMenu(false); }}
-                            className="w-full flex items-center space-x-2 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-300 hover:text-white hover:bg-slate-800 transition-colors"
-                          >
-                            <i data-lucide="user-plus" className="w-3.5 h-3.5 text-emerald-400"></i>
-                            <span>Đăng Ký Tài Khoản Mới</span>
-                          </button>
-                          <button
-                            onClick={() => { setActiveTab('STATS'); setShowProfileMenu(false); }}
-                            className="w-full flex items-center space-x-2 px-3 py-1.5 rounded-lg text-xs font-semibold text-emerald-400 hover:bg-emerald-500/10 transition-colors"
-                          >
-                            <i data-lucide="bar-chart-3" className="w-3.5 h-3.5"></i>
-                            <span>Thống Kê & Xuất Báo Cáo</span>
-                          </button>
-                          <button
-                            onClick={handleLogout}
-                            className="w-full flex items-center space-x-2 px-3 py-1.5 rounded-lg text-xs font-semibold text-rose-400 hover:bg-rose-500/10 transition-colors border-t border-slate-800/80 pt-2"
-                          >
-                            <i data-lucide="log-out" className="w-3.5 h-3.5"></i>
-                            <span>Đăng xuất tài khoản</span>
-                          </button>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                ) : (
-                  <div className="flex items-center space-x-2 border-l border-slate-700 pl-4">
-                    <button
-                      onClick={openLoginModal}
-                      className="bg-slate-800 hover:bg-slate-700 text-white font-medium text-xs px-3.5 py-1.5 rounded-lg border border-slate-700 flex items-center gap-1.5 transition-all"
-                    >
-                      <i data-lucide="log-in" className="w-3.5 h-3.5 text-emerald-400"></i>
-                      <span>Đăng nhập</span>
-                    </button>
-                    <button
-                      onClick={openRegisterModal}
-                      className="bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-xs px-3.5 py-1.5 rounded-lg shadow-sm flex items-center gap-1.5 transition-all"
-                    >
-                      <i data-lucide="user-plus" className="w-3.5 h-3.5"></i>
-                      <span>Đăng ký</span>
-                    </button>
-                  </div>
-                )}
               </div>
             </div>
           </header>
 
-          {/* BANNER NHẮC NHỞ GỬI BÁO CÁO ĐỊNH KỲ NGÀY 30 HÀNG THÁNG ĐẾN GMAIL */}
-          {showMonthlyReminder && (
-            <div className="bg-gradient-to-r from-amber-600 via-amber-500 to-emerald-600 text-white px-4 py-2.5 shadow-md flex items-center justify-between text-xs animate-in fade-in slide-in-from-top-2">
-              <div className="max-w-7xl mx-auto w-full flex flex-wrap items-center justify-between gap-3">
-                <div className="flex items-center gap-2.5">
-                  <div className="p-1.5 bg-white/20 rounded-lg">
-                    <i data-lucide="bell-ring" className="w-4 h-4 text-white animate-bounce"></i>
-                  </div>
-                  <div>
-                    <span className="font-bold tracking-wide">KỲ BÁO CÁO ĐỊNH KỲ NGÀY 30 HÀNG THÁNG:</span>
-                    <span className="ml-1.5 text-amber-100">
-                      Hôm nay là ngày 30 - Cần gửi báo cáo số lượng sử dụng web tháng này đến <strong>leanh2004ggv3@gmail.com</strong>
-                    </span>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={handleSendMonthlyReportToGmail}
-                    className="bg-white text-slate-900 hover:bg-slate-100 font-bold px-3 py-1.5 rounded-lg shadow-sm flex items-center gap-1.5 transition-transform hover:scale-105"
-                  >
-                    <i data-lucide="send" className="w-3.5 h-3.5 text-emerald-600"></i>
-                    <span>Gửi Báo Cáo Ngay (Gmail)</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setShowMonthlyReminder(false)}
-                    className="p-1 text-white/80 hover:text-white hover:bg-white/10 rounded"
-                    title="Ẩn thông báo hôm nay"
-                  >
-                    <i data-lucide="x" className="w-4 h-4"></i>
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
 
           <div className={isHdtnFullscreen && activeTab === 'HDTN_TEMPLATE_GENERATOR' ? "w-full min-h-screen bg-slate-100 flex-1 p-0 m-0" : "flex-1 flex max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 gap-6"}>
             {/* SIDEBAR NAVIGATION */}
@@ -5850,42 +5631,9 @@ Yêu cầu: đáp án chính xác, không trùng ý giữa các câu, phương �
                   <span className="truncate">Thư Viện Học Liệu</span>
                 </button>
 
-                {/* TAB 6: BÁO CÁO & THỐNG KÊ */}
-                <button
-                  onClick={() => setActiveTab('STATS')}
-                  className={`w-full flex items-center space-x-2.5 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
-                    activeTab === 'STATS' ? 'bg-emerald-50 text-emerald-800 font-bold border-l-4 border-emerald-600 shadow-sm' : 'text-slate-700 hover:bg-slate-50'
-                  }`}
-                >
-                  <i data-lucide="bar-chart-3" className="w-4 h-4 text-indigo-600 shrink-0"></i>
-                  <span className="truncate">Báo Cáo & Thống Kê</span>
-                </button>
 
-                <div className="pt-3 px-3 py-1.5 text-xs font-bold text-slate-400 uppercase tracking-wider border-t border-slate-100">
-                  Cơ Sở Dữ Liệu Cloud
-                </div>
-                {/* TAB 7: SUPABASE DATABASE */}
-                <button
-                  onClick={() => setActiveTab('DATABASE_VIEW')}
-                  className={`w-full flex items-center space-x-2.5 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
-                    activeTab === 'DATABASE_VIEW' ? 'bg-slate-100 text-slate-900 font-bold' : 'text-slate-700 hover:bg-slate-50'
-                  }`}
-                >
-                  <i data-lucide="database" className="w-4 h-4 text-slate-700 shrink-0"></i>
-                  <span className="truncate">Supabase PostgreSQL</span>
-                </button>
               </div>
 
-              {/* Architecture Info Box */}
-              <div className="bg-slate-900 text-slate-300 p-3 rounded-lg text-xs space-y-2 border border-slate-800">
-                <div className="flex items-center gap-1.5 font-bold text-emerald-400">
-                  <i data-lucide="layers" className="w-3.5 h-3.5"></i>
-                  <span>Kiến trúc Sơ đồ 4 Tầng</span>
-                </div>
-                <p className="text-[11px] text-slate-400 leading-snug">
-                  Đã kết nối React Frontend + Vercel Edge + AI Controller + Supabase PostgreSQL & Storage.
-                </p>
-              </div>
             </aside>
 
             {/* MAIN CONTENT AREA */}
@@ -5974,14 +5722,6 @@ Yêu cầu: đáp án chính xác, không trùng ý giữa các câu, phương �
               >
                 📂 Học Liệu
               </button>
-              <button
-                onClick={() => setActiveTab('STATS')}
-                className={`px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap ${
-                  activeTab === 'STATS' ? 'bg-emerald-600 text-white font-bold' : 'bg-white text-slate-700 border border-slate-200'
-                }`}
-              >
-                📊 Thống Kê
-              </button>
             </div>
 
 
@@ -6035,8 +5775,8 @@ Yêu cầu: đáp án chính xác, không trùng ý giữa các câu, phương �
                         { tab: 'ELEARNING', bieu: '📺', ten: 'Kho E-Learning', mo: '68 bài tự học CN 6–9', mau: 'from-emerald-500 to-green-600' },
                         { tab: 'HINH_HOC_3D', bieu: '📐', ten: '3D Hình học Toán', mo: '55 bài Toán 6–9', mau: 'from-blue-500 to-violet-500' },
                         { tab: 'IUPAC', bieu: '🧪', ten: 'Hoá học IUPAC', mo: 'Luyện đọc tên chất', mau: 'from-orange-400 to-rose-500' },
-                        { tab: 'MATERIALS', bieu: '📂', ten: 'Thư viện học liệu', mo: 'Tài liệu dùng chung', mau: 'from-amber-400 to-orange-500' },
-                        { tab: 'STATS', bieu: '📊', ten: 'Báo cáo & Thống kê', mo: 'Số lượt sử dụng web', mau: 'from-indigo-500 to-purple-600' }
+                        { tab: 'MATERIALS', bieu: '📂', ten: 'Thư viện học liệu', mo: 'Trò chơi PowerPoint, tư liệu', mau: 'from-amber-400 to-orange-500' }
+
                       ].map((o) => (
                         <button key={o.tab} type="button" onClick={() => setActiveTab(o.tab)} className="group text-left p-3.5 rounded-xl border border-slate-200 bg-white hover:border-violet-300 hover:shadow-md hover:-translate-y-0.5 transition-all">
                           <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${o.mau} flex items-center justify-center text-xl shadow-sm mb-2 group-hover:scale-110 transition-transform`}>{o.bieu}</div>
@@ -8345,36 +8085,6 @@ Yêu cầu: đáp án chính xác, không trùng ý giữa các câu, phương �
                       </div>
                     </div>
 
-                    {/* Gợi Ý 1: Bộ lọc Danh Mục Hóa Học */}
-                    <div className="mt-5 pt-4 border-t border-white/10">
-                      <p className="text-xs text-orange-200/70 mb-2 font-semibold uppercase tracking-wider">Lọc theo nhóm chất:</p>
-                      <div className="flex flex-wrap gap-2">
-                        {[
-                          { key: 'ALL', label: '📚 Tất Cả' },
-                          { key: 'nguyen-to', label: '⚗️ Nguyên Tố' },
-                          { key: 'oxit', label: '🔴 Oxit' },
-                          { key: 'axit', label: '🟡 Axit' },
-                          { key: 'bazo', label: '🟢 Bazơ' },
-                          { key: 'muoi', label: '🔵 Muối' },
-                          { key: 'huu-co', label: '🟣 Hữu Cơ' },
-                        ].map(cat => (
-                          <button
-                            key={cat.key}
-                            onClick={() => setIupacCategoryFilter(cat.key)}
-                            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                              iupacCategoryFilter === cat.key
-                                ? 'bg-orange-400 text-slate-950 shadow-md scale-105'
-                                : 'bg-white/10 hover:bg-white/20 text-white'
-                            }`}
-                          >
-                            {cat.label}
-                          </button>
-                        ))}
-                      </div>
-                      <p className="text-[11px] text-orange-200/50 mt-2 italic">
-                        ℹ️ App hiện có 1 gói — mỗi gói thêm sẽ hiển thị ở đây. Bộ lọc sẵn sàng cho phép mở rộng.
-                      </p>
-                    </div>
                   </div>
 
                   {/* Thẻ thông tin chi tiết */}
@@ -8899,7 +8609,7 @@ Yêu cầu: đáp án chính xác, không trùng ý giữa các câu, phương �
                   { key: 'EXAM', label: 'Đề thi' },
                   { key: 'CAD_DRAWING', label: 'Bản vẽ CAD' },
                   { key: 'VIDEO', label: 'Video' }
-                ];
+                ].filter(c => c.key === 'ALL' || materials.some(m => m.category === c.key));
 
                 return (
                   <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6 space-y-6">
@@ -8908,9 +8618,9 @@ Yêu cầu: đáp án chính xác, không trùng ý giữa các câu, phương �
                       <div>
                         <h2 className="font-bold text-slate-800 text-base flex items-center gap-2">
                           <i data-lucide="folder-open" className="w-5 h-5 text-amber-600"></i>
-                          <span>Material Controller - Quản Lý Thư Viện Học Liệu</span>
+                          <span>Thư Viện Học Liệu</span>
                         </h2>
-                        <p className="text-xs text-slate-500">Lưu trữ Slide trình chiếu, Bản vẽ CAD kỹ thuật, Đề thi & 47+ Trò chơi PPTX tương tác trên Supabase & Google Drive</p>
+                        <p className="text-xs text-slate-500">Trò chơi PowerPoint tương tác, slide và tư liệu lưu trên Google Drive</p>
                       </div>
                       <div className="flex items-center gap-2">
                         <a
@@ -8923,13 +8633,6 @@ Yêu cầu: đáp án chính xác, không trùng ý giữa các câu, phương �
                           <i data-lucide="external-link" className="w-4 h-4 text-amber-600"></i>
                           <span>Mở Drive Gốc (47+ Game)</span>
                         </a>
-                        <button
-                          onClick={() => setShowUploadModal(true)}
-                          className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold px-4 py-2 rounded-lg flex items-center gap-2 shadow-sm transition-colors"
-                        >
-                          <i data-lucide="upload" className="w-4 h-4"></i>
-                          <span>Upload Học Liệu Mới</span>
-                        </button>
                       </div>
                     </div>
 
@@ -9063,426 +8766,6 @@ Yêu cầu: đáp án chính xác, không trùng ý giữa các câu, phương �
                   </div>
                 );
               })()}
-
-              {/* TAB 4: STATS & ANALYTICS WORKER - QUẢN LÝ SỐ LƯỢNG SỬ DỤNG WEB & XUẤT BÁO CÁO */}
-              {activeTab === 'STATS' && (
-                <div className="space-y-6">
-                  {/* Top Header Card */}
-                  <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
-                    <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-100 pb-5">
-                      <div className="flex items-center space-x-3.5">
-                        <div className="p-3 bg-indigo-100 text-indigo-700 rounded-xl border border-indigo-200 shadow-sm">
-                          <i data-lucide="bar-chart-3" className="w-6 h-6"></i>
-                        </div>
-                        <div>
-                          <h2 className="font-bold text-slate-800 text-lg flex items-center gap-2">
-                            <span>Quản Lý & Báo Cáo Thống Kê Số Lượng Sử Dụng Web</span>
-                            <span className="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded-full border border-emerald-200">Thời gian thực</span>
-                          </h2>
-                          <p className="text-xs text-slate-500 mt-0.5">Theo dõi số lượng truy cập, tài khoản giáo viên, hoạt động soạn bài và xuất file báo cáo phục vụ chuyên môn</p>
-                        </div>
-                      </div>
-
-                      {/* Export Actions Bar */}
-                      <div className="flex flex-wrap items-center gap-2.5">
-                        <button
-                          type="button"
-                          onClick={handleExportStatsCsv}
-                          className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-3.5 py-2.5 rounded-xl shadow-sm flex items-center space-x-2 transition-all hover:scale-102"
-                          title="Tải về file Excel/CSV số liệu sử dụng web"
-                        >
-                          <i data-lucide="file-spreadsheet" className="w-4 h-4 text-emerald-200"></i>
-                          <span>Xuất Báo Cáo Excel/CSV (.csv)</span>
-                        </button>
-
-                        <button
-                          type="button"
-                          onClick={handleExportStatsWord}
-                          className="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-3.5 py-2.5 rounded-xl shadow-sm flex items-center space-x-2 transition-all hover:scale-102"
-                          title="Tải về file báo cáo hành chính chuẩn Microsoft Word"
-                        >
-                          <i data-lucide="file-text" className="w-4 h-4 text-blue-200"></i>
-                          <span>Xuất Báo Cáo Word (.doc)</span>
-                        </button>
-                      </div>
-                    </div>
-
-                    {/* 4 Metric KPI Cards */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-5">
-                      {/* KPI 1 */}
-                      <div className="p-4 rounded-xl bg-slate-900 text-white relative overflow-hidden shadow-sm border border-slate-800">
-                        <div className="flex items-center justify-between">
-                          <p className="text-xs text-slate-400 font-medium">Người Dùng Đăng Ký</p>
-                          <div className="p-1.5 bg-emerald-500/20 text-emerald-400 rounded-lg">
-                            <i data-lucide="users" className="w-4 h-4"></i>
-                          </div>
-                        </div>
-                        <p className="text-3xl font-extrabold text-emerald-400 mt-2">{registeredUsers.length}</p>
-                        <p className="text-[11px] text-slate-400 mt-1 flex items-center gap-1">
-                          <span className="text-emerald-400 font-semibold">{registeredUsers.filter(u => u.role === 'ADMIN').length} Admin</span>
-                          <span>•</span>
-                          <span>{registeredUsers.filter(u => u.role !== 'ADMIN').length} Giáo viên</span>
-                        </p>
-                      </div>
-
-                      {/* KPI 2 */}
-                      <div className="p-4 rounded-xl bg-slate-900 text-white relative overflow-hidden shadow-sm border border-slate-800">
-                        <div className="flex items-center justify-between">
-                          <p className="text-xs text-slate-400 font-medium">Tổng Lượt Truy Cập</p>
-                          <div className="p-1.5 bg-cyan-500/20 text-cyan-400 rounded-lg">
-                            <i data-lucide="globe" className="w-4 h-4"></i>
-                          </div>
-                        </div>
-                        <p className="text-3xl font-extrabold text-cyan-400 mt-2">{systemStats.totalVisits || 238}</p>
-                        <p className="text-[11px] text-slate-400 mt-1">Lượt đăng nhập & làm việc trên web</p>
-                      </div>
-
-                      {/* KPI 3 */}
-                      <div className="p-4 rounded-xl bg-slate-900 text-white relative overflow-hidden shadow-sm border border-slate-800">
-                        <div className="flex items-center justify-between">
-                          <p className="text-xs text-slate-400 font-medium">Giáo Án & KHBD Đã Soạn</p>
-                          <div className="p-1.5 bg-blue-500/20 text-blue-400 rounded-lg">
-                            <i data-lucide="sparkles" className="w-4 h-4"></i>
-                          </div>
-                        </div>
-                        <p className="text-3xl font-extrabold text-blue-400 mt-2">{systemStats.totalPlansCreated || 131}</p>
-                        <p className="text-[11px] text-slate-400 mt-1">Gồm KHBD 5512, HĐTN & PPCT</p>
-                      </div>
-
-                      {/* KPI 4 */}
-                      <div className="p-4 rounded-xl bg-slate-900 text-white relative overflow-hidden shadow-sm border border-slate-800">
-                        <div className="flex items-center justify-between">
-                          <p className="text-xs text-slate-400 font-medium">Lượt Xuất File Tài Liệu</p>
-                          <div className="p-1.5 bg-amber-500/20 text-amber-400 rounded-lg">
-                            <i data-lucide="download" className="w-4 h-4"></i>
-                          </div>
-                        </div>
-                        <p className="text-3xl font-extrabold text-amber-400 mt-2">{systemStats.totalExports || 94}</p>
-                        <p className="text-[11px] text-slate-400 mt-1">Tải về Word (.doc), PDF & Báo cáo</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* KHUNG CẤU HÌNH & GỬI BÁO CÁO ĐỊNH KỲ ĐẾN GMAIL */}
-                  <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-indigo-950 text-white rounded-2xl border border-indigo-500/30 p-6 shadow-xl relative overflow-hidden">
-                    <div className="absolute right-0 top-0 -mt-6 -mr-6 w-32 h-32 bg-indigo-500/10 rounded-full blur-2xl pointer-events-none"></div>
-                    
-                    <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-5 relative z-10">
-                      <div className="space-y-2">
-                        <div className="inline-flex items-center gap-2 bg-indigo-500/20 border border-indigo-400/40 text-indigo-300 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
-                          <i data-lucide="mail-check" className="w-4 h-4 text-indigo-400"></i>
-                          <span>Kênh Báo Cáo Định Kỳ Tự Động</span>
-                        </div>
-                        <h3 className="text-lg font-extrabold text-white flex items-center gap-2">
-                          <span>Gửi Báo Cáo Số Lượng Sử Dụng Web Đến Gmail</span>
-                          <span className="bg-emerald-500/20 text-emerald-400 text-xs px-2.5 py-0.5 rounded-full border border-emerald-500/40 font-semibold">
-                            Ngày 30 hàng tháng
-                          </span>
-                        </h3>
-                        <p className="text-xs text-slate-300 leading-relaxed max-w-2xl">
-                          Hệ thống định kỳ tổng hợp số liệu truy cập, số lượng tài khoản giáo viên đăng ký (qua Gmail &amp; Số điện thoại), số giáo án đã soạn và gửi file báo cáo đính kèm chuẩn Microsoft Word đến hòm thư:
-                        </p>
-                        <div className="flex flex-wrap items-center gap-3 pt-1">
-                          <span className="inline-flex items-center gap-1.5 bg-slate-800/90 border border-slate-700 px-3 py-1.5 rounded-xl font-mono text-xs font-bold text-emerald-400 shadow-inner">
-                            <i data-lucide="mail" className="w-4 h-4 text-emerald-400"></i>
-                            leanh2004ggv3@gmail.com
-                          </span>
-                          <span className="text-[11px] text-slate-400 flex items-center gap-1">
-                            <i data-lucide="clock" className="w-3.5 h-3.5 text-slate-400"></i>
-                            Lần gửi cuối: <strong className="text-slate-200">{lastReportEmailSent || 'Chưa gửi trong tháng này'}</strong>
-                          </span>
-                        </div>
-                      </div>
-
-                      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 shrink-0">
-                        <button
-                          type="button"
-                          onClick={handleSendMonthlyReportToGmail}
-                          className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs sm:text-sm px-5 py-3 rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 hover:scale-102"
-                          title="Tải file Word báo cáo và mở giao diện gửi thư Gmail đến leanh2004ggv3@gmail.com"
-                        >
-                          <i data-lucide="send" className="w-4 h-4"></i>
-                          <span>Gửi Báo Cáo Ngay (Gmail)</span>
-                        </button>
-                        <button
-                          type="button"
-                          onClick={handleExportStatsWord}
-                          className="bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white border border-slate-700 font-bold text-xs px-4 py-3 rounded-xl shadow-sm transition-all flex items-center justify-center gap-2"
-                          title="Tải ngay file Word .doc về máy"
-                        >
-                          <i data-lucide="file-text" className="w-4 h-4 text-blue-400"></i>
-                          <span>Tải File Word (.doc)</span>
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Feature Breakdown Section */}
-                  <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5">
-                    <h3 className="font-bold text-slate-800 text-sm mb-3 flex items-center gap-2">
-                      <i data-lucide="pie-chart" className="w-4 h-4 text-emerald-600"></i>
-                      <span>Tỉ Lệ Khai Thác Theo Phân Hệ Chuyên Môn</span>
-                    </h3>
-                    <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 text-xs">
-                      <div className="p-3 rounded-lg bg-emerald-50 border border-emerald-100">
-                        <div className="flex justify-between font-bold text-emerald-800 mb-1">
-                          <span>Soạn KHBD 5512 CN</span>
-                          <span>42%</span>
-                        </div>
-                        <div className="w-full bg-emerald-200 rounded-full h-1.5">
-                          <div className="bg-emerald-600 h-1.5 rounded-full" style={{ width: '42%' }}></div>
-                        </div>
-                      </div>
-                      <div className="p-3 rounded-lg bg-cyan-50 border border-cyan-100">
-                        <div className="flex justify-between font-bold text-cyan-800 mb-1">
-                          <span>Soạn GA Mẫu HĐTN</span>
-                          <span>34%</span>
-                        </div>
-                        <div className="w-full bg-cyan-200 rounded-full h-1.5">
-                          <div className="bg-cyan-600 h-1.5 rounded-full" style={{ width: '34%' }}></div>
-                        </div>
-                      </div>
-                      <div className="p-3 rounded-lg bg-blue-50 border border-blue-100">
-                        <div className="flex justify-between font-bold text-blue-800 mb-1">
-                          <span>Tạo PPCT 7 Cột</span>
-                          <span>16%</span>
-                        </div>
-                        <div className="w-full bg-blue-200 rounded-full h-1.5">
-                          <div className="bg-blue-600 h-1.5 rounded-full" style={{ width: '16%' }}></div>
-                        </div>
-                      </div>
-                      <div className="p-3 rounded-lg bg-amber-50 border border-amber-100">
-                        <div className="flex justify-between font-bold text-amber-800 mb-1">
-                          <span>App 3D & E-Learning</span>
-                          <span>8%</span>
-                        </div>
-                        <div className="w-full bg-amber-200 rounded-full h-1.5">
-                          <div className="bg-amber-600 h-1.5 rounded-full" style={{ width: '8%' }}></div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* USER MANAGEMENT & USAGE TABLE */}
-                  <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6 space-y-4">
-                    <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-4">
-                      <div>
-                        <h3 className="font-bold text-slate-800 text-sm flex items-center gap-2">
-                          <i data-lucide="users-round" className="w-4 h-4 text-indigo-600"></i>
-                          <span>Danh Sách Người Dùng & Thống Kê Số Lượng Sử Dụng</span>
-                        </h3>
-                        <p className="text-xs text-slate-500">Chi tiết tài khoản giáo viên đã đăng ký và tần suất sử dụng các tính năng web</p>
-                      </div>
-
-                      <div className="flex flex-wrap items-center gap-2.5">
-                        {/* Search Input */}
-                        <div className="relative">
-                          <i data-lucide="search" className="w-3.5 h-3.5 absolute left-3 top-2.5 text-slate-400"></i>
-                          <input
-                            type="text"
-                            value={userSearchQuery}
-                            onChange={(e) => setUserSearchQuery(e.target.value)}
-                            placeholder="Tìm tên, email, trường..."
-                            className="pl-8 pr-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-lg text-slate-700 focus:outline-none focus:border-emerald-500 w-48 sm:w-56"
-                          />
-                        </div>
-
-                        {/* Role Filter */}
-                        <select
-                          value={userRoleFilter}
-                          onChange={(e) => setUserRoleFilter(e.target.value)}
-                          className="px-2.5 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-lg text-slate-700 focus:outline-none focus:border-emerald-500 font-medium"
-                        >
-                          <option value="ALL">Tất cả vai trò</option>
-                          <option value="ADMIN">Quản trị viên (Admin)</option>
-                          <option value="TEACHER">Giáo viên (Teacher)</option>
-                        </select>
-                      </div>
-                    </div>
-
-                    {/* Table View */}
-                    <div className="overflow-x-auto border border-slate-200 rounded-xl">
-                      <table className="w-full text-left text-xs">
-                        <thead className="bg-slate-50 text-slate-600 font-bold border-b border-slate-200">
-                          <tr>
-                            <th className="p-3 text-center w-12">STT</th>
-                            <th className="p-3">Họ và Tên Giáo Viên</th>
-                            <th className="p-3">Gmail / Số Điện Thoại</th>
-                            <th className="p-3">Đơn Vị Trường</th>
-                            <th className="p-3">Môn Phụ Trách</th>
-                            <th className="p-3 text-center">Vai Trò</th>
-                            <th className="p-3 text-center">Lượt Đăng Nhập</th>
-                            <th className="p-3 text-center">Bài Đã Soạn</th>
-                            <th className="p-3 text-center">Lần ĐN Cuối</th>
-                            <th className="p-3 text-center">Trạng Thái</th>
-                            <th className="p-3 text-center w-28">Thao Tác</th>
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y divide-slate-100 text-slate-700">
-                          {registeredUsers
-                            .filter(u => {
-                              const matchesSearch = !userSearchQuery ||
-                                u.fullName.toLowerCase().includes(userSearchQuery.toLowerCase()) ||
-                                u.email.toLowerCase().includes(userSearchQuery.toLowerCase()) ||
-                                (u.phone && u.phone.includes(userSearchQuery)) ||
-                                (u.schoolName && u.schoolName.toLowerCase().includes(userSearchQuery.toLowerCase()));
-                              const matchesRole = userRoleFilter === 'ALL' || u.role === userRoleFilter;
-                              return matchesSearch && matchesRole;
-                            })
-                            .map((u, idx) => (
-                              <tr key={u.id} className="hover:bg-slate-50/80 transition-colors">
-                                <td className="p-3 text-center text-slate-400 font-semibold">{idx + 1}</td>
-                                <td className="p-3 font-semibold text-slate-900 flex items-center gap-2">
-                                  <div className="w-7 h-7 rounded-full bg-emerald-100 text-emerald-800 font-bold flex items-center justify-center shrink-0 text-xs">
-                                    {u.fullName ? u.fullName.charAt(0) : 'U'}
-                                  </div>
-                                  <span>{u.fullName}</span>
-                                </td>
-                                <td className="p-3 font-mono text-slate-600">
-                                  <div className="flex flex-col gap-0.5">
-                                    <span className="text-slate-800 font-medium">{u.email}</span>
-                                    {u.phone && (
-                                      <span className="text-[11px] text-emerald-600 font-semibold flex items-center gap-1">
-                                        <i data-lucide="phone" className="w-3 h-3 text-emerald-500"></i>
-                                        <span>{u.phone}</span>
-                                      </span>
-                                    )}
-                                  </div>
-                                </td>
-                                <td className="p-3">{u.schoolName}</td>
-                                <td className="p-3">{u.subject}</td>
-                                <td className="p-3 text-center">
-                                  <span className={`inline-block px-2 py-0.5 rounded text-[10px] font-bold ${
-                                    u.role === 'ADMIN' ? 'bg-amber-100 text-amber-800 border border-amber-200' : 'bg-slate-100 text-slate-700 border border-slate-200'
-                                  }`}>
-                                    {u.role === 'ADMIN' ? 'Quản trị' : 'Giáo viên'}
-                                  </span>
-                                </td>
-                                <td className="p-3 text-center font-bold text-emerald-600 bg-emerald-50/40">{u.loginCount || 1}</td>
-                                <td className="p-3 text-center font-bold text-blue-600 bg-blue-50/40">{u.plansCreated || 0}</td>
-                                <td className="p-3 text-center text-slate-500 text-[11px]">{u.lastLoginAt || 'Hôm nay'}</td>
-                                <td className="p-3 text-center">
-                                  <span className="inline-flex items-center gap-1 text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full text-[10px] font-semibold border border-emerald-200">
-                                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                                    <span>Hoạt động</span>
-                                  </span>
-                                </td>
-                                <td className="p-3 text-center">
-                                  <div className="flex items-center justify-center gap-1.5">
-                                    <button
-                                      type="button"
-                                      onClick={() => handleAdminResetPassword(u)}
-                                      className="p-1.5 text-amber-600 hover:text-amber-700 hover:bg-amber-50 rounded-lg border border-amber-200/80 transition-colors"
-                                      title={`Reset mật khẩu nhanh cho ${u.fullName} về 123456`}
-                                    >
-                                      <i data-lucide="rotate-ccw" className="w-3.5 h-3.5"></i>
-                                    </button>
-                                    {u.role !== 'ADMIN' && currentUser && currentUser.role === 'ADMIN' && (
-                                      <button
-                                        type="button"
-                                        onClick={() => handleDeleteUser(u.id, u.fullName)}
-                                        className="p-1.5 text-rose-500 hover:bg-rose-50 rounded-lg border border-rose-200/80 transition-colors"
-                                        title="Xóa tài khoản này"
-                                      >
-                                        <i data-lucide="trash-2" className="w-3.5 h-3.5"></i>
-                                      </button>
-                                    )}
-                                  </div>
-                                </td>
-                              </tr>
-                            ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-
-                  {/* REAL-TIME AUDIT LOGS */}
-                  <div className="p-5 rounded-xl border border-slate-200 bg-slate-50 space-y-3">
-                    <div className="flex items-center justify-between">
-                      <h3 className="font-bold text-xs uppercase tracking-wider text-slate-700 flex items-center gap-2">
-                        <i data-lucide="clock" className="w-4 h-4 text-emerald-600"></i>
-                        <span>Nhật Ký Sử Dụng Hệ Thống Thời Gian Thực (Audit Logs):</span>
-                      </h3>
-                      <span className="text-[11px] text-slate-500">{usageLogs.length} hoạt động ghi nhận</span>
-                    </div>
-
-                    <div className="space-y-2 text-xs">
-                      {usageLogs.slice(0, 15).map(log => (
-                        <div key={log.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-2.5 bg-white rounded-lg border border-slate-200 gap-1.5 hover:border-slate-300 transition-colors">
-                          <div className="flex items-center space-x-2.5">
-                            <span className="text-slate-400 font-mono text-[11px] shrink-0">{log.timestamp}</span>
-                            <span className="font-bold text-slate-800">{log.userName}:</span>
-                            <span className="text-slate-700 font-medium">{log.action}</span>
-                            {log.detail && (
-                              <span className="text-slate-500 text-[11px] italic truncate max-w-[280px]">({log.detail})</span>
-                            )}
-                          </div>
-                          <span className="text-emerald-600 font-semibold text-[11px] shrink-0 flex items-center gap-1">
-                            <i data-lucide="check-circle" className="w-3 h-3"></i>
-                            <span>Thành công</span>
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* TAB 5: DATABASE SCHEMA VIEWER */}
-              {activeTab === 'DATABASE_VIEW' && (
-                <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6 space-y-4">
-                  <div className="flex items-center justify-between border-b border-slate-100 pb-4">
-                    <div>
-                      <h2 className="font-bold text-slate-800 text-base flex items-center gap-2">
-                        <i data-lucide="database" className="w-5 h-5 text-slate-800"></i>
-                        <span>Supabase PostgreSQL Database Schema (`database/schema.sql`)</span>
-                      </h2>
-                      <p className="text-xs text-slate-500">Cấu trúc 4 bảng dữ liệu, chính sách bảo mật RLS và câu lệnh SQL khởi tạo</p>
-                    </div>
-                    <span className="text-xs bg-emerald-100 text-emerald-800 font-mono px-2.5 py-1 rounded font-semibold">
-                      PostgreSQL 15
-                    </span>
-                  </div>
-
-                  <div className="bg-slate-900 text-emerald-400 p-4 rounded-xl font-mono text-xs overflow-x-auto max-h-[500px] border border-slate-800 custom-scrollbar whitespace-pre">
-{`-- 1. BẢNG HỒ SƠ GIÁO VIÊN (PROFILES)
-CREATE TABLE IF NOT EXISTS public.profiles (
-    id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
-    email TEXT NOT NULL UNIQUE,
-    full_name TEXT NOT NULL,
-    school_name TEXT DEFAULT 'Trường THCS / THPT Chuyên',
-    subject TEXT DEFAULT 'Công nghệ & Hướng nghiệp',
-    avatar_url TEXT,
-    created_at TIMESTAMPTZ DEFAULT NOW()
-);
-
--- 2. BẢNG KẾ HOẠCH BÀI DẠY (LESSON_PLANS)
-CREATE TABLE IF NOT EXISTS public.lesson_plans (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    user_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
-    title TEXT NOT NULL,
-    grade_level INT NOT NULL CHECK (grade_level BETWEEN 6 AND 12),
-    subject_module TEXT NOT NULL,
-    topic_name TEXT NOT NULL,
-    duration_periods INT DEFAULT 2,
-    content_markdown TEXT NOT NULL,
-    format_type TEXT DEFAULT 'CV_5512',
-    created_at TIMESTAMPTZ DEFAULT NOW()
-);
-
--- 3. BẢNG THƯ VIỆN HỌC LIỆU (MATERIALS)
-CREATE TABLE IF NOT EXISTS public.materials (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    user_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
-    title TEXT NOT NULL,
-    category TEXT NOT NULL CHECK (category IN ('SLIDE', 'EXAM', 'CAD_DRAWING', 'VIDEO')),
-    file_path TEXT NOT NULL,
-    file_size BIGINT NOT NULL,
-    downloads_count INT DEFAULT 0
-);`}
-                  </div>
-                </div>
-              )}
 
               {/* TAB 6: PPCT GENERATOR (MODULE HO_TRO_TẠO_PPCT_CN) */}
               {activeTab === 'PPCT_GENERATOR' && (
