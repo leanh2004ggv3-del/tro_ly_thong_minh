@@ -222,6 +222,7 @@ code{background:#f1f5f9;border-radius:5px;padding:0 4px;font-size:12.5px;color:#
   <div class="buoc"><span class="so">4</span><b>Xem trước và xuất Word</b>
     <span style="margin-left:auto;display:flex;gap:10px;align-items:center;flex-wrap:wrap">
       <label class="tick nho2" style="display:flex;gap:6px;align-items:center"><input type="checkbox" id="chiQuanh" checked> Chỉ hiện quanh chỗ chèn</label>
+      <label class="tick nho2" style="display:flex;gap:6px;align-items:center" title="Gỡ chế độ «không cho hàng bảng ngắt qua trang» để Word không đẩy cả hàng sang trang sau, để trống nửa trang"><input type="checkbox" id="cNgat" checked> Bỏ khoảng trắng (hàng bảng ngắt qua trang)</label>
       <button class="nut xanh" id="bWord2">📝 Tải giáo án đã tích hợp (.docx)</button></span></div>
   <div class="chu-giai"><span style="--m:#dc0000">NLS — chữ đỏ</span><span style="--m:#0066cc">NLAI — chữ xanh dương</span><span style="--m:#f59e0b">đoạn cũ được nối thêm câu màu</span><span style="--m:#e5e7eb">nội dung cũ — giữ nguyên</span><span>Đã lồng ghép: <b id="soMoi">0</b></span></div>
   <div id="canhBao"></div>
@@ -781,6 +782,43 @@ function sinhLG(x, h) {
 const giaTriLG = (x, g, k) => (x.lg && x.lg[k] != null ? x.lg[k] : g[k]) || "";
 const batLG = (x, k) => !(x.tat && x.tat[k]);
 
+/* ---------- bỏ khoảng trắng: hàng bảng được ngắt qua trang (Luật riêng 21/10/2026) ----------
+   Hàng bảng đặt «không cho ngắt qua trang» (cantSplit) mà dài hơn phần còn lại của trang → Word đẩy cả hàng sang trang sau,
+   để trống nửa trang. App gỡ cantSplit; đoạn trong ô bỏ «giữ với đoạn sau / giữ các dòng» (keepNext, keepLines). Chữ không đổi. */
+let styleGiu = new Set();   // kiểu đoạn (style) có sẵn keepNext/keepLines trong styles.xml
+function kieuGiuDong(xml) {
+  const ds = new Set();
+  try {
+    const d = new DOMParser().parseFromString(xml, "application/xml");
+    for (const st of d.getElementsByTagNameNS(W, "style")) {
+      const ppr = [...st.childNodes].find(c => c.localName === "pPr");
+      if (ppr && [...ppr.childNodes].some(c => ["keepNext", "keepLines"].includes(c.localName) && !/^(0|false|off)$/i.test(c.getAttributeNS(W, "val") || c.getAttribute("w:val") || ""))) ds.add(st.getAttributeNS(W, "styleId") || st.getAttribute("w:styleId"));
+    }
+  } catch (e) {}
+  return ds;
+}
+function choNgatTrang(doc) {
+  const tat = e => !/^(0|false|off)$/i.test(e.getAttributeNS(W, "val") || e.getAttribute("w:val") || "");
+  let hang = 0, doan = 0;
+  for (const tr of [...doc.getElementsByTagNameNS(W, "tr")]) {
+    const trPr = [...tr.childNodes].find(c => c.localName === "trPr");
+    if (trPr) for (const c of [...trPr.childNodes]) if (c.localName === "cantSplit" && tat(c)) { trPr.removeChild(c); hang++; }
+  }
+  for (const p of [...doc.getElementsByTagNameNS(W, "p")]) {
+    let a = p.parentNode; while (a && a.localName !== "tc" && a.localName !== "body") a = a.parentNode;
+    if (!a || a.localName !== "tc") continue;
+    let ppr = [...p.childNodes].find(c => c.localName === "pPr"), sua = false;
+    if (ppr) for (const c of [...ppr.childNodes]) if (["keepNext", "keepLines", "pageBreakBefore"].includes(c.localName) && tat(c)) { ppr.removeChild(c); sua = true; }
+    const ps = ppr && [...ppr.childNodes].find(c => c.localName === "pStyle"), kieu = ps && (ps.getAttributeNS(W, "val") || ps.getAttribute("w:val"));
+    if (kieu && styleGiu.has(kieu)) {   // kiểu đoạn tự giữ dòng → ghi đè tắt ngay sau pStyle
+      ["keepLines", "keepNext"].forEach(t => { if ([...ppr.childNodes].some(c => c.localName === t)) return; const e = doc.createElementNS(W, "w:" + t); e.setAttributeNS(W, "w:val", "0"); ppr.insertBefore(e, ps.nextSibling); });
+      sua = true;
+    }
+    if (sua) doan++;
+  }
+  return { hang, doan };
+}
+
 /* ---------- áp tích hợp vào một bản sao XML ---------- */
 function apTichHop(xmlGoc, chiXem) {
   const doc = new DOMParser().parseFromString(xmlGoc, "application/xml");
@@ -838,6 +876,7 @@ function apTichHop(xmlGoc, chiXem) {
       if (v.kieu === "noi") noi(v.i, cham(chu), x.loai); else chen(v.i, [["- " + cham(chu), false]], x.loai);
     });
   });
+  const ngat = GA.ngatHang !== false ? choNgatTrang(doc) : { hang: 0, doan: 0 };
   if (chiXem) return { doc, moi, sua, canhBao };
   let s = new XMLSerializer().serializeToString(doc);
   if (!/^<\?xml/.test(s)) s = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\r\n' + s;
@@ -851,7 +890,7 @@ function apTichHop(xmlGoc, chiXem) {
   Object.keys(goc).forEach(k => cMoiChen[k] = cMoi[k] - chiGoc[k]);
   const lech = Object.keys(goc).filter(k => goc[k] !== chiGoc[k] || tong2[k] !== goc[k] + cMoiChen[k]);
   if (lech.length) throw new Error("Phần gốc bị thay đổi ở: " + lech.map(k => VAT[k]).join(", ") + " — em dừng, không xuất.");
-  return { xml: s, moi, sua, canhBao, giu: goc };
+  return { xml: s, moi, sua, canhBao, giu: goc, ngat };
 }
 
 /* ---------- PDF → Word dựng lại ---------- */
@@ -928,17 +967,19 @@ async function napFile(f) {
   $("trangThai").innerHTML = "⏳ Đang đọc <b>" + TT.esc(ten) + "</b>…";
   try {
     const buf = await f.arrayBuffer();
+    styleGiu = new Set();
     let zip, xml, nguon = duoi, ghiChu = "";
     if (duoi === "docx") {
       zip = await JSZip.loadAsync(buf);
       const f2 = zip.file("word/document.xml");
       if (!f2) throw new Error("File này không phải giáo án Word hợp lệ.");
       xml = await f2.async("string");
+      const fk = zip.file("word/styles.xml"); styleGiu = fk ? kieuGiuDong(await fk.async("string")) : new Set();
     } else {
       const r = await docPdf(buf); zip = r.zip; xml = r.xml;
       ghiChu = `PDF ${r.trang} trang đã được dựng lại thành Word (chữ Times New Roman 13). Bảng, hình, khung trong PDF <b>không giữ được</b>; chỉ số trên/dưới (x², H₂O) app cố giữ, còn <b>phân số, căn, công thức nhiều tầng sẽ bị vỡ</b>. Môn Toán, KHTN, Vật lí, Hoá: thầy cô đưa <b>file Word gốc</b> để giữ nguyên công thức.`;
     }
-    GA = { ten: ten.replace(/\.(docx|pdf)$/i, ""), nguon, zip, xml, xmlGoc: xml, ghiChu, themMoc: [], boCu: true };
+    GA = { ten: ten.replace(/\.(docx|pdf)$/i, ""), nguon, zip, xml, xmlGoc: xml, ghiChu, themMoc: [], boCu: true, ngatHang: $("cNgat").checked };
     datBoCu(true);
     phanTichLai(true);
     TT.ting(); TT.toast("Đã đọc xong giáo án", "ok");
@@ -1215,7 +1256,7 @@ async function xuatWord() {
   } catch (e) { GA.zip.file("word/document.xml", GA.xml); TT.toast(e.message, "loi"); TT.buzz(); $("canhBao").innerHTML = `<div>❌ ${TT.esc(e.message)}</div>`; return; }
   GA.zip.file("word/document.xml", GA.xml);   // trả lại bản gốc để còn sửa tiếp
   const mt = moTaVat(r.giu);
-  $("giuNguyen").innerHTML = `🛡️ Đã kiểm file tải về: chữ cũ giữ nguyên, chỉ thêm ${r.moi.size} đoạn mới và nối câu vào ${r.sua.size} đoạn${mt ? " — còn đủ " + TT.esc(mt) : ""}.`;
+  $("giuNguyen").innerHTML = `🛡️ Đã kiểm file tải về: chữ cũ giữ nguyên, chỉ thêm ${r.moi.size} đoạn mới và nối câu vào ${r.sua.size} đoạn${mt ? " — còn đủ " + TT.esc(mt) : ""}.${r.ngat.hang + r.ngat.doan ? ` Đã cho ${r.ngat.hang} hàng bảng được ngắt qua trang (bỏ khoảng trắng).` : ""}`;
   const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = GA.ten + " - tich hop NLS NLAI.docx";
   document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 800);
   TT.ting(); TT.phaoGiay(); TT.toast(`Đã xuất Word: lồng ghép ${r.moi.size + r.sua.size} chỗ`, "ok");
@@ -1250,6 +1291,7 @@ document.addEventListener("DOMContentLoaded", () => {
   $("bThemMoc").onclick = () => { const v = $("chonMoc").value; if (!GA || v === "") return; GA.themMoc.push(+v); phanTichLai(); TT.toast("Đã thêm mốc hoạt động", "ok"); };
   $("bXoaHet").onclick = () => { if (!DS.length || !confirm("Xoá hết các nội dung tích hợp đang nhập?")) return; DS = []; luu(); veDs(); veXem(); };
   $("chiQuanh").onchange = veXem;
+  $("cNgat").onchange = e => { if (GA) GA.ngatHang = e.target.checked; };
   document.addEventListener("change", e => { if (e.target.id === "cBoCu" && GA) { GA.boCu = e.target.checked; datBoCu(); phanTichLai(); TT.toast(GA.boCu ? "Đã bỏ nội dung tích hợp cũ" : "Giữ nội dung tích hợp cũ", "ok"); } });
   $("bWord").onclick = xuatWord; $("bWord2").onclick = xuatWord;
   const ds = $("dsTich");
