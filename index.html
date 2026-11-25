@@ -3117,6 +3117,271 @@
       );
     }
 
+    // ===== ĐĂNG KÝ / ĐĂNG NHẬP TÀI KHOẢN RIÊNG + GHI SỐ LIỆU SỬ DỤNG (25/11/2026) =====
+    const TL_CAU_HINH = { mayChu: 'https://script.google.com/macros/s/AKfycbxBca1W-HEh_Beo-odpp5QiS6br_7gEDEp3yWZNOA1p4R-1gfRwO8vDCCZ90PGthzygdw/exec' };
+    const TL_DA_CAU_HINH = !/^__TL_/.test(TL_CAU_HINH.mayChu);
+    const TL_TEN_MUC = {
+      HOME: 'Trang chủ', TO_TRUONG: 'Tổ Trưởng Số', HDTN_TEMPLATE_GENERATOR: 'Soạn GA theo mẫu HĐTN', AI_GENERATOR: 'Soạn KHBD 5512',
+      PPCT_GENERATOR: 'Tạo PPCT', EXAM_GENERATOR: 'Đề & Ma trận', APPS_3D: 'App thực hành 3D', ELEARNING: 'Kho E-Learning',
+      IUPAC: 'Hoá học IUPAC', HINH_HOC_3D: '3D Hình học Toán', MATERIALS: 'Thư viện học liệu', BAO_CAO_THAT: 'Báo cáo sử dụng'
+    };
+
+    const TL = (() => {
+      let phien = null;
+      try { phien = JSON.parse(localStorage.getItem('tl_phien') || 'null'); } catch (e) {}
+      if (phien && !(phien.han > Date.now())) phien = null;
+      let hang = [];
+      try { hang = JSON.parse(localStorage.getItem('tl_hang') || '[]'); } catch (e) {}
+      const bao = () => window.dispatchEvent(new Event('tl-doi'));
+      const luuHang = () => { try { localStorage.setItem('tl_hang', JSON.stringify(hang.slice(-200))); } catch (e) {} };
+      const goi = async (duLieu, giuSong) => {
+        const r = await fetch(TL_CAU_HINH.mayChu, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(duLieu), keepalive: !!giuSong, redirect: 'follow' });
+        return r.json();
+      };
+      const api = {
+        layPhien: () => phien,
+        vao: async (duLieu) => {
+          const kq = await goi(duLieu);
+          if (!kq.ok) throw new Error(kq.loi || 'Không thành công, thầy cô thử lại ạ');
+          phien = { phien: kq.phien, han: kq.han, tenDN: kq.tenDN, ten: kq.ten, quanTri: !!kq.quanTri };
+          localStorage.setItem('tl_phien', JSON.stringify(phien));
+          bao();
+          return phien;
+        },
+        dangNhap: (tenDN, mk) => api.vao({ hanh: 'dangNhap', tenDN, mk }),
+        dangKy: (ten, tenDN, mk) => api.vao({ hanh: 'dangKy', ten, tenDN, mk }),
+        dangXuat: (baoMayChu) => {
+          if (baoMayChu && phien) goi({ hanh: 'dangXuat', phien: phien.phien }).catch(() => {});
+          phien = null; localStorage.removeItem('tl_phien'); bao();
+        },
+        datLaiMK: (tenDN) => goi({ hanh: 'datLaiMK', phien: phien && phien.phien, tenDN }),
+        ghi: (chuc, ct) => {
+          if (!phien) return;
+          const cuoi = hang[hang.length - 1];
+          if (cuoi && cuoi.chuc === chuc && cuoi.ct === (ct || '') && Date.now() - cuoi.tg < 4000) return;
+          hang.push({ tg: Date.now(), chuc: String(chuc).slice(0, 60), ct: String(ct || '').slice(0, 150) });
+          luuHang();
+        },
+        day: async (giuSong) => {
+          if (!phien || !hang.length || !TL_DA_CAU_HINH) return;
+          const goiDi = hang.slice(0, 50);
+          try {
+            const kq = await goi({ hanh: 'ghi', phien: phien.phien, ds: goiDi }, giuSong);
+            if (kq.ok) { hang = hang.slice(goiDi.length); luuHang(); }
+            else if (kq.loi === 'het-phien') api.dangXuat();
+          } catch (e) { /* mất mạng: giữ lại, gửi lần sau */ }
+        },
+        baoCao: async () => {
+          const kq = await goi({ hanh: 'baoCao', phien: phien && phien.phien });
+          if (!kq.ok && kq.loi === 'het-phien') api.dangXuat();
+          return kq;
+        }
+      };
+      setInterval(() => api.day(false), 15000);
+      window.addEventListener('pagehide', () => api.day(true));
+      document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') api.day(true); });
+      return api;
+    })();
+    window.TL = TL;
+
+    function useTL() {
+      const [p, setP] = useState(TL.layPhien());
+      useEffect(() => { const f = () => setP(TL.layPhien()); window.addEventListener('tl-doi', f); return () => window.removeEventListener('tl-doi', f); }, []);
+      return p;
+    }
+
+    // Cổng: chưa đăng nhập thì che toàn bộ web
+    function CongDangNhap() {
+      const p = useTL();
+      const [loi, setLoi] = useState('');
+      const [dangXuLy, setDangXuLy] = useState(false);
+
+      // ghi lượt mở app / bài / nút chính (bắt sự kiện bấm toàn trang)
+      useEffect(() => {
+        const bat = (e) => {
+          const a = e.target.closest && e.target.closest('a[href]');
+          if (a && (a.target === '_blank' || /\.html/.test(a.getAttribute('href') || ''))) {
+            const href = decodeURIComponent(a.getAttribute('href') || '').split('/').pop().replace(/\.html.*$/, '');
+            TL.ghi('Mở app / bài', (a.closest('[class*="rounded"]')?.querySelector('h3,h4,.font-bold')?.innerText || href).trim().slice(0, 120));
+            return;
+          }
+          const b = e.target.closest && e.target.closest('button');
+          if (!b || b.closest('aside, [class*="md:hidden"]')) return;
+          const chu = (b.innerText || '').replace(/\s+/g, ' ').trim();
+          if (/^(Tạo|Soạn|Ra đề|Xuất|Tải|In \/|Xem giáo án mẫu|✨|Học & Trình Chiếu|Mở Trải Nghiệm|Xem Trước|Tạo Câu Hỏi)/i.test(chu) && chu.length < 80) TL.ghi('Bấm: ' + chu.slice(0, 50), '');
+        };
+        document.addEventListener('click', bat, true);
+        return () => document.removeEventListener('click', bat, true);
+      }, []);
+
+      const [che, setChe] = useState('vao'); // 'vao' | 'dangky'
+      const [o, setO] = useState({ ten: '', tenDN: '', mk: '', mk2: '' });
+      const doi = (k) => (e) => setO({ ...o, [k]: e.target.value });
+      const gui = async (e) => {
+        e.preventDefault(); setLoi('');
+        if (che === 'dangky' && o.mk !== o.mk2) { setLoi('Hai lần nhập mật khẩu chưa khớp'); return; }
+        setDangXuLy(true);
+        try {
+          if (che === 'vao') await TL.dangNhap(o.tenDN, o.mk); else await TL.dangKy(o.ten, o.tenDN, o.mk);
+          setO({ ten: '', tenDN: '', mk: '', mk2: '' });
+        } catch (err) {
+          setLoi(/fetch|network/i.test(err.message) ? 'Không kết nối được máy chủ, thầy cô kiểm tra mạng rồi thử lại ạ' : err.message);
+        } finally { setDangXuLy(false); }
+      };
+
+      if (p) return null;
+      const oCls = 'w-full border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500';
+      return (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 overflow-y-auto bg-gradient-to-br from-indigo-950/95 via-violet-900/95 to-sky-900/95 backdrop-blur-sm">
+          <div className="w-full max-w-md bg-white rounded-3xl shadow-2xl p-6 sm:p-7 space-y-4 my-auto">
+            <div className="text-center">
+              <img src="logo.png" alt="" className="w-14 h-14 mx-auto rounded-2xl border border-violet-200 p-1 object-contain" onError={(e) => { e.target.style.display = 'none'; }} />
+              <h2 className="text-2xl font-extrabold text-slate-900 mt-2">Trợ Lý Thông Minh</h2>
+              <p className="text-sm text-slate-500">Mời thầy cô đăng nhập để sử dụng web</p>
+            </div>
+            <div className="grid grid-cols-2 bg-slate-100 rounded-xl p-1 text-sm font-bold">
+              <button type="button" onClick={() => { setChe('vao'); setLoi(''); }} className={'py-2 rounded-lg ' + (che === 'vao' ? 'bg-white shadow text-violet-700' : 'text-slate-500')}>Đăng nhập</button>
+              <button type="button" onClick={() => { setChe('dangky'); setLoi(''); }} className={'py-2 rounded-lg ' + (che === 'dangky' ? 'bg-white shadow text-violet-700' : 'text-slate-500')}>Tạo tài khoản</button>
+            </div>
+            {!TL_DA_CAU_HINH ? (
+              <div className="text-sm text-rose-700 bg-rose-50 border border-rose-200 rounded-xl p-3">Web chưa được cấu hình máy chủ số liệu.</div>
+            ) : (
+              <form onSubmit={gui} className="space-y-3">
+                {che === 'dangky' && <input className={oCls} placeholder="Họ và tên (VD: Nguyễn Văn An)" value={o.ten} onChange={doi('ten')} required />}
+                <input className={oCls} placeholder={che === 'dangky' ? 'Tên đăng nhập (VD: an.cn — không dấu)' : 'Tên đăng nhập'} value={o.tenDN} onChange={doi('tenDN')} autoComplete="username" autoCapitalize="none" required />
+                <input className={oCls} type="password" placeholder={che === 'dangky' ? 'Mật khẩu (ít nhất 6 ký tự)' : 'Mật khẩu'} value={o.mk} onChange={doi('mk')} autoComplete={che === 'vao' ? 'current-password' : 'new-password'} required />
+                {che === 'dangky' && <input className={oCls} type="password" placeholder="Nhập lại mật khẩu" value={o.mk2} onChange={doi('mk2')} autoComplete="new-password" required />}
+                <button type="submit" disabled={dangXuLy} className="w-full py-3 rounded-xl font-bold text-white bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-700 hover:to-fuchsia-700 disabled:opacity-60">
+                  {dangXuLy ? 'Đang xử lý…' : (che === 'vao' ? 'Đăng nhập' : 'Tạo tài khoản và vào web')}
+                </button>
+              </form>
+            )}
+            {loi && <p className="text-sm text-rose-700 bg-rose-50 border border-rose-200 rounded-xl p-2.5">{loi}</p>}
+            {che === 'vao' && <p className="text-xs text-slate-500 text-center">Quên mật khẩu? Thầy cô nhờ quản trị web đặt lại giúp.</p>}
+            <p className="text-[12px] text-slate-500 leading-relaxed bg-slate-50 border border-slate-200 rounded-xl p-3">
+              🔒 Web chỉ ghi <b>họ tên, tên đăng nhập</b> và <b>lượt sử dụng các chức năng</b> (mở mục nào, lúc nào) để tổng hợp số liệu cho tổ chuyên môn. Mật khẩu được mã hoá một chiều, không ai đọc được.
+              Web <b>không</b> ghi nội dung giáo án, đề kiểm tra của thầy cô. Đăng nhập là thầy cô đồng ý với việc ghi này.
+            </p>
+          </div>
+        </div>
+      );
+    }
+
+    function TaiKhoanChip() {
+      const p = useTL();
+      const [mo, setMo] = useState(false);
+      if (!p) return null;
+      return (
+        <div className="relative">
+          <button type="button" onClick={() => setMo(!mo)} className="flex items-center gap-2 pl-1 pr-3 py-1 rounded-full bg-slate-800 border border-slate-700 hover:bg-slate-700 text-xs text-slate-100">
+<span className={'w-7 h-7 rounded-full flex items-center justify-center font-bold ' + (p.quanTri ? 'bg-amber-500' : 'bg-violet-600')}>{(p.ten || '?')[0]}</span>
+            <span className="max-w-[110px] truncate hidden sm:inline">{p.ten}</span>
+          </button>
+          {mo && (
+            <div className="absolute right-0 mt-2 w-64 bg-slate-900 border border-slate-700 rounded-xl shadow-xl p-3 text-xs text-slate-200 z-[60] space-y-2">
+              <div><b className="text-white">{p.ten}</b><br/><span className="text-slate-400">Tên đăng nhập: {p.tenDN}</span></div>
+              {p.quanTri && <div className="text-amber-300 font-semibold">★ Quản trị — xem được báo cáo</div>}
+              <button type="button" onClick={() => { setMo(false); TL.day(false).then(() => TL.dangXuat(true)); }} className="w-full text-left px-2 py-1.5 rounded-lg text-rose-300 hover:bg-rose-500/10 font-semibold">Đăng xuất</button>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    // Báo cáo số liệu thật — chỉ tài khoản quản trị (máy chủ cũng tự chặn người khác)
+    function BaoCaoSuDung() {
+      const p = useTL();
+      const [kq, setKq] = useState(null);
+      const [dang, setDang] = useState(false);
+      const tai = async () => {
+        setDang(true);
+        try { setKq(await TL.baoCao()); } catch (e) { setKq({ ok: false, loi: 'Không kết nối được máy chủ số liệu: ' + e.message }); }
+        setDang(false);
+      };
+      useEffect(() => { TL.day(false).then(tai); }, []);
+      if (!p || !p.quanTri) return <div className="bg-white rounded-xl border p-6 text-sm text-slate-600">Mục này chỉ dành cho tài khoản quản trị.</div>;
+
+      const xuatCSV = () => {
+        const q = (v) => '"' + String(v ?? '').replace(/"/g, '""') + '"';
+        let s = '﻿' + 'BÁO CÁO SỬ DỤNG WEB TRỢ LÝ THÔNG MINH\nLập lúc,' + q(kq.luc) + '\n\n';
+        s += 'Tổng người dùng,' + kq.tong.nguoiDung + '\nNgười dùng tháng này,' + kq.tong.nguoiDungThangNay + '\nLượt đăng nhập,' + kq.tong.luotDangNhap + '\nLượt sử dụng chức năng,' + kq.tong.luotDung + '\n\n';
+        s += 'Chức năng,Số lượt\n' + Object.entries(kq.theoChuc).sort((a, b) => b[1] - a[1]).map(([k, v]) => q(k) + ',' + v).join('\n') + '\n\n';
+        s += 'Họ tên,Tên đăng nhập,Ngày đăng ký,Lần cuối,Số lần đăng nhập,Số lượt dùng\n' + kq.nguoiDung.map(u => [u.ten, u.tenDN, u.lanDau, u.lanCuoi, u.soDN, u.soDung].map(q).join(',')).join('\n') + '\n\n';
+        s += 'Thời gian,Họ tên,Tên đăng nhập,Chức năng,Chi tiết\n' + kq.ganDay.map(r => [r.tg, r.ten, r.tenDN, r.chuc, r.ct].map(q).join(',')).join('\n');
+        const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([s], { type: 'text/csv;charset=utf-8' }));
+        a.download = 'Bao_cao_su_dung_web_' + kq.luc.slice(0, 10) + '.csv'; a.click();
+      };
+      const xuatWord = () => {
+        const e = (v) => String(v ?? '').replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
+        const td = 'style="border:1px solid #000;padding:4px"';
+        const bangHTML = (dau, hang) => '<table style="border-collapse:collapse;width:100%"><tr>' + dau.map(x => '<th ' + td + '>' + x + '</th>').join('') + '</tr>' + hang.map(r => '<tr>' + r.map(x => '<td ' + td + '>' + e(x) + '</td>').join('') + '</tr>').join('') + '</table>';
+        const than = '<h2 style="text-align:center">BÁO CÁO SỐ LIỆU SỬ DỤNG WEB TRỢ LÝ THÔNG MINH</h2><p style="text-align:center"><i>Số liệu tính đến ' + e(kq.luc) + '</i></p>'
+          + '<p><b>1. Tổng hợp:</b> ' + kq.tong.nguoiDung + ' người dùng (' + kq.tong.nguoiDungThangNay + ' người dùng trong tháng này); ' + kq.tong.luotDangNhap + ' lượt đăng nhập; ' + kq.tong.luotDung + ' lượt sử dụng chức năng.</p>'
+          + '<p><b>2. Theo chức năng:</b></p>' + bangHTML(['Chức năng', 'Số lượt'], Object.entries(kq.theoChuc).sort((a, b) => b[1] - a[1]))
+          + '<p><b>3. Danh sách người dùng:</b></p>' + bangHTML(['Họ tên', 'Tên đăng nhập', 'Ngày đăng ký', 'Lần cuối', 'Đăng nhập', 'Lượt dùng'], kq.nguoiDung.map(u => [u.ten, u.tenDN, u.lanDau, u.lanCuoi, u.soDN, u.soDung]));
+        const doc = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word"><head><meta charset="utf-8"><style>body{font-family:"Times New Roman";font-size:13pt}</style></head><body>' + than + '</body></html>';
+        const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob(['﻿' + doc], { type: 'application/msword' }));
+        a.download = 'Bao_cao_su_dung_web_' + kq.luc.slice(0, 10) + '.doc'; a.click();
+      };
+
+      const ngay = kq && kq.ok ? Object.entries(kq.theoNgay).sort() : [];
+      const maxNgay = Math.max(1, ...ngay.map(x => x[1]));
+      const chuc = kq && kq.ok ? Object.entries(kq.theoChuc).sort((a, b) => b[1] - a[1]).slice(0, 15) : [];
+      const maxChuc = Math.max(1, ...chuc.map(x => x[1]));
+      return (
+        <div className="space-y-5">
+          <div className="bg-gradient-to-r from-indigo-900 via-violet-900 to-sky-900 rounded-2xl p-6 text-white flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h2 className="text-xl font-extrabold">📊 Báo cáo sử dụng web (số liệu thật)</h2>
+              <p className="text-xs text-violet-200 mt-1">Ghi từ tài khoản thầy cô đăng nhập trên web (không tính lượt của quản trị) · chỉ tài khoản quản trị xem được{kq && kq.ok ? ' · cập nhật ' + kq.luc : ''}</p>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <button type="button" onClick={tai} disabled={dang} className="px-3.5 py-2 rounded-xl text-xs font-bold bg-white/10 border border-white/25 hover:bg-white/20">{dang ? 'Đang tải…' : '↻ Làm mới'}</button>
+              {kq && kq.ok && <button type="button" onClick={xuatCSV} className="px-3.5 py-2 rounded-xl text-xs font-bold bg-emerald-500 hover:bg-emerald-600">⬇ Tải Excel (.csv)</button>}
+              {kq && kq.ok && <button type="button" onClick={xuatWord} className="px-3.5 py-2 rounded-xl text-xs font-bold bg-sky-500 hover:bg-sky-600">⬇ Tải Word (.doc)</button>}
+            </div>
+          </div>
+          {!kq && <div className="bg-white rounded-xl border p-6 text-sm text-slate-500">Đang lấy số liệu…</div>}
+          {kq && !kq.ok && <div className="bg-rose-50 border border-rose-200 rounded-xl p-4 text-sm text-rose-800">{kq.loi}</div>}
+          {kq && kq.ok && (<>
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+              {[['Người dùng', kq.tong.nguoiDung, 'text-violet-700'], ['Người dùng tháng này', kq.tong.nguoiDungThangNay, 'text-sky-700'], ['Lượt đăng nhập', kq.tong.luotDangNhap, 'text-emerald-700'], ['Lượt dùng chức năng', kq.tong.luotDung, 'text-amber-700']].map(([t, v, m]) => (
+                <div key={t} className="bg-white rounded-xl border border-slate-200 p-4"><p className="text-xs text-slate-500 font-semibold">{t}</p><p className={'text-3xl font-extrabold mt-1 ' + m}>{v}</p></div>
+              ))}
+            </div>
+            <div className="grid lg:grid-cols-2 gap-4">
+              <div className="bg-white rounded-xl border border-slate-200 p-4">
+                <h3 className="text-sm font-bold text-slate-700 mb-3">Lượt dùng theo chức năng</h3>
+                {chuc.length ? chuc.map(([k, v]) => (
+                  <div key={k} className="flex items-center gap-2 text-xs mb-1.5"><span className="w-44 truncate text-slate-600" title={k}>{k}</span><div className="flex-1 bg-slate-100 rounded h-4"><div className="bg-violet-500 h-4 rounded" style={{ width: (v / maxChuc * 100) + '%' }}></div></div><span className="w-8 text-right font-bold text-slate-700">{v}</span></div>
+                )) : <p className="text-xs text-slate-400">Chưa có lượt dùng.</p>}
+              </div>
+              <div className="bg-white rounded-xl border border-slate-200 p-4">
+                <h3 className="text-sm font-bold text-slate-700 mb-3">30 ngày gần đây (lượt/ngày)</h3>
+                {ngay.length ? <div className="flex items-end gap-1 h-40">{ngay.map(([d, v]) => (
+                  <div key={d} className="flex-1 flex flex-col items-center justify-end h-full" title={d + ': ' + v + ' lượt'}><div className="w-full bg-sky-500 rounded-t" style={{ height: (v / maxNgay * 100) + '%' }}></div><span className="text-[9px] text-slate-400 mt-1">{d.slice(8)}</span></div>
+                ))}</div> : <p className="text-xs text-slate-400">Chưa có số liệu.</p>}
+              </div>
+            </div>
+            <div className="bg-white rounded-xl border border-slate-200 p-4 overflow-x-auto">
+              <h3 className="text-sm font-bold text-slate-700 mb-3">Người dùng ({kq.nguoiDung.length})</h3>
+              <table className="w-full text-xs"><thead><tr className="text-left text-slate-500 border-b"><th className="py-1.5 pr-2">Họ tên</th><th className="pr-2">Tên đăng nhập</th><th className="pr-2">Ngày đăng ký</th><th className="pr-2">Lần cuối</th><th className="pr-2 text-right">Đăng nhập</th><th className="pr-2 text-right">Lượt dùng</th><th></th></tr></thead>
+                <tbody>{kq.nguoiDung.map(u => <tr key={u.tenDN} className="border-b border-slate-100"><td className="py-1.5 pr-2 font-semibold text-slate-800">{u.ten}</td><td className="pr-2 text-slate-600">{u.tenDN}</td><td className="pr-2">{u.lanDau}</td><td className="pr-2">{u.lanCuoi}</td><td className="pr-2 text-right">{u.soDN}</td><td className="pr-2 text-right">{u.soDung}</td>
+                  <td className="text-right"><button type="button" className="text-[11px] font-semibold text-indigo-700 hover:underline whitespace-nowrap" onClick={async () => {
+                    if (!window.confirm('Đặt lại mật khẩu cho ' + u.ten + ' (' + u.tenDN + ')?')) return;
+                    const r = await TL.datLaiMK(u.tenDN);
+                    window.alert(r.ok ? 'Mật khẩu mới của ' + u.tenDN + ':  ' + r.mkMoi + '\n\nThầy cô ghi lại và báo riêng cho người dùng (mật khẩu này chỉ hiện một lần).' : (r.loi || 'Không đặt lại được'));
+                  }}>Đặt lại MK</button></td></tr>)}</tbody></table>
+            </div>
+            <div className="bg-white rounded-xl border border-slate-200 p-4 overflow-x-auto max-h-[420px] overflow-y-auto">
+              <h3 className="text-sm font-bold text-slate-700 mb-3">Nhật ký gần đây (300 dòng mới nhất)</h3>
+              <table className="w-full text-xs"><tbody>{kq.ganDay.map((r, i) => <tr key={i} className="border-b border-slate-100"><td className="py-1 pr-2 text-slate-400 whitespace-nowrap">{r.tg}</td><td className="pr-2 font-semibold">{r.ten}</td><td className="pr-2 text-violet-700">{r.chuc}</td><td className="text-slate-500">{r.ct}</td></tr>)}</tbody></table>
+            </div>
+          </>)}
+        </div>
+      );
+    }
+
     function App() {
       // Nhận diện tham số ?fullscreenApplet=true từ URL để tự động kích hoạt chế độ Toàn Màn Hình Applet
       const [isHdtnFullscreen, setIsHdtnFullscreen] = useState(() => {
@@ -3129,6 +3394,8 @@
       });
 
       const [activeTab, setActiveTab] = useState(() => isHdtnFullscreen ? 'HDTN_TEMPLATE_GENERATOR' : 'HOME');
+      const tl = useTL();
+      useEffect(() => { if (tl) TL.ghi('Xem mục', TL_TEN_MUC[activeTab] || activeTab); }, [activeTab, tl && tl.tenDN]);
       // Chế độ xem Tổ Trưởng Số: 'GRID' (Lưới 10 công cụ mở toàn màn hình mượt mà, chống treo) hoặc 'IFRAME'
       const [toTruongViewMode, setToTruongViewMode] = useState('GRID');
 
@@ -5485,6 +5752,7 @@ Yêu cầu: đáp án chính xác, không trùng ý giữa các câu, phương �
                 </button>
 
               </div>
+              <TaiKhoanChip />
             </div>
           </header>
 
@@ -5631,7 +5899,17 @@ Yêu cầu: đáp án chính xác, không trùng ý giữa các câu, phương �
                   <span className="truncate">Thư Viện Học Liệu</span>
                 </button>
 
-
+                {tl && tl.quanTri && (
+                  <button
+                    onClick={() => setActiveTab('BAO_CAO_THAT')}
+                    className={`w-full flex items-center space-x-2.5 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                      activeTab === 'BAO_CAO_THAT' ? 'bg-indigo-50 text-indigo-800 font-bold border-l-4 border-indigo-600 shadow-sm' : 'text-slate-700 hover:bg-slate-50'
+                    }`}
+                  >
+                    <i data-lucide="bar-chart-3" className="w-4 h-4 text-indigo-600 shrink-0"></i>
+                    <span className="truncate">Báo Cáo Sử Dụng</span>
+                  </button>
+                )}
               </div>
 
             </aside>
@@ -5722,6 +6000,16 @@ Yêu cầu: đáp án chính xác, không trùng ý giữa các câu, phương �
               >
                 📂 Học Liệu
               </button>
+              {tl && tl.quanTri && (
+                <button
+                  onClick={() => setActiveTab('BAO_CAO_THAT')}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap ${
+                    activeTab === 'BAO_CAO_THAT' ? 'bg-indigo-600 text-white font-bold' : 'bg-white text-slate-700 border border-slate-200'
+                  }`}
+                >
+                  📊 Báo Cáo
+                </button>
+              )}
             </div>
 
 
@@ -8767,6 +9055,8 @@ Yêu cầu: đáp án chính xác, không trùng ý giữa các câu, phương �
                 );
               })()}
 
+              {activeTab === 'BAO_CAO_THAT' && tl && tl.quanTri && <BaoCaoSuDung />}
+
               {/* TAB 6: PPCT GENERATOR (MODULE HO_TRO_TẠO_PPCT_CN) */}
               {activeTab === 'PPCT_GENERATOR' && (
                 <div className="space-y-6">
@@ -9849,6 +10139,7 @@ Yêu cầu: đáp án chính xác, không trùng ý giữa các câu, phương �
 
     ReactDOM.createRoot(document.getElementById('root')).render(
       <ErrorBoundary>
+        <CongDangNhap />
         <App />
       </ErrorBoundary>
     );
