@@ -3123,7 +3123,7 @@
     const TL_TEN_MUC = {
       HOME: 'Trang chủ', TO_TRUONG: 'Tổ Trưởng Số', HDTN_TEMPLATE_GENERATOR: 'Soạn GA theo mẫu HĐTN', AI_GENERATOR: 'Soạn KHBD 5512',
       PPCT_GENERATOR: 'Tạo PPCT', EXAM_GENERATOR: 'Đề & Ma trận', APPS_3D: 'App thực hành 3D', ELEARNING: 'Kho E-Learning',
-      IUPAC: 'Hoá học IUPAC', HINH_HOC_3D: '3D Hình học Toán', MATERIALS: 'Thư viện học liệu', BAO_CAO_THAT: 'Báo cáo sử dụng'
+      IUPAC: 'Hoá học IUPAC', TINH_HUONG_9: 'Tình huống HĐTN 9', HINH_HOC_3D: '3D Hình học Toán', MATERIALS: 'Thư viện học liệu', BAO_CAO_THAT: 'Báo cáo sử dụng'
     };
 
     const TL = (() => {
@@ -5863,6 +5863,20 @@ Yêu cầu: đáp án chính xác, không trùng ý giữa các câu, phương �
                   <span className="bg-emerald-100 text-emerald-700 text-[10px] px-1.5 py-0.5 rounded-full font-bold">68</span>
                 </button>
 
+                {/* TINH_HUONG_9: APP EM XỬ LÍ TÌNH HUỐNG HĐTN 9 (26/11/2026) */}
+                <button
+                  onClick={() => setActiveTab('TINH_HUONG_9')}
+                  className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                    activeTab === 'TINH_HUONG_9' ? 'bg-indigo-50 text-indigo-800 font-bold border-l-4 border-indigo-500 shadow-sm' : 'text-slate-700 hover:bg-slate-50'
+                  }`}
+                >
+                  <div className="flex items-center space-x-2.5 truncate">
+                    <i data-lucide="users" className="w-4 h-4 text-indigo-500 shrink-0"></i>
+                    <span className="truncate">Tình Huống HĐTN 9</span>
+                  </div>
+                  <span className="bg-indigo-100 text-indigo-700 text-[10px] px-1.5 py-0.5 rounded-full font-bold">29</span>
+                </button>
+
                 {/* TAB MỚI: APP ĐỌC TÊN HÓA HỌC IUPAC */}
                 <button
                   onClick={() => setActiveTab('IUPAC')}
@@ -5988,6 +6002,14 @@ Yêu cầu: đáp án chính xác, không trùng ý giữa các câu, phương �
                 🧪 Hóa Học IUPAC
               </button>
               <button
+                onClick={() => setActiveTab('TINH_HUONG_9')}
+                className={`px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap ${
+                  activeTab === 'TINH_HUONG_9' ? 'bg-indigo-600 text-white font-bold' : 'bg-white text-slate-700 border border-slate-200'
+                }`}
+              >
+                🎭 Tình huống HĐTN 9
+              </button>
+              <button
                 onClick={() => setActiveTab('HINH_HOC_3D')}
                 className={`px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap ${
                   activeTab === 'HINH_HOC_3D' ? 'bg-blue-600 text-white font-bold' : 'bg-white text-slate-700 border border-slate-200'
@@ -6066,6 +6088,7 @@ Yêu cầu: đáp án chính xác, không trùng ý giữa các câu, phương �
                         { tab: 'APPS_3D', bieu: '🎮', ten: 'App thực hành 3D', mo: '13 app Công nghệ', mau: 'from-cyan-500 to-teal-500' },
                         { tab: 'ELEARNING', bieu: '📺', ten: 'Kho E-Learning', mo: '68 bài tự học CN 6–9', mau: 'from-emerald-500 to-green-600' },
                         { tab: 'HINH_HOC_3D', bieu: '📐', ten: '3D Hình học Toán', mo: '55 bài Toán 6–9', mau: 'from-blue-500 to-violet-500' },
+                        { tab: 'TINH_HUONG_9', bieu: '🎭', ten: 'Tình huống HĐTN 9', mo: '29 tình huống SGK cho HS', mau: 'from-indigo-500 to-pink-500' },
                         { tab: 'IUPAC', bieu: '🧪', ten: 'Hoá học IUPAC', mo: 'Luyện đọc tên chất', mau: 'from-orange-400 to-rose-500' },
                         { tab: 'MATERIALS', bieu: '📂', ten: 'Thư viện học liệu', mo: 'Trò chơi PowerPoint, tư liệu', mau: 'from-amber-400 to-orange-500' }
 
@@ -8333,6 +8356,34 @@ Yêu cầu: đáp án chính xác, không trùng ý giữa các câu, phương �
                           </div>
                         </div>
                     ))}
+                  </div>
+                </div>
+              )}
+
+              {/* TINH_HUONG_9: APP EM XỬ LÍ TÌNH HUỐNG HĐTN 9 (26/11/2026) */}
+              {activeTab === 'TINH_HUONG_9' && (
+                <div className="space-y-5 animate-in fade-in duration-200">
+                  <div className="bg-gradient-to-r from-indigo-900 via-violet-800 to-pink-800 rounded-2xl p-6 text-white shadow-lg">
+                    <div className="flex flex-wrap items-center justify-between gap-4">
+                      <div className="min-w-0">
+                        <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/10 text-indigo-100 rounded-full text-xs font-semibold border border-white/20 mb-2">
+                          <i data-lucide="users" className="w-3.5 h-3.5"></i>
+                          <span>Hoạt động trải nghiệm, hướng nghiệp 9 — Kết nối tri thức</span>
+                        </div>
+                        <h2 className="text-2xl font-black tracking-tight text-white">Em Xử Lí Tình Huống</h2>
+                        <p className="text-sm text-indigo-100/90 mt-1 max-w-2xl">
+                          29 tình huống trong SGK (Chủ đề 1–6, 9): chọn cách ứng xử, xếp bước, phân loại, lập ngân sách và viết lời của em. Học sinh chỉ gõ mã (HS01…) hoặc tên nhóm; kết quả lưu trên máy đang dùng.
+                        </p>
+                      </div>
+                      <a href="tinh-huong-9/" target="_blank" rel="noopener noreferrer"
+                        className="px-5 py-2.5 bg-pink-500 hover:bg-pink-400 text-white font-bold rounded-xl flex items-center gap-2 shadow-lg transition-colors text-sm">
+                        <i data-lucide="external-link" className="w-4 h-4"></i>
+                        Mở App Toàn Màn Hình
+                      </a>
+                    </div>
+                  </div>
+                  <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                    <iframe src="tinh-huong-9/" title="Em xử lí tình huống HĐTN 9" className="w-full block" style={{ height: '78vh', minHeight: '560px', border: 0 }}></iframe>
                   </div>
                 </div>
               )}
