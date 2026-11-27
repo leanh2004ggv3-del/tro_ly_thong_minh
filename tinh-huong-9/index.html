@@ -143,6 +143,15 @@ main{padding:6px 22px 40px;max-width:1360px;margin:0 auto}
 .bang-sai{width:100%;border-collapse:collapse;font-size:15px}
 .bang-sai td,.bang-sai th{padding:8px;border-bottom:1px solid #e2e8f0;text-align:left}
 .dai-thu{background:repeating-linear-gradient(45deg,#fde68a,#fde68a 12px,#fef3c7 12px,#fef3c7 24px);color:#92400e;font-weight:900;text-align:center;padding:8px;border-radius:12px;margin-bottom:10px;letter-spacing:2px}
+.nut-video{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:86px;height:86px;border-radius:50%;border:0;background:rgba(15,23,42,.72);color:#fff;font-size:34px;box-shadow:0 8px 24px rgba(0,0,0,.3);transition:transform .15s}
+.nut-video:hover{transform:translate(-50%,-50%) scale(1.08)}
+.khung-tranh{position:relative}
+.nhan-video{position:absolute;right:12px;bottom:12px;padding:6px 12px;border-radius:999px;background:#fff;font-weight:800;font-size:14px;color:var(--cd);box-shadow:0 4px 12px rgba(0,0,0,.15);pointer-events:none}
+#hopVideo{position:fixed;inset:0;z-index:60;background:rgba(15,23,42,.82);display:none;align-items:center;justify-content:center;padding:20px}
+#hopVideo.mo{display:flex}
+#hopVideo .ben{width:min(1100px,100%);background:#0f172a;border-radius:18px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+#hopVideo video{display:block;width:100%;max-height:78vh;background:#000}
+#hopVideo .dong{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;color:#e2e8f0;font-weight:700;gap:10px}
 #phao{position:fixed;inset:0;pointer-events:none;z-index:50;width:100%;height:100%}
 /* chiếu TV */
 body.tv{font-size:19px}
@@ -186,6 +195,7 @@ body.tv .khung-canh h2{font-size:30px}
 </header>
 <div class="nhap">✅ BẢN NHÁP — thầy/cô duyệt trước khi dùng · Nội dung bám SGK HĐTN, HN 9 (Kết nối tri thức); phương án và lời giải thích do trợ lý soạn theo phần Gợi ý của SGK</div>
 <main id="man"></main>
+<div id="hopVideo" onclick="if(event.target===this)dongVideo()"><div class="ben"><video controls playsinline preload="none"></video><div class="dong"><span class="ten"></span><button class="nut nho" onclick="dongVideo()">✕ Đóng</button></div></div></div>
 <canvas id="phao"></canvas>
 
 <script>
@@ -195,6 +205,15 @@ var KHOA = "em-xu-li-tinh-huong-hdtn9-v1";
 var CD = {}; DL.chu_de.forEach(function (c) { CD[c.cd] = c; });
 var TH = {}; DL.tinh_huong.forEach(function (t) { TH[t.id] = t; });
 var KHONG_HU = false;   // chế độ chụp
+var THU_MUC_VIDEO = /*THU_MUC_VIDEO*/"video/", CO_VIDEO = ["c1-t1", "c1-t2", "c2-t1", "c2-t2", "c2-t3", "c2-t4", "c3-t1", "c3-t2", "c3-t3", "c3-t4", "c3-t5", "c3-t6", "c3-t7", "c3-t8", "c3-t9", "c4-t1", "c4-t2", "c4-t3", "c4-t4", "c4-t5", "c4-t6", "c4-t7", "c5-t1", "c5-t2", "c6-t1", "c6-t2", "c6-t3", "c6-t4", "c9-t1"];
+function coVideo(id) { return CO_VIDEO.indexOf(id) >= 0; }
+function moVideo(id) {
+  var h = document.getElementById("hopVideo"), t = TH[id];
+  h.querySelector(".ten").textContent = "🎬 " + t.ten + " · SGK " + t.trang;
+  var v = h.querySelector("video"); v.src = THU_MUC_VIDEO + id + ".mp4"; h.classList.add("mo");
+  try { var pr = v.play(); if (pr && pr.catch) pr.catch(function () {}); } catch (e) {}
+}
+function dongVideo() { var h = document.getElementById("hopVideo"), v = h.querySelector("video"); v.pause(); v.removeAttribute("src"); v.load(); h.classList.remove("mo"); }
 
 /* ---------------- lưu trữ (chỉ mã HS / tên nhóm, trong trình duyệt máy này) ---------------- */
 function docKho() {
@@ -363,9 +382,9 @@ function vat(v) {
   return s + (M[k] || "") + '</g>';
 }
 function bongNoi(b) {
-  var x = b[0], y = b[1], t = b[2], w = Math.min(Math.max(t.length * 6.6 + 18, 60), 230);
+  var x = b[0], y = b[1], t = b[2], co = t.length > 32 ? 11 : 12, w = Math.min(Math.max(t.length * co * 0.55 + 20, 60), 390);
   var x0 = Math.max(4, Math.min(396 - w, x - w / 2));
-  return '<g><rect x="' + x0 + '" y="' + (y - 18) + '" width="' + w + '" height="28" rx="12" fill="#fff" stroke="#334155" stroke-width="1.5"/><path d="M' + (x - 6) + ' ' + (y + 10) + ' l6 10 6 -10" fill="#fff" stroke="#334155" stroke-width="1.5"/><rect x="' + (x - 7) + '" y="' + (y + 7) + '" width="14" height="4" fill="#fff"/><text x="' + (x0 + w / 2) + '" y="' + (y + 1) + '" font-size="12" text-anchor="middle" font-family="Segoe UI" font-weight="700" fill="#1e293b">' + e(t) + '</text></g>';
+  return '<g><rect x="' + x0 + '" y="' + (y - 18) + '" width="' + w + '" height="28" rx="12" fill="#fff" stroke="#334155" stroke-width="1.5"/><path d="M' + (x - 6) + ' ' + (y + 10) + ' l6 10 6 -10" fill="#fff" stroke="#334155" stroke-width="1.5"/><rect x="' + (x - 7) + '" y="' + (y + 7) + '" width="14" height="4" fill="#fff"/><text x="' + (x0 + w / 2) + '" y="' + (y + 1) + '" font-size="' + co + '" text-anchor="middle" font-family="Segoe UI" font-weight="700" fill="#1e293b">' + e(t) + '</text></g>';
 }
 function tranh(t) {
   var c = t.canh;
@@ -389,6 +408,7 @@ function ve() {
   document.body.classList.toggle("khong-hieu-ung", KHONG_HU);
   var m = document.getElementById("man");
   document.documentElement.style.setProperty("--cd", "#4f46e5");
+  if (document.getElementById("hopVideo").classList.contains("mo")) dongVideo();
   if (q.man === "chu-de" && CD[q.cd]) veChuDe(m, +q.cd);
   else if (q.man === "th" && TH[q.id]) veTH(m, TH[q.id], q);
   else if (q.man === "gv") veGV(m, q);
@@ -430,7 +450,7 @@ function veChuDe(m, cd) {
   var h = '<div class="kinh tieu-de-cd"><div class="bieu">' + c.icon + '</div><div><h2>Chủ đề ' + cd + '. ' + e(c.ten) + '</h2><div style="color:var(--chu2);font-weight:700">' + c.trang + ' · chọn một tình huống để bắt đầu</div></div><button class="nut phu" style="margin-left:auto" onclick="diToi(\'trang-chu\')">← Các chủ đề</button></div><div class="luoi-th">';
   DL.tinh_huong.filter(function (t) { return t.cd === cd; }).forEach(function (t) {
     var x = KHO.ma && daXong(t.id);
-    h += '<div class="the-th" onclick="diToi(\'th&id=' + t.id + '\')">' + tranh(t) + '<div class="ben"><span class="huy">' + t.nhan + ' · ' + t.trang + '</span> ' + (x ? '<span class="huy xong">✓ Đã xong</span>' : '') + (t.an_toan ? ' <span class="huy at">❗ An toàn</span>' : '') + '<h3>' + e(t.ten) + '</h3><div style="color:var(--chu2);font-size:14px;font-weight:600">' + t.nv.length + ' nhiệm vụ + lời của em</div></div></div>';
+    h += '<div class="the-th" onclick="diToi(\'th&id=' + t.id + '\')"><div class="khung-tranh">' + tranh(t) + (coVideo(t.id) ? '<span class="nhan-video">🎬 Có video</span>' : '') + '</div><div class="ben"><span class="huy">' + t.nhan + ' · ' + t.trang + '</span> ' + (x ? '<span class="huy xong">✓ Đã xong</span>' : '') + (t.an_toan ? ' <span class="huy at">❗ An toàn</span>' : '') + '<h3>' + e(t.ten) + '</h3><div style="color:var(--chu2);font-size:14px;font-weight:600">' + t.nv.length + ' nhiệm vụ + lời của em</div></div></div>';
   });
   m.innerHTML = h + '</div>';
 }
@@ -440,7 +460,7 @@ var TT = null; // trạng thái nhiệm vụ đang làm
 function veTH(m, t, q) {
   var c = CD[t.cd]; document.documentElement.style.setProperty("--cd", c.mau);
   var b = q.nv !== undefined ? +q.nv : 0;
-  var h = '<div class="man-th"><section class="kinh khung-canh">' + tranh(t)
+  var h = '<div class="man-th"><section class="kinh khung-canh">' + '<div class="khung-tranh">' + tranh(t) + (coVideo(t.id) ? '<button class="nut-video" title="Xem video tình huống" onclick="moVideo(\'' + t.id + '\')">▶</button><span class="nhan-video">🎬 Xem video</span>' : '') + '</div>'
     + '<div style="margin:10px 4px 0"><span class="huy">Chủ đề ' + t.cd + '</span> <span class="huy">' + t.nhan + ' · SGK ' + t.trang + '</span></div>'
     + '<h2>' + e(t.ten) + '</h2><p class="tom">' + e(t.tom) + '</p>'
     + (t.an_toan ? '<div class="an-toan"><b>⚠️</b><span>Nếu em hoặc bạn em đang gặp chuyện như thế này thật, hãy nói ngay với cha mẹ hoặc thầy cô mà em tin cậy. Em không phải tự chịu một mình.</span></div>' : '')
