@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Em xử lí tình huống – HĐTN, HN 8</title>
+<style>
+:root{
+  --nen1:#eef4ff; --nen2:#fff4ea; --chu:#1e293b; --chu2:#475569; --kinh:rgba(255,255,255,.82); --vien:rgba(148,163,184,.35);
+  --chinh:#4f46e5; --nhan1:#f97316; --nhan2:#0ea5e9; --dung:#16a34a; --dung-nen:#dcfce7; --sai:#dc2626; --sai-nen:#fee2e2;
+  --cd:#4f46e5; --bong:0 10px 30px rgba(30,41,59,.12);
+  font-family:"Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif;
+}
+*{box-sizing:border-box}
+body{margin:0;color:var(--chu);min-height:100vh;
+  background:radial-gradient(circle at 10% 0%,#dbe7ff 0,transparent 45%),radial-gradient(circle at 95% 15%,#ffe4cc 0,transparent 40%),linear-gradient(160deg,var(--nen1),var(--nen2));}
+button{font-family:inherit;cursor:pointer}
+.dau{display:flex;align-items:center;gap:14px;padding:12px 22px;flex-wrap:wrap}
+.logo{display:flex;align-items:center;gap:10px;cursor:pointer}
+.logo h1{margin:0;font-size:26px;letter-spacing:.5px;background:linear-gradient(90deg,#4f46e5,#ec4899,#f97316);-webkit-background-clip:text;background-clip:text;color:transparent;font-weight:900}
+.logo small{display:block;color:var(--chu2);font-weight:600;font-size:13px}
+.dau .phai{margin-left:auto;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:999px;background:var(--kinh);border:1px solid var(--vien);font-weight:700;font-size:14px}
+.nut{border:0;border-radius:14px;padding:11px 18px;min-height:44px;font-weight:800;font-size:16px;color:#fff;
+  background:linear-gradient(135deg,var(--cd),#ec4899);box-shadow:0 6px 16px rgba(79,70,229,.28);transition:transform .15s,box-shadow .15s}
+.nut:hover{transform:translateY(-2px);box-shadow:0 10px 22px rgba(79,70,229,.32)}
+.nut:active{transform:translateY(1px) scale(.98)}
+.nut.phu{background:var(--kinh);color:var(--chu);border:1px solid var(--vien);box-shadow:none}
+.nut.nho{padding:7px 12px;min-height:38px;font-size:14px}
+.nut[disabled]{opacity:.45;cursor:not-allowed;transform:none}
+.nhap{margin:0 22px 8px;padding:7px 14px;border-radius:12px;background:#fff7d6;border:1px dashed #eab308;color:#854d0e;font-weight:700;font-size:14px;text-align:center}
+main{padding:6px 22px 40px;max-width:1360px;margin:0 auto}
+.kinh{background:var(--kinh);border:1px solid var(--vien);border-radius:20px;box-shadow:var(--bong);backdrop-filter:blur(6px)}
+.hien{animation:hien .3s ease}
+@keyframes hien{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes noi{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+@keyframes rung{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-7px)}40%,80%{transform:translateX(7px)}}
+.khong-hieu-ung *{animation:none!important;transition:none!important}
+/* trang chủ */
+.anh-hung{display:grid;grid-template-columns:1.2fr 1fr;gap:20px;padding:22px;align-items:center}
+.anh-hung h2{font-size:34px;margin:0 0 6px;line-height:1.15}
+.anh-hung p{color:var(--chu2);font-size:17px;margin:6px 0 14px;line-height:1.5}
+.o-ma{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.o-ma input{font-size:18px;padding:11px 14px;border-radius:14px;border:2px solid #c7d2fe;min-width:200px;font-weight:700}
+.o-ma .goi-y{width:100%;font-size:13px;color:var(--chu2)}
+.canh-bao-ma{color:var(--sai);font-weight:700;font-size:14px;width:100%}
+.luoi-cd{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px;margin-top:18px}
+.the-cd{position:relative;padding:16px;border-radius:20px;cursor:pointer;background:linear-gradient(160deg,#fff,color-mix(in srgb,var(--m) 12%,#fff));border:2px solid color-mix(in srgb,var(--m) 30%,transparent);box-shadow:var(--bong);transition:transform .18s}
+.the-cd:hover{transform:translateY(-4px)}
+.the-cd .bieu{width:62px;height:62px;border-radius:18px;display:grid;place-items:center;font-size:32px;background:linear-gradient(135deg,var(--m),color-mix(in srgb,var(--m) 55%,#fff));box-shadow:0 6px 14px color-mix(in srgb,var(--m) 40%,transparent)}
+.the-cd h3{margin:12px 0 2px;font-size:19px}
+.the-cd .nho{color:var(--chu2);font-size:13px;font-weight:600}
+.thanh{height:10px;border-radius:99px;background:#e2e8f0;overflow:hidden;margin-top:10px}
+.thanh i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--m),#22c55e)}
+/* chủ đề */
+.tieu-de-cd{display:flex;align-items:center;gap:14px;padding:16px 20px;margin-bottom:16px}
+.tieu-de-cd .bieu{width:56px;height:56px;border-radius:16px;display:grid;place-items:center;font-size:30px;background:var(--cd);color:#fff}
+.tieu-de-cd h2{margin:0;font-size:26px}
+.luoi-th{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:16px}
+.the-th{border-radius:18px;overflow:hidden;cursor:pointer;background:#fff;box-shadow:var(--bong);border:2px solid transparent;transition:transform .18s,border-color .18s}
+.the-th:hover{transform:translateY(-4px);border-color:var(--cd)}
+.the-th svg{display:block;width:100%;height:auto}
+.the-th .ben{padding:10px 14px 14px}
+.the-th h3{margin:4px 0;font-size:18px}
+.huy{display:inline-block;padding:3px 10px;border-radius:99px;font-size:12px;font-weight:800;background:color-mix(in srgb,var(--cd) 14%,#fff);color:var(--cd)}
+.huy.xong{background:var(--dung-nen);color:var(--dung)}
+.huy.at{background:#ffedd5;color:#c2410c}
+/* màn tình huống */
+.man-th{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:18px;align-items:start}
+.khung-canh{padding:14px}
+.khung-canh svg{width:100%;height:auto;border-radius:14px;display:block}
+.khung-canh h2{margin:12px 4px 4px;font-size:24px}
+.tom{font-size:17px;line-height:1.6;margin:6px 4px 4px}
+.an-toan{margin-top:12px;padding:12px 14px;border-radius:14px;background:linear-gradient(135deg,#fff7ed,#ffedd5);border:2px solid #fb923c;font-weight:700;color:#9a3412;display:flex;gap:10px;align-items:center}
+.an-toan b{font-size:26px}
+.bang-nv{padding:18px}
+.cham{display:flex;gap:8px;margin-bottom:12px;align-items:center;flex-wrap:wrap}
+.cham span{padding:5px 12px;border-radius:99px;font-weight:800;font-size:13px;background:#e2e8f0;color:#64748b}
+.cham span.dang{background:var(--cd);color:#fff;box-shadow:0 0 0 4px color-mix(in srgb,var(--cd) 25%,transparent)}
+.cham span.da{background:var(--dung-nen);color:var(--dung)}
+.hoi{font-size:20px;font-weight:800;margin:4px 0 12px;line-height:1.4}
+.pa{display:flex;gap:12px;align-items:flex-start;width:100%;text-align:left;padding:12px 14px;margin:8px 0;border-radius:16px;border:2px solid #e2e8f0;background:#fff;font-size:16.5px;line-height:1.45;color:var(--chu);transition:transform .12s,border-color .12s,background .2s}
+.pa:hover{border-color:var(--cd);transform:translateX(3px)}
+.pa .chu-cai{flex:none;width:38px;height:38px;border-radius:12px;display:grid;place-items:center;font-weight:900;font-size:19px;color:#fff;background:linear-gradient(135deg,var(--cd),#ec4899)}
+.pa.dung{border-color:var(--dung);background:var(--dung-nen)}
+.pa.dung .chu-cai{background:var(--dung)}
+.pa.sai{border-color:var(--sai);background:var(--sai-nen);animation:rung .35s}
+.pa.sai .chu-cai{background:var(--sai)}
+.pa.chon{border-color:var(--cd);background:color-mix(in srgb,var(--cd) 10%,#fff)}
+.pa .giai{display:block;margin-top:6px;font-size:14.5px;font-weight:600}
+.pa.dung .giai{color:#166534}.pa.sai .giai{color:#991b1b}
+.loi-bao{margin-top:12px;padding:12px 14px;border-radius:14px;font-weight:700;display:flex;gap:12px;align-items:center}
+.loi-bao.tot{background:var(--dung-nen);color:#166534}
+.loi-bao.chua{background:var(--sai-nen);color:#991b1b}
+.hang-nut{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;justify-content:flex-end}
+/* phân loại */
+.kho{display:flex;flex-wrap:wrap;gap:8px;min-height:54px;padding:10px;border-radius:14px;background:#f1f5f9;border:2px dashed #cbd5e1;margin-bottom:12px}
+.the-pl{padding:9px 12px;border-radius:12px;background:#fff;border:2px solid #cbd5e1;font-weight:700;font-size:15px;cursor:grab;user-select:none;box-shadow:0 3px 8px rgba(0,0,0,.06)}
+.the-pl.chon{border-color:var(--cd);box-shadow:0 0 0 4px color-mix(in srgb,var(--cd) 25%,transparent)}
+.the-pl.dung{border-color:var(--dung);background:var(--dung-nen)}
+.the-pl.sai{border-color:var(--sai);background:var(--sai-nen);animation:rung .35s}
+.the-pl small{display:block;font-weight:600;font-size:12.5px;margin-top:3px}
+.thung-hang{display:grid;gap:10px}
+.thung{border-radius:16px;padding:10px;min-height:120px;background:#fff;border:2px solid var(--tm);cursor:pointer;display:flex;flex-direction:column;gap:6px}
+.thung h4{margin:0 0 4px;padding:6px 10px;border-radius:10px;color:#fff;background:var(--tm);font-size:15px;text-align:center}
+.thung.sang{box-shadow:0 0 0 4px color-mix(in srgb,var(--tm) 30%,transparent)}
+/* xếp bước */
+.xep{list-style:none;padding:0;margin:0;position:relative}
+.xep:before{content:"";position:absolute;left:24px;top:20px;bottom:20px;width:4px;border-radius:4px;background:linear-gradient(var(--cd),#ec4899,#f97316)}
+.xep li{position:relative;display:flex;align-items:center;gap:10px;margin:8px 0;padding:10px 10px 10px 8px;border-radius:14px;background:#fff;border:2px solid #e2e8f0;font-size:16px;font-weight:600;cursor:grab}
+.xep li .so{flex:none;width:36px;height:36px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:900;background:var(--cd);z-index:1;box-shadow:0 0 0 4px #fff}
+.xep li .chu{flex:1}
+.xep li .mui{display:flex;flex-direction:column;gap:2px}
+.xep li .mui button{border:0;border-radius:8px;width:34px;height:26px;background:#eef2ff;font-weight:900;color:var(--cd)}
+.xep li.dung{border-color:var(--dung);background:var(--dung-nen)}.xep li.dung .so{background:var(--dung)}
+.xep li.sai{border-color:var(--sai);background:var(--sai-nen)}.xep li.sai .so{background:var(--sai)}
+.xep li.keo{opacity:.4}
+/* ngân sách */
+.ns{display:grid;grid-template-columns:1fr 210px;gap:14px;align-items:center}
+.thu-nhap{padding:10px 14px;border-radius:14px;background:linear-gradient(135deg,#ecfdf5,#d1fae5);font-weight:800;margin-bottom:10px}
+.dong-ns{margin:10px 0}
+.dong-ns label{display:flex;justify-content:space-between;gap:8px;font-weight:800;font-size:15px}.dong-ns label>span:last-child{white-space:nowrap}
+.dong-ns input{width:100%;accent-color:var(--mm);height:26px}
+.dong-ns .tien{color:var(--chu2);font-weight:700}
+.tong{margin-top:6px;padding:10px 14px;border-radius:12px;font-weight:900;text-align:center;font-size:17px}
+.tong.ok{background:var(--dung-nen);color:var(--dung)}.tong.vuot{background:var(--sai-nen);color:var(--sai)}.tong.thieu{background:#fef9c3;color:#a16207}
+.tieu-chi{list-style:none;padding:0;margin:10px 0 0;font-weight:700;font-size:15px}
+.tieu-chi li{margin:4px 0}
+/* lời của em */
+.loi-em textarea{width:100%;min-height:120px;font-size:17px;padding:12px;border-radius:14px;border:2px solid #c7d2fe;font-family:inherit}
+.cu{display:flex;gap:12px;align-items:flex-end}
+.cu .bong-noi{flex:1;padding:12px 16px;border-radius:18px 18px 18px 4px;background:#eef2ff;font-weight:700;font-size:16px;line-height:1.45}
+.cu svg{flex:none;animation:noi 3s ease-in-out infinite}
+.hoan-thanh{text-align:center;padding:24px}
+.sao{font-size:46px;letter-spacing:6px}
+/* giáo viên */
+.kpi{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin:12px 0}
+.kpi div{padding:16px;border-radius:18px;background:#fff;box-shadow:var(--bong);border-top:6px solid var(--k)}
+.kpi b{display:block;font-size:36px;color:var(--k)}
+.kpi span{color:var(--chu2);font-weight:700}
+.thu{position:relative;height:300px}
+.thu canvas{position:absolute;inset:0;width:100%;height:100%}
+.bang-sai{width:100%;border-collapse:collapse;font-size:15px}
+.bang-sai td,.bang-sai th{padding:8px;border-bottom:1px solid #e2e8f0;text-align:left}
+.dai-thu{background:repeating-linear-gradient(45deg,#fde68a,#fde68a 12px,#fef3c7 12px,#fef3c7 24px);color:#92400e;font-weight:900;text-align:center;padding:8px;border-radius:12px;margin-bottom:10px;letter-spacing:2px}
+.nut-video{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:86px;height:86px;border-radius:50%;border:0;background:rgba(15,23,42,.72);color:#fff;font-size:34px;box-shadow:0 8px 24px rgba(0,0,0,.3);transition:transform .15s}
+.nut-video:hover{transform:translate(-50%,-50%) scale(1.08)}
+.khung-tranh{position:relative}
+.nhan-video{position:absolute;right:12px;bottom:12px;padding:6px 12px;border-radius:999px;background:#fff;font-weight:800;font-size:14px;color:var(--cd);box-shadow:0 4px 12px rgba(0,0,0,.15);pointer-events:none}
+#hopVideo{position:fixed;inset:0;z-index:60;background:rgba(15,23,42,.82);display:none;align-items:center;justify-content:center;padding:20px}
+#hopVideo.mo{display:flex}
+#hopVideo .ben{width:min(1100px,100%);background:#0f172a;border-radius:18px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+#hopVideo video{display:block;width:100%;max-height:78vh;background:#000}
+#hopVideo .dong{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;color:#e2e8f0;font-weight:700;gap:10px}
+#phao{position:fixed;inset:0;pointer-events:none;z-index:50;width:100%;height:100%}
+/* chiếu TV */
+body.tv{font-size:19px}
+body.tv .hoi{font-size:27px}
+body.tv .pa{font-size:22px;padding:16px}
+body.tv .pa .chu-cai{width:52px;height:52px;font-size:28px}
+body.tv .tom{font-size:21px}
+body.tv .xep li,body.tv .the-pl{font-size:20px}
+body.tv .khung-canh h2{font-size:30px}
+@media (max-width:620px){.thung-hang{grid-template-columns:repeat(2,1fr)!important}.pa{font-size:15.5px}.hoi{font-size:18px}.anh-hung h2{font-size:27px}}
+@media (max-width:900px){.man-th,.anh-hung,.ns{grid-template-columns:1fr}.logo h1{font-size:21px}main{padding:6px 12px 30px}.dau{padding:10px 12px}.nhap{margin:0 12px 8px}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <linearGradient id="gTroi" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7dd3fc"/><stop offset="1" stop-color="#e0f2fe"/></linearGradient>
+  <linearGradient id="gTuong" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fef3c7"/><stop offset="1" stop-color="#fde68a"/></linearGradient>
+  <linearGradient id="gTuong2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e0e7ff"/><stop offset="1" stop-color="#c7d2fe"/></linearGradient>
+  <linearGradient id="gHong" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fce7f3"/><stop offset="1" stop-color="#fbcfe8"/></linearGradient>
+  <linearGradient id="gCo" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#86efac"/><stop offset="1" stop-color="#22c55e"/></linearGradient>
+  <linearGradient id="gDem" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#312e81"/><stop offset="1" stop-color="#6366f1"/></linearGradient>
+  <linearGradient id="gMang" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ede9fe"/><stop offset="1" stop-color="#fce7f3"/></linearGradient>
+  <linearGradient id="gRem" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#991b1b"/><stop offset=".5" stop-color="#dc2626"/><stop offset="1" stop-color="#991b1b"/></linearGradient>
+  <linearGradient id="gGo" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d6a46a"/><stop offset="1" stop-color="#a16207"/></linearGradient>
+  <linearGradient id="gGom" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#9a3412"/><stop offset=".5" stop-color="#ea580c"/><stop offset="1" stop-color="#9a3412"/></linearGradient>
+  <linearGradient id="gXu" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fde047"/><stop offset="1" stop-color="#ca8a04"/></linearGradient>
+  <radialGradient id="gDen" cx=".5" cy="0" r="1"><stop offset="0" stop-color="#fff" stop-opacity=".55"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
+</defs></svg>
+
+<header class="dau">
+  <div class="logo" onclick="diToi('trang-chu')" title="Về trang chủ">
+    <svg width="52" height="52" viewBox="0 0 52 52"><circle cx="26" cy="26" r="24" fill="#4f46e5"/><path d="M12 30c0-8 6-14 14-14s14 6 14 14" fill="none" stroke="#fde047" stroke-width="4" stroke-linecap="round"/><circle cx="19" cy="30" r="5" fill="#fff"/><circle cx="33" cy="30" r="5" fill="#fff"/><circle cx="19" cy="30" r="2.4" fill="#1e293b"/><circle cx="33" cy="30" r="2.4" fill="#1e293b"/><path d="M24 36l2 3 2-3z" fill="#f97316"/></svg>
+    <div><h1>EM XỬ LÍ TÌNH HUỐNG</h1><small>Hoạt động trải nghiệm, hướng nghiệp 8 · 33 tình huống SGK</small></div>
+  </div>
+  <div class="phai">
+    <span class="chip" id="chipMa">👤 Chưa nhập mã</span>
+    <button class="nut phu nho" id="nutAm" onclick="doiAm()">🔊 Âm thanh</button>
+    <button class="nut phu nho" id="nutTV" onclick="doiTV()">📺 Chiếu TV</button>
+    <button class="nut phu nho" onclick="diToi('gv')">📊 Giáo viên</button>
+  </div>
+</header>
+<div class="nhap">✅ BẢN NHÁP — thầy/cô duyệt trước khi dùng · Nội dung bám SGK HĐTN, HN 8 (Kết nối tri thức); phương án và lời giải thích do trợ lý soạn theo phần Gợi ý của SGK</div>
+<main id="man"></main>
+<div id="hopVideo" onclick="if(event.target===this)dongVideo()"><div class="ben"><video controls playsinline preload="none"></video><div class="dong"><span class="ten"></span><button class="nut nho" onclick="dongVideo()">✕ Đóng</button></div></div></div>
+<canvas id="phao"></canvas>
+
+<script>
+"use strict";
+var DL = {"chu_de": [{"cd": 1, "ten": "Em với nhà trường", "mau": "#3b82f6", "icon": "🏫", "trang": "SGK tr.7–9"}, {"cd": 2, "ten": "Khám phá bản thân", "mau": "#8b5cf6", "icon": "🔍", "trang": "SGK tr.15–19"}, {"cd": 3, "ten": "Trách nhiệm với bản thân", "mau": "#f97316", "icon": "🎯", "trang": "SGK tr.22–27"}, {"cd": 4, "ten": "Rèn luyện bản thân", "mau": "#10b981", "icon": "💪", "trang": "SGK tr.30–35"}, {"cd": 5, "ten": "Em với gia đình", "mau": "#ec4899", "icon": "🏡", "trang": "SGK tr.38–41"}], "tinh_huong": [{"cd": 1, "trang": "tr.7", "nhan": "Tình huống 1", "ten": "Minh Hà muốn kết bạn", "canh": {"nen": "lop", "nguoi": [{"x": 120, "ao": "#ec4899", "toc": "dai", "cam": "lo"}, {"x": 270, "ao": "#a855f7", "toc": "buoc", "cam": "vui"}], "vat": [["giay", 190, 205]], "loi": []}, "tom": "Minh Hà vẽ rất đẹp nhưng nhút nhát, ngại giao tiếp. Minh Hà muốn kết bạn với Hồng Ánh vì hai bạn có nhiều điểm chung.", "nv": [{"loai": "chon", "hoi": "Minh Hà nên làm gì?", "chon": [{"t": "Mạnh dạn bắt chuyện về sở thích chung, rủ Hồng Ánh cùng vẽ hoặc tham gia một hoạt động.", "d": 1, "g": "Chủ động, tự tin làm quen là cách xây dựng tình bạn (SGK tr.6)."}, {"t": "Chờ Hồng Ánh bắt chuyện trước.", "d": 0, "g": "Có thể chờ mãi; nên chủ động."}, {"t": "Nhờ bạn khác nói hộ là mình muốn làm bạn.", "d": 0, "g": "Tự nói sẽ chân thành hơn."}, {"t": "Thôi, vì mình nhút nhát.", "d": 0, "g": "Mạnh dạn một chút sẽ có thêm bạn."}]}], "loi": "Em đã làm quen với một người bạn thân như thế nào?", "id": "c1-t1"}, {"cd": 1, "trang": "tr.7", "nhan": "Tình huống 2", "ten": "Nghe nói Khanh nói xấu mình", "canh": {"nen": "santruong", "nguoi": [{"x": 130, "ao": "#3b82f6", "toc": "ngan", "cam": "buon"}, {"x": 230, "ao": "#f97316", "toc": "ngan", "cam": "binh"}, {"x": 320, "ao": "#22c55e", "toc": "ngan", "cam": "binh"}], "vat": [], "loi": []}, "tom": "Minh buồn vì một bạn kể rằng nghe Khanh nói xấu Minh.", "nv": [{"loai": "chon", "hoi": "Minh nên làm gì?", "chon": [{"t": "Bình tĩnh, gặp riêng Khanh hỏi và trao đổi thẳng thắn để tránh hiểu lầm.", "d": 1, "g": "Trao đổi thẳng thắn khi hiểu lầm giúp giữ tình bạn (SGK tr.6)."}, {"t": "Nói xấu lại Khanh.", "d": 0, "g": "Trả đũa làm mâu thuẫn tăng."}, {"t": "Không chơi với Khanh nữa.", "d": 0, "g": "Chưa rõ thực hư đã cắt đứt là vội vàng."}, {"t": "Đăng lên mạng kể tội Khanh.", "d": 0, "g": "Làm sự việc tệ hơn."}]}], "loi": "Khi nghe người khác kể lại lời không hay về mình, em làm gì?", "id": "c1-t2"}, {"cd": 1, "trang": "tr.7", "nhan": "Tình huống 3", "ten": "Bạn thân sắp chuyển trường", "canh": {"nen": "santruong", "nguoi": [{"x": 150, "ao": "#ec4899", "toc": "dai", "cam": "buon"}, {"x": 260, "ao": "#eab308", "toc": "buoc", "cam": "buon"}], "vat": [["hop-qua", 205, 215]], "loi": []}, "tom": "Hiền buồn vì người bạn thân sắp chuyển trường.", "nv": [{"loai": "chon", "hoi": "Hiền có thể làm gì để giữ gìn tình bạn?", "chon": [{"t": "Dành thời gian bên bạn, làm một món quà hoặc đoạn phim kỉ niệm, hẹn giữ liên lạc.", "d": 1, "g": "Những việc làm giữ gìn tình bạn (SGK tr.7)."}, {"t": "Tránh mặt bạn cho đỡ buồn.", "d": 0, "g": "Bỏ lỡ thời gian quý còn lại bên nhau."}, {"t": "Giận bạn vì bỏ mình đi.", "d": 0, "g": "Chuyển trường thường do hoàn cảnh gia đình."}, {"t": "Thôi không liên lạc nữa.", "d": 0, "g": "Ở xa vẫn có thể giữ tình bạn."}]}], "loi": "Em sẽ viết điều gì muốn nói với bạn thân của mình?", "id": "c1-t3"}, {"cd": 1, "trang": "tr.9", "nhan": "Tình huống 1", "ten": "Bị doạ đăng ảnh", "canh": {"nen": "mang", "nguoi": [{"x": 110, "ao": "#3b82f6", "toc": "ngan", "cam": "lo"}], "vat": [["canh-bao", 330, 60]], "loi": []}, "tom": "Khi cả nhóm họp trực tuyến, Thành chụp lại ảnh Minh với biểu cảm không đẹp, rồi doạ sẽ đưa lên trang mạng xã hội của lớp nếu Minh không cho chép bài.", "nv": [{"loai": "chon", "hoi": "Minh nên làm gì?", "chon": [{"t": "Không cho chép bài, không trả lời tin nhắn đe doạ; lưu lại bằng chứng và kể ngay với thầy cô, cha mẹ.", "d": 1, "g": "Đúng bảng Nên của SGK: kể với người tin tưởng, không trả lời tin nhắn đe doạ."}, {"t": "Cho Thành chép bài để yên chuyện.", "d": 0, "g": "Chiều theo người bắt nạt thì họ sẽ đòi tiếp."}, {"t": "Doạ lại Thành.", "d": 0, "g": "Thể hiện hiếu chiến, thách thức là việc không nên làm."}, {"t": "Giấu kín vì xấu hổ.", "d": 0, "g": "Giấu giếm việc mình bị bắt nạt là không nên."}]}], "loi": "Nếu bạn em bị doạ đăng ảnh xấu lên mạng, em sẽ giúp bạn thế nào?", "an_toan": 1, "id": "c1-t4"}, {"cd": 1, "trang": "tr.9", "nhan": "Tình huống 2", "ten": "Bị trêu đùa ác ý", "canh": {"nen": "lop", "nguoi": [{"x": 140, "ao": "#3b82f6", "toc": "ngan", "cam": "cuoi"}, {"x": 250, "ao": "#ec4899", "toc": "dai", "cam": "buon"}], "vat": [], "loi": [[140, 40, "Ha ha, lại ngồi đây à?"]]}, "tom": "Duy Anh thường trêu đùa ác ý với Hạnh. Hạnh đã chuyển chỗ ngồi nhưng Duy Anh vẫn sang bàn trêu.", "nv": [{"loai": "chon", "hoi": "Hạnh và các bạn trong lớp nên làm gì?", "chon": [{"t": "Hạnh thể hiện rõ thái độ không chấp nhận và kể với thầy cô, cha mẹ; các bạn khác không cười theo, lên tiếng giúp Hạnh.", "d": 1, "g": "Đúng bảng Nên của SGK; không giúp khi chứng kiến bạn bị bắt nạt là việc không nên."}, {"t": "Hạnh cố chịu, rồi sẽ hết.", "d": 0, "g": "Giấu giếm khiến việc bắt nạt kéo dài."}, {"t": "Hạnh trêu lại Duy Anh thật nặng.", "d": 0, "g": "Đáp trả hiếu chiến có thể làm xung đột lớn hơn."}, {"t": "Các bạn khác cười cho vui.", "d": 0, "g": "Cổ vũ người bắt nạt."}]}], "loi": "Lớp em có thể làm gì để “Lớp học không có bắt nạt”?", "an_toan": 1, "id": "c1-t5"}, {"cd": 1, "trang": "tr.9", "nhan": "Tình huống 3", "ten": "Bị chặn đường đòi tiền", "canh": {"nen": "duonglang", "nguoi": [{"x": 120, "ao": "#1e293b", "toc": "ngan", "cam": "gian"}, {"x": 210, "ao": "#0ea5e9", "toc": "ngan", "cam": "lo"}, {"x": 300, "ao": "#1e293b", "toc": "ngan", "cam": "gian"}], "vat": [], "loi": []}, "tom": "Đức Anh là học sinh mới chuyển đến. Một nhóm học sinh thường chặn đường, đòi Đức Anh những thứ vô lí, đòi tiền ăn sáng và lục cặp của bạn.", "nv": [{"loai": "chon", "hoi": "Đức Anh nên làm gì?", "chon": [{"t": "Bỏ đi hoặc kêu to nhờ trợ giúp; không thách thức; kể ngay với thầy cô, cha mẹ.", "d": 1, "g": "Đúng bảng Nên của SGK tr.8."}, {"t": "Đưa tiền cho xong chuyện.", "d": 0, "g": "Nhóm bắt nạt sẽ tiếp tục đòi."}, {"t": "Rủ bạn đến đánh lại nhóm đó.", "d": 0, "g": "Bạo lực làm sự việc nguy hiểm hơn."}, {"t": "Im lặng vì mình là học sinh mới.", "d": 0, "g": "Cần báo người lớn để được bảo vệ."}]}], "loi": "Em biết những dấu hiệu nào của bắt nạt học đường?", "an_toan": 1, "id": "c1-t6"}, {"cd": 2, "trang": "tr.15", "nhan": "Hoạt động 2", "ten": "Minh hết giận Khoa", "canh": {"nen": "duonglang", "nguoi": [{"x": 140, "ao": "#3b82f6", "toc": "ngan", "cam": "gian"}, {"x": 260, "ao": "#22c55e", "toc": "ngan", "cam": "lo"}], "vat": [["xe-dap", 320, 205]], "loi": []}, "tom": "Minh và Khoa hẹn nhau đi thăm bạn ốm. Khoa đến trễ 15 phút, Minh rất bực bội. Nhưng khi thấy Khoa mồ hôi nhễ nhại, dắt chiếc xe đạp xẹp lốp, cơn giận của Minh tan biến, Minh thấy thương bạn.", "nv": [{"loai": "xep", "hoi": "Sắp xếp diễn biến cảm xúc của Minh.", "buoc": ["Hai bạn hẹn nhau đi thăm bạn ốm", "Khoa đến trễ 15 phút, Minh bực bội", "Minh thấy Khoa mồ hôi nhễ nhại, dắt xe xẹp lốp", "Cơn giận tan biến, Minh thương bạn"]}, {"loai": "chon", "hoi": "Điều gì giúp Minh điều chỉnh cảm xúc?", "chon": [{"t": "Hiểu lí do của bạn trước khi trách.", "d": 1, "g": "Suy nghĩ lại sự việc tích cực giúp điều chỉnh cảm xúc (SGK tr.15)."}, {"t": "Khoa xin lỗi rất nhiều.", "d": 0, "g": "Minh hết giận khi hiểu hoàn cảnh của bạn."}, {"t": "Minh cố quên đi.", "d": 0, "g": "Minh hiểu ra lí do chứ không cố quên."}, {"t": "Thời gian trôi qua.", "d": 0, "g": "Cảm xúc đổi ngay khi Minh hiểu chuyện."}]}], "loi": "Kể một lần cảm xúc của em thay đổi khi hiểu ra lí do của người khác.", "id": "c2-t1"}, {"cd": 2, "trang": "tr.16", "nhan": "Tình huống 1", "ten": "Bài kiểm tra 5 điểm", "canh": {"nen": "lop", "nguoi": [{"x": 180, "ao": "#3b82f6", "toc": "ngan", "cam": "buon"}], "vat": [["giay", 250, 205]], "loi": [], "bang": "Ngữ văn 8"}, "tom": "Bình nghĩ bài kiểm tra Ngữ văn của mình ít nhất được 7 điểm, nhưng chỉ được 5 điểm. Bình cho rằng thầy chấm chặt, cảm thấy buồn và thất vọng.", "nv": [{"loai": "chon", "hoi": "Bình nên điều chỉnh cảm xúc thế nào?", "chon": [{"t": "Hít thở sâu cho bình tĩnh; xem lại bài, tìm chỗ sai; hỏi thầy những chỗ chưa hiểu; đặt mục tiêu cho bài sau.", "d": 1, "g": "Lấy lại bình tĩnh rồi suy nghĩ tích cực (SGK tr.15)."}, {"t": "Đổ lỗi cho thầy chấm chặt.", "d": 0, "g": "Đổ lỗi không giúp Bình tiến bộ."}, {"t": "Xé bài kiểm tra cho đỡ tức.", "d": 0, "g": "Hành động tiêu cực."}, {"t": "Bỏ học Ngữ văn vì không có năng khiếu.", "d": 0, "g": "Suy nghĩ tiêu cực."}]}], "loi": "Khi điểm thấp hơn mong đợi, em làm gì?", "id": "c2-t2"}, {"cd": 2, "trang": "tr.16", "nhan": "Tình huống 2", "ten": "Hoa muốn làm báo tường", "canh": {"nen": "lop", "nguoi": [{"x": 130, "ao": "#ec4899", "toc": "dai", "cam": "chan"}, {"x": 260, "ao": "#3b82f6", "toc": "ngan", "cam": "binh"}], "vat": [["giay", 80, 205]], "loi": [[260, 40, "Hoa tập văn nghệ nhé!"]]}, "tom": "Hoa thích vẽ, đăng kí làm báo tường dịp 20-11. Nhưng lớp trưởng lại phân công Hoa tập văn nghệ. Hoa thấy khó chịu.", "nv": [{"loai": "chon", "hoi": "Hoa nên làm gì?", "chon": [{"t": "Bình tĩnh trao đổi với lớp trưởng về mong muốn của mình; nếu chưa đổi được thì vẫn hoàn thành phần việc được giao.", "d": 1, "g": "Điều chỉnh cảm xúc và cư xử có trách nhiệm."}, {"t": "Từ chối tập văn nghệ.", "d": 0, "g": "Bỏ việc chung vì không vừa ý."}, {"t": "Nói xấu lớp trưởng với các bạn.", "d": 0, "g": "Làm mâu thuẫn tăng."}, {"t": "Tập cho có lệ.", "d": 0, "g": "Ảnh hưởng tới tiết mục của lớp."}]}], "loi": "Khi được giao việc mình không thích, em làm thế nào?", "id": "c2-t3"}, {"cd": 2, "trang": "tr.18", "nhan": "Hoạt động 1", "ten": "Hùng thương thuyết với mẹ", "canh": {"nen": "nha", "nguoi": [{"x": 130, "ao": "#a855f7", "toc": "buoc", "cam": "lo", "vai": "nguoi-lon"}, {"x": 260, "ao": "#3b82f6", "toc": "ngan", "cam": "vui"}], "vat": [["bong", 320, 215]], "loi": [[260, 40, "Con thử 1 tháng thôi ạ!"]]}, "tom": "Hùng muốn tham gia câu lạc bộ bóng đá, mỗi tuần sinh hoạt một lần. Hùng thương thuyết với mẹ: xin thử một tháng, nếu ảnh hưởng đến học tập sẽ thôi.", "nv": [{"loai": "xep", "hoi": "Sắp xếp các bước thương thuyết của Hùng (SGK tr.18).", "buoc": ["Nêu yêu cầu cụ thể: tham gia CLB bóng đá, mỗi tuần một lần", "Lắng nghe mẹ, đưa ra thoả hiệp: xin thử một tháng", "Cam kết: nếu ảnh hưởng học tập sẽ thôi", "Chốt ý kiến hai mẹ con cùng đồng thuận"]}], "loi": "Em muốn thương thuyết với ai về việc gì? Em sẽ đưa ra thoả hiệp nào?", "id": "c2-t4"}, {"cd": 2, "trang": "tr.19", "nhan": "Hoạt động 2", "ten": "Đi dã ngoại bằng gì?", "canh": {"nen": "lop", "nguoi": [{"x": 110, "ao": "#3b82f6", "toc": "ngan", "cam": "binh"}, {"x": 200, "ao": "#ec4899", "toc": "dai", "cam": "binh"}, {"x": 290, "ao": "#22c55e", "toc": "ngan", "cam": "binh"}], "vat": [["xe-dap", 350, 205]], "loi": []}, "tom": "Lớp đi dã ngoại ở nơi cách trường khoảng 10 km. Một số bạn muốn thuê ô tô vì nhanh, an toàn; một số khác muốn đi xe đạp cho tiết kiệm.", "nv": [{"loai": "chon", "hoi": "Cách thương thuyết nào phù hợp?", "chon": [{"t": "Lắng nghe lí do hai bên; cùng tìm phương án dung hoà (VD thuê xe chung để giảm chi phí); xin ý kiến cô chủ nhiệm, phụ huynh rồi chốt phương án cả lớp đồng thuận.", "d": 1, "g": "Lắng nghe, thoả hiệp, tìm cách cả hai bên chấp nhận (SGK tr.18)."}, {"t": "Nhóm nào đông hơn thì quyết, không cần nghe nhóm kia.", "d": 0, "g": "Chưa lắng nghe, dễ mất đoàn kết."}, {"t": "Ai thích gì đi nấy.", "d": 0, "g": "Hoạt động chung cần thống nhất, đảm bảo an toàn."}, {"t": "Tranh cãi đến khi một bên chịu thua.", "d": 0, "g": "Tranh cãi gay gắt không phải thương thuyết."}]}], "loi": "Lớp em từng thương thuyết để chọn phương án nào chưa? Kết quả thế nào?", "id": "c2-t5"}, {"cd": 3, "trang": "tr.22", "nhan": "Hoạt động 1", "ten": "Ba bạn sống có trách nhiệm", "canh": {"nen": "santruong", "nguoi": [{"x": 110, "ao": "#3b82f6", "toc": "ngan", "cam": "vui"}, {"x": 210, "ao": "#ec4899", "toc": "dai", "cam": "vui"}, {"x": 310, "ao": "#22c55e", "toc": "ngan", "cam": "vui"}], "vat": [["sach", 160, 210]], "loi": []}, "tom": "Nam ham chơi điện tử, kết quả kiểm tra kém, thấy có lỗi với bố mẹ nên quyết tâm không chơi, dành thời gian ôn bài. Hạnh được rủ đi sinh nhật Lan nhưng mẹ ốm, bố đi làm xa, nên chúc mừng Lan trên lớp rồi về chăm mẹ. An được nhóm giao sưu tầm ảnh danh lam thắng cảnh, nhờ họ hàng, hàng xóm xin tạp chí, lịch cũ để hoàn thành.", "nv": [{"loai": "chon-nhieu", "hoi": "Chọn TẤT CẢ biểu hiện của sống có trách nhiệm.", "chon": [{"t": "Nam quyết tâm không chơi điện tử, dành thời gian ôn bài", "d": 1, "g": "Trách nhiệm với bản thân."}, {"t": "Hạnh chúc mừng Lan trên lớp rồi về chăm mẹ", "d": 1, "g": "Trách nhiệm với gia đình mà vẫn quan tâm bạn."}, {"t": "An nhờ mọi người giúp để hoàn thành phần việc", "d": 1, "g": "Trách nhiệm trong hoạt động chung."}, {"t": "Bỏ dở việc nhóm vì quá khó", "d": 0, "g": "Thiếu trách nhiệm."}, {"t": "Đi sinh nhật bạn dù mẹ đang ốm ở nhà", "d": 0, "g": "Chưa quan tâm đến gia đình."}]}], "loi": "Kể một việc em đã làm thể hiện trách nhiệm với bản thân hoặc mọi người.", "id": "c3-t1"}, {"cd": 3, "trang": "tr.23", "nhan": "Tình huống 1", "ten": "Cúc nghỉ ốm một tuần", "canh": {"nen": "lop", "nguoi": [{"x": 130, "ao": "#ec4899", "toc": "dai", "cam": "buon"}, {"x": 260, "ao": "#22c55e", "toc": "ngan", "cam": "vui"}], "vat": [["sach", 195, 205]], "loi": []}, "tom": "Cúc bị ốm phải nghỉ học một tuần, lực học yếu đi.", "nv": [{"loai": "chon", "hoi": "Là bạn cùng lớp, em sẽ làm gì?", "chon": [{"t": "Chép bài, giảng lại những phần Cúc nghỉ, rủ Cúc cùng học nhóm.", "d": 1, "g": "Trách nhiệm với bạn bè."}, {"t": "Để Cúc tự lo.", "d": 0, "g": "Thờ ơ với bạn gặp khó khăn."}, {"t": "Cho Cúc chép bài kiểm tra.", "d": 0, "g": "Gian lận không giúp bạn tiến bộ."}, {"t": "Chê Cúc học kém đi.", "d": 0, "g": "Làm bạn buồn."}]}], "loi": "Em đã giúp một bạn gặp khó khăn trong học tập như thế nào?", "id": "c3-t2"}, {"cd": 3, "trang": "tr.23", "nhan": "Tình huống 2", "ten": "Huy bị đau chân", "canh": {"nen": "duonglang", "nguoi": [{"x": 150, "ao": "#3b82f6", "toc": "ngan", "cam": "lo"}, {"x": 260, "ao": "#22c55e", "toc": "ngan", "cam": "vui"}], "vat": [["xe-dap", 330, 205]], "loi": []}, "tom": "Huy đá bóng bị đau chân, không tự đạp xe đến trường được. Nam ở gần nhà Huy.", "nv": [{"loai": "chon", "hoi": "Nam nên làm gì?", "chon": [{"t": "Chủ động chở hoặc đưa Huy đi học cho đến khi Huy khỏi.", "d": 1, "g": "Trách nhiệm, quan tâm tới bạn."}, {"t": "Chờ Huy nhờ mới giúp.", "d": 0, "g": "Nên chủ động khi thấy bạn cần."}, {"t": "Bảo Huy nghỉ học cho khỏi đi.", "d": 0, "g": "Nghỉ học ảnh hưởng việc học của Huy."}, {"t": "Thấy Huy đau chân thì trêu.", "d": 0, "g": "Thiếu tôn trọng bạn."}]}], "loi": "Em đã từng giúp bạn đến trường khi bạn gặp khó khăn chưa?", "id": "c3-t3"}, {"cd": 3, "trang": "tr.23", "nhan": "Tình huống 3", "ten": "Mai bị sốt", "canh": {"nen": "nha", "nguoi": [{"x": 170, "ao": "#ec4899", "toc": "buoc", "cam": "lo"}], "vat": [["hoa", 270, 210], ["lo-thuoc", 90, 215]], "loi": []}, "tom": "Mai được phân công mang lọ hoa trang trí lớp trong buổi sơ kết thi đua, nhưng sáng hôm đó Mai bị sốt.", "nv": [{"loai": "chon", "hoi": "Mai nên làm gì?", "chon": [{"t": "Báo ngay lớp trưởng hoặc cô chủ nhiệm, nhờ bạn mang lọ hoa thay, rồi nghỉ ngơi.", "d": 1, "g": "Có trách nhiệm với việc được giao và với sức khoẻ của mình."}, {"t": "Cố đi học để mang lọ hoa.", "d": 0, "g": "Đang sốt cần nghỉ; có thể nhờ bạn."}, {"t": "Ở nhà, không báo ai.", "d": 0, "g": "Lớp sẽ thiếu lọ hoa mà không biết."}, {"t": "Nhắn rằng mình quên.", "d": 0, "g": "Không trung thực."}]}], "loi": "Khi không thể làm việc được giao, em làm gì?", "id": "c3-t4"}, {"cd": 3, "trang": "tr.27", "nhan": "Tình huống 1", "ten": "Sinh nhật buổi tối", "canh": {"nen": "santruong", "nguoi": [{"x": 140, "ao": "#3b82f6", "toc": "ngan", "cam": "vui"}, {"x": 260, "ao": "#ec4899", "toc": "dai", "cam": "lo"}], "vat": [], "loi": [[140, 40, "Tối nay đi chúc mừng Hoa nhé!"]]}, "tom": "Nam rủ Mai buổi tối đến chúc mừng sinh nhật Hoa. Mai không muốn đi vào buổi tối vì sợ nguy hiểm.", "nv": [{"loai": "chon", "hoi": "Mai nên từ chối thế nào?", "chon": [{"t": "Từ chối, nói rõ lí do, đề xuất cách khác: gửi quà, chúc mừng Hoa trên lớp hoặc vào ban ngày.", "d": 1, "g": "Từ chối kèm phương án thay thế (SGK tr.26)."}, {"t": "Đồng ý đi cho Nam vui.", "d": 0, "g": "Làm điều mình thấy không an toàn."}, {"t": "Nói dối là bị ốm.", "d": 0, "g": "Không cần nói dối; nêu lí do thật."}, {"t": "Im lặng không trả lời.", "d": 0, "g": "Nên trả lời rõ ràng."}]}], "loi": "Em đã từng từ chối lời rủ của bạn như thế nào?", "id": "c3-t5"}, {"cd": 3, "trang": "tr.27", "nhan": "Tình huống 2", "ten": "Rủ tẩy chay bạn", "canh": {"nen": "lop", "nguoi": [{"x": 130, "ao": "#f97316", "toc": "ngan", "cam": "gian"}, {"x": 250, "ao": "#3b82f6", "toc": "ngan", "cam": "lo"}], "vat": [], "loi": [[130, 40, "Đừng chơi với Huy nữa!"]]}, "tom": "Long giận Huy, rủ Minh không chơi với Huy nữa.", "nv": [{"loai": "chon", "hoi": "Minh nên làm gì?", "chon": [{"t": "Từ chối: vẫn chơi với cả hai bạn; khuyên Long nói chuyện với Huy để làm lành.", "d": 1, "g": "Không tham gia cô lập bạn khác."}, {"t": "Nghe theo Long để Long không giận.", "d": 0, "g": "Cô lập bạn là một dấu hiệu bắt nạt."}, {"t": "Kể lại cho Huy để Huy giận Long.", "d": 0, "g": "Làm mâu thuẫn tăng."}, {"t": "Rủ thêm cả lớp không chơi với Huy.", "d": 0, "g": "Bắt nạt bằng cách cô lập."}]}], "loi": "Khi hai bạn của em giận nhau, em làm gì?", "id": "c3-t6"}, {"cd": 3, "trang": "tr.27", "nhan": "Tình huống 3", "ten": "Lời mời hút thuốc", "canh": {"nen": "nhavanhoa", "nguoi": [{"x": 140, "ao": "#f97316", "toc": "ngan", "cam": "cuoi"}, {"x": 260, "ao": "#22c55e", "toc": "ngan", "cam": "lo"}], "vat": [["canh-bao", 340, 70]], "loi": [[140, 35, "Thử đi! Cảm giác đặc biệt lắm!"]]}, "tom": "Ở sân nhà văn hoá, Sơn đưa thuốc lá cho Tuấn và nói: “Thử đi! Cảm giác đặc biệt lắm đấy”.", "nv": [{"loai": "chon", "hoi": "Tuấn nên từ chối thế nào?", "chon": [{"t": "Từ chối thẳng, dứt khoát: “Không, mình không hút” rồi rời đi; khuyên Sơn bỏ thuốc.", "d": 1, "g": "Tình huống có hại cho sức khoẻ: từ chối thẳng, dứt khoát (SGK tr.26)."}, {"t": "Thử một hơi cho biết.", "d": 0, "g": "Thuốc lá gây nghiện, hại sức khoẻ."}, {"t": "Cầm lấy rồi vứt đi khi Sơn không thấy.", "d": 0, "g": "Chưa từ chối rõ ràng."}, {"t": "Hẹn để lần khác.", "d": 0, "g": "Trì hoãn khiến Sơn tiếp tục mời."}]}], "loi": "Em sẽ nói gì nếu bị bạn rủ làm việc có hại cho sức khoẻ?", "id": "c3-t7"}, {"cd": 4, "trang": "tr.30", "nhan": "Hoạt động 1", "ten": "Áo khoác giảm 50%", "canh": {"dt": "Cửa hàng online", "tin": [["Áo khoác GIẢM 50%!", "do"], ["Mẫu mới nhất!", "vang"], ["Đăng kí nhận tư vấn", "xam"]], "nen": "mang", "nguoi": [{"x": 110, "ao": "#ec4899", "toc": "dai", "cam": "buon"}], "vat": [["quan-ao", 300, 220]], "loi": []}, "tom": "Hà xem quảng cáo áo khoác giảm giá 50% trên mạng xã hội, đăng kí thông tin. Nhân viên gọi điện tư vấn, Hà mua “mẫu mới nhất”. Khi nhận hàng, áo không giống quảng cáo và không đổi được. Hà rất thất vọng, tiếc tiền.", "nv": [{"loai": "chon-nhieu", "hoi": "Hà rút ra được những điều gì? Chọn TẤT CẢ ý đúng.", "chon": [{"t": "Không tin hoàn toàn vào quảng cáo giảm giá", "d": 1, "g": "Quảng cáo có thể phóng đại."}, {"t": "Xem đánh giá, nguồn gốc, chính sách đổi trả trước khi mua", "d": 1, "g": "Giúp tránh mua phải hàng kém."}, {"t": "Cân nhắc mình có thật cần không", "d": 1, "g": "Người tiêu dùng thông thái mua theo nhu cầu."}, {"t": "Cứ giảm giá 50% là nên mua ngay", "d": 0, "g": "Giảm giá chưa chắc là rẻ, là tốt."}, {"t": "Người tư vấn càng nhiệt tình thì hàng càng tốt", "d": 0, "g": "Lời tư vấn nhằm bán được hàng."}]}], "loi": "Em hoặc người thân đã từng mua hàng vì quảng cáo chưa? Kết quả thế nào?", "id": "c4-t1"}, {"cd": 4, "trang": "tr.31", "nhan": "Tình huống 1", "ten": "Mua 1 tặng 1", "canh": {"nen": "duonglang", "nguoi": [{"x": 150, "ao": "#ec4899", "toc": "dai", "cam": "lo"}, {"x": 270, "ao": "#f97316", "toc": "ngan", "cam": "vui", "vai": "nguoi-lon"}], "vat": [["hop-qua", 90, 215]], "loi": [[270, 40, "Mua 1 tặng 1 đây!"]]}, "tom": "Lan được mời vào quán đồ ăn vặt mới mở có khuyến mãi “mua 1 tặng 1”. Lan đang đói, nhưng nếu mua thì sẽ không đủ tiền mua quà sinh nhật bạn.", "nv": [{"loai": "chon", "hoi": "Lan nên làm gì?", "chon": [{"t": "Không mua; giữ tiền mua quà như đã định, về nhà ăn nhẹ.", "d": 1, "g": "Chi tiêu theo kế hoạch, không bị khuyến mãi lôi kéo."}, {"t": "Mua vì được tặng thêm, rất lời.", "d": 0, "g": "Sẽ thiếu tiền mua quà sinh nhật."}, {"t": "Mua rồi mượn tiền bạn mua quà.", "d": 0, "g": "Vay mượn vì chi tiêu không cần thiết."}, {"t": "Mua quà rẻ hơn để còn tiền ăn.", "d": 0, "g": "Đổi kế hoạch chỉ vì khuyến mãi."}]}], "loi": "Em có hay bị khuyến mãi lôi kéo không? Em làm gì để tránh?", "id": "c4-t2"}, {"cd": 4, "trang": "tr.31", "nhan": "Tình huống 2", "ten": "Thuốc giảm cân nhanh", "canh": {"nen": "nha", "nguoi": [{"x": 120, "ao": "#a855f7", "toc": "buoc", "cam": "vui"}, {"x": 220, "ao": "#3b82f6", "toc": "ngan", "cam": "lo"}, {"x": 320, "ao": "#eab308", "toc": "buoc", "cam": "vui", "vai": "nguoi-lon"}], "vat": [["lo-thuoc", 270, 215]], "loi": [[320, 40, "Uống là giảm cân nhanh!"]]}, "tom": "Chị gái Hoàng tin lời cô hàng xóm tiếp thị một loại thực phẩm chức năng giảm cân nhanh. Hoàng không yên tâm.", "nv": [{"loai": "chon", "hoi": "Hoàng nên nói gì với chị?", "chon": [{"t": "Khuyên chị tìm hiểu nguồn gốc sản phẩm, hỏi ý kiến bác sĩ; giảm cân nên bằng ăn uống, tập luyện hợp lí.", "d": 1, "g": "Bảo vệ sức khoẻ, không tin lời tiếp thị."}, {"t": "Ủng hộ chị mua thử.", "d": 0, "g": "Sản phẩm không rõ nguồn gốc có thể hại sức khoẻ."}, {"t": "Mắng cô hàng xóm lừa đảo.", "d": 0, "g": "Thiếu lễ phép, chưa có căn cứ."}, {"t": "Mặc kệ chị.", "d": 0, "g": "Nên góp ý vì sức khoẻ của chị."}]}], "loi": "Em đã thấy quảng cáo sản phẩm sức khoẻ nào đáng nghi ngờ chưa?", "id": "c4-t3"}, {"cd": 4, "trang": "tr.31", "nhan": "Tình huống 3", "ten": "Quà mừng thọ ông", "canh": {"dt": "Quà tặng online", "tin": [["Ấm chén giảm 30%", "do"], ["Kèm bình hoa -50%", "vang"], ["Chỉ còn hôm nay!", "xam"]], "nen": "mang", "nguoi": [{"x": 110, "ao": "#ec4899", "toc": "dai", "cam": "lo"}], "vat": [["hop-qua", 280, 215]], "loi": []}, "tom": "Hoa và chị chọn quà mừng thọ ông trên mạng: bộ ấm chén giảm giá 30%; nếu mua kèm bình hoa thì bình hoa được giảm 50%.", "nv": [{"loai": "chon", "hoi": "Hai chị em nên quyết định thế nào?", "chon": [{"t": "Chọn món ông thích, vừa số tiền đã định; chỉ mua thêm bình hoa nếu thật cần; so sánh giá ở nơi khác.", "d": 1, "g": "Mua theo nhu cầu, không bị ưu đãi mua kèm lôi kéo."}, {"t": "Mua cả hai vì giảm tới 50%.", "d": 0, "g": "Mua kèm món không cần là tốn thêm tiền."}, {"t": "Mua món đắt nhất cho sang.", "d": 0, "g": "Đắt chưa chắc phù hợp với ông."}, {"t": "Đặt ngay kẻo hết khuyến mãi.", "d": 0, "g": "Vội vàng dễ mua sai."}]}], "loi": "Em thường chọn quà cho người thân như thế nào?", "id": "c4-t4"}, {"cd": 4, "trang": "tr.31", "nhan": "Tình huống 4", "ten": "Đơn hàng gần 100 000 đồng", "canh": {"nen": "duonglang", "nguoi": [{"x": 170, "ao": "#22c55e", "toc": "ngan", "cam": "lo"}], "vat": [["hop-qua", 280, 215], ["dong-xu", 90, 220]], "loi": []}, "tom": "Long đi mua đồ thực hành cho nhóm. Cửa hàng có áp phích “Đơn hàng trên 100 000 đồng được tặng quà”. Đơn hàng của Long gần 100 000 đồng.", "nv": [{"loai": "chon", "hoi": "Long nên làm gì?", "chon": [{"t": "Chỉ mua đúng đồ thực hành cần; không mua thêm thứ không cần chỉ để được quà.", "d": 1, "g": "Tiền của nhóm cần chi đúng việc."}, {"t": "Mua thêm vài món cho đủ để nhận quà.", "d": 0, "g": "Tiêu tiền của nhóm vào thứ không cần."}, {"t": "Mua thêm rồi giữ quà cho mình.", "d": 0, "g": "Không công bằng với nhóm."}, {"t": "Hỏi bán hàng có quà gì rồi mới quyết.", "d": 0, "g": "Món quà không phải mục tiêu mua sắm."}]}], "loi": "Em có từng mua thêm hàng chỉ để được quà tặng không?", "id": "c4-t5"}, {"cd": 4, "trang": "tr.33", "nhan": "Hoạt động 1, 2", "ten": "Ý tưởng kinh doanh của Ngọc", "canh": {"nen": "lop", "nguoi": [{"x": 120, "ao": "#ec4899", "toc": "dai", "cam": "vui"}, {"x": 220, "ao": "#a855f7", "toc": "buoc", "cam": "vui"}, {"x": 320, "ao": "#eab308", "toc": "dai", "cam": "vui"}], "vat": [["hop-qua", 270, 210], ["hoa", 60, 205]], "loi": [], "bang": "Đồ thủ công"}, "tom": "Ngọc và nhóm bạn thích làm đồ thủ công như móc chìa khoá, dây buộc tóc, hoa cài áo. Tìm hiểu, nhóm thấy nhiều người cùng sở thích nên nảy ra ý tưởng kinh doanh. Kế hoạch mẫu trong SGK: vốn 400 000 đồng; doanh thu dự kiến 500 000 đồng/tháng; lãi dự kiến 100 000 đồng/tháng.", "nv": [{"loai": "xep", "hoi": "Sắp xếp các nội dung của kế hoạch kinh doanh (theo mẫu SGK tr.33).", "buoc": ["Ý tưởng kinh doanh: đồ làm bằng tay", "Đối tượng khách hàng và nhu cầu", "Kế hoạch tiếp thị: giới thiệu trong trường, trên mạng xã hội", "Vốn và chi phí nguyên liệu", "Kênh bán hàng: trực tiếp, trực tuyến", "Doanh thu và lãi dự kiến"]}, {"loai": "chon", "hoi": "Doanh thu dự kiến 500 000 đồng/tháng, lãi dự kiến 100 000 đồng/tháng. Chi phí mỗi tháng là bao nhiêu?", "chon": [{"t": "400 000 đồng", "d": 1, "g": "Lãi = doanh thu − chi phí, nên chi phí = 500 000 − 100 000 = 400 000 đồng."}, {"t": "600 000 đồng", "d": 0, "g": "Đó là doanh thu cộng lãi, không phải chi phí."}, {"t": "100 000 đồng", "d": 0, "g": "Đó là lãi."}, {"t": "500 000 đồng", "d": 0, "g": "Đó là doanh thu."}]}], "loi": "Nếu kinh doanh nhỏ, em sẽ chọn ý tưởng gì? Vì sao?", "id": "c4-t6"}, {"cd": 4, "trang": "tr.35", "nhan": "Tình huống 1", "ten": "Muốn kết bạn với Mai", "canh": {"nen": "lop", "nguoi": [{"x": 140, "ao": "#ec4899", "toc": "dai", "cam": "lo"}, {"x": 270, "ao": "#a855f7", "toc": "buoc", "cam": "vui"}], "vat": [], "loi": [], "bang": "English Club"}, "tom": "Lan tham gia câu lạc bộ tiếng Anh, có thiện cảm với Mai và muốn kết bạn.", "nv": [{"loai": "chon", "hoi": "Lan nên làm gì?", "chon": [{"t": "Chủ động chào hỏi, bắt chuyện, rủ Mai cùng luyện nói tiếng Anh.", "d": 1, "g": "Chủ động kết bạn là biểu hiện tự chủ (SGK tr.34)."}, {"t": "Chờ Mai bắt chuyện trước.", "d": 0, "g": "Có thể bỏ lỡ cơ hội kết bạn."}, {"t": "Gửi lời mời kết bạn trên mạng rồi thôi.", "d": 0, "g": "Nên làm quen trực tiếp."}, {"t": "Nhờ bạn khác hỏi hộ.", "d": 0, "g": "Tự làm quen sẽ chân thành hơn."}]}], "loi": "Em đã chủ động làm quen với ai gần đây?", "id": "c4-t7"}, {"cd": 4, "trang": "tr.35", "nhan": "Tình huống 2", "ten": "Bình luận trên mạng", "canh": {"dt": "Bình luận", "tin": [["Chúc mừng nhóm!", "xanh"], ["Chắc may mắn thôi…", "xam"], ["Chưa phải tốt nhất", "xam"]], "nen": "mang", "nguoi": [{"x": 110, "ao": "#3b82f6", "toc": "ngan", "cam": "buon"}], "vat": [["cup", 160, 230]], "loi": []}, "tom": "Nhóm của Thắng đạt giải Nhất cuộc thi sáng tạo khoa học kĩ thuật của trường và đăng ảnh lên mạng xã hội. Có bình luận cho rằng nhóm chỉ may mắn, sản phẩm chưa phải tốt nhất.", "nv": [{"loai": "chon", "hoi": "Thắng nên ứng xử thế nào?", "chon": [{"t": "Bình tĩnh, cảm ơn góp ý, trả lời lịch sự và tiếp tục hoàn thiện sản phẩm.", "d": 1, "g": "Bình luận, trả lời bình luận tích cực là biểu hiện tự chủ trên mạng xã hội (SGK tr.34)."}, {"t": "Trả lời gay gắt, chê lại người bình luận.", "d": 0, "g": "Dễ gây tranh cãi trên mạng."}, {"t": "Xoá ảnh, không tham gia thi nữa.", "d": 0, "g": "Để một bình luận làm mất động lực."}, {"t": "Rủ cả nhóm vào bình luận chê lại.", "d": 0, "g": "Làm mâu thuẫn lan rộng."}]}], "loi": "Khi đọc bình luận không hay về mình trên mạng, em làm gì?", "id": "c4-t8"}, {"cd": 4, "trang": "tr.35", "nhan": "Tình huống 3", "ten": "Chọn người dẫn chương trình", "canh": {"nen": "sankhau", "nguoi": [{"x": 130, "ao": "#3b82f6", "toc": "ngan", "cam": "lo"}, {"x": 230, "ao": "#ec4899", "toc": "dai", "cam": "vui"}, {"x": 320, "ao": "#a855f7", "toc": "buoc", "cam": "vui"}], "vat": [["mic", 270, 170]], "loi": []}, "tom": "Chào mừng ngày 22-12, Cường làm đội trưởng đội văn nghệ, phải chọn người dẫn chương trình. Mai, bạn thân của Cường, muốn được chọn, nhưng khả năng dẫn chương trình chưa bằng một bạn khác.", "nv": [{"loai": "chon", "hoi": "Cường nên làm gì?", "chon": [{"t": "Chọn bạn dẫn tốt hơn vì việc chung của lớp; nói chuyện khéo léo với Mai và giao Mai phần việc phù hợp.", "d": 1, "g": "Tự chủ, công bằng, vẫn giữ tình bạn."}, {"t": "Chọn Mai vì là bạn thân.", "d": 0, "g": "Thiên vị, ảnh hưởng tới chương trình của lớp."}, {"t": "Để cả lớp bỏ phiếu cho khỏi mất lòng.", "d": 0, "g": "Có thể bỏ phiếu, nhưng đội trưởng cần cân nhắc khả năng và giải thích rõ."}, {"t": "Không nói gì với Mai.", "d": 0, "g": "Mai sẽ buồn vì không được giải thích."}]}], "loi": "Khi phải chọn giữa bạn thân và người phù hợp hơn, em làm gì?", "id": "c4-t9"}, {"cd": 5, "trang": "tr.38", "nhan": "Hoạt động 2", "ten": "Hưng thuyết phục bố mẹ", "canh": {"nen": "nha", "nguoi": [{"x": 110, "ao": "#a855f7", "toc": "buoc", "cam": "lo", "vai": "nguoi-lon"}, {"x": 190, "ao": "#3b82f6", "toc": "ngan", "cam": "lo", "vai": "nguoi-lon"}, {"x": 300, "ao": "#22c55e", "toc": "ngan", "cam": "vui"}], "vat": [["bong", 350, 220]], "loi": []}, "tom": "Hưng muốn tham gia câu lạc bộ bóng rổ, nhưng bố mẹ không đồng ý vì sắp đến cuối cấp. Hưng lắng nghe, lễ phép cảm ơn bố mẹ, rồi nêu lợi ích: giao lưu, rèn tính kiên trì, sức khoẻ tốt, tâm trạng phấn chấn giúp học tốt hơn.", "nv": [{"loai": "xep", "hoi": "Sắp xếp các bước Hưng đã thuyết phục bố mẹ.", "buoc": ["Lắng nghe ý kiến của bố mẹ", "Lễ phép cảm ơn bố mẹ đã quan tâm", "Nêu lợi ích: sức khoẻ, kiên trì, tinh thần phấn chấn, học tốt hơn"]}], "loi": "Em đã từng thuyết phục người thân điều gì? Em làm thế nào?", "id": "c5-t1"}, {"cd": 5, "trang": "tr.39", "nhan": "Tình huống 1", "ten": "Thảo muốn kinh doanh", "canh": {"nen": "nha", "nguoi": [{"x": 110, "ao": "#a855f7", "toc": "buoc", "cam": "lo", "vai": "nguoi-lon"}, {"x": 190, "ao": "#3b82f6", "toc": "ngan", "cam": "lo", "vai": "nguoi-lon"}, {"x": 300, "ao": "#ec4899", "toc": "dai", "cam": "vui"}], "vat": [["hop-qua", 350, 215]], "loi": []}, "tom": "Thảo xin ý kiến bố mẹ về dự định kinh doanh nhỏ. Bố mẹ cho rằng Thảo chưa nên, chỉ cần tập trung học.", "nv": [{"loai": "chon", "hoi": "Thảo nên làm gì?", "chon": [{"t": "Lắng nghe lo lắng của bố mẹ; chọn lúc phù hợp trình bày kế hoạch nhỏ, cam kết không ảnh hưởng việc học.", "d": 1, "g": "Tôn trọng ý kiến khác và thuyết phục bằng phương án hợp lí (SGK tr.38)."}, {"t": "Lén làm mà không cho bố mẹ biết.", "d": 0, "g": "Không trung thực."}, {"t": "Giận dỗi bố mẹ.", "d": 0, "g": "Không giải quyết được."}, {"t": "Từ bỏ ngay ước mơ.", "d": 0, "g": "Có thể thuyết phục bằng kế hoạch cụ thể."}]}], "loi": "Nếu bố mẹ chưa đồng ý dự định của em, em sẽ làm gì?", "id": "c5-t2"}, {"cd": 5, "trang": "tr.39", "nhan": "Tình huống 2", "ten": "Mừng thọ bà nội", "canh": {"nen": "nha", "nguoi": [{"x": 90, "ao": "#64748b", "toc": "bac", "cam": "vui", "vai": "nguoi-lon"}, {"x": 170, "ao": "#3b82f6", "toc": "ngan", "cam": "binh", "vai": "nguoi-lon"}, {"x": 250, "ao": "#a855f7", "toc": "buoc", "cam": "binh", "vai": "nguoi-lon"}, {"x": 335, "ao": "#22c55e", "toc": "ngan", "cam": "lo"}], "vat": [["banh-kem", 40, 215]], "loi": []}, "tom": "Gia đình An tổ chức mừng thọ bà nội. Bố muốn làm mâm cơm ấm cúng, mẹ muốn mời họ hàng. An biết bà thích một điểm du lịch xa nên muốn cả nhà đưa bà đi.", "nv": [{"loai": "chon", "hoi": "An nên làm gì?", "chon": [{"t": "Tôn trọng ý kiến bố mẹ; đề xuất hỏi ý bà và cùng tìm phương án dung hoà, ví dụ mừng thọ ấm cúng rồi hẹn đưa bà đi chơi dịp thích hợp.", "d": 1, "g": "Lắng nghe, đặt mình vào vị trí người thân, đưa phương án hợp lí."}, {"t": "Khăng khăng đòi đi du lịch.", "d": 0, "g": "Chưa tôn trọng ý kiến của bố mẹ."}, {"t": "Im lặng, không góp ý.", "d": 0, "g": "Có ý kiến hay nên chia sẻ."}, {"t": "Nói bố mẹ không hiểu bà.", "d": 0, "g": "Thiếu tôn trọng."}]}], "loi": "Nhà em thường tổ chức mừng thọ, sinh nhật ông bà thế nào?", "id": "c5-t3"}, {"cd": 5, "trang": "tr.39", "nhan": "Tình huống 3", "ten": "Ông nội bệnh nặng", "canh": {"nen": "nha", "nguoi": [{"x": 130, "ao": "#64748b", "toc": "bac", "cam": "buon", "vai": "nguoi-lon"}, {"x": 260, "ao": "#ec4899", "toc": "dai", "cam": "lo"}], "vat": [["giuong", 140, 225]], "loi": []}, "tom": "Ông nội của Trang mắc bệnh hiểm nghèo. Bố mẹ lo lắng mất ăn mất ngủ. Trang muốn động viên ông và giúp bố mẹ bớt lo.", "nv": [{"loai": "chon", "hoi": "Trang có thể làm gì?", "chon": [{"t": "Thường xuyên trò chuyện, động viên, chăm sóc ông; tự giác học tập và làm việc nhà để bố mẹ yên tâm.", "d": 1, "g": "Lời nói, việc làm khiến người thân hài lòng (SGK tr.38)."}, {"t": "Tránh vào phòng ông vì sợ buồn.", "d": 0, "g": "Ông cần con cháu ở bên."}, {"t": "Hỏi bố mẹ về bệnh của ông liên tục.", "d": 0, "g": "Có thể làm bố mẹ thêm lo."}, {"t": "Đi chơi nhiều cho quên chuyện buồn.", "d": 0, "g": "Chưa chia sẻ với gia đình."}]}], "loi": "Em đã làm gì để động viên người thân khi gia đình có chuyện buồn?", "id": "c5-t4"}, {"cd": 5, "trang": "tr.41", "nhan": "Tình huống 1", "ten": "Hộp bút giảm giá", "canh": {"nen": "duonglang", "nguoi": [{"x": 170, "ao": "#3b82f6", "toc": "ngan", "cam": "lo"}], "vat": [["hop-qua", 270, 215], ["sach", 90, 215]], "loi": []}, "tom": "Nam vừa được mua một hộp bút đẹp nhân dịp sinh nhật. Đi qua cửa hàng, Nam thấy một hộp bút ưng ý đang giảm giá 50% và băn khoăn có nên mua thêm không.", "nv": [{"loai": "chon", "hoi": "Nam nên làm gì?", "chon": [{"t": "Không mua, vì đã có hộp bút mới; để dành tiền cho việc cần hơn.", "d": 1, "g": "Chỉ mua thứ thật cần (SGK tr.40)."}, {"t": "Mua vì giảm tới 50%.", "d": 0, "g": "Rẻ nhưng không cần thì vẫn là lãng phí."}, {"t": "Mua để đổi dùng cho vui.", "d": 0, "g": "Lãng phí."}, {"t": "Xin bố mẹ thêm tiền để mua.", "d": 0, "g": "Mua thứ không cần."}]}], "loi": "Em đã từng mua món đồ không thật cần chưa? Em rút ra điều gì?", "id": "c5-t5"}, {"cd": 5, "trang": "tr.41", "nhan": "Tình huống 2", "ten": "Nước chảy tràn chậu", "canh": {"nen": "bep", "nguoi": [{"x": 150, "ao": "#3b82f6", "toc": "ngan", "cam": "lo"}, {"x": 260, "ao": "#ec4899", "toc": "buoc", "cam": "vui", "to": 0.8}], "vat": [["nuoc-lu", 200, 240]], "loi": []}, "tom": "Tiến thấy em gái cho rất nhiều bột xà phòng để ngâm quần áo, rồi để nước chảy tràn chậu cho trôi bọt.", "nv": [{"loai": "chon", "hoi": "Tiến nên làm gì?", "chon": [{"t": "Nhẹ nhàng nhắc em khoá nước, chỉ cho em dùng lượng xà phòng vừa đủ và cách xả nước tiết kiệm.", "d": 1, "g": "Tiết kiệm điện, nước, đồ dùng trong gia đình."}, {"t": "Mắng em lãng phí.", "d": 0, "g": "Nên hướng dẫn em nhẹ nhàng."}, {"t": "Mặc kệ em.", "d": 0, "g": "Bỏ qua để lãng phí tiếp diễn."}, {"t": "Mách bố mẹ phạt em.", "d": 0, "g": "Nên tự hướng dẫn em trước."}]}], "loi": "Nhà em đã làm gì để tiết kiệm điện, nước?", "id": "c5-t6"}]};
+var KHOA = "em-xu-li-tinh-huong-hdtn8-v1";
+var CD = {}; DL.chu_de.forEach(function (c) { CD[c.cd] = c; });
+var TH = {}; DL.tinh_huong.forEach(function (t) { TH[t.id] = t; });
+var KHONG_HU = false;   // chế độ chụp
+var THU_MUC_VIDEO = /*THU_MUC_VIDEO*/"video/", CO_VIDEO = ["c1-t1", "c1-t2", "c1-t3", "c1-t4", "c1-t5", "c1-t6", "c2-t1", "c2-t2", "c2-t3", "c2-t4", "c2-t5", "c3-t1", "c3-t2", "c3-t3", "c3-t4", "c3-t5", "c3-t6", "c3-t7", "c4-t1", "c4-t2", "c4-t3", "c4-t4", "c4-t5", "c4-t6", "c4-t7", "c4-t8", "c4-t9", "c5-t1", "c5-t2", "c5-t3", "c5-t4", "c5-t5", "c5-t6"];
+function coVideo(id) { return CO_VIDEO.indexOf(id) >= 0; }
+function moVideo(id) {
+  var h = document.getElementById("hopVideo"), t = TH[id];
+  h.querySelector(".ten").textContent = "🎬 " + t.ten + " · SGK " + t.trang;
+  var v = h.querySelector("video"); v.src = THU_MUC_VIDEO + id + ".mp4"; h.classList.add("mo");
+  try { var pr = v.play(); if (pr && pr.catch) pr.catch(function () {}); } catch (e) {}
+}
+function dongVideo() { var h = document.getElementById("hopVideo"), v = h.querySelector("video"); v.pause(); v.removeAttribute("src"); v.load(); h.classList.remove("mo"); }
+
+/* ---------------- lưu trữ (chỉ mã HS / tên nhóm, trong trình duyệt máy này) ---------------- */
+function docKho() {
+  try { var k = JSON.parse(localStorage.getItem(KHOA) || "null"); if (k && k.luot) return k; } catch (e) {}
+  return { ma: "", am: true, luot: [], loi: [] };
+}
+var KHO = docKho();
+function ghiKho() { try { localStorage.setItem(KHOA, JSON.stringify(KHO)); } catch (e) {} }
+function maHopLe(s) { return /^(HS\d{1,3}|Nhóm\s?\d{1,2}|Nhom\s?\d{1,2}|Tổ\s?\d{1,2})$/i.test(s.trim()); }
+function capNhatChip() {
+  document.getElementById("chipMa").textContent = KHO.ma ? "👤 " + KHO.ma : "👤 Chưa nhập mã";
+  document.getElementById("nutAm").textContent = KHO.am ? "🔊 Âm thanh" : "🔈 Tắt tiếng";
+}
+function ghiLuot(id, nv, dungLanDau, soLan) {
+  KHO.luot.push({ ma: KHO.ma || "Chưa có mã", id: id, nv: nv, dung: dungLanDau ? 1 : 0, lan: soLan, t: new Date().toISOString() });
+  ghiKho();
+}
+function daXong(id, ma) {
+  ma = ma || KHO.ma;
+  var t = TH[id];
+  for (var i = 0; i < t.nv.length; i++) {
+    if (!KHO.luot.some(function (l) { return l.ma === ma && l.id === id && l.nv === i; })) return false;
+  }
+  return true;
+}
+
+/* ---------------- âm thanh, pháo giấy ---------------- */
+var AC = null;
+function am(loai) {
+  if (!KHO.am || KHONG_HU) return;
+  try {
+    AC = AC || new (window.AudioContext || window.webkitAudioContext)();
+    var notes = loai === "dung" ? [880, 1320] : loai === "xong" ? [660, 880, 1100, 1320] : [220, 180];
+    notes.forEach(function (f, i) {
+      var o = AC.createOscillator(), g = AC.createGain();
+      o.type = loai === "sai" ? "triangle" : "sine"; o.frequency.value = f;
+      var t0 = AC.currentTime + i * 0.11;
+      g.gain.setValueAtTime(0.0001, t0); g.gain.exponentialRampToValueAtTime(0.25, t0 + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.25);
+      o.connect(g); g.connect(AC.destination); o.start(t0); o.stop(t0 + 0.3);
+    });
+  } catch (e) {}
+}
+function doiAm() { KHO.am = !KHO.am; ghiKho(); capNhatChip(); }
+function doiTV() { document.body.classList.toggle("tv"); }
+var phaoHat = [];
+function phaoGiay() {
+  if (KHONG_HU) return;
+  var c = document.getElementById("phao"), x = c.getContext("2d");
+  c.width = innerWidth; c.height = innerHeight;
+  var mau = ["#f97316", "#22c55e", "#3b82f6", "#ec4899", "#eab308", "#8b5cf6"];
+  for (var i = 0; i < 120; i++) phaoHat.push({ x: innerWidth / 2 + (Math.random() - .5) * 200, y: innerHeight * .45, vx: (Math.random() - .5) * 14, vy: -Math.random() * 13 - 4, r: Math.random() * 6 + 4, m: mau[i % 6], q: Math.random() * 6, s: 120 });
+  function buoc() {
+    x.clearRect(0, 0, c.width, c.height);
+    phaoHat.forEach(function (p) { p.x += p.vx; p.y += p.vy; p.vy += 0.45; p.q += 0.2; p.s--; x.save(); x.translate(p.x, p.y); x.rotate(p.q); x.fillStyle = p.m; x.fillRect(-p.r / 2, -p.r / 4, p.r, p.r / 2); x.restore(); });
+    phaoHat = phaoHat.filter(function (p) { return p.s > 0 && p.y < c.height + 20; });
+    if (phaoHat.length) requestAnimationFrame(buoc); else x.clearRect(0, 0, c.width, c.height);
+  }
+  requestAnimationFrame(buoc);
+}
+
+/* ---------------- tranh SVG tự vẽ ---------------- */
+function e(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
+function nen(k, c) {
+  var s = "";
+  if (k === "lop" || k === "phongtuvan") {
+    s += '<rect width="400" height="260" fill="url(#gTuong2)"/><rect y="200" width="400" height="60" fill="#cbd5e1"/><rect y="198" width="400" height="5" fill="#94a3b8"/>';
+    if (k === "lop") s += '<rect x="40" y="22" width="190" height="95" rx="6" fill="#14532d" stroke="#a16207" stroke-width="6"/><text x="' + (c.nguoi && c.nguoi.some(function (p) { return p.vai === "gv" && p.x < 140; }) ? 170 : 135) + '" y="78" font-size="20" fill="#f0fdf4" text-anchor="middle" font-family="Segoe UI" font-weight="700">' + e(c.bang || "Lớp 8") + '</text>';
+    else s += '<rect x="20" y="30" width="80" height="140" fill="url(#gGo)"/><g fill="#fff" opacity=".9"><rect x="28" y="40" width="10" height="30" fill="#ef4444"/><rect x="40" y="44" width="10" height="26" fill="#3b82f6"/><rect x="52" y="40" width="10" height="30" fill="#22c55e"/><rect x="28" y="90" width="10" height="30" fill="#eab308"/><rect x="40" y="92" width="10" height="28" fill="#8b5cf6"/></g><rect x="150" y="178" width="120" height="14" rx="4" fill="#92400e"/>';
+    s += '<rect x="270" y="24" width="100" height="80" rx="6" fill="url(#gTroi)" stroke="#fff" stroke-width="5"/><line x1="320" y1="24" x2="320" y2="104" stroke="#fff" stroke-width="4"/>';
+  } else if (k === "thuvien") {
+    s += '<rect width="400" height="260" fill="url(#gTuong)"/><rect y="205" width="400" height="55" fill="#d6a46a"/>';
+    for (var i = 0; i < 3; i++) { var x0 = 14 + i * 132; s += '<rect x="' + x0 + '" y="20" width="118" height="150" fill="url(#gGo)" rx="4"/>'; for (var h = 0; h < 3; h++) { for (var b = 0; b < 8; b++) s += '<rect x="' + (x0 + 6 + b * 14) + '" y="' + (28 + h * 48) + '" width="11" height="' + (34 + (b % 3) * 3) + '" fill="' + ["#ef4444", "#3b82f6", "#22c55e", "#eab308", "#8b5cf6", "#ec4899"][(b + h + i) % 6] + '" rx="2"/>'; } }
+  } else if (k === "santruong" || k === "duonglang" || k === "trangtrai" || k === "benhvien" || k === "nhavanhoa") {
+    s += '<rect width="400" height="260" fill="url(#gTroi)"/><circle cx="350" cy="40" r="22" fill="#fde047"/>';
+    if (k === "santruong") s += '<rect x="180" y="60" width="210" height="100" fill="#fef3c7"/><rect x="170" y="50" width="230" height="16" fill="#dc2626"/><g fill="#7dd3fc">' + [0, 1, 2, 3].map(function (j) { return '<rect x="' + (195 + j * 50) + '" y="80" width="30" height="26" rx="3"/><rect x="' + (195 + j * 50) + '" y="118" width="30" height="26" rx="3"/>'; }).join("") + '</g><rect y="160" width="400" height="100" fill="#fcd9b6"/>';
+    if (k === "duonglang") s += '<path d="M0 150 Q100 120 200 150 T400 140 V260 H0Z" fill="url(#gCo)"/><path d="M150 260 L190 150 H220 L270 260Z" fill="#e7e5e4"/><path d="M30 150 l30-26 30 26z" fill="#dc2626"/><rect x="36" y="150" width="48" height="34" fill="#fef3c7"/><path d="M300 140 l30-26 30 26z" fill="#b45309"/><rect x="306" y="140" width="48" height="34" fill="#fff7ed"/>';
+    if (k === "trangtrai") s += '<rect y="150" width="400" height="110" fill="url(#gCo)"/><g>' + [40, 100, 160].map(function (x) { return '<rect x="' + (x - 4) + '" y="110" width="8" height="45" fill="#92400e"/><circle cx="' + x + '" cy="100" r="26" fill="#16a34a"/><circle cx="' + (x - 9) + '" cy="96" r="5" fill="#f97316"/><circle cx="' + (x + 10) + '" cy="106" r="5" fill="#f97316"/>'; }).join("") + '</g><g stroke="#a16207" stroke-width="4">' + [0, 1, 2, 3, 4, 5, 6, 7].map(function (j) { return '<line x1="' + (j * 55) + '" y1="175" x2="' + (j * 55) + '" y2="200"/>'; }).join("") + '<line x1="0" y1="182" x2="400" y2="182"/></g>';
+    if (k === "benhvien") s += '<rect x="200" y="40" width="190" height="130" fill="#f8fafc" stroke="#cbd5e1" stroke-width="3"/><rect x="275" y="55" width="40" height="40" rx="6" fill="#fff"/><rect x="290" y="60" width="10" height="30" fill="#dc2626"/><rect x="280" y="70" width="30" height="10" fill="#dc2626"/><text x="295" y="120" font-size="13" text-anchor="middle" font-family="Segoe UI" font-weight="700" fill="#334155">BỆNH VIỆN HUYỆN</text><rect y="170" width="400" height="90" fill="#e2e8f0"/>';
+    if (k === "nhavanhoa") s += '<rect x="90" y="50" width="230" height="120" fill="#fff7ed"/><path d="M80 52 L205 10 L330 52Z" fill="#dc2626"/><rect x="150" y="28" width="110" height="18" rx="4" fill="#facc15"/><text x="205" y="41" font-size="11" text-anchor="middle" font-family="Segoe UI" font-weight="800" fill="#7c2d12">NHÀ VĂN HOÁ</text><rect y="170" width="400" height="90" fill="#fde68a"/><path d="M20 30 v60" stroke="#78350f" stroke-width="3"/><rect x="21" y="30" width="30" height="20" fill="#dc2626"/><text x="36" y="45" font-size="12" text-anchor="middle" fill="#fde047">★</text>';
+    if (k === "santruong" || k === "duonglang") s += '<rect x="22" y="110" width="12" height="60" fill="#92400e"/><circle cx="28" cy="98" r="30" fill="#22c55e"/><circle cx="46" cy="112" r="20" fill="#16a34a"/>';
+  } else if (k === "nha" || k === "bep") {
+    s += '<rect width="400" height="260" fill="url(#gHong)"/><rect y="200" width="400" height="60" fill="#d6a46a"/><rect y="198" width="400" height="5" fill="#a16207"/>';
+    if (k === "nha") s += '<rect x="250" y="30" width="110" height="90" rx="6" fill="url(#gTroi)" stroke="#fff" stroke-width="6"/><path d="M250 30 q20 50 0 90" fill="#f9a8d4"/><path d="M360 30 q-20 50 0 90" fill="#f9a8d4"/><rect x="40" y="40" width="70" height="50" fill="#fff" stroke="#a16207" stroke-width="4"/><path d="M45 85 l20-25 15 15 10-10 15 20z" fill="#22c55e"/>';
+    else s += '<g opacity=".5">' + [0, 1, 2, 3, 4, 5, 6, 7].map(function (j) { return '<rect x="' + (j * 50) + '" y="40" width="48" height="48" fill="#fff"/>'; }).join("") + '</g><rect x="0" y="150" width="400" height="50" fill="#94a3b8"/><rect x="0" y="146" width="400" height="8" fill="#64748b"/>';
+  } else if (k === "phonghoc") {
+    s += '<rect width="400" height="260" fill="url(#gDem)"/><circle cx="340" cy="50" r="22" fill="#fef9c3"/><circle cx="350" cy="44" r="20" fill="#4338ca"/>' + [30, 90, 150, 260].map(function (x, j) { return '<circle cx="' + x + '" cy="' + (30 + j * 9) + '" r="2" fill="#fff"/>'; }).join("") + '<rect y="185" width="400" height="75" fill="#92400e"/><rect y="180" width="400" height="10" fill="#b45309"/><path d="M60 180 l20-60 h30" stroke="#e2e8f0" stroke-width="5" fill="none"/><path d="M100 115 l40 0 -10 25 h-20z" fill="#fde047"/><path d="M95 140 l60 45 h-110z" fill="url(#gDen)"/>';
+  } else if (k === "mang") {
+    s += '<rect width="400" height="260" fill="url(#gMang)"/><g opacity=".25" fill="#8b5cf6"><circle cx="60" cy="40" r="30"/><circle cx="370" cy="230" r="40"/></g>';
+    s += '<rect x="200" y="18" width="150" height="228" rx="20" fill="#1e293b"/><rect x="208" y="34" width="134" height="196" rx="10" fill="#f8fafc"/><rect x="208" y="34" width="134" height="24" fill="#6366f1"/><text x="275" y="51" font-size="11" fill="#fff" text-anchor="middle" font-family="Segoe UI" font-weight="700">' + e(c.dt || "Tin nhắn mới") + '</text>';
+    if (c.tin) {
+      var MT = { do: ["#fee2e2", "#991b1b"], xanh: ["#dcfce7", "#166534"], xam: ["#e2e8f0", "#1e293b"], vang: ["#fef3c7", "#92400e"] };
+      c.tin.forEach(function (m, k) { var y = 68 + k * 40, mm = MT[m[1]] || MT.xam, w = Math.min(126, m[0].length * 6.2 + 14), x = m[1] === "xanh" ? 336 - w : 214;
+        s += '<rect x="' + x + '" y="' + y + '" width="' + w + '" height="28" rx="10" fill="' + mm[0] + '"/><text x="' + (x + 7) + '" y="' + (y + 18) + '" font-size="9.5" font-family="Segoe UI" fill="' + mm[1] + '">' + e(m[0]) + '</text>'; });
+    } else {
+      s += '<rect x="214" y="68" width="110" height="34" rx="10" fill="#fee2e2"/><text x="220" y="83" font-size="9.5" font-family="Segoe UI" fill="#991b1b">Coi chừng! Bọn tớ sẽ</text><text x="220" y="96" font-size="9.5" font-family="Segoe UI" fill="#991b1b">tung tin xấu về cậu…</text>';
+      s += '<rect x="214" y="110" width="90" height="22" rx="10" fill="#fee2e2"/><text x="220" y="125" font-size="9.5" font-family="Segoe UI" fill="#991b1b">Lên mạng hết đấy!</text>';
+      s += '<rect x="240" y="150" width="96" height="40" rx="10" fill="#dcfce7"/><text x="246" y="166" font-size="9.5" font-family="Segoe UI" fill="#166534">📸 Lưu bằng chứng</text><text x="246" y="181" font-size="9.5" font-family="Segoe UI" fill="#166534">👨‍👩‍👦 Báo người lớn</text>';
+    }
+    s += '<rect y="230" width="400" height="30" fill="#c4b5fd" opacity=".5"/>';
+  } else if (k === "sankhau") {
+    s += '<rect width="400" height="260" fill="#1e1b4b"/><path d="M0 0 h400 v30 q-50 16 -100 0 q-50 16 -100 0 q-50 16 -100 0 q-50 16 -100 0z" fill="url(#gRem)"/><rect x="0" y="0" width="50" height="210" fill="url(#gRem)"/><rect x="350" y="0" width="50" height="210" fill="url(#gRem)"/><path d="M120 0 L60 210 H340 L280 0Z" fill="url(#gDen)" opacity=".6"/><rect y="200" width="400" height="60" fill="url(#gGo)"/>';
+  } else if (k === "sanbong") {
+    s += '<rect width="400" height="260" fill="url(#gTroi)"/><rect y="120" width="400" height="140" fill="url(#gCo)"/>' + [0, 1, 2, 3].map(function (j) { return '<rect x="' + (j * 100) + '" y="120" width="50" height="140" fill="#fff" opacity=".08"/>'; }).join("") + '<rect x="30" y="80" width="90" height="60" fill="none" stroke="#fff" stroke-width="5"/><path d="M30 80 l12 14 h66 l12-14" fill="none" stroke="#e2e8f0" stroke-width="2"/>';
+  } else if (k === "tien") {
+    s += '<rect width="400" height="260" fill="#ecfdf5"/><circle cx="330" cy="70" r="46" fill="none" stroke="#d1fae5" stroke-width="20"/><path d="M330 24 a46 46 0 0 1 43.7 60.2" fill="none" stroke="#10b981" stroke-width="20"/><path d="M373.7 84.2 a46 46 0 0 1 -22 26" fill="none" stroke="#f97316" stroke-width="20"/><path d="M351.7 110.2 a46 46 0 0 1 -35 3" fill="none" stroke="#ec4899" stroke-width="20"/><rect y="215" width="400" height="45" fill="#a7f3d0"/>';
+  } else if (k === "xuonggom") {
+    s += '<rect width="400" height="260" fill="#ffedd5"/><rect y="200" width="400" height="60" fill="#c2410c" opacity=".55"/><rect x="20" y="40" width="360" height="10" fill="#92400e"/><rect x="20" y="100" width="360" height="10" fill="#92400e"/>' + [40, 90, 140, 200, 250, 300, 350].map(function (x, j) { return '<path d="M' + (x - 12) + ' 40 q-6 -26 12 -30 q18 4 12 30z" fill="' + (j % 2 ? "#ea580c" : "#0e7490") + '"/><path d="M' + (x - 10) + ' 100 q-8 -32 10 -36 q18 4 10 36z" fill="' + (j % 2 ? "#0e7490" : "#b45309") + '"/>'; }).join("");
+  }
+  return s;
+}
+var DA = "#f5cba7";
+function nguoi(p) {
+  var to = p.to || (p.vai === "gv" || p.vai === "nguoi-lon" ? 1.1 : 1), x = p.x, y = 236;
+  var s = '<g transform="translate(' + x + ',' + y + ') scale(' + to + ')">';
+  s += '<ellipse cx="0" cy="2" rx="26" ry="5" fill="#000" opacity=".12"/>';
+  s += '<rect x="-14" y="-52" width="11" height="52" rx="5" fill="#1e3a8a"/><rect x="3" y="-52" width="11" height="52" rx="5" fill="#1e3a8a"/>';
+  if (p.toc === "dai" || p.toc === "buoc") s += '<path d="M-20 -55 h40 l6 22 h-52z" fill="' + (p.vai ? "#334155" : "#1e3a8a") + '"/>';
+  s += '<rect x="-21" y="-104" width="42" height="56" rx="14" fill="' + p.ao + '"/>';
+  if (!p.vai) s += '<path d="M-8 -104 l8 12 8 -12" fill="#fff"/><path d="M-3 -98 l3 14 3-14z" fill="#dc2626"/>';
+  if (p.vai === "gv") s += '<path d="M-10 -104 l10 30 10 -30" fill="none" stroke="#fff" stroke-width="3"/>';
+  var tay = p.cam === "vui" || p.cam === "cuoi" ? '<path d="M-20 -96 q-16 10 -12 -18" stroke="' + p.ao + '" stroke-width="9" fill="none" stroke-linecap="round"/><circle cx="-31" cy="-116" r="5" fill="' + DA + '"/><path d="M20 -96 q12 20 4 38" stroke="' + p.ao + '" stroke-width="9" fill="none" stroke-linecap="round"/>'
+    : p.cam === "lo" ? '<path d="M-20 -96 q-6 -14 8 -22" stroke="' + p.ao + '" stroke-width="9" fill="none" stroke-linecap="round"/><path d="M20 -96 q6 -14 -8 -22" stroke="' + p.ao + '" stroke-width="9" fill="none" stroke-linecap="round"/>'
+    : '<path d="M-20 -96 q-10 20 -4 38" stroke="' + p.ao + '" stroke-width="9" fill="none" stroke-linecap="round"/><path d="M20 -96 q10 20 4 38" stroke="' + p.ao + '" stroke-width="9" fill="none" stroke-linecap="round"/>';
+  s += tay;
+  var mt = { "ngan": "#3f2a1d", "dai": "#2b1b12", "buoc": "#4a2c17", "bac": "#9ca3af" }[p.toc] || "#3f2a1d";
+  if (p.toc === "dai") s += '<path d="M-21 -128 q-4 30 4 42 h34 q8 -12 4 -42z" fill="' + mt + '"/>';
+  s += '<rect x="-5" y="-112" width="10" height="10" fill="' + DA + '"/><circle cx="0" cy="-128" r="20" fill="' + DA + '"/>';
+  if (p.toc === "buoc") s += '<circle cx="0" cy="-152" r="9" fill="' + mt + '"/>';
+  s += '<path d="M-21 -128 q0 -24 21 -24 q21 0 21 24 q-10 -10 -21 -10 q-12 0 -21 10z" fill="' + mt + '"/>';
+  if (p.toc === "bac" || p.vai === "gv") s += '<g fill="none" stroke="#334155" stroke-width="2"><circle cx="-8" cy="-128" r="5.5"/><circle cx="8" cy="-128" r="5.5"/><path d="M-2.5 -128 h5"/></g>';
+  var c = p.cam || "binh";
+  var mat = c === "chan" ? '<path d="M-11 -128 h6 M5 -128 h6" stroke="#1e293b" stroke-width="2.5" stroke-linecap="round"/>' : '<circle cx="-8" cy="-128" r="2.6" fill="#1e293b"/><circle cx="8" cy="-128" r="2.6" fill="#1e293b"/>';
+  if (c === "gian") mat += '<path d="M-13 -137 l9 4 M13 -137 l-9 4" stroke="#1e293b" stroke-width="2.5" stroke-linecap="round"/><circle cx="-12" cy="-120" r="3.5" fill="#f87171" opacity=".6"/><circle cx="12" cy="-120" r="3.5" fill="#f87171" opacity=".6"/>';
+  if (c === "buon") mat += '<path d="M-13 -134 l8 -3 M13 -134 l-8 -3" stroke="#1e293b" stroke-width="2" stroke-linecap="round"/>';
+  var mieng = { "vui": '<path d="M-7 -119 q7 7 14 0" stroke="#7f1d1d" stroke-width="2.5" fill="none" stroke-linecap="round"/>',
+    "cuoi": '<path d="M-8 -120 q8 11 16 0z" fill="#7f1d1d"/>',
+    "buon": '<path d="M-6 -115 q6 -6 12 0" stroke="#7f1d1d" stroke-width="2.5" fill="none" stroke-linecap="round"/>',
+    "gian": '<path d="M-6 -115 q6 -5 12 0" stroke="#7f1d1d" stroke-width="2.5" fill="none" stroke-linecap="round"/>',
+    "lo": '<path d="M-7 -117 q3 -3 5 0 q2 3 4 0 q3 -3 5 0" stroke="#7f1d1d" stroke-width="2" fill="none"/><path d="M17 -140 q4 6 0 9 q-4 -3 0 -9z" fill="#38bdf8"/>',
+    "chan": '<path d="M-6 -117 h12" stroke="#7f1d1d" stroke-width="2.5" stroke-linecap="round"/>',
+    "binh": '<path d="M-5 -118 q5 4 10 0" stroke="#7f1d1d" stroke-width="2.5" fill="none" stroke-linecap="round"/>' }[c];
+  s += mat + mieng + '</g>';
+  return s;
+}
+function vat(v) {
+  var k = v[0], x = v[1], y = v[2], s = '<g transform="translate(' + x + ',' + y + ')">';
+  var M = {
+    "not-nhac": '<g style="animation:noi 2.4s ease-in-out infinite"><path d="M0 0 v-26 l16 -5 v24" stroke="#7c3aed" stroke-width="3" fill="none"/><ellipse cx="-3" cy="1" rx="6" ry="4.5" fill="#7c3aed"/><ellipse cx="13" cy="-6" rx="6" ry="4.5" fill="#7c3aed"/></g>',
+    "sach": '<rect x="-22" y="-14" width="44" height="12" rx="2" fill="#3b82f6"/><rect x="-18" y="-26" width="38" height="12" rx="2" fill="#ef4444"/><rect x="-20" y="-38" width="40" height="12" rx="2" fill="#22c55e"/>',
+    "dong-ho": '<circle r="20" fill="#fff" stroke="#334155" stroke-width="4"/><path d="M0 0 v-13 M0 0 l9 5" stroke="#334155" stroke-width="3" stroke-linecap="round"/>',
+    "giay": '<rect x="-16" y="-22" width="32" height="40" rx="3" fill="#fff" stroke="#94a3b8" stroke-width="2"/><path d="M-10 -12 h20 M-10 -4 h20 M-10 4 h14" stroke="#94a3b8" stroke-width="2"/>',
+    "may-tinh": '<rect x="-30" y="-46" width="60" height="40" rx="4" fill="#1e293b"/><rect x="-26" y="-42" width="52" height="32" fill="#7dd3fc"/><path d="M-20 -18 l12 -14 10 8 8 -6 10 12z" fill="#16a34a"/><rect x="-36" y="-6" width="72" height="6" rx="3" fill="#475569"/>',
+    "xe-dap": '<g fill="none" stroke="#1e293b" stroke-width="4"><circle cx="-30" cy="0" r="22"/><circle cx="30" cy="0" r="22" stroke-dasharray="6 5"/><path d="M-30 0 l20 -30 h32 l8 30 M-10 -30 l20 30 M22 -30 l-4 -10 h-10"/></g><text x="30" y="-28" font-size="16" text-anchor="middle">💨</text>',
+    "bat-chao": '<path d="M-20 -14 h40 q0 22 -20 22 q-20 0 -20 -22z" fill="#f8fafc" stroke="#0ea5e9" stroke-width="3"/><path d="M-6 -22 q4 -8 0 -14 M6 -22 q4 -8 0 -14" stroke="#94a3b8" stroke-width="2" fill="none"/>',
+    "noi-chao": '<rect x="-28" y="-30" width="56" height="34" rx="8" fill="#94a3b8"/><rect x="-32" y="-34" width="64" height="8" rx="4" fill="#64748b"/><path d="M-10 -40 q5 -10 0 -18 M8 -40 q5 -10 0 -18" stroke="#cbd5e1" stroke-width="3" fill="none"/><text x="0" y="-8" font-size="14" text-anchor="middle">❤</text>',
+    "noi-com": '<rect x="-22" y="-30" width="44" height="34" rx="10" fill="#f8fafc" stroke="#94a3b8" stroke-width="2"/><rect x="-24" y="-36" width="48" height="10" rx="5" fill="#ec4899"/>',
+    "choi": '<path d="M0 -70 v60" stroke="#a16207" stroke-width="5"/><path d="M-14 -10 h28 l6 34 h-40z" fill="#facc15"/>',
+    "quan-ao": '<path d="M-20 -10 l10 -10 h20 l10 10 -8 6 v18 h-24 v-18z" fill="#f472b6"/>',
+    "bong": '<circle r="14" fill="#fff" stroke="#1e293b" stroke-width="2"/><path d="M0 -6 l6 4 -2 7 h-8 l-2 -7z" fill="#1e293b"/>',
+    "cup": '<path d="M-16 -50 h32 v14 q0 18 -16 20 q-16 -2 -16 -20z" fill="url(#gXu)"/><rect x="-4" y="-16" width="8" height="12" fill="#ca8a04"/><rect x="-14" y="-4" width="28" height="8" rx="2" fill="#92400e"/><text x="0" y="-30" font-size="11" text-anchor="middle" font-weight="900" fill="#78350f">3</text>',
+    "mic": '<rect x="-3" y="-40" width="6" height="40" fill="#475569"/><rect x="-7" y="-58" width="14" height="22" rx="7" fill="#1e293b"/><path d="M-18 2 h36" stroke="#475569" stroke-width="5"/>',
+    "hoa": '<path d="M0 0 v-30" stroke="#16a34a" stroke-width="4"/><circle cx="0" cy="-36" r="9" fill="#f472b6"/><circle cx="-9" cy="-30" r="7" fill="#fb7185"/><circle cx="9" cy="-30" r="7" fill="#fb7185"/><circle cx="0" cy="-34" r="4" fill="#fde047"/>',
+    "dong-xu": '<ellipse cx="0" cy="0" rx="22" ry="8" fill="#ca8a04"/><ellipse cx="0" cy="-6" rx="22" ry="8" fill="#eab308"/><ellipse cx="0" cy="-12" rx="22" ry="8" fill="url(#gXu)"/><text x="0" y="-8" font-size="10" text-anchor="middle" font-weight="900" fill="#78350f">đ</text>',
+    "heo": '<ellipse cx="0" cy="-16" rx="30" ry="22" fill="#f9a8d4"/><circle cx="26" cy="-20" r="9" fill="#f472b6"/><rect x="-8" y="-40" width="16" height="4" rx="2" fill="#831843"/><circle cx="10" cy="-24" r="2.5" fill="#1e293b"/><rect x="-20" y="0" width="8" height="8" fill="#f472b6"/><rect x="10" y="0" width="8" height="8" fill="#f472b6"/>',
+    "binh-gom": '<path d="M-14 0 q-12 -26 4 -38 v-8 h20 v8 q16 12 4 38z" fill="url(#gGom)"/><path d="M-12 -22 h24" stroke="#fde68a" stroke-width="3"/>',
+    "ga": '<ellipse cx="0" cy="-10" rx="14" ry="11" fill="#fef3c7"/><circle cx="10" cy="-22" r="7" fill="#fef3c7"/><path d="M16 -22 l6 2 -6 2z" fill="#f97316"/><path d="M8 -30 q2 -6 6 -2" fill="#dc2626"/>',
+    "dien-thoai": '<rect x="-14" y="-26" width="28" height="48" rx="5" fill="#1e293b"/><rect x="-11" y="-21" width="22" height="36" fill="#a5b4fc"/><path d="M-5 -8 l9 5 -9 5z" fill="#fff"/>',
+    "canh-bao": '<path d="M0 -26 l26 44 h-52z" fill="#f97316"/><text x="0" y="12" font-size="26" text-anchor="middle" font-weight="900" fill="#fff">!</text>',
+    "heart": '<path d="M0 10 l-16 -16 a9 9 0 0 1 16 -10 a9 9 0 0 1 16 10z" fill="#ef4444"/>',
+    "may-set": '<path d="M-60 -10 a26 26 0 0 1 30 -26 a32 32 0 0 1 58 4 a22 22 0 0 1 30 22z" fill="#475569"/><path d="M-6 -6 l-14 30 h12 l-10 28 26 -36 h-12 l10 -22z" fill="#fde047" stroke="#ca8a04" stroke-width="1.5"/>',
+    "mua": '<g stroke="#1d4ed8" stroke-width="2.5" stroke-linecap="round" opacity=".7">' + [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17].map(function (i) { var x = (i % 6) * 34 - 90 + (Math.floor(i / 6) % 2) * 17, y = Math.floor(i / 6) * 50; return '<path d="M' + x + ' ' + y + ' l-8 22"/>'; }).join("") + '</g>',
+    "nuoc-lu": '<path d="M-200 0 q25 -10 50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 V60 H-200z" fill="#a16207" opacity=".75"/><path d="M-200 10 q25 -8 50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0" fill="none" stroke="#fde68a" stroke-width="2" opacity=".7"/>',
+    "nui-sat": '<path d="M-90 0 L-30 -110 L20 -60 L60 -120 L120 0z" fill="#92400e"/><path d="M-20 -90 l10 20 -8 16 12 22" fill="none" stroke="#1c1917" stroke-width="3"/><circle cx="40" cy="-20" r="9" fill="#78350f"/><circle cx="58" cy="-10" r="6" fill="#78350f"/>',
+    "ran": '<path d="M-40 0 q15 -14 30 0 t30 0 t30 0" fill="none" stroke="#16a34a" stroke-width="9" stroke-linecap="round"/><circle cx="22" cy="-2" r="7" fill="#15803d"/><path d="M28 -2 l8 -3 M28 -2 l8 3" stroke="#dc2626" stroke-width="1.5"/>',
+    "xe-may": '<g fill="none" stroke="#1e293b" stroke-width="5"><circle cx="-34" cy="0" r="16"/><circle cx="34" cy="0" r="16"/></g><path d="M-34 0 l20 -22 h34 l14 22" fill="none" stroke="#dc2626" stroke-width="6"/><rect x="-16" y="-34" width="34" height="12" rx="6" fill="#1e293b"/>',
+    "ca": '<ellipse cx="0" cy="-8" rx="24" ry="10" fill="#94a3b8"/><path d="M22 -8 l14 -10 v20z" fill="#64748b"/><circle cx="-14" cy="-10" r="2" fill="#1e293b"/>',
+    "ly-nuoc": '<path d="M-12 -34 h24 l-4 34 h-16z" fill="#fef9c3" stroke="#ca8a04" stroke-width="2"/><circle cx="4" cy="-28" r="7" fill="#84cc16"/>',
+    "lo-thuoc": '<rect x="-12" y="-30" width="24" height="30" rx="5" fill="#fff" stroke="#dc2626" stroke-width="2.5"/><rect x="-10" y="-38" width="20" height="9" rx="2" fill="#dc2626"/><path d="M-5 -15 h10 M0 -20 v10" stroke="#dc2626" stroke-width="2.5"/>',
+    "banh-kem": '<rect x="-26" y="-22" width="52" height="22" rx="4" fill="#f9a8d4"/><rect x="-26" y="-26" width="52" height="7" rx="3" fill="#fff"/><path d="M0 -26 v-14" stroke="#f59e0b" stroke-width="3"/><path d="M0 -46 q4 4 0 8 q-4 -4 0 -8z" fill="#f97316"/>',
+    "tivi": '<rect x="-34" y="-50" width="68" height="44" rx="5" fill="#1e293b"/><rect x="-30" y="-46" width="60" height="36" fill="#38bdf8"/><path d="M-10 -6 l-8 10 M10 -6 l8 10" stroke="#1e293b" stroke-width="3"/>',
+    "mui-ten": '<path d="M-30 0 h50 m-12 -12 l12 12 -12 12" fill="none" stroke="#dc2626" stroke-width="5" stroke-linecap="round"/>',
+    "giuong": '<rect x="-50" y="-30" width="100" height="18" rx="4" fill="#e2e8f0" stroke="#94a3b8" stroke-width="2"/><rect x="-50" y="-12" width="6" height="16" fill="#94a3b8"/><rect x="44" y="-12" width="6" height="16" fill="#94a3b8"/><rect x="-46" y="-40" width="26" height="12" rx="5" fill="#fff"/>',
+    "khoi": '<g fill="#94a3b8" opacity=".75"><circle cx="0" cy="-20" r="14"/><circle cx="14" cy="-38" r="17"/><circle cx="-6" cy="-58" r="20"/><circle cx="18" cy="-78" r="16"/></g>',
+    "lua": '<path d="M-18 0 q-6 -22 8 -34 q-2 14 8 16 q-2 -20 10 -30 q2 20 12 26 q6 10 -2 22z" fill="#f97316"/><path d="M-8 0 q-2 -12 6 -18 q0 8 6 10 q2 -8 6 -12 q4 12 -2 20z" fill="#fde047"/>',
+    "chuong": '<rect x="-46" y="-40" width="92" height="40" fill="#a16207"/><path d="M-52 -40 l52 -24 52 24z" fill="#78350f"/><g stroke="#78350f" stroke-width="3"><path d="M-30 -40 v40 M-10 -40 v40 M10 -40 v40 M30 -40 v40"/></g><path d="M-60 4 q20 -8 40 0 t40 0 t40 0" fill="none" stroke="#65a30d" stroke-width="5" opacity=".7"/>',
+    "hop-qua": '<rect x="-22" y="-30" width="44" height="32" fill="#f97316"/><rect x="-25" y="-38" width="50" height="10" fill="#fb923c"/><rect x="-4" y="-38" width="8" height="40" fill="#fde047"/>'
+  };
+  return s + (M[k] || "") + '</g>';
+}
+function bongNoi(b) {
+  var x = b[0], y = b[1], t = b[2], co = t.length > 32 ? 11 : 12, w = Math.min(Math.max(t.length * co * 0.55 + 20, 60), 390);
+  var x0 = Math.max(4, Math.min(396 - w, x - w / 2));
+  return '<g><rect x="' + x0 + '" y="' + (y - 18) + '" width="' + w + '" height="28" rx="12" fill="#fff" stroke="#334155" stroke-width="1.5"/><path d="M' + (x - 6) + ' ' + (y + 10) + ' l6 10 6 -10" fill="#fff" stroke="#334155" stroke-width="1.5"/><rect x="' + (x - 7) + '" y="' + (y + 7) + '" width="14" height="4" fill="#fff"/><text x="' + (x0 + w / 2) + '" y="' + (y + 1) + '" font-size="' + co + '" text-anchor="middle" font-family="Segoe UI" font-weight="700" fill="#1e293b">' + e(t) + '</text></g>';
+}
+function tranh(t) {
+  var c = t.canh;
+  return '<svg viewBox="0 0 400 260" role="img" aria-label="' + e(t.ten) + '">' + nen(c.nen, c) + (c.vat || []).map(vat).join("") + (c.nguoi || []).map(nguoi).join("") + (c.loi || []).map(bongNoi).join("") + '</svg>';
+}
+function cu(cao) {
+  cao = cao || 90;
+  return '<svg width="' + cao + '" height="' + cao + '" viewBox="0 0 90 90"><ellipse cx="45" cy="86" rx="24" ry="4" fill="#000" opacity=".12"/><ellipse cx="45" cy="52" rx="30" ry="32" fill="#8b5cf6"/><ellipse cx="45" cy="60" rx="19" ry="21" fill="#ede9fe"/><path d="M20 26 l6 -16 10 12z M70 26 l-6 -16 -10 12z" fill="#7c3aed"/><circle cx="33" cy="40" r="11" fill="#fff"/><circle cx="57" cy="40" r="11" fill="#fff"/><circle cx="34" cy="41" r="5" fill="#1e293b"/><circle cx="58" cy="41" r="5" fill="#1e293b"/><circle cx="36" cy="39" r="1.6" fill="#fff"/><circle cx="60" cy="39" r="1.6" fill="#fff"/><path d="M41 50 l4 6 4 -6z" fill="#f97316"/><path d="M30 18 h30 l-15 -10z" fill="#1e293b"/><rect x="28" y="16" width="34" height="5" fill="#1e293b"/></svg>';
+}
+
+/* ---------------- điều hướng ---------------- */
+function thamSo() {
+  var h = location.hash.replace(/^#/, ""), p = h.split("&"), q = { man: p[0] || "trang-chu" };
+  p.slice(1).forEach(function (x) { var a = x.split("="); q[decodeURIComponent(a[0])] = decodeURIComponent(a[1] || "1"); });
+  return q;
+}
+function diToi(h) { location.hash = h; }
+function ve() {
+  var q = thamSo();
+  KHONG_HU = !!q.chup;
+  document.body.classList.toggle("khong-hieu-ung", KHONG_HU);
+  var m = document.getElementById("man");
+  document.documentElement.style.setProperty("--cd", "#4f46e5");
+  if (document.getElementById("hopVideo").classList.contains("mo")) dongVideo();
+  if (q.man === "chu-de" && CD[q.cd]) veChuDe(m, +q.cd);
+  else if (q.man === "th" && TH[q.id]) veTH(m, TH[q.id], q);
+  else if (q.man === "gv") veGV(m, q);
+  else veTrangChu(m);
+  m.classList.remove("hien"); void m.offsetWidth; if (!KHONG_HU) m.classList.add("hien");
+  scrollTo(0, 0);
+  capNhatChip();
+}
+addEventListener("hashchange", ve);
+
+/* ---------------- TRANG CHỦ ---------------- */
+function veTrangChu(m) {
+  var tong = DL.tinh_huong.length, xong = DL.tinh_huong.filter(function (t) { return KHO.ma && daXong(t.id); }).length;
+  var pt = tong ? xong / tong : 0, R = 46, CV = 2 * Math.PI * R;
+  var h = '<section class="kinh anh-hung"><div><h2>Mỗi tình huống,<br>một cách ứng xử hay 🌟</h2>'
+    + '<p>Đọc tình huống trong SGK, chọn cách xử lí, xếp các bước và viết <b>lời của em</b>. Làm sai không sao: app chỉ cho em <b>vì sao</b> rồi mời em thử lại.</p>'
+    + '<div class="o-ma"><input id="oMa" placeholder="VD: HS05 hoặc Nhóm 2" value="' + e(KHO.ma) + '" maxlength="12"><button class="nut" onclick="luuMa()">Bắt đầu ▶</button>'
+    + '<div class="goi-y">🔒 Chỉ gõ <b>mã</b> (HS01…) hoặc <b>tên nhóm</b> (Nhóm 1…), <b>không gõ họ tên</b>. Kết quả lưu trên máy này.</div><div class="canh-bao-ma" id="bao"></div></div></div>'
+    + '<div style="display:flex;align-items:center;justify-content:center;gap:18px"><div class="cu">' + cu(120) + '</div>'
+    + '<svg width="140" height="140" viewBox="0 0 120 120"><circle cx="60" cy="60" r="' + R + '" fill="none" stroke="#e2e8f0" stroke-width="14"/><circle cx="60" cy="60" r="' + R + '" fill="none" stroke="url(#gCo)" stroke-width="14" stroke-linecap="round" stroke-dasharray="' + (CV * pt) + ' ' + CV + '" transform="rotate(-90 60 60)"/><text x="60" y="58" text-anchor="middle" font-size="26" font-weight="900" fill="#16a34a">' + xong + '</text><text x="60" y="78" text-anchor="middle" font-size="12" font-weight="700" fill="#475569">/ ' + tong + ' đã xong</text></svg></div></section>';
+  h += '<div class="luoi-cd">';
+  DL.chu_de.forEach(function (c) {
+    var ds = DL.tinh_huong.filter(function (t) { return t.cd === c.cd; });
+    var x = ds.filter(function (t) { return KHO.ma && daXong(t.id); }).length;
+    h += '<div class="the-cd" style="--m:' + c.mau + '" onclick="diToi(\'chu-de&cd=' + c.cd + '\')"><div class="bieu">' + c.icon + '</div><h3>Chủ đề ' + c.cd + '. ' + e(c.ten) + '</h3><div class="nho">' + c.trang + ' · ' + ds.length + ' tình huống</div><div class="thanh"><i style="width:' + Math.round(100 * x / ds.length) + '%"></i></div><div class="nho" style="margin-top:4px">Đã xong ' + x + '/' + ds.length + '</div></div>';
+  });
+  h += '</div>';
+  m.innerHTML = h;
+}
+function luuMa() {
+  var v = document.getElementById("oMa").value.trim().replace(/\s+/g, " ");
+  if (!maHopLe(v)) { document.getElementById("bao").textContent = "⚠ Chỉ nhận mã dạng HS05, Nhóm 2 hoặc Tổ 3 (không gõ họ tên)."; am("sai"); return; }
+  KHO.ma = v.replace(/^hs/i, "HS").replace(/^nhom/i, "Nhóm").replace(/^nhóm/i, "Nhóm").replace(/^tổ/i, "Tổ"); ghiKho(); capNhatChip(); am("dung"); ve();
+}
+
+/* ---------------- CHỦ ĐỀ ---------------- */
+function veChuDe(m, cd) {
+  var c = CD[cd]; document.documentElement.style.setProperty("--cd", c.mau);
+  var h = '<div class="kinh tieu-de-cd"><div class="bieu">' + c.icon + '</div><div><h2>Chủ đề ' + cd + '. ' + e(c.ten) + '</h2><div style="color:var(--chu2);font-weight:700">' + c.trang + ' · chọn một tình huống để bắt đầu</div></div><button class="nut phu" style="margin-left:auto" onclick="diToi(\'trang-chu\')">← Các chủ đề</button></div><div class="luoi-th">';
+  DL.tinh_huong.filter(function (t) { return t.cd === cd; }).forEach(function (t) {
+    var x = KHO.ma && daXong(t.id);
+    h += '<div class="the-th" onclick="diToi(\'th&id=' + t.id + '\')"><div class="khung-tranh">' + tranh(t) + (coVideo(t.id) ? '<span class="nhan-video">🎬 Có video</span>' : '') + '</div><div class="ben"><span class="huy">' + t.nhan + ' · ' + t.trang + '</span> ' + (x ? '<span class="huy xong">✓ Đã xong</span>' : '') + (t.an_toan ? ' <span class="huy at">❗ An toàn</span>' : '') + '<h3>' + e(t.ten) + '</h3><div style="color:var(--chu2);font-size:14px;font-weight:600">' + t.nv.length + ' nhiệm vụ + lời của em</div></div></div>';
+  });
+  m.innerHTML = h + '</div>';
+}
+
+/* ---------------- TÌNH HUỐNG ---------------- */
+var TT = null; // trạng thái nhiệm vụ đang làm
+function veTH(m, t, q) {
+  var c = CD[t.cd]; document.documentElement.style.setProperty("--cd", c.mau);
+  var b = q.nv !== undefined ? +q.nv : 0;
+  var h = '<div class="man-th"><section class="kinh khung-canh">' + '<div class="khung-tranh">' + tranh(t) + (coVideo(t.id) ? '<button class="nut-video" title="Xem video tình huống" onclick="moVideo(\'' + t.id + '\')">▶</button><span class="nhan-video">🎬 Xem video</span>' : '') + '</div>'
+    + '<div style="margin:10px 4px 0"><span class="huy">Chủ đề ' + t.cd + '</span> <span class="huy">' + t.nhan + ' · SGK ' + t.trang + '</span></div>'
+    + '<h2>' + e(t.ten) + '</h2><p class="tom">' + e(t.tom) + '</p>'
+    + (t.an_toan ? '<div class="an-toan"><b>⚠️</b><span>Nếu em hoặc bạn em đang gặp chuyện như thế này thật, hãy nói ngay với cha mẹ hoặc thầy cô mà em tin cậy. Em không phải tự chịu một mình.</span></div>' : '')
+    + '</section><section class="kinh bang-nv" id="bangNV"></section></div>';
+  m.innerHTML = h;
+  TT = { t: t, b: b, lan: 0, xong: false, q: q };
+  veNV();
+}
+function chamTienTrinh() {
+  var t = TT.t, s = '<div class="cham">';
+  for (var i = 0; i <= t.nv.length; i++) s += '<span class="' + (i < TT.b ? "da" : i === TT.b ? "dang" : "") + '">' + (i < t.nv.length ? "Nhiệm vụ " + (i + 1) : "✍ Lời của em") + '</span>';
+  return s + '<button class="nut phu nho" style="margin-left:auto" onclick="diToi(\'chu-de&cd=' + t.cd + '\')">← Danh sách</button></div>';
+}
+function veNV() {
+  var p = document.getElementById("bangNV"), t = TT.t;
+  TT.lan = 0; TT.xong = false;
+  if (TT.b >= t.nv.length) { veLoiEm(p); return; }
+  var nv = t.nv[TT.b], h = chamTienTrinh() + '<div class="hoi">' + e(nv.hoi) + '</div><div id="vung"></div><div id="baoKQ"></div><div class="hang-nut" id="hangNut"></div>';
+  p.innerHTML = h;
+  ({ "chon": veChon, "chon-nhieu": veChonNhieu, "phan-loai": vePhanLoai, "xep": veXep, "ngan-sach": veNganSach })[nv.loai](nv);
+}
+function baoKQ(tot, chu) {
+  document.getElementById("baoKQ").innerHTML = '<div class="loi-bao ' + (tot ? "tot" : "chua") + '"><span style="font-size:30px">' + (tot ? "🎉" : "🤔") + '</span><span>' + chu + '</span></div>';
+}
+function ketThucNV(dung) {
+  TT.lan++;
+  if (dung) {
+    if (!TT.xong) { TT.xong = true; ghiLuot(TT.t.id, TT.b, TT.lan === 1, TT.lan); }
+    am("dung"); phaoGiay();
+    document.getElementById("hangNut").innerHTML = '<button class="nut" onclick="TT.b++;veNV()">' + (TT.b + 1 < TT.t.nv.length ? "Nhiệm vụ tiếp ▶" : "Viết lời của em ✍") + '</button>';
+  } else am("sai");
+}
+function chuCai(i) { return "ABCDEFGH".charAt(i); }
+function tron(a) { a = a.slice(); for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var x = a[i]; a[i] = a[j]; a[j] = x; } return a; }
+
+/* chọn một */
+function veChon(nv) {
+  var v = document.getElementById("vung");
+  v.innerHTML = nv.chon.map(function (c, i) { return '<button class="pa" data-i="' + i + '" onclick="bamChon(' + i + ')"><span class="chu-cai">' + chuCai(i) + '</span><span>' + e(c.t) + '<span class="giai"></span></span></button>'; }).join("");
+  if (TT.q.chon !== undefined) bamChon(+TT.q.chon);
+}
+function bamChon(i) {
+  if (TT.xong) return;
+  var nv = TT.t.nv[TT.b], c = nv.chon[i], o = document.querySelector('.pa[data-i="' + i + '"]');
+  o.classList.remove("sai"); void o.offsetWidth;
+  o.classList.add(c.d ? "dung" : "sai");
+  o.querySelector(".giai").textContent = (c.d ? "✔ " : "✘ ") + c.g;
+  if (c.d) baoKQ(true, "Chính xác! " + (TT.lan === 0 ? "Em chọn đúng ngay lần đầu ⭐" : "Em đã tìm ra cách hợp lí."));
+  else baoKQ(false, "Chưa hợp lí — đọc lí do ngay dưới phương án " + chuCai(i) + " rồi chọn lại nhé.");
+  ketThucNV(!!c.d);
+}
+
+/* chọn nhiều */
+function veChonNhieu(nv) {
+  TT.thuTu = tron(nv.chon.map(function (_, i) { return i; }));
+  document.getElementById("vung").innerHTML = TT.thuTu.map(function (i, k) { return '<button class="pa" data-i="' + i + '" onclick="this.classList.toggle(\'chon\');this.classList.remove(\'dung\',\'sai\');this.querySelector(\'.giai\').textContent=\'\'"><span class="chu-cai">' + chuCai(k) + '</span><span>' + e(nv.chon[i].t) + '<span class="giai"></span></span></button>'; }).join("");
+  document.getElementById("hangNut").innerHTML = '<button class="nut" onclick="kiemChonNhieu()">Kiểm tra ✔</button>';
+}
+function kiemChonNhieu() {
+  if (TT.xong) return;
+  var nv = TT.t.nv[TT.b], dungHet = true;
+  document.querySelectorAll("#vung .pa").forEach(function (o) {
+    var c = nv.chon[+o.dataset.i], chon = o.classList.contains("chon"), dung = chon === !!c.d;
+    if (!dung) dungHet = false;
+    if (chon || !dung) { o.classList.add(dung ? "dung" : "sai"); o.querySelector(".giai").textContent = (dung ? "✔ " : (chon ? "✘ Không nên chọn: " : "✘ Em bỏ sót: ")) + c.g; }
+  });
+  if (dungHet) baoKQ(true, "Tuyệt vời! Em đã chọn đủ và đúng.");
+  else baoKQ(false, "Còn chỗ chưa đúng: ô đỏ là chọn nhầm hoặc bỏ sót. Bấm để sửa rồi kiểm tra lại.");
+  ketThucNV(dungHet);
+}
+
+/* phân loại */
+var thePL = null;
+function vePhanLoai(nv) {
+  var mau = ["#16a34a", "#dc2626", "#0ea5e9", "#a855f7"];
+  if (nv.thung.length === 2 && /Tích cực/.test(nv.thung[0]) === false) mau = ["#0ea5e9", "#f97316"];
+  if (nv.thung.length >= 3) mau = ["#0ea5e9", "#f97316", "#ec4899", "#16a34a"];
+  var h = '<div style="font-weight:700;color:var(--chu2);margin-bottom:6px">👆 Chạm một thẻ rồi chạm vào ô đúng (hoặc kéo thả).</div><div class="kho" id="kho" ondragover="event.preventDefault()" ondrop="thaVao(event,-1)" onclick="chamThung(-1)">'
+    + tron(nv.the.map(function (_, i) { return i; })).map(function (i) { return '<div class="the-pl" draggable="true" data-i="' + i + '" ondragstart="event.dataTransfer.setData(\'text\',' + i + ')" onclick="chonThe(event,' + i + ')">' + e(nv.the[i].t) + '<small></small></div>'; }).join("")
+    + '</div><div class="thung-hang" style="grid-template-columns:repeat(' + nv.thung.length + ',1fr)">'
+    + nv.thung.map(function (tn, k) { return '<div class="thung" style="--tm:' + mau[k] + '" data-k="' + k + '" ondragover="event.preventDefault();this.classList.add(\'sang\')" ondragleave="this.classList.remove(\'sang\')" ondrop="thaVao(event,' + k + ')" onclick="chamThung(' + k + ')"><h4>' + e(tn) + '</h4></div>'; }).join("") + '</div>';
+  document.getElementById("vung").innerHTML = h;
+  document.getElementById("hangNut").innerHTML = '<button class="nut" onclick="kiemPhanLoai()">Kiểm tra ✔</button>';
+  thePL = null;
+}
+function chonThe(ev, i) {
+  ev.stopPropagation();
+  document.querySelectorAll(".the-pl").forEach(function (o) { o.classList.remove("chon"); });
+  thePL = thePL === i ? null : i;
+  if (thePL !== null) document.querySelector('.the-pl[data-i="' + i + '"]').classList.add("chon");
+}
+function datThe(i, k) {
+  var o = document.querySelector('.the-pl[data-i="' + i + '"]');
+  o.classList.remove("chon", "dung", "sai"); o.querySelector("small").textContent = "";
+  (k < 0 ? document.getElementById("kho") : document.querySelector('.thung[data-k="' + k + '"]')).appendChild(o);
+}
+function chamThung(k) { if (thePL === null) return; datThe(thePL, k); thePL = null; }
+function thaVao(ev, k) { ev.preventDefault(); ev.stopPropagation(); document.querySelectorAll(".thung").forEach(function (o) { o.classList.remove("sang"); }); datThe(+ev.dataTransfer.getData("text"), k); }
+function kiemPhanLoai() {
+  if (TT.xong) return;
+  var nv = TT.t.nv[TT.b];
+  if (document.querySelectorAll("#kho .the-pl").length) { baoKQ(false, "Còn thẻ chưa xếp. Hãy xếp hết các thẻ vào ô rồi kiểm tra."); am("sai"); return; }
+  var dungHet = true;
+  document.querySelectorAll(".thung").forEach(function (th) {
+    var k = +th.dataset.k;
+    th.querySelectorAll(".the-pl").forEach(function (o) {
+      var c = nv.the[+o.dataset.i], d = c.th === k; if (!d) dungHet = false;
+      o.classList.add(d ? "dung" : "sai"); o.querySelector("small").textContent = (d ? "✔ " : "✘ Thuộc ô “" + nv.thung[c.th] + "”: ") + c.g;
+    });
+  });
+  if (dungHet) baoKQ(true, "Xếp đúng hết! Em phân biệt rất rõ.");
+  else baoKQ(false, "Thẻ đỏ đang ở nhầm ô. Đọc gợi ý trên thẻ, kéo sang ô đúng rồi kiểm tra lại.");
+  ketThucNV(dungHet);
+}
+
+/* xếp bước */
+function veXep(nv) {
+  var tt = tron(nv.buoc.map(function (_, i) { return i; }));
+  for (var g = 0; g < 5 && tt.every(function (x, i) { return x === i; }); g++) tt = tron(tt);
+  document.getElementById("vung").innerHTML = '<div style="font-weight:700;color:var(--chu2);margin-bottom:6px">↕ Dùng nút ▲▼ hoặc kéo thả để xếp từ bước đầu đến bước cuối.</div><ul class="xep" id="dsXep">' + tt.map(function (i) { return liXep(nv, i); }).join("") + '</ul>';
+  danhSo();
+  document.getElementById("hangNut").innerHTML = '<button class="nut" onclick="kiemXep()">Kiểm tra ✔</button>';
+  var ds = document.getElementById("dsXep"), keo = null;
+  ds.addEventListener("dragstart", function (ev) { keo = ev.target.closest("li"); keo.classList.add("keo"); });
+  ds.addEventListener("dragend", function () { if (keo) keo.classList.remove("keo"); keo = null; danhSo(); });
+  ds.addEventListener("dragover", function (ev) { ev.preventDefault(); var li = ev.target.closest("li"); if (!li || !keo || li === keo) return; var r = li.getBoundingClientRect(); ds.insertBefore(keo, ev.clientY > r.top + r.height / 2 ? li.nextSibling : li); });
+  if (TT.q.kiem) { if (TT.q.kiem === "dung") { nv.buoc.forEach(function (_, i) { ds.appendChild(ds.querySelector('li[data-i="' + i + '"]')); }); danhSo(); } kiemXep(); }
+}
+function liXep(nv, i) { return '<li draggable="true" data-i="' + i + '"><span class="so"></span><span class="chu">' + e(nv.buoc[i]) + '</span><span class="mui"><button onclick="doiCho(this,-1)" title="Lên">▲</button><button onclick="doiCho(this,1)" title="Xuống">▼</button></span></li>'; }
+function danhSo() { document.querySelectorAll("#dsXep li").forEach(function (li, k) { li.querySelector(".so").textContent = k + 1; li.classList.remove("dung", "sai"); }); }
+function doiCho(nut, d) {
+  if (TT.xong) return;
+  var li = nut.closest("li"), ds = li.parentNode;
+  if (d < 0 && li.previousElementSibling) ds.insertBefore(li, li.previousElementSibling);
+  if (d > 0 && li.nextElementSibling) ds.insertBefore(li.nextElementSibling, li);
+  danhSo();
+}
+function kiemXep() {
+  if (TT.xong) return;
+  var dungHet = true, sai = 0;
+  document.querySelectorAll("#dsXep li").forEach(function (li, k) { var d = +li.dataset.i === k; if (!d) { dungHet = false; sai++; } li.classList.add(d ? "dung" : "sai"); });
+  if (dungHet) baoKQ(true, "Đúng thứ tự rồi! Làm theo các bước này, việc sẽ trôi chảy.");
+  else baoKQ(false, "Có " + sai + " bước đang ở sai vị trí (màu đỏ). Gợi ý: việc nào cần làm TRƯỚC để việc sau làm được?");
+  ketThucNV(dungHet);
+}
+
+/* ngân sách */
+var MUC = [{ t: "Chi thiết yếu (ăn sáng, học tập…)", m: "#0ea5e9" }, { t: "Chi sở thích (vui chơi, giải trí…)", m: "#f97316" }, { t: "Cho, tặng (quà, từ thiện…)", m: "#ec4899" }, { t: "Tiết kiệm", m: "#16a34a" }];
+function tien(x) { return Math.round(x).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") + " đ"; }
+function veNganSach(nv) {
+  var bd = nv.dich ? [40, 20, 10, 30] : [50, 20, 10, 20];
+  var h = '<div class="thu-nhap">💵 Thu mỗi tháng: ' + tien(nv.thu) + ' <span style="font-weight:600;color:#047857">(' + e(nv.nguon) + ')</span></div><div class="ns"><div>'
+    + MUC.map(function (u, i) { return '<div class="dong-ns" style="--mm:' + u.m + '"><label><span style="color:' + u.m + '">● ' + u.t + '</span><span><b id="pt' + i + '">' + bd[i] + '%</b> · <span class="tien" id="tt' + i + '"></span></span></label><input type="range" min="0" max="100" step="5" value="' + bd[i] + '" id="tr' + i + '" oninput="capNhatNS()"></div>'; }).join("")
+    + '<div class="tong" id="tong"></div></div><div style="text-align:center"><svg id="banh" width="200" height="200" viewBox="0 0 200 200"></svg></div></div>'
+    + '<ul class="tieu-chi" id="tieuChi"></ul>'
+    + '<div style="font-size:13px;color:var(--chu2);margin-top:6px">' + (nv.dich ? "Mục tiêu: đặt đúng tỉ lệ Trang đã định (SGK tr.24)." : "Tiêu chí là gợi ý của app dựa trên các bước SGK tr.25: biết khoản thu, ưu tiên chi thiết yếu, có cho tặng, có tiết kiệm, cân đối thu – chi.") + '</div>';
+  document.getElementById("vung").innerHTML = h;
+  document.getElementById("hangNut").innerHTML = '<button class="nut" onclick="kiemNS()">Kiểm tra ✔</button>';
+  if (TT.q.mau) { var mm = nv.dich || [45, 15, 10, 30]; mm.forEach(function (v, i) { document.getElementById("tr" + i).value = v; }); }
+  capNhatNS();
+}
+function layPT() { return [0, 1, 2, 3].map(function (i) { return +document.getElementById("tr" + i).value; }); }
+function capNhatNS() {
+  var nv = TT.t.nv[TT.b], p = layPT(), s = p.reduce(function (a, b) { return a + b; }, 0);
+  p.forEach(function (v, i) { document.getElementById("pt" + i).textContent = v + "%"; document.getElementById("tt" + i).textContent = tien(nv.thu * v / 100); });
+  var tg = document.getElementById("tong");
+  tg.className = "tong " + (s === 100 ? "ok" : s > 100 ? "vuot" : "thieu");
+  tg.textContent = s === 100 ? "✔ Cân đối: tổng 100% = " + tien(nv.thu) : s > 100 ? "⚠ Vượt " + (s - 100) + "%: chi nhiều hơn thu " + tien(nv.thu * (s - 100) / 100) : "Còn " + (100 - s) + "% (" + tien(nv.thu * (100 - s) / 100) + ") chưa phân bổ";
+  var g = "", goc = -Math.PI / 2, tong = Math.max(s, 100);
+  p.forEach(function (v, i) {
+    if (!v) return; var a = v / tong * 2 * Math.PI, x1 = 100 + 80 * Math.cos(goc), y1 = 100 + 80 * Math.sin(goc), x2 = 100 + 80 * Math.cos(goc + a), y2 = 100 + 80 * Math.sin(goc + a);
+    g += v >= tong ? '<circle cx="100" cy="100" r="80" fill="' + MUC[i].m + '"/>' : '<path d="M100 100 L' + x1 + ' ' + y1 + ' A80 80 0 ' + (a > Math.PI ? 1 : 0) + ' 1 ' + x2 + ' ' + y2 + 'Z" fill="' + MUC[i].m + '" stroke="#fff" stroke-width="2"/>';
+    goc += a;
+  });
+  if (s < 100) { var a2 = (100 - s) / 100 * 2 * Math.PI; g += '<path d="M100 100 L' + (100 + 80 * Math.cos(goc)) + ' ' + (100 + 80 * Math.sin(goc)) + ' A80 80 0 ' + (a2 > Math.PI ? 1 : 0) + ' 1 ' + (100 + 80 * Math.cos(goc + a2)) + ' ' + (100 + 80 * Math.sin(goc + a2)) + 'Z" fill="#e2e8f0"/>'; }
+  g += '<circle cx="100" cy="100" r="44" fill="#fff"/><text x="100" y="98" text-anchor="middle" font-size="22" font-weight="900" fill="' + (s === 100 ? "#16a34a" : "#dc2626") + '">' + s + '%</text><text x="100" y="118" text-anchor="middle" font-size="11" font-weight="700" fill="#64748b">đã phân bổ</text>';
+  document.getElementById("banh").innerHTML = g;
+}
+function kiemNS() {
+  if (TT.xong) return;
+  var nv = TT.t.nv[TT.b], p = layPT(), s = p.reduce(function (a, b) { return a + b; }, 0), ds;
+  if (nv.dich) {
+    ds = [[s === 100, "Tổng đúng 100% (cân đối thu – chi)"]].concat(MUC.map(function (u, i) { return [p[i] === nv.dich[i], u.t.split(" (")[0] + ": " + nv.dich[i] + "%" + (p[i] === nv.dich[i] ? " = " + tien(nv.thu * nv.dich[i] / 100) : (i === 2 ? " (quà 10% + từ thiện 5%)" : ""))]; }));
+  } else {
+    ds = [[s === 100, "Tổng đúng 100%: không chi vượt thu, không để tiền “trôi nổi”"], [p[0] >= p[1], "Chi thiết yếu được ưu tiên hơn chi sở thích"], [p[2] > 0, "Có khoản cho, tặng"], [p[3] >= 10, "Tiết kiệm ít nhất 10%"]];
+  }
+  document.getElementById("tieuChi").innerHTML = ds.map(function (d) { return '<li style="color:' + (d[0] ? "#16a34a" : "#dc2626") + '">' + (d[0] ? "✔ " : "✘ ") + e(d[1]) + '</li>'; }).join("");
+  var ok = ds.every(function (d) { return d[0]; });
+  if (ok) baoKQ(true, nv.dich ? "Đúng tỉ lệ của Trang! 240 000 + 20 000 + 60 000 + 80 000 = 400 000 đ." : "Ngân sách hợp lí! Em đã cân đối thu – chi.");
+  else baoKQ(false, "Chưa đạt tiêu chí màu đỏ. Kéo lại các thanh rồi kiểm tra.");
+  ketThucNV(ok);
+}
+
+/* lời của em */
+function veLoiEm(p) {
+  var t = TT.t, cu_ = KHO.loi.filter(function (l) { return l.id === t.id && l.ma === KHO.ma; }).pop();
+  p.innerHTML = chamTienTrinh() + '<div class="cu">' + cu(86) + '<div class="bong-noi">' + e(t.loi) + '</div></div>'
+    + '<div class="loi-em" style="margin-top:12px"><textarea id="oLoi" maxlength="600" placeholder="Viết 1–3 câu bằng lời của em… (không ghi họ tên ai)">' + e(cu_ ? cu_.text : "") + '</textarea></div>'
+    + '<div style="font-size:13px;color:var(--chu2);margin-top:4px">Phần này không chấm điểm. Thầy cô xem trong file xuất.</div>'
+    + '<div class="hang-nut"><button class="nut phu" onclick="hoanThanh(false)">Bỏ qua</button><button class="nut" onclick="hoanThanh(true)">Lưu và hoàn thành ⭐</button></div>';
+}
+function hoanThanh(luu) {
+  var t = TT.t, v = (document.getElementById("oLoi").value || "").trim();
+  if (luu && v) { KHO.loi.push({ ma: KHO.ma || "Chưa có mã", id: t.id, text: v, t: new Date().toISOString() }); ghiKho(); }
+  var ds = DL.tinh_huong.filter(function (x) { return x.cd === t.cd; }), k = ds.indexOf(t), sau = ds[k + 1];
+  var dungNgay = KHO.luot.filter(function (l) { return l.id === t.id && l.ma === (KHO.ma || "Chưa có mã"); }).slice(-t.nv.length).filter(function (l) { return l.dung; }).length;
+  var sao = 1 + (dungNgay >= Math.ceil(t.nv.length / 2) ? 1 : 0) + (luu && v ? 1 : 0);
+  am("xong"); phaoGiay();
+  document.getElementById("bangNV").innerHTML = '<div class="hoan-thanh">' + cu(110) + '<div class="sao">' + "⭐".repeat(sao) + '<span style="opacity:.25">' + "⭐".repeat(3 - sao) + '</span></div><h2>Hoàn thành “' + e(t.ten) + '”!</h2><p style="font-size:17px;color:var(--chu2)">⭐ làm xong · ⭐ đúng ngay lần đầu · ⭐ viết lời của em</p><div class="hang-nut" style="justify-content:center">'
+    + '<button class="nut phu" onclick="diToi(\'chu-de&cd=' + t.cd + '\')">← Chủ đề ' + t.cd + '</button>' + (sau ? '<button class="nut" onclick="diToi(\'th&id=' + sau.id + '\')">Tình huống tiếp ▶</button>' : '<button class="nut" onclick="diToi(\'trang-chu\')">Chọn chủ đề khác ▶</button>') + '</div></div>';
+}
+
+/* ---------------- GIÁO VIÊN ---------------- */
+function duLieuThu() {
+  var luot = [], loi = [], ma = ["Nhóm 1", "Nhóm 2", "Nhóm 3", "Nhóm 4", "Nhóm 5", "Nhóm 6"], r = 7;
+  function ng() { r = (r * 9301 + 49297) % 233280; return r / 233280; }
+  DL.tinh_huong.forEach(function (t, k) { ma.forEach(function (m) { t.nv.forEach(function (_, i) { var kho = (t.cd === 4 && i === 1) || t.id === "c3-t8" || t.id === "c2-t4" ? .45 : .78; var d = ng() < kho; luot.push({ ma: m, id: t.id, nv: i, dung: d ? 1 : 0, lan: d ? 1 : 2 + Math.floor(ng() * 2), t: "2026-11-2" + (k % 5) + "T08:00:00" }); }); }); });
+  return { luot: luot, loi: loi };
+}
+function thongKe(kho) {
+  var theo = {};
+  kho.luot.forEach(function (l) { var k = l.id + "|" + l.nv; theo[k] = theo[k] || { id: l.id, nv: l.nv, n: 0, d: 0, lan: 0 }; theo[k].n++; theo[k].d += l.dung; theo[k].lan += l.lan; });
+  return theo;
+}
+function veGV(m, q) {
+  var kho = q.mau ? duLieuThu() : KHO, tk = thongKe(kho), ds = Object.keys(tk).map(function (k) { return tk[k]; });
+  var tongN = kho.luot.length, tongD = kho.luot.reduce(function (a, l) { return a + l.dung; }, 0);
+  var soMa = {}; kho.luot.forEach(function (l) { soMa[l.ma] = 1; });
+  var h = (q.mau ? '<div class="dai-thu">DỮ LIỆU THỬ — CHỈ ĐỂ XEM GIAO DIỆN</div>' : '')
+    + '<div class="kinh" style="padding:18px"><div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap"><div style="font-size:34px">📊</div><div><h2 style="margin:0">Bảng của thầy cô</h2><div style="color:var(--chu2);font-weight:600">Dữ liệu nằm trong trình duyệt của máy này. Cuối tuần nhớ bấm “Sao lưu”.</div></div><button class="nut phu" style="margin-left:auto" onclick="diToi(\'trang-chu\')">← Trang chủ</button></div>'
+    + '<div class="kpi"><div style="--k:#4f46e5"><b>' + tongN + '</b><span>lượt làm nhiệm vụ</span></div><div style="--k:#0ea5e9"><b>' + Object.keys(soMa).length + '</b><span>mã HS / nhóm đã làm</span></div><div style="--k:#16a34a"><b>' + (tongN ? Math.round(100 * tongD / tongN) : 0) + '%</b><span>đúng ngay lần đầu</span></div><div style="--k:#ec4899"><b>' + kho.loi.length + '</b><span>“lời của em” đã viết</span></div></div>'
+    + '<h3 style="margin:16px 0 6px">Tỉ lệ đúng ngay lần đầu theo tình huống</h3><div class="thu"><canvas id="bieuDo"></canvas></div>'
+    + '<h3 style="margin:16px 0 6px">5 nhiệm vụ lớp hay chọn sai nhất → gợi ý nội dung cho tiết Sinh hoạt lớp</h3><table class="bang-sai"><tr><th>Tình huống</th><th>Nhiệm vụ</th><th>Số lượt</th><th>Đúng lần đầu</th></tr>'
+    + ds.filter(function (x) { return x.n; }).sort(function (a, b) { return a.d / a.n - b.d / b.n; }).slice(0, 5).map(function (x) { var t = TH[x.id]; return '<tr><td><b>' + e(t.ten) + '</b> <span class="huy">CĐ' + t.cd + ' · ' + t.trang + '</span></td><td>' + (x.nv + 1) + '. ' + e(t.nv[x.nv].hoi) + '</td><td>' + x.n + '</td><td style="font-weight:900;color:' + (x.d / x.n < .6 ? "#dc2626" : "#16a34a") + '">' + Math.round(100 * x.d / x.n) + '%</td></tr>'; }).join("")
+    + '</table>' + (ds.length ? '' : '<p style="color:var(--chu2)">Chưa có lượt làm nào trên máy này.</p>')
+    + '<div class="hang-nut" style="justify-content:flex-start"><button class="nut" onclick="xuatCSV()">⬇ Xuất kết quả (CSV)</button><button class="nut" onclick="xuatLoi()">⬇ Xuất lời của em (CSV)</button><button class="nut phu" onclick="saoLuu()">💾 Sao lưu</button><label class="nut phu" style="display:inline-flex;align-items:center">📂 Nhập sao lưu<input type="file" accept=".json" style="display:none" onchange="nhapSaoLuu(this)"></label><button class="nut phu" onclick="xoaDL()">🗑 Xoá dữ liệu</button></div></div>';
+  m.innerHTML = h;
+  veBieuDo(tk);
+}
+function veBieuDo(tk) {
+  var cv = document.getElementById("bieuDo"), r = cv.getBoundingClientRect(), dp = window.devicePixelRatio || 1;
+  cv.width = r.width * dp; cv.height = r.height * dp; var x = cv.getContext("2d"); x.scale(dp, dp);
+  var W = r.width, H = r.height, L = 40, B = 46, n = DL.tinh_huong.length, bw = (W - L - 10) / n;
+  x.font = "12px Segoe UI"; x.fillStyle = "#64748b"; x.strokeStyle = "#e2e8f0";
+  [0, 25, 50, 75, 100].forEach(function (v) { var y = H - B - (H - B - 14) * v / 100; x.beginPath(); x.moveTo(L, y); x.lineTo(W, y); x.stroke(); x.fillText(v + "%", 4, y + 4); });
+  DL.tinh_huong.forEach(function (t, i) {
+    var n_ = 0, d = 0; Object.keys(tk).forEach(function (k) { if (tk[k].id === t.id) { n_ += tk[k].n; d += tk[k].d; } });
+    var v = n_ ? d / n_ : 0, h = (H - B - 14) * v, x0 = L + i * bw + 3;
+    var g = x.createLinearGradient(0, H - B - h, 0, H - B); g.addColorStop(0, CD[t.cd].mau); g.addColorStop(1, "#ffffff");
+    x.fillStyle = n_ ? g : "#f1f5f9"; x.beginPath(); if (x.roundRect) x.roundRect(x0, H - B - h, bw - 6, h, 5); else x.rect(x0, H - B - h, bw - 6, h); x.fill();
+    x.save(); x.translate(x0 + (bw - 6) / 2, H - B + 8); x.rotate(Math.PI / 3); x.fillStyle = "#334155"; x.font = "11px Segoe UI"; x.fillText(t.id.replace("c", "CĐ").replace("-t", "-"), 0, 0); x.restore();
+  });
+}
+function taiFile(ten, noiDung, kieu) {
+  var a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([noiDung], { type: kieu })); a.download = ten; document.body.appendChild(a); a.click(); setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 500);
+}
+function oCSV(v) { v = String(v == null ? "" : v); return /[",\n;]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; }
+function ngayTen() { var d = new Date(); return d.getFullYear() + "-" + ("0" + (d.getMonth() + 1)).slice(-2) + "-" + ("0" + d.getDate()).slice(-2); }
+function xuatCSV() {
+  var dong = [["Ma", "ChuDe", "TinhHuong", "TrangSGK", "NhiemVu", "DungLanDau", "SoLanThu", "ThoiGian"]];
+  KHO.luot.forEach(function (l) { var t = TH[l.id]; if (t) dong.push([l.ma, t.cd, t.ten, t.trang, l.nv + 1, l.dung ? "Có" : "Không", l.lan, l.t]); });
+  taiFile("ket-qua-tinh-huong-HDTN8-" + ngayTen() + ".csv", "﻿" + dong.map(function (r) { return r.map(oCSV).join(","); }).join("\n"), "text/csv");
+}
+function xuatLoi() {
+  var dong = [["Ma", "ChuDe", "TinhHuong", "TrangSGK", "LoiCuaEm", "ThoiGian"]];
+  KHO.loi.forEach(function (l) { var t = TH[l.id]; if (t) dong.push([l.ma, t.cd, t.ten, t.trang, l.text, l.t]); });
+  taiFile("loi-cua-em-HDTN8-" + ngayTen() + ".csv", "﻿" + dong.map(function (r) { return r.map(oCSV).join(","); }).join("\n"), "text/csv");
+}
+function saoLuu() { taiFile("sao-luu-tinh-huong-HDTN8-" + ngayTen() + ".json", JSON.stringify(KHO), "application/json"); }
+function nhapSaoLuu(inp) {
+  var f = inp.files[0]; if (!f) return;
+  var r = new FileReader(); r.onload = function () { try { var k = JSON.parse(r.result); if (!k.luot) throw 0; KHO.luot = KHO.luot.concat(k.luot); KHO.loi = KHO.loi.concat(k.loi || []); ghiKho(); alert("Đã nhập thêm " + k.luot.length + " lượt."); ve(); } catch (e) { alert("File không đúng định dạng sao lưu của app."); } }; r.readAsText(f);
+}
+function xoaDL() { if (confirm("Xoá toàn bộ kết quả trên máy này? Nên bấm Sao lưu trước. Không khôi phục được.")) { KHO.luot = []; KHO.loi = []; ghiKho(); ve(); } }
+
+capNhatChip();
+ve();
+</script>
+</body>
+</html>
